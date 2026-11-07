@@ -167,7 +167,7 @@ Then pick your system in Step 2 and follow the **Already running SeerrNG** part.
 ### Step 2: Pick your system
 
 <details>
-<summary><img src="https://cdn.simpleicons.org/linux/333" width="14"> <b>Linux</b> (Ubuntu, Debian, Fedora, Raspberry Pi OS…)</summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/linux/eee"><img src="https://cdn.simpleicons.org/linux/333" width="14"></picture> <b>Linux</b> (Ubuntu, Debian, Fedora, Raspberry Pi OS…)</summary>
 
 <br>
 
@@ -180,7 +180,7 @@ docker compose version
 <blockquote>
 
 <details>
-<summary><img src="https://cdn.simpleicons.org/linux/333" width="14"> <b>New install</b> (SeerrNG + Lumen)</summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/linux/eee"><img src="https://cdn.simpleicons.org/linux/333" width="14"></picture> <b>New install</b> (SeerrNG + Lumen)</summary>
 
 <br>
 
@@ -197,7 +197,7 @@ docker compose ps                     # both seerrng and lumen should say "runni
 </details>
 
 <details>
-<summary><img src="https://cdn.simpleicons.org/linux/333" width="14"> <b>Already running SeerrNG</b></summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/linux/eee"><img src="https://cdn.simpleicons.org/linux/333" width="14"></picture> <b>Already running SeerrNG</b></summary>
 
 <br>
 
@@ -274,7 +274,7 @@ Open `http://localhost:5080` on the PC, or `http://<PC's IP>:5080` from a phone.
 </details>
 
 <details>
-<summary><img src="https://cdn.simpleicons.org/apple/333" width="14"> <b>macOS</b> (Docker Desktop)</summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/apple/eee"><img src="https://cdn.simpleicons.org/apple/333" width="14"></picture> <b>macOS</b> (Docker Desktop)</summary>
 
 <br>
 
@@ -287,7 +287,7 @@ docker compose version
 <blockquote>
 
 <details>
-<summary><img src="https://cdn.simpleicons.org/apple/333" width="14"> <b>New install</b> (SeerrNG + Lumen)</summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/apple/eee"><img src="https://cdn.simpleicons.org/apple/333" width="14"></picture> <b>New install</b> (SeerrNG + Lumen)</summary>
 
 <br>
 
@@ -303,7 +303,7 @@ docker compose ps
 </details>
 
 <details>
-<summary><img src="https://cdn.simpleicons.org/apple/333" width="14"> <b>Already running SeerrNG</b></summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/apple/eee"><img src="https://cdn.simpleicons.org/apple/333" width="14"></picture> <b>Already running SeerrNG</b></summary>
 
 <br>
 
@@ -444,7 +444,7 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
 </details>
 
 <details>
-<summary><img src="https://cdn.simpleicons.org/synology/B5B5B6" width="14"> <b>Synology</b> (Container Manager)</summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/synology/ddd"><img src="https://cdn.simpleicons.org/synology/555" width="14"></picture> <b>Synology</b> (Container Manager)</summary>
 
 <br>
 
