@@ -114,8 +114,8 @@ You'll need about 15 minutes. **Open the sections that match your setup**. Each 
 >     image: seerrng-lumen:local
 >     container_name: lumen
 >     environment:
->       SEERR_URL: http://seerrng:5055           # how Lumen reaches SeerrNG
->       SEERR_FULL_URL: http://192.168.1.50:5055 # where people open full SeerrNG
+>       SEERR_URL: http://seerrng:5055           # how Lumen talks to SeerrNG behind the scenes
+>       SEERR_FULL_URL: http://192.168.1.50:5055 # the address you'd type in your browser to open full SeerrNG
 >       LUMEN_TRUSTED_PROXIES: ''                # your reverse proxy's IP/subnet, if any
 >       LUMEN_REAL_IP_HEADER: X-Forwarded-For    # CF-Connecting-IP for Cloudflare Tunnel
 >     ports: [5080:80]
@@ -322,8 +322,8 @@ Each choice below has two routes:
        image: seerrng-lumen:local
        container_name: lumen
        environment:
-         SEERR_URL: http://192.168.1.50:5055        # your Unraid IP + SeerrNG's port
-         SEERR_FULL_URL: http://192.168.1.50:5055   # where people open full SeerrNG (or your SeerrNG domain)
+         SEERR_URL: http://192.168.1.50:5055        # how Lumen talks to SeerrNG behind the scenes: your Unraid IP + SeerrNG's port
+         SEERR_FULL_URL: http://192.168.1.50:5055   # the address you'd type in your browser to open full SeerrNG (or your SeerrNG domain)
          LUMEN_TRUSTED_PROXIES: ''                  # filled in at Step 2 if you use a reverse proxy or tunnel
          LUMEN_REAL_IP_HEADER: X-Forwarded-For
        ports:
@@ -368,8 +368,8 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
    - **Repository:** `seerrng-lumen:local`
    - **Network Type:** `bridge` (or the custom network your reverse proxy uses)
    - **Add another Path, Port, Variable…** → **Port**: container `80`, host `5080`
-   - **Variable** `SEERR_URL` = `http://<Unraid IP>:5055`
-   - **Variable** `SEERR_FULL_URL` = `http://<Unraid IP>:5055` (or your SeerrNG domain)
+   - **Variable** `SEERR_URL` = `http://<Unraid IP>:5055` (how Lumen talks to SeerrNG behind the scenes)
+   - **Variable** `SEERR_FULL_URL` = `http://<Unraid IP>:5055`, or your SeerrNG domain (the address you'd type in your browser to open full SeerrNG)
    - **Variable** `LUMEN_TRUSTED_PROXIES` = leave empty for now (see Step 2)
 3. **Apply**, then open `http://<Unraid IP>:5080`.
 
@@ -423,8 +423,8 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
        container_name: lumen
        depends_on: [seerrng]
        environment:
-         SEERR_URL: http://seerrng:5055
-         SEERR_FULL_URL: http://192.168.1.50:5055   # your Unraid IP
+         SEERR_URL: http://seerrng:5055             # how Lumen talks to SeerrNG behind the scenes (leave as is)
+         SEERR_FULL_URL: http://192.168.1.50:5055   # the address you'd type in your browser to open full SeerrNG: your Unraid IP
          LUMEN_TRUSTED_PROXIES: ''
          LUMEN_REAL_IP_HEADER: X-Forwarded-For
        ports:
@@ -554,8 +554,8 @@ sudo docker build -t seerrng-lumen:local https://github.com/snapetech-org/seerrn
 <br>
 
 - `TZ` (new install): your time zone, for example `America/New_York` or `Europe/Berlin`.
-- `SEERR_FULL_URL`: the address people type to open full SeerrNG, for example `http://192.168.1.50:5055` (the machine's IP, port 5055) or `https://seerr.example.com`. Lumen sends people there for pages it doesn't have, like settings and users.
-- `SEERR_URL` (adding Lumen to an existing SeerrNG): how Lumen reaches SeerrNG.
+- `SEERR_FULL_URL`: **the address you'd type in your browser to open full SeerrNG**, for example `http://192.168.1.50:5055` (the machine's IP, port 5055) or `https://seerr.example.com`. Lumen sends people there for pages it doesn't have, like settings and users.
+- `SEERR_URL`: **how Lumen talks to SeerrNG behind the scenes.** Nobody types this one into a browser; it can be a container name that only works between containers.
 
 | How SeerrNG runs | `SEERR_URL` |
 |---|---|
