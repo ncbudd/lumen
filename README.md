@@ -330,7 +330,9 @@ Each choice below has two routes:
          - 5080:80
        cap_drop: [ALL]
        security_opt: [no-new-privileges:true]
-       # Optional settings + logo (see "Settings for everyone"). Create the file first, then remove the #s:
+       # Optional: your settings file and logo. See "Settings for everyone" further down; leave these
+       # lines as they are until you've downloaded lumen-config.json. (":ro" means read-only; it isn't
+       # part of the file name.)
        # volumes:
        #   - /mnt/user/appdata/lumen/lumen-config.json:/usr/share/nginx/html/lumen-config.json:ro
        #   - /mnt/user/appdata/lumen/branding:/usr/share/nginx/html/branding:ro
@@ -737,6 +739,22 @@ Every person can change how Lumen works on their **You** page. As an admin you c
    ```
 
 Create the file **before** adding the lines: if it's missing, Docker makes a folder with that name and Lumen ignores it.
+
+- `:ro` at the end of each line means **read-only** (Lumen can read the files but never change them). It isn't part of the file name: the file is just `lumen-config.json`.
+- **No permissions to change.** Lumen only reads these files, so the usual defaults are fine. (The `chown 1000:1000` in the install steps is only for SeerrNG's own config folder.)
+- Use the downloaded file rather than an empty one. If you want to mount the folder before you've chosen anything, put `{}` in it.
+
+<details>
+<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>On Unraid</b></summary>
+
+<br>
+
+1. In **Terminal** (`>_`), make the folder: `mkdir -p /mnt/user/appdata/lumen/branding`
+2. Copy the downloaded `lumen-config.json` into `/mnt/user/appdata/lumen/`, for example over the network share `\<Unraid IP>ppdata\lumen` (with the appdata share exported) or with the **Dynamix File Manager** plugin. Put a logo or icon in `branding` if you want one.
+3. Open the `lumen` stack → **Edit Stack**, remove the `#` in front of the three `volumes` lines, **Ctrl+S**, then **Compose Up**.
+   Without Compose: edit the container and **Add another Path** for each: container `/usr/share/nginx/html/lumen-config.json` → host `/mnt/user/appdata/lumen/lumen-config.json` (Access Mode **Read Only**), and container `/usr/share/nginx/html/branding` → host `/mnt/user/appdata/lumen/branding`.
+
+</details>
 
 <details>
 <summary>What's in the file</summary>
