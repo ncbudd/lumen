@@ -559,7 +559,7 @@ sudo docker build -t seerrng-lumen:local https://github.com/snapetech-org/seerrn
   | Your setup | `SEERR_FULL_URL` |
   |---|---|
   | Full SeerrNG is only used at home | the machine's IP and port, e.g. `http://192.168.1.50:5055` |
-  | Full SeerrNG has its own domain (Cloudflare Tunnel or a reverse proxy) | that domain, e.g. `https://seerr.example.com` |
+  | Full SeerrNG has its own admin domain (protected, see Step 3) | that domain, e.g. `https://seerr.example.com` |
 
   With the IP, those links only work on your home network. With a domain, they work from anywhere. The domain must be a **different** one from Lumen's (see Step 2).
 - `SEERR_URL`: **how Lumen talks to SeerrNG behind the scenes.** Nobody types this one into a browser; it can be a container name that only works between containers.
@@ -583,7 +583,7 @@ If people reach SeerrNG through a domain today, point that domain at **Lumen** i
 | Address | Goes to | Who uses it |
 |---|---|---|
 | `https://requests.example.com` | Lumen | everyone |
-| `https://seerr.example.com` (or `http://192.168.1.50:5055`) | full SeerrNG, and `SEERR_FULL_URL` | admins |
+| `http://192.168.1.50:5055` (simplest and safest), or a second domain such as `https://seerr.example.com` that only admins can get through (e.g. Cloudflare Access) | full SeerrNG, and `SEERR_FULL_URL` | admins |
 
 Don't point both at Lumen: the Settings and Users links would just loop back into Lumen.
 
@@ -605,7 +605,7 @@ Nothing more to do. Share `http://<this-machine>:5080` with your family. Leave `
 2. Edit the hostname that pointed at SeerrNG (or add one) and change the **Service** to:
    - `http://lumen:80` if `cloudflared` runs in Docker on the same network as Lumen, or
    - `http://<LAN IP>:5080` otherwise.
-3. Give full SeerrNG its own hostname for admins, for example `seerr.example.com` → `http://seerrng:5055` (or keep it home-network only), and set `SEERR_FULL_URL` to that address, e.g. `https://seerr.example.com`.
+3. Keep full SeerrNG home-network only, or give it its own admin hostname (for example `seerr.example.com` → `http://seerrng:5055`) protected with a **Cloudflare Access** policy so only admins get through. Set `SEERR_FULL_URL` to that address.
 4. Tell Lumen to trust the tunnel. Set these on the Lumen service and run `docker compose up -d`:
 
    ```yaml
@@ -731,7 +731,7 @@ In full SeerrNG go to **Settings → Network**, turn on **Trust Reverse Proxy**,
 
 SeerrNG limits wrong-password attempts per visitor. With Lumen in front, every request reaches SeerrNG from Lumen, which passes on the real visitor's address. SeerrNG only reads it with this switch on. Without it, a few wrong passwords from one person could lock out everyone for a while.
 
-Keep SeerrNG's own port (5055) off the internet: don't port-forward it or point a public tunnel at it.
+Keep full SeerrNG off the open internet: don't port-forward 5055, and if it has its own domain, put a sign-in wall in front of it (for example Cloudflare Access) so only admins can reach it. Your family uses Lumen.
 
 </details>
 
