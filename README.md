@@ -750,7 +750,7 @@ Create the file **before** adding the lines: if it's missing, Docker makes a fol
 <br>
 
 1. In **Terminal** (`>_`), make the folder: `mkdir -p /mnt/user/appdata/lumen/branding`
-2. Copy the downloaded `lumen-config.json` into `/mnt/user/appdata/lumen/`, for example over the network share `\<Unraid IP>ppdata\lumen` (with the appdata share exported) or with the **Dynamix File Manager** plugin. Put a logo or icon in `branding` if you want one.
+2. Copy the downloaded `lumen-config.json` into `/mnt/user/appdata/lumen/`, for example over the network share `\\<Unraid IP>\appdata\lumen` (with the appdata share exported) or with the **Dynamix File Manager** plugin. Put a logo or icon in `branding` if you want one.
 3. Open the `lumen` stack → **Edit Stack**, remove the `#` in front of the three `volumes` lines, **Ctrl+S**, then **Compose Up**.
    Without Compose: edit the container and **Add another Path** for each: container `/usr/share/nginx/html/lumen-config.json` → host `/mnt/user/appdata/lumen/lumen-config.json` (Access Mode **Read Only**), and container `/usr/share/nginx/html/branding` → host `/mnt/user/appdata/lumen/branding`.
 
