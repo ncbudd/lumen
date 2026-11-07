@@ -177,8 +177,10 @@ Then pick your system in Step 2 and follow the **Already running SeerrNG** part.
 docker compose version
 ```
 
+<blockquote>
+
 <details>
-<summary><b>New install</b> (SeerrNG + Lumen)</summary>
+<summary><img src="https://cdn.simpleicons.org/linux/333" width="14"> <b>New install</b> (SeerrNG + Lumen)</summary>
 
 <br>
 
@@ -195,7 +197,7 @@ docker compose ps                     # both seerrng and lumen should say "runni
 </details>
 
 <details>
-<summary><b>Already running SeerrNG</b></summary>
+<summary><img src="https://cdn.simpleicons.org/linux/333" width="14"> <b>Already running SeerrNG</b></summary>
 
 <br>
 
@@ -212,6 +214,8 @@ docker compose up -d
 
 </details>
 
+</blockquote>
+
 Open `http://<this-machine>:5080`.
 
 </details>
@@ -227,8 +231,10 @@ Open `http://<this-machine>:5080`.
 docker compose version
 ```
 
+<blockquote>
+
 <details>
-<summary><b>New install</b> (SeerrNG + Lumen)</summary>
+<summary>🪟 <b>New install</b> (SeerrNG + Lumen)</summary>
 
 <br>
 
@@ -246,7 +252,7 @@ For `SEERR_FULL_URL`, use your PC's IP (run `ipconfig`, look for **IPv4 Address*
 </details>
 
 <details>
-<summary><b>Already running SeerrNG</b></summary>
+<summary>🪟 <b>Already running SeerrNG</b></summary>
 
 <br>
 
@@ -260,6 +266,8 @@ docker compose up -d
 SeerrNG installed directly on Windows (not in Docker)? Use `SEERR_URL: http://host.docker.internal:5055`.
 
 </details>
+
+</blockquote>
 
 Open `http://localhost:5080` on the PC, or `http://<PC's IP>:5080` from a phone. If phones can't connect, allow port 5080 through Windows Firewall when prompted.
 
@@ -276,8 +284,10 @@ Open `http://localhost:5080` on the PC, or `http://<PC's IP>:5080` from a phone.
 docker compose version
 ```
 
+<blockquote>
+
 <details>
-<summary><b>New install</b> (SeerrNG + Lumen)</summary>
+<summary><img src="https://cdn.simpleicons.org/apple/333" width="14"> <b>New install</b> (SeerrNG + Lumen)</summary>
 
 <br>
 
@@ -293,7 +303,7 @@ docker compose ps
 </details>
 
 <details>
-<summary><b>Already running SeerrNG</b></summary>
+<summary><img src="https://cdn.simpleicons.org/apple/333" width="14"> <b>Already running SeerrNG</b></summary>
 
 <br>
 
@@ -306,6 +316,8 @@ docker compose up -d
 
 </details>
 
+</blockquote>
+
 Open `http://localhost:5080`, or `http://<Mac's IP>:5080` from a phone (System Settings → Wi-Fi → Details shows the IP).
 
 </details>
@@ -317,8 +329,10 @@ Open `http://localhost:5080`, or `http://<Mac's IP>:5080` from a phone (System S
 
 The easiest route is the **[Compose Manager Plus](https://ca.unraid.net/apps/compose-manager-plus-0wft8je0ra0zhy)** plugin ([GitHub](https://github.com/mstrhakr/compose_plugin)): you paste one block of text and press a button. It replaces the older Compose Manager plugin and picks up any stacks you already have. If you'd rather not add a plugin, use **Add Container** further down.
 
+<blockquote>
+
 <details open>
-<summary><b>Easy route: Compose Manager Plus</b> (recommended)</summary>
+<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>Unraid with Compose Manager Plus</b> (easy route, recommended)</summary>
 
 <br>
 
@@ -403,7 +417,7 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
 </details>
 
 <details>
-<summary><b>Without Compose (Add Container)</b></summary>
+<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>Unraid without Compose</b> (Add Container)</summary>
 
 <br>
 
@@ -424,6 +438,8 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
 3. **Apply**. To update later, run the `docker build` line again and restart the container.
 
 </details>
+
+</blockquote>
 
 </details>
 
