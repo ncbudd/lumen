@@ -124,47 +124,9 @@ You'll need about 15 minutes. **Open the sections that match your setup**. Each 
 
 There is no prebuilt Lumen image yet. Docker builds it from SeerrNG's code the first time it starts, which takes a few minutes. After that, starting is instant.
 
-### Step 1: Do you already run SeerrNG?
+### Step 1: Pick your system
 
-<details>
-<summary><b>No, I'm starting fresh</b>: install SeerrNG and Lumen together</summary>
-
-<br>
-
-You'll use one compose file that runs both. Pick your system in Step 2 and follow the **New install** part.
-
-You'll set two addresses in the file:
-
-- `TZ`: your time zone, for example `America/New_York` or `Europe/Berlin`.
-- `SEERR_FULL_URL`: the address people type to reach full SeerrNG, for example `http://192.168.1.50:5055` (this machine's IP, port 5055) or `https://seerr.example.com`.
-
-After it starts, open `http://<this-machine>:5055` and finish SeerrNG's setup wizard: sign in with your Plex, Jellyfin or Emby account, connect the server, and add Sonarr and Radarr. SeerrNG's [getting started guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started) walks through it.
-
-</details>
-
-<details>
-<summary><b>Yes, SeerrNG is already running</b>: add Lumen next to it</summary>
-
-<br>
-
-Your SeerrNG and its settings stay exactly as they are, apart from one switch (Step 4). You only add one container.
-
-Lumen needs to know where SeerrNG is (`SEERR_URL`):
-
-| How SeerrNG runs | `SEERR_URL` |
-|---|---|
-| Docker Compose, and you'll add Lumen **to the same file** | `http://seerrng:5055` (your SeerrNG service name) |
-| Docker, in a different compose file or `docker run` (Unraid templates too) | `http://<machine's LAN IP>:5055`, e.g. `http://192.168.1.50:5055` |
-| Installed directly on the same machine (Windows, Linux package, Snap) | `http://host.docker.internal:5055` with Docker Desktop, otherwise the LAN IP |
-| On another machine | `http://<that machine's IP>:5055` |
-
-If you changed SeerrNG's port, use yours instead of 5055. `SEERR_FULL_URL` is where people open full SeerrNG in their browser, often the same address or your SeerrNG domain.
-
-Then pick your system in Step 2 and follow the **Already running SeerrNG** part.
-
-</details>
-
-### Step 2: Pick your system
+Open your system, then choose **New install** if you don't have SeerrNG yet, or **SeerrNG already running** to add Lumen next to the one you have. Adding Lumen leaves your SeerrNG and its settings as they are, apart from one switch in Step 3.
 
 <details>
 <summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/linux/eee"><img src="https://cdn.simpleicons.org/linux/333" width="14"></picture> <b>Linux</b> (Ubuntu, Debian, Fedora, Raspberry Pi OS…)</summary>
@@ -180,7 +142,7 @@ docker compose version
 <blockquote>
 
 <details>
-<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/linux/eee"><img src="https://cdn.simpleicons.org/linux/333" width="14"></picture> <b>New install</b> (SeerrNG + Lumen)</summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/linux/eee"><img src="https://cdn.simpleicons.org/linux/333" width="14"></picture> <b>New install</b>: SeerrNG and Lumen together</summary>
 
 <br>
 
@@ -194,16 +156,18 @@ docker compose up -d
 docker compose ps                     # both seerrng and lumen should say "running"
 ```
 
+Then open `http://<this-machine>:5055` and finish SeerrNG's setup wizard ([guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started)). Lumen is at `http://<this-machine>:5080`.
+
 </details>
 
 <details>
-<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/linux/eee"><img src="https://cdn.simpleicons.org/linux/333" width="14"></picture> <b>Already running SeerrNG</b></summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/linux/eee"><img src="https://cdn.simpleicons.org/linux/333" width="14"></picture> <b>SeerrNG already running</b>: add Lumen</summary>
 
 <br>
 
-**SeerrNG is in a compose file:** add the `lumen` block from the quick start above under `services:`, lined up with `seerrng:`, then run `docker compose up -d` in that folder.
+**If SeerrNG is in a compose file,** add the `lumen` block from the quick start above under `services:`, lined up with `seerrng:`, then run `docker compose up -d` in that folder.
 
-**Anything else:**
+**Otherwise,** give Lumen its own folder:
 
 ```sh
 mkdir ~/lumen && cd ~/lumen
@@ -212,11 +176,11 @@ nano compose.yaml   # set SEERR_URL and SEERR_FULL_URL
 docker compose up -d
 ```
 
+Open `http://<this-machine>:5080`.
+
 </details>
 
 </blockquote>
-
-Open `http://<this-machine>:5080`.
 
 </details>
 
@@ -234,7 +198,7 @@ docker compose version
 <blockquote>
 
 <details>
-<summary>🪟 <b>New install</b> (SeerrNG + Lumen)</summary>
+<summary>🪟 <b>New install</b>: SeerrNG and Lumen together</summary>
 
 <br>
 
@@ -247,12 +211,12 @@ docker compose up -d
 docker compose ps
 ```
 
-For `SEERR_FULL_URL`, use your PC's IP (run `ipconfig`, look for **IPv4 Address**), for example `http://192.168.1.50:5055`.
+For `SEERR_FULL_URL`, use your PC's IP (run `ipconfig`, look for **IPv4 Address**), for example `http://192.168.1.50:5055`. Then open `http://localhost:5055` and finish SeerrNG's setup wizard ([guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started)).
 
 </details>
 
 <details>
-<summary>🪟 <b>Already running SeerrNG</b></summary>
+<summary>🪟 <b>SeerrNG already running</b>: add Lumen</summary>
 
 <br>
 
@@ -269,7 +233,7 @@ SeerrNG installed directly on Windows (not in Docker)? Use `SEERR_URL: http://ho
 
 </blockquote>
 
-Open `http://localhost:5080` on the PC, or `http://<PC's IP>:5080` from a phone. If phones can't connect, allow port 5080 through Windows Firewall when prompted.
+Open Lumen at `http://localhost:5080` on the PC, or `http://<PC's IP>:5080` from a phone. If phones can't connect, allow port 5080 through Windows Firewall when prompted.
 
 </details>
 
@@ -287,7 +251,7 @@ docker compose version
 <blockquote>
 
 <details>
-<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/apple/eee"><img src="https://cdn.simpleicons.org/apple/333" width="14"></picture> <b>New install</b> (SeerrNG + Lumen)</summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/apple/eee"><img src="https://cdn.simpleicons.org/apple/333" width="14"></picture> <b>New install</b>: SeerrNG and Lumen together</summary>
 
 <br>
 
@@ -300,10 +264,12 @@ docker compose up -d
 docker compose ps
 ```
 
+Then open `http://localhost:5055` and finish SeerrNG's setup wizard ([guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started)).
+
 </details>
 
 <details>
-<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/apple/eee"><img src="https://cdn.simpleicons.org/apple/333" width="14"></picture> <b>Already running SeerrNG</b></summary>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/apple/eee"><img src="https://cdn.simpleicons.org/apple/333" width="14"></picture> <b>SeerrNG already running</b>: add Lumen</summary>
 
 <br>
 
@@ -318,7 +284,7 @@ docker compose up -d
 
 </blockquote>
 
-Open `http://localhost:5080`, or `http://<Mac's IP>:5080` from a phone (System Settings → Wi-Fi → Details shows the IP).
+Open Lumen at `http://localhost:5080`, or `http://<Mac's IP>:5080` from a phone (System Settings → Wi-Fi → Details shows the IP).
 
 </details>
 
@@ -327,88 +293,56 @@ Open `http://localhost:5080`, or `http://<Mac's IP>:5080` from a phone (System S
 
 <br>
 
-The easiest route is the **[Compose Manager Plus](https://ca.unraid.net/apps/compose-manager-plus-0wft8je0ra0zhy)** plugin ([GitHub](https://github.com/mstrhakr/compose_plugin)): you paste one block of text and press a button. It replaces the older Compose Manager plugin and picks up any stacks you already have. If you'd rather not add a plugin, use **Add Container** further down.
+Each choice below has two routes:
+
+- **With [Compose Manager Plus](https://ca.unraid.net/apps/compose-manager-plus-0wft8je0ra0zhy)** ([GitHub](https://github.com/mstrhakr/compose_plugin)), the easy route: paste one block of text and press a button. Install it from the **Apps** tab. It replaces the older *Compose Manager* plugin (remove that first) and keeps any stacks you already have.
+- **Without Compose**: build the image once in the terminal and use **Add Container**.
 
 <blockquote>
 
-<details open>
-<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>Unraid with Compose Manager Plus</b> (easy route, recommended)</summary>
+<details>
+<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>SeerrNG already running</b>: add Lumen (the usual case)</summary>
 
 <br>
 
-1. **Apps** tab → search **Compose Manager Plus** → **Install**. (If the old *Compose Manager* is installed, remove it first; Plus keeps your stacks.)
-2. **Docker** tab → **Compose** section → **Add Stack** → name it `lumen` → **OK**. The editor opens.
-3. On the **Compose** tab, paste the block that fits you (below) and change the IP addresses to your Unraid server's IP. Press **Ctrl+S** to save.
-4. Press **Compose Up**. The first start builds Lumen, which takes a few minutes; you can close the window while it runs.
-5. Open `http://<Unraid IP>:5080`.
+<blockquote>
 
-**Already running SeerrNG** (the usual case: SeerrNG from Community Apps). Paste this:
+<details>
+<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>With Compose Manager Plus</b> (easy route, recommended)</summary>
 
-```yaml
-services:
-  lumen:
-    build: https://github.com/snapetech-org/seerrng.git#main:lumen
-    image: seerrng-lumen:local
-    container_name: lumen
-    environment:
-      SEERR_URL: http://192.168.1.50:5055        # your Unraid IP + SeerrNG's port
-      SEERR_FULL_URL: http://192.168.1.50:5055   # where people open full SeerrNG (or your SeerrNG domain)
-      LUMEN_TRUSTED_PROXIES: ''                  # filled in at Step 3 if you use a reverse proxy or tunnel
-      LUMEN_REAL_IP_HEADER: X-Forwarded-For
-    ports:
-      - 5080:80
-    cap_drop: [ALL]
-    security_opt: [no-new-privileges:true]
-    # Optional settings + logo (see "Settings for everyone"). Create the file first, then remove the #s:
-    # volumes:
-    #   - /mnt/user/appdata/lumen/lumen-config.json:/usr/share/nginx/html/lumen-config.json:ro
-    #   - /mnt/user/appdata/lumen/branding:/usr/share/nginx/html/branding:ro
-    restart: unless-stopped
-```
+<br>
+
+1. **Docker** tab → **Compose** section → **Add Stack** → name it `lumen` → **OK**. The editor opens.
+2. On the **Compose** tab, paste this and change both IP addresses to your Unraid server's IP. Press **Ctrl+S** to save.
+
+   ```yaml
+   services:
+     lumen:
+       build: https://github.com/snapetech-org/seerrng.git#main:lumen
+       image: seerrng-lumen:local
+       container_name: lumen
+       environment:
+         SEERR_URL: http://192.168.1.50:5055        # your Unraid IP + SeerrNG's port
+         SEERR_FULL_URL: http://192.168.1.50:5055   # where people open full SeerrNG (or your SeerrNG domain)
+         LUMEN_TRUSTED_PROXIES: ''                  # filled in at Step 2 if you use a reverse proxy or tunnel
+         LUMEN_REAL_IP_HEADER: X-Forwarded-For
+       ports:
+         - 5080:80
+       cap_drop: [ALL]
+       security_opt: [no-new-privileges:true]
+       # Optional settings + logo (see "Settings for everyone"). Create the file first, then remove the #s:
+       # volumes:
+       #   - /mnt/user/appdata/lumen/lumen-config.json:/usr/share/nginx/html/lumen-config.json:ro
+       #   - /mnt/user/appdata/lumen/branding:/usr/share/nginx/html/branding:ro
+       restart: unless-stopped
+   ```
+
+3. Press **Compose Up**. The first start builds Lumen, which takes a few minutes; you can close the window while it runs.
+4. Open `http://<Unraid IP>:5080`.
 
 If SeerrNG and your reverse proxy sit on a custom Docker network (for example `proxynet`), you can add Lumen to it with `networks: [proxynet]` plus a top-level `networks: { proxynet: { external: true } }`, and use `SEERR_URL: http://seerrng:5055`.
 
-**New install** (no SeerrNG yet). First open **Terminal** (`>_`, top right) and create SeerrNG's config folder:
-
-```sh
-mkdir -p /mnt/user/appdata/seerrng && chown 1000:1000 /mnt/user/appdata/seerrng
-```
-
-Then paste this, set your time zone and IP, and finish SeerrNG's setup wizard at `http://<Unraid IP>:5055`:
-
-```yaml
-services:
-  seerrng:
-    image: ghcr.io/snapetech-org/seerrng:latest
-    container_name: seerrng
-    environment:
-      LOG_LEVEL: info
-      PORT: 5055
-      TZ: America/New_York                       # your time zone
-    ports:
-      - 5055:5055
-    volumes:
-      - /mnt/user/appdata/seerrng:/app/config
-    restart: unless-stopped
-
-  lumen:
-    build: https://github.com/snapetech-org/seerrng.git#main:lumen
-    image: seerrng-lumen:local
-    container_name: lumen
-    depends_on: [seerrng]
-    environment:
-      SEERR_URL: http://seerrng:5055
-      SEERR_FULL_URL: http://192.168.1.50:5055   # your Unraid IP
-      LUMEN_TRUSTED_PROXIES: ''
-      LUMEN_REAL_IP_HEADER: X-Forwarded-For
-    ports:
-      - 5080:80
-    cap_drop: [ALL]
-    security_opt: [no-new-privileges:true]
-    restart: unless-stopped
-```
-
-**Updating:** rebuild Lumen in **Terminal**, then press **Compose Up** on the stack again (it swaps in the new build):
+**Updating:** rebuild Lumen in **Terminal**, then press **Compose Up** on the stack again:
 
 ```sh
 docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seerrng.git#main:lumen
@@ -417,7 +351,7 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
 </details>
 
 <details>
-<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>Unraid without Compose</b> (Add Container)</summary>
+<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>Without Compose</b> (Add Container)</summary>
 
 <br>
 
@@ -434,8 +368,92 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
    - **Add another Path, Port, Variable…** → **Port**: container `80`, host `5080`
    - **Variable** `SEERR_URL` = `http://<Unraid IP>:5055`
    - **Variable** `SEERR_FULL_URL` = `http://<Unraid IP>:5055` (or your SeerrNG domain)
-   - **Variable** `LUMEN_TRUSTED_PROXIES` = leave empty for now (see Step 3)
-3. **Apply**. To update later, run the `docker build` line again and restart the container.
+   - **Variable** `LUMEN_TRUSTED_PROXIES` = leave empty for now (see Step 2)
+3. **Apply**, then open `http://<Unraid IP>:5080`.
+
+**Updating:** run the `docker build` line again and restart the container.
+
+</details>
+
+</blockquote>
+
+</details>
+
+<details>
+<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>New install</b>: SeerrNG and Lumen together</summary>
+
+<br>
+
+<blockquote>
+
+<details>
+<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>With Compose Manager Plus</b> (easy route, recommended)</summary>
+
+<br>
+
+1. Open **Terminal** (`>_`, top right) and create SeerrNG's config folder:
+
+   ```sh
+   mkdir -p /mnt/user/appdata/seerrng && chown 1000:1000 /mnt/user/appdata/seerrng
+   ```
+
+2. **Docker** tab → **Compose** section → **Add Stack** → name it `seerrng` → **OK**.
+3. On the **Compose** tab, paste this, set your time zone and Unraid IP, and press **Ctrl+S**:
+
+   ```yaml
+   services:
+     seerrng:
+       image: ghcr.io/snapetech-org/seerrng:latest
+       container_name: seerrng
+       environment:
+         LOG_LEVEL: info
+         PORT: 5055
+         TZ: America/New_York                       # your time zone
+       ports:
+         - 5055:5055
+       volumes:
+         - /mnt/user/appdata/seerrng:/app/config
+       restart: unless-stopped
+
+     lumen:
+       build: https://github.com/snapetech-org/seerrng.git#main:lumen
+       image: seerrng-lumen:local
+       container_name: lumen
+       depends_on: [seerrng]
+       environment:
+         SEERR_URL: http://seerrng:5055
+         SEERR_FULL_URL: http://192.168.1.50:5055   # your Unraid IP
+         LUMEN_TRUSTED_PROXIES: ''
+         LUMEN_REAL_IP_HEADER: X-Forwarded-For
+       ports:
+         - 5080:80
+       cap_drop: [ALL]
+       security_opt: [no-new-privileges:true]
+       restart: unless-stopped
+   ```
+
+4. Press **Compose Up** (the first start takes a few minutes).
+5. Open `http://<Unraid IP>:5055` and finish SeerrNG's setup wizard ([guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started)). Lumen is at `http://<Unraid IP>:5080`.
+
+</details>
+
+<details>
+<summary><img src="https://cdn.simpleicons.org/unraid/F15A2C" width="14"> <b>Without Compose</b> (Add Container)</summary>
+
+<br>
+
+1. Add SeerrNG: in **Terminal** run `mkdir -p /mnt/user/appdata/seerrng && chown 1000:1000 /mnt/user/appdata/seerrng`, then **Docker** tab → **Add Container**:
+   - **Name:** `seerrng`, **Repository:** `ghcr.io/snapetech-org/seerrng:latest`
+   - **Port**: container `5055`, host `5055`
+   - **Path**: container `/app/config`, host `/mnt/user/appdata/seerrng`
+   - **Variable** `TZ` = your time zone, e.g. `America/New_York`
+
+   **Apply**, then open `http://<Unraid IP>:5055` and finish SeerrNG's setup wizard ([guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started)).
+2. Add Lumen with the steps under **SeerrNG already running → Without Compose** above.
+
+</details>
+
+</blockquote>
 
 </details>
 
@@ -448,21 +466,43 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
 
 <br>
 
-1. **Package Center** → install **Container Manager**.
-2. **File Station** → in the `docker` share, create a folder `lumen` (new install: also create `lumen/seerrng-config`).
-3. **Container Manager** → **Project** → **Create**:
-   - **Project name:** `lumen`
-   - **Path:** the `docker/lumen` folder
-   - **Source:** **Create docker-compose.yml**, and paste:
-     - **New install:** [compose.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.yaml), with `TZ` and `SEERR_FULL_URL` (`http://<NAS IP>:5055`) set.
-     - **Already running SeerrNG:** [compose.lumen-only.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.lumen-only.yaml), with `SEERR_URL` and `SEERR_FULL_URL` set to `http://<NAS IP>:5055`.
+**Get Docker.** **Package Center** → install **Container Manager**.
+
+<blockquote>
+
+<details>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/synology/ddd"><img src="https://cdn.simpleicons.org/synology/555" width="14"></picture> <b>New install</b>: SeerrNG and Lumen together</summary>
+
+<br>
+
+1. **File Station** → in the `docker` share, create a folder `seerrng`, and inside it a folder `seerrng-config`.
+2. SeerrNG needs that config folder to belong to user 1000. Enable SSH (**Control Panel → Terminal & SNMP**), connect, and run:
+
+   ```sh
+   sudo chown 1000:1000 /volume1/docker/seerrng/seerrng-config
+   ```
+
+3. **Container Manager** → **Project** → **Create**: name `seerrng`, path `docker/seerrng`, source **Create docker-compose.yml**. Paste [compose.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.yaml) and set `TZ` and `SEERR_FULL_URL` (`http://<NAS IP>:5055`).
 4. **Next** → **Done**. It builds and starts.
+5. Open `http://<NAS IP>:5055` and finish SeerrNG's setup wizard ([guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started)). Lumen is at `http://<NAS IP>:5080`.
 
-**New install:** SeerrNG needs its config folder to belong to user 1000. Enable SSH (**Control Panel → Terminal & SNMP**), connect, and run `sudo chown 1000:1000 /volume1/docker/lumen/seerrng-config`.
+</details>
 
-**Build fails mentioning `git`?** Download the [SeerrNG ZIP](https://github.com/snapetech-org/seerrng/archive/refs/heads/main.zip), unzip it into `docker/lumen`, rename the folder to `seerrng`, change the `build:` line to `build: ./seerrng/lumen`, and build again.
+<details>
+<summary><picture><source media="(prefers-color-scheme: dark)" srcset="https://cdn.simpleicons.org/synology/ddd"><img src="https://cdn.simpleicons.org/synology/555" width="14"></picture> <b>SeerrNG already running</b>: add Lumen</summary>
 
-Open `http://<NAS IP>:5080`.
+<br>
+
+1. **File Station** → in the `docker` share, create a folder `lumen`.
+2. **Container Manager** → **Project** → **Create**: name `lumen`, path `docker/lumen`, source **Create docker-compose.yml**. Paste [compose.lumen-only.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.lumen-only.yaml) and set `SEERR_URL` and `SEERR_FULL_URL` to `http://<NAS IP>:5055`.
+3. **Next** → **Done**. It builds and starts.
+4. Open `http://<NAS IP>:5080`.
+
+</details>
+
+</blockquote>
+
+**Build fails mentioning `git`?** Download the [SeerrNG ZIP](https://github.com/snapetech-org/seerrng/archive/refs/heads/main.zip), unzip it into the project folder, rename the unzipped folder to `seerrng`, change the `build:` line to `build: ./seerrng/lumen`, and build again.
 
 </details>
 
@@ -471,23 +511,63 @@ Open `http://<NAS IP>:5080`.
 
 <br>
 
-1. **Apps** → **Discover Apps** → ⋮ → **Install via YAML**.
-2. Name it `lumen` and paste [compose.lumen-only.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.lumen-only.yaml) (or [compose.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.yaml) for a new install, with `./seerrng-config` changed to a dataset path such as `/mnt/tank/apps/seerrng`, owned by user 1000).
-3. Set `SEERR_URL` and `SEERR_FULL_URL` to `http://<TrueNAS IP>:5055` → **Save**.
+<blockquote>
 
-If the install complains about `build`, build the image once in **System → Shell**:
+<details>
+<summary><img src="https://cdn.simpleicons.org/truenas/0095D5" width="14"> <b>New install</b>: SeerrNG and Lumen together</summary>
+
+<br>
+
+1. Create a dataset for SeerrNG's settings, for example `/mnt/tank/apps/seerrng`, owned by user 1000.
+2. **Apps** → **Discover Apps** → ⋮ → **Install via YAML**. Name it `seerrng`.
+3. Paste [compose.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.yaml), change `./seerrng-config` to your dataset path, set `TZ` and `SEERR_FULL_URL` (`http://<TrueNAS IP>:5055`) → **Save**.
+4. Open `http://<TrueNAS IP>:5055` and finish SeerrNG's setup wizard ([guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started)). Lumen is at `http://<TrueNAS IP>:5080`.
+
+</details>
+
+<details>
+<summary><img src="https://cdn.simpleicons.org/truenas/0095D5" width="14"> <b>SeerrNG already running</b>: add Lumen</summary>
+
+<br>
+
+1. **Apps** → **Discover Apps** → ⋮ → **Install via YAML**. Name it `lumen`.
+2. Paste [compose.lumen-only.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.lumen-only.yaml) and set `SEERR_URL` and `SEERR_FULL_URL` to `http://<TrueNAS IP>:5055` → **Save**.
+3. Open `http://<TrueNAS IP>:5080`.
+
+</details>
+
+</blockquote>
+
+**Install complains about `build`?** Build the image once in **System → Shell**, then delete the `build:` line from the YAML (keep `image: seerrng-lumen:local`) and save again:
 
 ```sh
 sudo docker build -t seerrng-lumen:local https://github.com/snapetech-org/seerrng.git#main:lumen
 ```
 
-Then delete the `build:` line from the YAML (keep `image: seerrng-lumen:local`) and save again.
+</details>
 
-Open `http://<TrueNAS IP>:5080`.
+<details>
+<summary>❓ <b>Which addresses go in the file?</b> (<code>TZ</code>, <code>SEERR_URL</code>, <code>SEERR_FULL_URL</code>)</summary>
+
+<br>
+
+- `TZ` (new install): your time zone, for example `America/New_York` or `Europe/Berlin`.
+- `SEERR_FULL_URL`: the address people type to open full SeerrNG, for example `http://192.168.1.50:5055` (the machine's IP, port 5055) or `https://seerr.example.com`. Lumen sends people there for pages it doesn't have, like settings and users.
+- `SEERR_URL` (adding Lumen to an existing SeerrNG): how Lumen reaches SeerrNG.
+
+| How SeerrNG runs | `SEERR_URL` |
+|---|---|
+| Docker Compose, and you added Lumen **to the same file** | `http://seerrng:5055` (your SeerrNG service name) |
+| Docker, in a different compose file or `docker run` (Unraid templates too) | `http://<machine's LAN IP>:5055`, e.g. `http://192.168.1.50:5055` |
+| Installed directly on the same machine (Windows, Linux package, Snap) | `http://host.docker.internal:5055` with Docker Desktop, otherwise the LAN IP |
+| On another machine | `http://<that machine's IP>:5055` |
+
+If you changed SeerrNG's port, use yours instead of 5055.
 
 </details>
 
-### Step 3: How do people reach it?
+
+### Step 2: How do people reach it?
 
 <details>
 <summary>🏠 <b>Only at home</b> (no domain, no reverse proxy)</summary>
@@ -622,7 +702,7 @@ List several with commas. Never use `0.0.0.0/0`. If you skip this, everything st
 
 </details>
 
-### Step 4: One switch in SeerrNG
+### Step 3: One switch in SeerrNG
 
 In full SeerrNG go to **Settings → Network**, turn on **Trust Reverse Proxy**, save, and restart SeerrNG (`docker compose restart seerrng`, or restart the container).
 
@@ -637,9 +717,9 @@ Keep SeerrNG's own port (5055) off the internet: don't port-forward it or point 
 
 </details>
 
-### Step 5: Sign in and share it
+### Step 4: Sign in and share it
 
-Open Lumen, sign in with your usual Plex, Jellyfin, Emby or SeerrNG account, and look around. Lumen and full SeerrNG work side by side, so you can try it as long as you like before telling anyone. When you're happy, share the Lumen address (or point your domain at it in Step 3). Your family keeps the same accounts.
+Open Lumen, sign in with your usual Plex, Jellyfin, Emby or SeerrNG account, and look around. Lumen and full SeerrNG work side by side, so you can try it as long as you like before telling anyone. When you're happy, share the Lumen address (or point your domain at it in Step 2). Your family keeps the same accounts.
 
 ## Settings for everyone (optional)
 
@@ -741,7 +821,7 @@ It should print SeerrNG's version. If not, try the LAN IP instead of the contain
 
 <br>
 
-SeerrNG sees everyone as one visitor. Turn on **Trust Reverse Proxy** (Step 4) and, behind a proxy, set `LUMEN_TRUSTED_PROXIES` (Step 3).
+SeerrNG sees everyone as one visitor. Turn on **Trust Reverse Proxy** (Step 3) and, behind a proxy, set `LUMEN_TRUSTED_PROXIES` (Step 2).
 
 </details>
 
