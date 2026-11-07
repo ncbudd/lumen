@@ -1,0 +1,43 @@
+# Keeps lumen/ identical to Lumen in SeerrNG (snapetech-org/seerrng, branch main).
+# lumen/ is owned upstream: changes reach it only through this sync. Everything else in
+# this repo (README, media, guides, .github) is this repo's own and is left alone.
+name: Sync lumen/ from SeerrNG
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: sync-upstream
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch SeerrNG main (lumen/ only)
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/snapetech-org/seerrng.git "$RUNNER_TEMP/up"
+          git -C "$RUNNER_TEMP/up" sparse-checkout set lumen
+          echo "UPSTREAM_SHA=$(git -C "$RUNNER_TEMP/up" rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Copy lumen/ and record the commit
+        run: |
+          rsync -a --delete "$RUNNER_TEMP/up/lumen/" lumen/
+          echo "$UPSTREAM_SHA" > UPSTREAM
+
+      - name: Commit if anything changed
+        run: |
+          git add -A lumen UPSTREAM
+          if git diff --cached --quiet; then
+            echo "Already in sync with snapetech-org/seerrng@${UPSTREAM_SHA::8}"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898289+github-actions[bot]@users.noreply.github.com" \
+              commit -m "Sync lumen/ with snapetech-org/seerrng@${UPSTREAM_SHA::8}"
+          git push

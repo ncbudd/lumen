@@ -18,7 +18,7 @@ Your family finds something, taps **Request**, and it shows up in Plex, Jellyfin
 
 ---
 
-Lumen is part of SeerrNG: it was merged into [snapetech-org/seerrng](https://github.com/snapetech-org/seerrng/tree/main/lumen) and is built from there. This page shows what it looks like and walks you through installing it, step by step. The code is in [`lumen/`](lumen) here as a snapshot of SeerrNG [`31df5dc`](https://github.com/snapetech-org/seerrng/tree/31df5dc5/lumen), but **always install from SeerrNG** (the commands below do that) so you get the latest version.
+Lumen is part of SeerrNG: it was merged into [snapetech-org/seerrng](https://github.com/snapetech-org/seerrng/tree/main/lumen) and is built from there. This page shows what it looks like and walks you through installing it, step by step. The code is in [`lumen/`](lumen) here, kept identical to SeerrNG's `main` by an automatic sync ([`UPSTREAM`](UPSTREAM) names the commit), but **always install from SeerrNG** (the commands below do that). Testing Lumen or sending a change? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## See it
 
