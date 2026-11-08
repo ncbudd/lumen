@@ -21,6 +21,7 @@ import {
 import {
   ActionBar,
   AdvancedOptions,
+  canRequest4k,
   DetailTop,
   Facts,
   fmtRun,
@@ -43,8 +44,7 @@ export default function MovieDetail() {
   const like = useApi<Paged<TitleResult>>(`/movie/${id}/recommendations`).data;
   const pub = usePublicSettings();
   const { user } = useAuth();
-  // ADMIN | REQUEST_4K | REQUEST_4K_MOVIE
-  const can4k = !!user && (user.permissions & (2 | 1024 | 2048)) !== 0;
+  const can4k = !!user && canRequest4k(user.permissions, 'movie');
   const toast = useToast();
   const [opts, setOpts] = useState<RequestOptions>({});
   const [busy, setBusy] = useState(false);
@@ -70,10 +70,22 @@ export default function MovieDetail() {
   const trailer = m.relatedVideos?.find(
     (v) => v.type === 'Trailer' && v.site === 'YouTube'
   );
-  const request = async (is4k = false) => {
+  // a 4K copy is in hand or on its way (requested, downloading, partly or fully there)
+  const has4k =
+    !!s4k && s4k >= MediaStatus.PENDING && s4k <= MediaStatus.AVAILABLE;
+  const request = async (force4k = false) => {
+    // Advanced options may have picked a 4K server; the Request 4K button always means 4K
+    const is4k = force4k || !!opts.is4k;
     setBusy(true);
     try {
-      await requestMovie(m.id, { ...opts, is4k });
+      // the Request 4K button ignores options chosen for an HD server and keeps only who
+      // it's for, so SeerrNG uses the 4K server's own defaults
+      await requestMovie(
+        m.id,
+        force4k && !opts.is4k
+          ? { is4k: true, userId: opts.userId }
+          : { ...opts, is4k }
+      );
       toast(`Requested ${m.title}${is4k ? ' in 4K' : ''}`);
       dropCache(`/movie/${m.id}`);
       reload();
@@ -108,11 +120,9 @@ export default function MovieDetail() {
         {unreleased ? 'Request · downloads on release' : 'Request'}
       </button>
     );
+  // offered whether or not the HD copy is here or requested: they're separate files
   const fourK =
-    pub?.movie4kEnabled &&
-    can4k &&
-    s?.k === 'ok' &&
-    !(s4k && s4k >= MediaStatus.PENDING) ? (
+    pub?.movie4kEnabled && can4k && !has4k ? (
       <button
         className="btn btn-quiet"
         disabled={busy}
@@ -180,7 +190,14 @@ export default function MovieDetail() {
           {fourK}
           {trailerBtn}
         </div>
-        {!s && <AdvancedOptions kind="movie" is4k={false} onChange={onOpts} />}
+        {!s && (
+          <AdvancedOptions
+            kind="movie"
+            is4k={false}
+            allow4k={!!pub?.movie4kEnabled && can4k && !has4k}
+            onChange={onOpts}
+          />
+        )}
         <div className="dcols">
           <div style={{ display: 'grid', gap: 22 }}>
             {m.tagline && <p className="tagline">{m.tagline}</p>}
@@ -214,7 +231,9 @@ export default function MovieDetail() {
                   pub?.movie4kEnabled
                     ? s4k === MediaStatus.AVAILABLE
                       ? `On ${serverName}`
-                      : 'Not yet'
+                      : has4k
+                        ? 'Requested'
+                        : 'Not yet'
                     : '',
                 ],
               ]}
