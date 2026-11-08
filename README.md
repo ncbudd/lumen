@@ -110,8 +110,7 @@ You'll need about 15 minutes. **Open the sections that match your setup**. Each 
 >
 > ```yaml
 >   lumen:
->     build: https://github.com/snapetech-org/seerrng.git#main:lumen
->     image: seerrng-lumen:local
+>     image: ghcr.io/snapetech-org/seerrng-lumen:latest
 >     container_name: lumen
 >     environment:
 >       SEERR_INTERNAL_URL: http://seerrng:5055      # how Lumen talks to SeerrNG behind the scenes
@@ -122,7 +121,7 @@ You'll need about 15 minutes. **Open the sections that match your setup**. Each 
 >     restart: unless-stopped
 > ```
 
-There is no prebuilt Lumen image yet. Docker builds it from SeerrNG's code the first time it starts, which takes a few minutes. After that, starting is instant.
+Lumen is a prebuilt image for amd64 and arm64: `ghcr.io/snapetech-org/seerrng-lumen`. The examples use `:latest`, which follows SeerrNG's releases. To stay on one release, use its version instead, for example `:v3.72.23`.
 
 ### Step 1: Pick your system
 
@@ -296,7 +295,7 @@ Open Lumen at `http://localhost:5080`, or `http://<Mac's IP>:5080` from a phone 
 Each choice below has two routes:
 
 - **With [Compose Manager Plus](https://ca.unraid.net/apps/compose-manager-plus-0wft8je0ra0zhy)** ([GitHub](https://github.com/mstrhakr/compose_plugin)), the easy route: paste one block of text and press a button. Install it from the **Apps** tab. It replaces the older *Compose Manager* plugin (remove that first) and keeps any stacks you already have.
-- **Without Compose**: build the image once in the terminal and use **Add Container**.
+- **Without Compose**: use **Add Container** with the published image.
 
 <blockquote>
 
@@ -318,8 +317,7 @@ Each choice below has two routes:
    ```yaml
    services:
      lumen:
-       build: https://github.com/snapetech-org/seerrng.git#main:lumen
-       image: seerrng-lumen:local
+       image: ghcr.io/snapetech-org/seerrng-lumen:latest
        container_name: lumen
        environment:
          SEERR_INTERNAL_URL: http://192.168.1.50:5055  # how Lumen talks to SeerrNG behind the scenes: your Unraid IP + SeerrNG's port
@@ -339,16 +337,12 @@ Each choice below has two routes:
        restart: unless-stopped
    ```
 
-3. Press **Compose Up**. The first start builds Lumen, which takes a few minutes; you can close the window while it runs.
+3. Press **Compose Up**. Docker downloads Lumen and starts it.
 4. Open `http://<Unraid IP>:5080`.
 
 If SeerrNG and your reverse proxy sit on a custom Docker network (for example `proxynet`), you can add Lumen to it with `networks: [proxynet]` plus a top-level `networks: { proxynet: { external: true } }`, and use `SEERR_INTERNAL_URL: http://seerrng:5055`.
 
-**Updating:** rebuild Lumen in **Terminal**, then press **Compose Up** on the stack again:
-
-```sh
-docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seerrng.git#main:lumen
-```
+**Updating:** press **Update Stack** on the `lumen` stack. It downloads the new image and restarts Lumen.
 
 </details>
 
@@ -357,23 +351,17 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
 
 <br>
 
-1. Open **Terminal** (top right `>_`) and build the image once:
-
-   ```sh
-   docker build -t seerrng-lumen:local https://github.com/snapetech-org/seerrng.git#main:lumen
-   ```
-
-2. **Docker** tab → **Add Container**:
+1. **Docker** tab → **Add Container**:
    - **Name:** `lumen`
-   - **Repository:** `seerrng-lumen:local`
+   - **Repository:** `ghcr.io/snapetech-org/seerrng-lumen:latest`
    - **Network Type:** `bridge` (or the custom network your reverse proxy uses)
    - **Add another Path, Port, Variable…** → **Port**: container `80`, host `5080`
    - **Variable** `SEERR_INTERNAL_URL` = `http://<Unraid IP>:5055` (how Lumen talks to SeerrNG behind the scenes)
    - **Variable** `SEERR_BROWSER_URL` = `http://<Unraid IP>:5055`, or your SeerrNG domain (the address you'd type in your browser to open full SeerrNG)
    - **Variable** `LUMEN_TRUSTED_PROXIES` = leave empty for now (see Step 2)
-3. **Apply**, then open `http://<Unraid IP>:5080`.
+2. **Apply**, then open `http://<Unraid IP>:5080`.
 
-**Updating:** run the `docker build` line again and restart the container.
+**Updating:** Unraid shows an update for Lumen like any other container. Press **apply update**, or use **Update All**.
 
 </details>
 
@@ -418,8 +406,7 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
        restart: unless-stopped
 
      lumen:
-       build: https://github.com/snapetech-org/seerrng.git#main:lumen
-       image: seerrng-lumen:local
+       image: ghcr.io/snapetech-org/seerrng-lumen:latest
        container_name: lumen
        depends_on: [seerrng]
        environment:
@@ -434,7 +421,7 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
        restart: unless-stopped
    ```
 
-4. Press **Compose Up** (the first start takes a few minutes).
+4. Press **Compose Up**.
 5. Open `http://<Unraid IP>:5055` and finish SeerrNG's setup wizard ([guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started)). Lumen is at `http://<Unraid IP>:5080`.
 
 </details>
@@ -485,7 +472,7 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
    ```
 
 3. **Container Manager** → **Project** → **Create**: name `seerrng`, path `docker/seerrng`, source **Create docker-compose.yml**. Paste [compose.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.yaml) and set `TZ` and `SEERR_BROWSER_URL` (`http://<NAS IP>:5055`).
-4. **Next** → **Done**. It builds and starts.
+4. **Next** → **Done**. It downloads and starts.
 5. Open `http://<NAS IP>:5055` and finish SeerrNG's setup wizard ([guide](https://github.com/snapetech-org/seerrng/tree/main/docs/getting-started)). Lumen is at `http://<NAS IP>:5080`.
 
 </details>
@@ -497,14 +484,12 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
 
 1. **File Station** → in the `docker` share, create a folder `lumen`.
 2. **Container Manager** → **Project** → **Create**: name `lumen`, path `docker/lumen`, source **Create docker-compose.yml**. Paste [compose.lumen-only.yaml](https://raw.githubusercontent.com/snapetech-org/seerrng/main/lumen/compose.lumen-only.yaml) and set `SEERR_INTERNAL_URL` and `SEERR_BROWSER_URL` to `http://<NAS IP>:5055`.
-3. **Next** → **Done**. It builds and starts.
+3. **Next** → **Done**. It downloads and starts.
 4. Open `http://<NAS IP>:5080`.
 
 </details>
 
 </blockquote>
-
-**Build fails mentioning `git`?** Download the [SeerrNG ZIP](https://github.com/snapetech-org/seerrng/archive/refs/heads/main.zip), unzip it into the project folder, rename the unzipped folder to `seerrng`, change the `build:` line to `build: ./seerrng/lumen`, and build again.
 
 </details>
 
@@ -539,12 +524,6 @@ docker build --pull -t seerrng-lumen:local https://github.com/snapetech-org/seer
 </details>
 
 </blockquote>
-
-**Install complains about `build`?** Build the image once in **System → Shell**, then delete the `build:` line from the YAML (keep `image: seerrng-lumen:local`) and save again:
-
-```sh
-sudo docker build -t seerrng-lumen:local https://github.com/snapetech-org/seerrng.git#main:lumen
-```
 
 </details>
 
@@ -815,12 +794,13 @@ Create the file **before** adding the lines: if it's missing, Docker makes a fol
 In the folder with `compose.yaml`:
 
 ```sh
-docker compose pull --ignore-buildable   # updates SeerrNG (new-install file only)
-docker compose build --pull              # rebuilds Lumen from the latest code
+docker compose pull
 docker compose up -d
 ```
 
-People get the new version the next time they open or refresh Lumen. **Unraid:** run the `docker build` line from the Unraid section, then **Compose Up** (or restart the container if you used Add Container).
+`pull` downloads the latest SeerrNG and Lumen images. People get the new version the next time they open or refresh Lumen. Watchtower, Unraid's **Update All** and other image updaters update Lumen too.
+
+**Set up before v3.72.23?** Your Lumen service probably still has `build:` and `image: seerrng-lumen:local`. Replace those two lines with `image: ghcr.io/snapetech-org/seerrng-lumen:latest`, then run the two commands above. On Unraid without Compose, edit the `lumen` container and change **Repository** to the same address.
 
 ## Switching back
 
@@ -876,15 +856,6 @@ Run `docker compose logs lumen`. A message about `LUMEN_TRUSTED_PROXIES` or `LUM
 <br>
 
 The config folder doesn't belong to user 1000. Run `sudo chown -R 1000:1000 seerrng-config`.
-
-</details>
-
-<details>
-<summary><b>The build fails, mentioning <code>git</code>.</b></summary>
-
-<br>
-
-Some NAS systems can't build from a GitHub address. Download the [SeerrNG ZIP](https://github.com/snapetech-org/seerrng/archive/refs/heads/main.zip), unzip it next to `compose.yaml`, rename the folder to `seerrng`, and change the `build:` line to `build: ./seerrng/lumen`.
 
 </details>
 
