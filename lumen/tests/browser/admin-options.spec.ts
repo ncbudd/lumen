@@ -52,7 +52,10 @@ async function fixtures(
         localLogin: true,
         enabledMediaCategories: {},
       };
-    else if (path === '/auth/me') {
+    else if (path === '/request/status') {
+      status = 404;
+      json = { message: 'Legacy fixture endpoint' };
+    } else if (path === '/auth/me') {
       status = signedIn ? 200 : 401;
       json = signedIn
         ? { id: 1, displayName: 'fam', permissions: opts.permissions ?? 2 }
@@ -2416,4 +2419,29 @@ test('4K series selection uses 4K season ownership even when every HD season is 
     path: info.outputPath('4k-seasons.png'),
     fullPage: true,
   });
+});
+
+test('a configured full SeerrNG address explicitly selects the native interface', async ({
+  page,
+}) => {
+  await fixtures(page, {
+    config: { seerrPublicUrl: 'https://seerr.example.com/?source=lumen' },
+  });
+  await page.goto('/no-such-page');
+  await expect(
+    page.getByRole('link', { name: 'open full SeerrNG' })
+  ).toHaveAttribute(
+    'href',
+    'https://seerr.example.com/?source=lumen&interface=classic'
+  );
+});
+
+test('unsafe full-interface URLs fall back to the same-origin native entry', async ({
+  page,
+}) => {
+  await fixtures(page, { config: { seerrPublicUrl: 'javascript:alert(1)' } });
+  await page.goto('/no-such-page');
+  await expect(
+    page.getByRole('link', { name: 'open full SeerrNG' })
+  ).toHaveAttribute('href', '/seerrng');
 });

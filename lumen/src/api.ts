@@ -2,6 +2,19 @@
 // container or the Vite dev proxy), so SeerrNG's session cookie does the auth.
 import { markAllStale } from './apiCache';
 
+export function csrfHeaders(): Record<string, string> {
+  const token = document.cookie
+    .split('; ')
+    .find((cookie) => cookie.startsWith('XSRF-TOKEN='))
+    ?.slice('XSRF-TOKEN='.length);
+  if (!token) return {};
+  try {
+    return { 'X-XSRF-TOKEN': decodeURIComponent(token) };
+  } catch {
+    return {};
+  }
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -18,7 +31,11 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
     // a request someone just made. Revalidate every time; unchanged answers come back as 304.
     cache: 'no-cache',
     ...init,
-    headers: { 'Content-Type': 'application/json', ...(init.headers || {}) },
+    headers: {
+      'Content-Type': 'application/json',
+      ...csrfHeaders(),
+      ...(init.headers || {}),
+    },
   });
   if (!res.ok) {
     let msg = res.statusText;
@@ -390,6 +407,11 @@ export interface DownloadItem {
   status?: string;
 }
 export interface RequestItem {
+  currentStatus?: {
+    stage: string;
+    percent: number | null;
+    message?: string;
+  };
   id: number;
   status: number; // 1 pending approval, 2 approved, 3 declined, 4 failed, 5 completed
   type: string;
@@ -398,7 +420,7 @@ export interface RequestItem {
   bookFormat?: string;
   seasons: { seasonNumber: number }[];
   requestedBy: { id: number; displayName: string };
-  media: {
+  media: MediaInfo & {
     mediaType: string;
     tmdbId: number;
     status: number;

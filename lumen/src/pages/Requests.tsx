@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import {
   api,
   ApiError,
+  bookMediaForFormat,
   cancelRequest,
   mediaLink,
   MediaStatus,
@@ -57,6 +58,74 @@ const EVERYONE_FILTERS = [
   ['available', 'Available', 'available'],
 ] as const;
 const PAGE = 20;
+
+// Older companion backends may reject the opt-in parameter. Never retry an
+// authorization failure or outage as a legacy response, and reset on sign-out.
+interface RequestListPage {
+  pageInfo?: { pages?: number; results?: number };
+  results: RequestItem[];
+  authoritativeStatus?: boolean;
+}
+let statusProjectionSupported = true;
+let statusFilterSupported = true;
+async function requestList(path: string): Promise<RequestListPage> {
+  const filter = new URLSearchParams(path.split('?')[1]).get('filter');
+  if (
+    statusFilterSupported &&
+    (filter === 'available' || filter === 'processing')
+  ) {
+    try {
+      // The legacy list filter follows aggregate media/coarse request flags.
+      // Reuse the lifecycle owner's filtering and pagination for file truth.
+      const stages =
+        filter === 'available'
+          ? ['available']
+          : ['searching', 'downloading', 'importing', 'library'];
+      const data = await api<{
+        pageInfo: { pages: number; results: number };
+        results: {
+          request: RequestItem;
+          status: NonNullable<RequestItem['currentStatus']>;
+        }[];
+      }>(path.replace('/request?', '/request/status?'));
+      if (
+        !Array.isArray(data.results) ||
+        !Number.isSafeInteger(data.pageInfo?.results) ||
+        data.pageInfo.results < 0 ||
+        data.results.some(
+          (item) =>
+            !item.request ||
+            !Number.isSafeInteger(item.request.id) ||
+            item.request.id <= 0 ||
+            !stages.includes(item.status?.stage)
+        )
+      ) {
+        throw new Error('Invalid request status response');
+      }
+      return {
+        ...data,
+        authoritativeStatus: true,
+        results: data.results.map(({ request, status }) => ({
+          ...request,
+          currentStatus: status,
+        })),
+      };
+    } catch (error) {
+      if (!(error instanceof ApiError) || ![400, 404].includes(error.status))
+        throw error;
+      statusFilterSupported = false;
+    }
+  }
+  if (!statusProjectionSupported) return api<RequestListPage>(path);
+  try {
+    return await api<RequestListPage>(`${path}&includeStatus=true`);
+  } catch (error) {
+    if (!(error instanceof ApiError) || error.status !== 400) throw error;
+    const result = await api<RequestListPage>(path);
+    statusProjectionSupported = false;
+    return result;
+  }
+}
 
 // what a request looks like to the person who made it, in plain words
 // "00:03:03" -> "About 3 min left"
@@ -113,8 +182,93 @@ function state(
   detail?: string;
 } {
   const r = x.r;
+  const current = r.currentStatus;
+  if (current) {
+    const base = { active: true, detail: current.message };
+    const available =
+      r.type !== 'movie' && r.type !== 'tv'
+        ? 'In library'
+        : `${r.is4k ? '4K on' : 'On'} ${serverName}`;
+    switch (current.stage) {
+      case 'available':
+        return {
+          ...base,
+          k: 'ok',
+          word: available,
+          ico: 'check',
+          active: false,
+        };
+      case 'requested':
+        return {
+          ...base,
+          k: 'wait',
+          word: r.status === 1 ? 'Waiting for approval' : 'Requested',
+          ico: 'clock',
+        };
+      case 'approved':
+        return { ...base, k: 'wait', word: 'Approved', ico: 'clock' };
+      case 'searching':
+        return { ...base, k: 'wait', word: 'Searching', ico: 'clock' };
+      case 'downloading': {
+        const pct =
+          typeof current.percent === 'number' &&
+          Number.isFinite(current.percent) &&
+          current.percent >= 0 &&
+          current.percent <= 100
+            ? Math.round(current.percent)
+            : undefined;
+        return {
+          ...base,
+          k: 'dl',
+          word:
+            pct === 0
+              ? 'Queued'
+              : pct === undefined
+                ? 'Downloading'
+                : `Downloading ${pct}%`,
+          ico: 'down',
+          pct,
+        };
+      }
+      case 'importing':
+        return { ...base, k: 'wait', word: 'Importing', ico: 'clock' };
+      case 'library':
+        return { ...base, k: 'wait', word: 'Checking library', ico: 'clock' };
+      case 'failed':
+        return { ...base, k: 'bad', word: 'Couldn’t get it', ico: 'x' };
+      case 'declined':
+        return { ...base, k: 'bad', word: 'Declined', ico: 'x', active: false };
+      case 'cancelled':
+        return {
+          ...base,
+          k: 'bad',
+          word: 'Cancelled',
+          ico: 'x',
+          active: false,
+        };
+      case 'unavailable':
+        return { ...base, k: 'bad', word: 'Unavailable', ico: 'x' };
+      default:
+        return { ...base, k: 'wait', word: 'Status unavailable', ico: 'clock' };
+    }
+  }
   // a 4K request follows the 4K copy, not the HD one already on Plex
-  const ms = r.is4k ? r.media.status4k : r.media.status;
+  const bookStatuses =
+    r.type === 'book'
+      ? (r.bookFormat === 'both'
+          ? (['ebook', 'audiobook'] as const)
+          : ([r.bookFormat === 'audiobook' ? 'audiobook' : 'ebook'] as const)
+        ).map((format) => bookMediaForFormat(r.media, format)?.status)
+      : null;
+  const ms = bookStatuses
+    ? bookStatuses.every((status) => status === MediaStatus.AVAILABLE)
+      ? MediaStatus.AVAILABLE
+      : undefined
+    : ['magazine', 'sports'].includes(r.type)
+      ? undefined
+      : r.is4k
+        ? r.media.status4k
+        : r.media.status;
   const dls =
     (r.is4k
       ? r.media.downloadStatus4k
@@ -212,7 +366,7 @@ function progress(r: RequestItem) {
 // (e.g. one person's requests). Two pages of SeerrNG's in-progress requests are plenty.
 async function startedDownloads(query = '') {
   const page = (skip: number) =>
-    api<{ pageInfo?: { pages?: number }; results: RequestItem[] }>(
+    requestList(
       `/request?take=100&skip=${skip}&filter=processing&sort=added${query}`
     );
   const first = await page(0);
@@ -515,6 +669,7 @@ export default function Requests() {
   const [p, setP] = useSearchParams();
   const tab = p.get('tab') || 'active';
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [ownError, setOwnError] = useState(false);
   const [tick, setTick] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const pull = usePullToRefresh(() => {
@@ -554,7 +709,22 @@ export default function Requests() {
     if (!manage) return;
     let live = true;
     api<Record<string, number>>('/request/count')
-      .then((d) => live && setCounts(d))
+      .then(
+        (d) =>
+          live &&
+          setCounts((previous) => {
+            // Coarse media counts can describe a different book format. Derive
+            // availability and processing counts from their lifecycle pages.
+            const next = { ...d };
+            delete next.available;
+            delete next.processing;
+            if (previous?.available !== undefined)
+              next.available = previous.available;
+            if (previous?.processing !== undefined)
+              next.processing = previous.processing;
+            return next;
+          })
+      )
       .catch(() => live && setCounts(null));
     return () => {
       live = false;
@@ -570,13 +740,17 @@ export default function Requests() {
       const out: RequestItem[] = [];
       let total = 0;
       for (let skip = 0; skip < take; skip += 100) {
-        const d = await api<{
-          pageInfo?: { results?: number };
-          results: RequestItem[];
-        }>(
+        const d = await requestList(
           `/request?take=${Math.min(100, take - skip)}&skip=${skip}&filter=${filter}&sort=added`
         );
         total = d.pageInfo?.results ?? 0;
+        if (
+          live &&
+          (filter === 'available' || filter === 'processing') &&
+          d.authoritativeStatus
+        ) {
+          setCounts((previous) => ({ ...previous, [filter]: total }));
+        }
         out.push(...d.results);
         if (d.results.length < Math.min(100, take - skip)) break;
       }
@@ -622,8 +796,9 @@ export default function Requests() {
   useEffect(() => {
     if (!user || everyone) return;
     let live = true;
+    setOwnError(false);
     const media = Promise.all([
-      api<{ results: RequestItem[] }>(
+      requestList(
         `/request?take=40&skip=0&filter=all&sort=added&requestedBy=${user.id}`
       ).then((d) => d.results),
       startedDownloads(`&requestedBy=${user.id}`).catch(() => []),
@@ -641,7 +816,7 @@ export default function Requests() {
         a.concat(b).sort((x, y) => y.r.createdAt.localeCompare(x.r.createdAt))
       )
       .then((x) => live && setRows(x))
-      .catch(() => live && setRows([]))
+      .catch(() => live && setOwnError(true))
       .finally(() => live && setRefreshing(false));
     return () => {
       live = false;
@@ -661,7 +836,11 @@ export default function Requests() {
     (x) => state(x, serverName).k === 'ok' && !state(x, serverName).active
   );
   const list = everyone
-    ? others || []
+    ? (others || []).filter((row) =>
+        show === 'available'
+          ? state(row, serverName).k === 'ok' && !state(row, serverName).active
+          : show !== 'processing' || state(row, serverName).active
+      )
     : tab === 'ready'
       ? ready
       : tab === 'all'
@@ -763,15 +942,19 @@ export default function Requests() {
           </button>
         ))}
       </div>
-      {!shown && (!everyone || !othersError) && (
+      {!shown && !(everyone ? othersError : ownError) && (
         <p className="note">
           {everyone ? 'Loading everyone’s requests…' : 'Loading your requests…'}
         </p>
       )}
-      {everyone && othersError && (
+      {(everyone ? othersError : ownError) && (
         <div className="empty" role="alert">
           <b>Couldn’t load requests</b>
-          <p>Try again to check everyone’s request history.</p>
+          <p>
+            {everyone
+              ? 'Try again to check everyone’s request history.'
+              : 'Try again to check your request history.'}
+          </p>
           <button
             className="btn btn-tonal"
             onClick={() => setTick((t) => t + 1)}
@@ -980,6 +1163,8 @@ export default function Requests() {
 }
 
 onSessionReset(() => {
+  statusProjectionSupported = true;
+  statusFilterSupported = true;
   described.clear();
   retryLater.clear();
   bookCalls.clear();
