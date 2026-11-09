@@ -68,7 +68,36 @@ interface RequestListPage {
 }
 let statusProjectionSupported = true;
 let statusFilterSupported = true;
+// SeerrNG checks at most 32 title variants (HD and 4K) per answer against the viewer's own media
+// server access and reports the rest as not available, so a page of 100 showed most titles as
+// missing. Ask in pages small enough to stay inside that and join them.
+const SAFE_TAKE = 15;
 async function requestList(path: string): Promise<RequestListPage> {
+  const [base, query = ''] = path.split('?');
+  const params = new URLSearchParams(query);
+  const take = Number(params.get('take') || 0);
+  if (!(take > SAFE_TAKE)) return requestListOnce(path);
+  const skip = Number(params.get('skip') || 0);
+  const pages: RequestListPage[] = [];
+  for (let offset = 0; offset < take; offset += SAFE_TAKE) {
+    const size = Math.min(SAFE_TAKE, take - offset);
+    params.set('take', String(size));
+    params.set('skip', String(skip + offset));
+    const page = await requestListOnce(`${base}?${params}`);
+    pages.push(page);
+    if (page.results.length < size) break;
+  }
+  const total = pages[pages.length - 1].pageInfo?.results;
+  return {
+    pageInfo:
+      total === undefined
+        ? pages[0].pageInfo
+        : { results: total, pages: Math.max(1, Math.ceil(total / take)) },
+    results: pages.flatMap((p) => p.results),
+    authoritativeStatus: pages.every((p) => p.authoritativeStatus) || undefined,
+  };
+}
+async function requestListOnce(path: string): Promise<RequestListPage> {
   const filter = new URLSearchParams(path.split('?')[1]).get('filter');
   if (
     statusFilterSupported &&
@@ -872,6 +901,9 @@ export default function Requests() {
     }
   };
   const cancel = async (id: number) => {
+    // a second tap while the first is on its way would fail ("not found") after it worked
+    if (acting === id) return;
+    setActing(id);
     try {
       // game requests (negative ids here) are withdrawn through their own endpoint
       if (id < 0)
@@ -880,9 +912,13 @@ export default function Requests() {
         });
       else await cancelRequest(id);
       toast('Request cancelled');
+      // gone now, not after the list has refreshed
+      setRows((list) => list && list.filter((x) => x.r.id !== id));
       setTick((t) => t + 1);
     } catch (e) {
       toast(e instanceof Error ? e.message : 'Couldn’t cancel');
+    } finally {
+      setActing(null);
     }
   };
 
@@ -1120,6 +1156,7 @@ export default function Requests() {
                   ) : x.r.status === 1 ? (
                     <button
                       className="btn btn-sm btn-quiet"
+                      disabled={acting === x.r.id}
                       onClick={() => cancel(x.r.id)}
                     >
                       Cancel

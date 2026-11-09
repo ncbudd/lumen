@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
+  audiobookEditionsPath,
   bookIdFor,
   bookMediaForFormat,
   chaptarrWork,
@@ -23,8 +24,9 @@ import {
   fmtHrs,
   Pill,
 } from '../components/detail';
+import { ServiceNote } from '../components/extra';
 import { useToast } from '../components/toast';
-import { dropCache, useApi } from '../hooks';
+import { dropBookStates, dropCache, useApi } from '../hooks';
 import { Icon } from '../icons';
 import { usePrefs } from '../settings';
 
@@ -114,9 +116,7 @@ export default function BookDetail() {
   // narrations load on the ebook page too, so its Audiobook button reads the same as on the audiobook page
   const narrData = prefs.narratorChoice && !!work;
   const eds = useApi<{ editions: Edition[] }>(
-    narrData
-      ? `/editions/book?format=audiobook&term=${encodeURIComponent('work:' + work)}`
-      : null
+    narrData && work ? audiobookEditionsPath(work) : null
   );
   const allRows = useMemo(
     () => narrations(eds.data?.editions || []),
@@ -211,7 +211,8 @@ export default function BookDetail() {
   };
 
   if (error)
-    return f === 'ebook' ? (
+    // only "not found" means there's no ebook; a rate limit or outage can be tried again
+    return f === 'ebook' && first.errorStatus === 404 ? (
       <div className="empty">
         <b>No ebook edition found</b>ChaptarrNG only knows this book as an
         audiobook.{' '}
@@ -223,10 +224,7 @@ export default function BookDetail() {
         </Link>
       </div>
     ) : (
-      <div className="empty">
-        <b>Couldn’t load this book</b>
-        {error}
-      </div>
+      <ServiceNote error={error} what="this book" retry={reload} />
     );
   if (!b) return <div className="detail-loading" aria-busy="true" />;
 
@@ -299,6 +297,7 @@ export default function BookDetail() {
         `Requested ${b.title} · ${audio ? (showNarr && chosenRow ? who(chosenRow) : 'audiobook') : 'ebook'}`
       );
       dropCache(`/book/${encodeURIComponent(bookId)}`);
+      dropBookStates(); // book cards elsewhere show the new request straight away
       reload();
     } catch (e) {
       toast(e instanceof Error ? e.message : 'Request failed');

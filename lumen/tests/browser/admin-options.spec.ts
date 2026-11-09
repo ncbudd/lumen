@@ -2050,7 +2050,8 @@ test('Everyone shows more on request and filters by status', async ({
   await filters.getByRole('button', { name: /Failed/ }).click();
   await expect(page).toHaveURL(/show=failed/);
   await expect(page.getByText('Nothing here')).toBeVisible();
-  expect(asked).toContain('failed:0:20');
+  // pages of at most 15 keep SeerrNG's per-response availability check complete
+  expect(asked).toContain('failed:0:15');
 });
 
 test('a temporary configured game probe failure keeps that platform and Retry reachable', async ({
@@ -2593,4 +2594,23 @@ test('a page of posters asks for the server settings once, not once per poster',
   ).toBeVisible();
   await page.waitForTimeout(500);
   expect(settingsCalls() - before).toBeLessThanOrEqual(1);
+});
+
+test('the request sheet still requests when no Radarr server is set up', async ({
+  page,
+}) => {
+  const { posts, errors } = await fixtures(page);
+  await page.route('**/api/v1/service/radarr', (route) =>
+    route.fulfill({ json: [] })
+  );
+  await page.goto('/movies');
+  await quickRequest(page, 'Fresh Pick');
+  const sheet = page.getByRole('dialog', { name: 'Request Fresh Pick' });
+  await expect(sheet.getByText('No Radarr server to choose')).toBeVisible();
+  const send = sheet.getByRole('button', { name: 'Request', exact: true });
+  await expect(send).toBeEnabled();
+  await send.click();
+  await expect(sheet).toHaveCount(0);
+  expect(posts.filter((p) => p.path === '/request')).toHaveLength(1);
+  expect(errors).toEqual([]);
 });
