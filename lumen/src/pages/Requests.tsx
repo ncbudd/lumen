@@ -211,6 +211,29 @@ function seasonList(ns: number[]) {
   return `${ns.length === 1 ? 'Season' : 'Seasons'} ${runs.join(', ')}`;
 }
 
+// an edition id that names a specific edition rather than just "this book" (Open Library work ids
+// and plain edition ids from the book service are not pins)
+const OL_EDITION = /^(?:\/?books\/)?OL\d+M$/i;
+function otherEditionInLibrary(r: RequestItem): boolean {
+  if (r.type !== 'book' || r.status !== 5) return false;
+  if (r.media.status !== 4 && r.media.status !== 5) return false;
+  const pin = r.preferredEditionId;
+  if (!pin || OL_EDITION.test(pin)) return false;
+  const m = r.media;
+  const ebook = !!m.availableEbookServiceIds?.length;
+  const audiobook =
+    !!m.availableAudiobookServiceIds?.length ||
+    !!m.audiobookLibraryItemId ||
+    m.hasPlexAudiobookFile === true ||
+    !!m.ratingKey;
+  const format = r.bookFormat ?? 'ebook';
+  return format === 'both'
+    ? ebook && audiobook
+    : format === 'audiobook'
+      ? audiobook
+      : ebook;
+}
+
 function state(
   x: Row,
   serverName = 'Plex'
@@ -274,6 +297,17 @@ function state(
       case 'importing':
         return { ...base, k: 'wait', word: 'Importing', ico: 'clock' };
       case 'library':
+        // a completed request pinned to one edition, while another edition of the book is what's
+        // in the library: the server keeps saying "library" for it, which would never settle
+        if (otherEditionInLibrary(r))
+          return {
+            k: 'ok',
+            word: 'Different edition in library',
+            ico: 'check',
+            active: false,
+            detail:
+              'This book is in your library in another edition than the one requested.',
+          };
         return { ...base, k: 'wait', word: 'Checking library', ico: 'clock' };
       case 'failed':
         return { ...base, k: 'bad', word: 'Couldn’t get it', ico: 'x' };
@@ -414,6 +448,24 @@ async function startedDownloads(query = '') {
   const more =
     (first.pageInfo?.pages || 1) > 1 ? (await page(100)).results : [];
   return first.results.concat(more).filter((r) => progress(r) > 0);
+}
+// All of one person's requests, newest first, a page of the list at a time (one call each), so
+// the tab counts are the real totals and nothing falls out of every tab. Row detail lookups stay
+// limited separately (describeAll).
+const OWN_PAGE = 15;
+const OWN_MAX = 2000; // a safety stop, not a limit anyone should meet
+async function ownRequests(userId: number): Promise<RequestItem[]> {
+  const out: RequestItem[] = [];
+  for (let skip = 0; skip < OWN_MAX; skip += OWN_PAGE) {
+    const d = await requestList(
+      `/request?take=${OWN_PAGE}&skip=${skip}&filter=all&sort=added&requestedBy=${userId}`
+    );
+    out.push(...d.results);
+    const total = d.pageInfo?.results;
+    if (d.results.length < OWN_PAGE) break;
+    if (total !== undefined && out.length >= total) break;
+  }
+  return out;
 }
 const merge = (...lists: RequestItem[][]) => {
   const seen = new Set<number>();
@@ -874,9 +926,7 @@ export default function Requests() {
     let live = true;
     setOwnError(false);
     const media = Promise.all([
-      requestList(
-        `/request?take=40&skip=0&filter=all&sort=added&requestedBy=${user.id}`
-      ).then((d) => d.results),
+      ownRequests(user.id),
       startedDownloads(`&requestedBy=${user.id}`).catch(() => []),
     ]).then(([recent, started]) =>
       describeAll(

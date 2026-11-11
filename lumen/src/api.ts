@@ -205,10 +205,16 @@ export async function englishAudioEdition(
         narrators?: string[] | null;
         selected?: boolean;
         durationSeconds?: number | null;
+        requestable?: boolean;
       }[];
     }>(audiobookEditionsPath(workId));
+    // copies SeerrNG can't pin come with an empty id; naming one would pin nothing
     const en = d.editions.filter(
-      (e) => englishLang(e.language) && e.narrators?.length
+      (e) =>
+        englishLang(e.language) &&
+        e.narrators?.length &&
+        e.id &&
+        e.requestable !== false
     );
     return (
       en.find((e) => e.selected) ||
@@ -483,6 +489,7 @@ export interface Edition {
   releaseDate?: string;
   owned?: boolean;
   selected?: boolean;
+  requestable?: boolean; // false: no edition id SeerrNG can pin a request to
 }
 export interface DownloadItem {
   size: number;
@@ -502,6 +509,7 @@ export interface RequestItem {
   is4k: boolean;
   createdAt: string;
   bookFormat?: string;
+  preferredEditionId?: string | null;
   seasons: { seasonNumber: number }[];
   requestedBy: { id: number; displayName: string };
   media: MediaInfo & {

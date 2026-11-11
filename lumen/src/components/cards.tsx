@@ -18,13 +18,13 @@ import {
   type TitleResult,
 } from '../api';
 import { useMediaServerName } from '../auth';
+import { friendlyError } from '../errors';
 import { dropBookStates, useBookStates } from '../hooks';
 import { Icon, type IconName } from '../icons';
+import { scrollBehavior } from '../motion';
 import { usePrefs } from '../settings';
 import { useQuickRequest } from './requestSheet';
 import { useToast } from './toast';
-import { friendlyError } from '../errors';
-import { scrollBehavior } from '../motion';
 
 // A stable theme-owned tone per title keeps drawn covers consistent between visits.
 function toneOf(text: string) {
@@ -183,8 +183,15 @@ const MON = [
   'Nov',
   'Dec',
 ];
-export const shortDate = (d?: string) =>
-  d ? `${MON[+d.slice(5, 7) - 1]} ${+d.slice(8, 10)}` : '';
+// "Mar 11", or "Mar 11, 2027" when the date is in another year than this one (`year: false` for
+// callers that print the year themselves)
+export const shortDate = (d?: string, year = true) =>
+  d
+    ? `${MON[+d.slice(5, 7) - 1]} ${+d.slice(8, 10)}` +
+      (year && +d.slice(0, 4) !== new Date().getFullYear()
+        ? `, ${+d.slice(0, 4)}`
+        : '')
+    : '';
 
 // local request state so a card flips to "Requested" straight away
 function useRequested(initial: Stat) {
@@ -235,6 +242,18 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
     );
   });
   const [request, busy] = useBusy(quick.request);
+  // The Request button sits in an overlay that only shows on hover or focus. While the sheet is
+  // open the poster has neither, so keep the overlay up until focus is back on the button.
+  const goRef = useRef<HTMLButtonElement>(null);
+  const sheetOpen = quick.sheet !== null;
+  const [hold, setHold] = useState(false);
+  useEffect(() => {
+    if (sheetOpen) setHold(true);
+    else if (hold) {
+      goRef.current?.focus({ preventScroll: true });
+      setHold(false);
+    }
+  }, [sheetOpen, hold]);
   let qb: ReactNode;
   const plex = plexUrl(it.mediaInfo);
   if (s?.k === 'ok')
@@ -269,7 +288,12 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
   else
     qb = (
       <>
-        <button className="qbtn go" disabled={busy} onClick={request}>
+        <button
+          ref={goRef}
+          className="qbtn go"
+          disabled={busy}
+          onClick={request}
+        >
           <Icon name="plus" size="sm" />
           {unreleased ? 'Request early' : 'Request'}
         </button>
@@ -286,7 +310,7 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
       </>
     );
   return (
-    <div className="poster">
+    <div className={hold ? 'poster hold' : 'poster'}>
       <div className="art">
         <Cover
           src={it.posterPath ? tmdbImg(it.posterPath) : null}
