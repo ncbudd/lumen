@@ -1,13 +1,16 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { MediaInfo } from '../api';
+import { isAdministrator, useAuth } from '../auth';
 import { useExtras, type Extra } from '../extras';
+import { usePublicSettings } from '../hooks';
 import { Icon, type IconName } from '../icons';
 import { usePrefs } from '../settings';
 import { Glyph, statusOf, type Stat } from './cards';
 import { Pill } from './detail';
 import { Avatar, fullSeerrUrl } from './Shell';
 import { useToast } from './toast';
+import { friendlyError } from '../errors';
 
 // The pieces the extra categories share: a poster card, the page header, the status-aware
 // request button and the "this category is off" notice.
@@ -138,7 +141,7 @@ export function RequestButton({
       setDone(true);
       toast('Requested');
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'Request failed');
+      toast(friendlyError(e, 'Request failed'));
     } finally {
       setBusy(false);
     }
@@ -162,6 +165,10 @@ export const StatPill = ({ s }: { s: Stat }) =>
 export function ExtraGate({ k, children }: { k: Extra; children: ReactNode }) {
   const x = useExtras();
   const { seerrPublicUrl } = usePrefs();
+  const { user } = useAuth();
+  const lockedToLumen =
+    usePublicSettings()?.lockLumenForNonAdmins &&
+    !isAdministrator(user?.permissions);
   if (!x.ready)
     return x.error ? (
       <ServiceNote error={x.error} what="this page" retry={x.retry} />
@@ -187,13 +194,17 @@ export function ExtraGate({ k, children }: { k: Extra; children: ReactNode }) {
         <Link to="/" style={{ color: 'var(--accent)' }}>
           Back to Discover
         </Link>{' '}
-        or{' '}
-        <a
-          href={fullSeerrUrl(seerrPublicUrl)}
-          style={{ color: 'var(--accent)' }}
-        >
-          open full SeerrNG
-        </a>
+        {!lockedToLumen && (
+          <>
+            or{' '}
+            <a
+              href={fullSeerrUrl(seerrPublicUrl)}
+              style={{ color: 'var(--accent)' }}
+            >
+              open full SeerrNG
+            </a>
+          </>
+        )}
         .
       </div>
     </>

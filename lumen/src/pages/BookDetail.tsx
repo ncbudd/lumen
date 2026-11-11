@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
+  api,
   audiobookEditionsPath,
   audiobookshelfLink,
   bookIdFor,
@@ -17,9 +18,11 @@ import {
   type ChaptarrWork,
   type Edition,
 } from '../api';
+import { useAuth } from '../auth';
 import { statusOf } from '../components/cards';
 import {
   ActionBar,
+  canChooseRequestOptions,
   DetailTop,
   Facts,
   fmtHrs,
@@ -27,9 +30,10 @@ import {
 } from '../components/detail';
 import { ServiceNote } from '../components/extra';
 import { useToast } from '../components/toast';
-import { dropBookStates, dropCache, useApi } from '../hooks';
+import { dropBookStates, useApi } from '../hooks';
 import { Icon } from '../icons';
 import { usePrefs } from '../settings';
+import { friendlyError } from '../errors';
 
 const english = (e: Edition) =>
   !e.language || /^(en|eng|english|und)$/i.test(e.language);
@@ -106,6 +110,7 @@ export default function BookDetail() {
     p.get('f') === 'audio' ? 'audiobook' : 'ebook';
   const { prefs, audiobookshelfUrl } = usePrefs();
   const toast = useToast();
+  const { user } = useAuth();
   const plainId = bookIdFor(decodeURIComponent(id), f);
   const first = useApi<BookDetails>(`/book/${encodeURIComponent(plainId)}`);
   const bookId = plainId;
@@ -251,9 +256,36 @@ export default function BookDetail() {
   const longest = Math.max(0, ...rows.map((r) => r.durationSeconds || 0));
   const series = b.series?.[0];
   const audio = f === 'audiobook';
+  // nothing to choose between: no narrator details, or no recordings found at all
+  const noChoice = !anotherMode && (!work || (!!eds.data && !rows.length));
   // owned in this format: an audiobook in the library doesn't make the ebook owned (or the reverse)
   const available =
     bookMediaForFormat(b.mediaInfo, f)?.status === MediaStatus.AVAILABLE;
+  const pendingRequest = canChooseRequestOptions(user?.permissions)
+    ? b.mediaInfo?.requests?.find(
+        (request) =>
+          request.status === 1 &&
+          ((request.bookFormat ?? 'ebook') === f ||
+            request.bookFormat === 'both')
+      )
+    : undefined;
+  const approve = async () => {
+    if (!pendingRequest || busy) return;
+    setBusy(true);
+    try {
+      await api(`/request/${pendingRequest.id}/approve`, {
+        method: 'POST',
+        body: '{}',
+      });
+      toast('Request approved');
+      dropBookStates();
+      reload();
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Couldn’t approve the request');
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const requestAnother = async () => {
     const row = rows.find((r) => r.id === chosen);
@@ -271,7 +303,7 @@ export default function BookDetail() {
       );
       setCwTick((t) => t + 1);
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'Request failed');
+      toast(friendlyError(e, 'Request failed'));
     } finally {
       setBusy(false);
     }
@@ -299,11 +331,10 @@ export default function BookDetail() {
       toast(
         `Requested ${b.title} · ${audio ? (showNarr && chosenRow ? who(chosenRow) : 'audiobook') : 'ebook'}`
       );
-      dropCache(`/book/${encodeURIComponent(bookId)}`);
       dropBookStates(); // book cards elsewhere show the new request straight away
-      reload();
+      first.refresh();
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'Request failed');
+      toast(friendlyError(e, 'Request failed'));
     } finally {
       setBusy(false);
     }
@@ -335,38 +366,42 @@ export default function BookDetail() {
     );
   };
   const listen = inAbs(true);
-  const main =
-    audio && showNarr && anotherMode ? (
-      chosenRow ? (
-        <button
-          className="btn btn-primary"
-          disabled={busy}
-          onClick={requestAnother}
-        >
-          <Icon name="plus" />
-          Request another narrator · {who(chosenRow)}
-        </button>
-      ) : ownsAny ? (
-        listen
-      ) : (
-        <button className="btn btn-tonal" disabled>
-          <Icon name="clock" />
-          Requested
-        </button>
-      )
-    ) : available && (!showNarr || !requestable.length) ? (
-      inAbs(audio)
-    ) : s && s.k !== 'ok' ? (
-      <button className="btn btn-tonal" disabled>
-        <Icon name={s.ico} />
-        {s.word}
-      </button>
-    ) : (
-      <button className="btn btn-primary" disabled={busy} onClick={request}>
+  const main = pendingRequest ? (
+    <button className="btn btn-ok" disabled={busy} onClick={approve}>
+      <Icon name="check" />
+      {busy ? 'Approving…' : 'Approve request'}
+    </button>
+  ) : audio && showNarr && anotherMode ? (
+    chosenRow ? (
+      <button
+        className="btn btn-primary"
+        disabled={busy}
+        onClick={requestAnother}
+      >
         <Icon name="plus" />
-        {label}
+        Request another narrator · {who(chosenRow)}
       </button>
-    );
+    ) : ownsAny ? (
+      listen
+    ) : (
+      <button className="btn btn-tonal" disabled>
+        <Icon name="clock" />
+        Requested
+      </button>
+    )
+  ) : available && (!showNarr || !requestable.length) ? (
+    inAbs(audio)
+  ) : s && s.k !== 'ok' ? (
+    <button className="btn btn-tonal" disabled>
+      <Icon name={s.ico} />
+      {s.word}
+    </button>
+  ) : (
+    <button className="btn btn-primary" disabled={busy} onClick={request}>
+      <Icon name="plus" />
+      {label}
+    </button>
+  );
 
   return (
     <article className="detail">
@@ -374,16 +409,13 @@ export default function BookDetail() {
         status={s}
         poster={b.posterPath || undefined}
         square={audio}
+        whole
         title={b.title}
-        by={
-          series?.title ? (
-            <>
-              {series.title}
-              {series.position ? ` #${series.position}` : ''}
-            </>
-          ) : undefined
-        }
+        by={b.author || undefined}
         line={[
+          series?.title
+            ? `${series.title}${series.position ? ' #' + series.position : ''}`
+            : '',
           b.firstPublishYear,
           audio && longest ? fmtHrs(longest) + ' listen' : '',
           audio ? 'Audiobook' : 'Ebook',
@@ -427,12 +459,19 @@ export default function BookDetail() {
         </div>
         <div className="dcols">
           <div style={{ display: 'grid', gap: 22 }}>
+            {b.description && <p className="ov long">{b.description.trim()}</p>}
             {showNarr ? (
               <div id="narr">
                 <div className="sec-head">
-                  <h2>{anotherMode ? 'Narrations' : 'Choose a narrator'}</h2>
+                  <h2>
+                    {anotherMode
+                      ? 'Narrations'
+                      : noChoice
+                        ? 'Narrator'
+                        : 'Choose a narrator'}
+                  </h2>
                   <span className="note">
-                    {eds.data
+                    {eds.data && rows.length
                       ? `${rows.length} English recording${rows.length === 1 ? '' : 's'}`
                       : ''}
                   </span>
@@ -459,7 +498,13 @@ export default function BookDetail() {
                     the best available recording.
                   </p>
                 )}
-                {eds.data && (
+                {noChoice && eds.data && (
+                  <p className="note">
+                    No English recordings with narrator details were found.
+                    Requesting it gets the best available English recording.
+                  </p>
+                )}
+                {eds.data && !noChoice && (
                   <div
                     className="nlist"
                     role="radiogroup"
@@ -586,6 +631,12 @@ export default function BookDetail() {
                         aria-checked={chosen === '*'}
                         tabIndex={0}
                         onClick={() => setPick('*')}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            setPick('*');
+                          }
+                        }}
                       >
                         <span className="radio" />
                         <span className="nart">
