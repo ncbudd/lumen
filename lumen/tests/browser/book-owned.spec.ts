@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
-// Shaped like SeerrNG 3.72.31: the catalogue feeds carry no mediaInfo, the owned list does.
+// Shaped like SeerrNG 3.72.31: catalogues may carry server-resolved mediaInfo, while the
+// owned list carries format-specific library state.
 const ownedAudio = 'bookshelf:1:NDI4Mjkw';
 const ownedAudioWork = 'bookshelf:1:aGM6NDU5NzQ0';
 const audioOnlyEbookOwned = 'bookshelf:1:MjYwNDY4';
@@ -23,6 +24,33 @@ const card = (
   posterPath: 'https://covers.invalid/cover.jpg',
   ...extra,
 });
+const audioMedia = {
+  status: 5,
+  availableEbookServiceIds: [0],
+  availableAudiobookServiceIds: [1],
+  audiobookLibraryServiceId: 1,
+  audiobookLibraryItemId: 'abs-item',
+  hasPlexAudiobookFile: false,
+};
+const ebookMedia = {
+  status: 5,
+  availableEbookServiceIds: [0],
+  availableAudiobookServiceIds: null,
+  hasPlexAudiobookFile: false,
+};
+const audiobookOnlyMedia = {
+  status: 5,
+  availableEbookServiceIds: null,
+  availableAudiobookServiceIds: [1],
+  hasPlexAudiobookFile: false,
+};
+// The catalogue knows these works through an ebook, but there is no audiobook file.
+const ebookOnlyMedia = {
+  status: 5,
+  availableEbookServiceIds: [0],
+  availableAudiobookServiceIds: null,
+  hasPlexAudiobookFile: false,
+};
 const audioFeed = [
   card(
     ownedAudio,
@@ -40,21 +68,25 @@ const audioFeed = [
   card('bookshelf:1:OTk5OTk5', 'Not Owned Recording', 'Writer Two', {
     provider: 'bookshelf',
     bookFormat: 'audiobook',
+    mediaInfo: ebookOnlyMedia,
   }),
   // only the ebook of this one is in the library
   card(audioOnlyEbookOwned, 'Wool', 'Hugh Howey', {
     provider: 'bookshelf',
     bookFormat: 'audiobook',
+    mediaInfo: ebookOnlyMedia,
   }),
 ];
 const ebookFeed = [
   card('OL15358691W', 'Throne of Glass', 'Sarah J. Maas', {
     provider: 'openlibrary',
     bookFormat: 'ebook',
+    mediaInfo: ebookMedia,
   }),
   card('OL17860744W', 'Project Hail Mary', 'Andy Weir', {
     provider: 'openlibrary',
     bookFormat: 'ebook',
+    mediaInfo: ebookMedia,
   }),
   card('OL66554W', 'Pride and Prejudice', 'Jane Austen', {
     provider: 'openlibrary',
@@ -64,22 +96,15 @@ const ebookFeed = [
   card('OL1W', 'Wool', 'Someone Else', {
     provider: 'openlibrary',
     bookFormat: 'ebook',
+    mediaInfo: audiobookOnlyMedia,
+  }),
+  // A similar title and same author is a different Open Library work and must not inherit
+  // the owned state from Project Hail Mary.
+  card('OL2W', 'Project Hail Mary: Illustrated Edition', 'Andy Weir', {
+    provider: 'openlibrary',
+    bookFormat: 'ebook',
   }),
 ];
-const audioMedia = {
-  status: 5,
-  availableEbookServiceIds: [0],
-  availableAudiobookServiceIds: [1],
-  audiobookLibraryServiceId: 1,
-  audiobookLibraryItemId: 'abs-item',
-  hasPlexAudiobookFile: false,
-};
-const ebookMedia = {
-  status: 5,
-  availableEbookServiceIds: [0],
-  availableAudiobookServiceIds: null,
-  hasPlexAudiobookFile: false,
-};
 const library = {
   audiobook: [
     card(
@@ -108,7 +133,10 @@ const library = {
   ],
 };
 
-async function fixtures(page: Page) {
+async function fixtures(
+  page: Page,
+  options: { libraryStatus?: number; libraryTotalPages?: number } = {}
+) {
   const calls: string[] = [];
   await page.route('https://**/*', (r) => r.abort());
   await page.route('**/lumen-config.json', (r) => r.fulfill({ json: {} }));
@@ -145,8 +173,24 @@ async function fixtures(page: Page) {
         ),
       });
     }
-    if (path === '/book/library')
-      return route.fulfill({ json: paged(library[format]) });
+    if (path === '/book/library') {
+      if (options.libraryStatus && options.libraryStatus !== 200)
+        return route.fulfill({
+          status: options.libraryStatus,
+          json: { message: 'Library unavailable' },
+        });
+      return route.fulfill({
+        json: {
+          ...paged(library[format]),
+          page: Number(url.searchParams.get('page') || 1),
+          totalPages: options.libraryTotalPages ?? 1,
+          totalResults:
+            options.libraryTotalPages === undefined
+              ? library[format].length
+              : Math.max(0, (options.libraryTotalPages - 1) * 50 + 1),
+        },
+      });
+    }
     if (path.startsWith('/discover/genreslider/'))
       return route.fulfill({ json: [] });
     if (path.startsWith('/discover/') || path === '/search')
@@ -170,7 +214,7 @@ const expectOwned = async (page: Page, title: string, owned: boolean) => {
 
 test('audiobook cards show the books already in the library', async ({
   page,
-}) => {
+}, info) => {
   const calls = await fixtures(page);
   await page.goto('/audiobooks');
   await expect(poster(page, 'Not Owned Recording')).toHaveCount(1);
@@ -187,11 +231,19 @@ test('audiobook cards show the books already in the library', async ({
   await expectOwned(page, 'Not Owned Recording', false);
   // owning the ebook is not owning the audiobook
   await expectOwned(page, 'Wool', false);
+  await page.screenshot({
+    path: info.outputPath('audiobooks-all.png'),
+    fullPage: true,
+  });
 
   await page.getByRole('button', { name: 'Not yet', exact: true }).click();
   await expect(poster(page, 'Not Owned Recording')).toHaveCount(1);
   await expect(poster(page, 'Wool')).toHaveCount(1);
   await expect(page.locator('.grid .poster')).toHaveCount(2);
+  await page.screenshot({
+    path: info.outputPath('audiobooks-not-yet.png'),
+    fullPage: true,
+  });
 
   await page.getByRole('button', { name: 'In library', exact: true }).click();
   await expect(page.locator('.grid .poster')).toHaveCount(2);
@@ -203,9 +255,9 @@ test('audiobook cards show the books already in the library', async ({
   ).toBeLessThanOrEqual(2);
 });
 
-test('ebook cards from Open Library match owned books by title and author', async ({
+test('ebook cards use server-resolved Open Library identity without title guesses', async ({
   page,
-}) => {
+}, info) => {
   await fixtures(page);
   await page.goto('/books');
   await expect(poster(page, 'Pride and Prejudice')).toHaveCount(1);
@@ -213,11 +265,38 @@ test('ebook cards from Open Library match owned books by title and author', asyn
   await expectOwned(page, 'Project Hail Mary', true);
   await expectOwned(page, 'Pride and Prejudice', false);
   await expectOwned(page, 'Wool', false);
+  await expectOwned(page, 'Project Hail Mary: Illustrated Edition', false);
+  await expect(
+    poster(page, 'Pride and Prejudice').locator('.glyph.wait')
+  ).toHaveAttribute('title', 'Library status unknown');
+  const unknownBook = poster(page, 'Pride and Prejudice');
+  if (info.project.name === 'desktop') {
+    await unknownBook.hover();
+    await expect(
+      unknownBook.getByRole('button', { name: 'Request anyway' })
+    ).toBeVisible();
+  } else {
+    await expect(
+      unknownBook.getByRole('button', {
+        name: 'Request Pride and Prejudice anyway; library status is unknown',
+      })
+    ).toBeVisible();
+  }
+  await page.screenshot({
+    path: info.outputPath('ebooks-all.png'),
+    fullPage: true,
+  });
 
   await page.getByRole('button', { name: 'Not yet', exact: true }).click();
-  await expect(page.locator('.grid .poster')).toHaveCount(2);
-  await expect(poster(page, 'Pride and Prejudice')).toHaveCount(1);
+  await expect(page.locator('.note[role="status"]')).toContainText(
+    'library status could not be confirmed'
+  );
+  await expect(page.locator('.grid .poster')).toHaveCount(1);
   await expect(poster(page, 'Wool')).toHaveCount(1);
+  await page.screenshot({
+    path: info.outputPath('ebooks-not-yet.png'),
+    fullPage: true,
+  });
 
   await page.getByRole('button', { name: 'In library', exact: true }).click();
   await expect(page.locator('.grid .poster')).toHaveCount(3);
@@ -248,7 +327,44 @@ test('Discover rows and search results mark owned books', async ({ page }) => {
   await expectOwned(page, 'Throne of Glass', true);
 });
 
-test('a book SeerrNG already marks keeps its state when the owned list is unavailable', async ({
+test('Not yet hides results when the library check fails', async ({ page }) => {
+  await fixtures(page, { libraryStatus: 503 });
+  await page.goto('/books?show=not');
+
+  await expect(page.getByRole('alert')).toContainText(
+    'Library Check Unavailable'
+  );
+  await expect(page.locator('.grid .poster')).toHaveCount(0);
+});
+
+test('Not yet hides results when the library exceeds the bounded scan', async ({
+  page,
+}) => {
+  const calls = await fixtures(page, { libraryTotalPages: 21 });
+  await page.goto('/books?show=not');
+
+  await expect(page.getByRole('alert')).toContainText(
+    'Library Check Incomplete'
+  );
+  await expect(page.locator('.grid .poster')).toHaveCount(0);
+  expect(
+    calls.filter((call) => call.startsWith('/discover/books'))
+  ).toHaveLength(1);
+});
+
+test('Not yet hides results when library pagination is malformed', async ({
+  page,
+}) => {
+  await fixtures(page, { libraryTotalPages: 0 });
+  await page.goto('/books?show=not');
+
+  await expect(page.getByRole('alert')).toContainText(
+    'Library Check Unavailable'
+  );
+  await expect(page.locator('.grid .poster')).toHaveCount(0);
+});
+
+test('server status stays visible while Not yet hides unverified books when the library is unavailable', async ({
   page,
 }) => {
   await fixtures(page);
@@ -272,6 +388,8 @@ test('a book SeerrNG already marks keeps its state when the owned list is unavai
   await expectOwned(page, 'Marked By Server', true);
   await expectOwned(page, 'Unmarked', false);
   await page.getByRole('button', { name: 'Not yet', exact: true }).click();
-  await expect(page.locator('.grid .poster')).toHaveCount(1);
-  await expect(poster(page, 'Unmarked')).toHaveCount(1);
+  await expect(page.getByRole('alert')).toContainText(
+    'Library Check Unavailable'
+  );
+  await expect(page.locator('.grid .poster')).toHaveCount(0);
 });
