@@ -62,7 +62,15 @@ export const MediaStatus = {
 } as const;
 
 export interface MediaInfo {
-  requests?: { id: number; status: number; bookFormat?: string }[];
+  requests?: {
+    id: number;
+    status: number;
+    bookFormat?: string;
+    is4k?: boolean;
+    createdAt?: string;
+    requestedBy?: { displayName?: string };
+    seasons?: { seasonNumber: number; status?: number }[];
+  }[];
   hasPlexAudiobookFile?: boolean;
   availableEbookServiceIds?: number[] | null;
   availableAudiobookServiceIds?: number[] | null;
@@ -75,6 +83,8 @@ export interface MediaInfo {
   downloadStatus4k?: { size: number; sizeLeft: number }[];
   // comics: issues/volumes in the library out of those known (BackIssue)
   comicProgress?: { owned: number; total: number };
+  // comics: the series in the reading server (Kavita), once any of it is in
+  readerUrl?: string;
   status?: number;
   status4k?: number;
   mediaAddedAt?: string;
@@ -100,6 +110,7 @@ export interface TitleResult {
 export interface BookResult {
   id: string;
   mediaType: 'book';
+  provider?: 'openlibrary' | 'bookshelf';
   title: string;
   author?: string;
   posterPath?: string | null;
@@ -222,10 +233,16 @@ export async function englishAudioEdition(
         narrators?: string[] | null;
         selected?: boolean;
         durationSeconds?: number | null;
+        requestable?: boolean;
       }[];
     }>(audiobookEditionsPath(workId));
+    // copies SeerrNG can't pin come with an empty id; naming one would pin nothing
     const en = d.editions.filter(
-      (e) => englishLang(e.language) && e.narrators?.length
+      (e) =>
+        englishLang(e.language) &&
+        e.narrators?.length &&
+        e.id &&
+        e.requestable !== false
     );
     return (
       en.find((e) => e.selected) ||
@@ -326,6 +343,37 @@ export const hardcoverWorkId = (id: string) => {
     return null;
   }
 };
+// "Read in Kavita": SeerrNG's link to the series (http/https only), moved onto the admin's
+// Kavita address when Lumen has one, the way the Audiobookshelf address works
+export const kavitaLink = (
+  readerUrl?: string | null,
+  base?: string
+): string | null => {
+  const web = (raw: string) => {
+    try {
+      const url = new URL(raw);
+      return ['http:', 'https:'].includes(url.protocol) &&
+        !url.username &&
+        !url.password
+        ? url
+        : null;
+    } catch {
+      return null;
+    }
+  };
+  const link = readerUrl ? web(readerUrl) : null;
+  if (!link) return null;
+  const series = /\/library\/(\d+)\/series\/(\d+)\/?$/.exec(link.pathname);
+  const own = base ? web(base) : null;
+  if (own && series) {
+    own.search = '';
+    own.hash = '';
+    own.pathname = `${own.pathname.replace(/\/+$/, '')}/library/${series[1]}/series/${series[2]}`;
+    return own.href;
+  }
+  return link.href;
+};
+
 // The admin's Audiobookshelf address (http/https only), opening the item when SeerrNG knows it
 export const audiobookshelfLink = (
   base?: string,
@@ -500,6 +548,7 @@ export interface Edition {
   releaseDate?: string;
   owned?: boolean;
   selected?: boolean;
+  requestable?: boolean; // false: no edition id SeerrNG can pin a request to
 }
 export interface DownloadItem {
   size: number;
@@ -519,6 +568,7 @@ export interface RequestItem {
   is4k: boolean;
   createdAt: string;
   bookFormat?: string;
+  preferredEditionId?: string | null;
   seasons: { seasonNumber: number }[];
   requestedBy: { id: number; displayName: string };
   media: MediaInfo & {
