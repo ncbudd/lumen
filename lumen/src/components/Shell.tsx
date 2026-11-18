@@ -12,15 +12,22 @@ import { useBlocklistNavigation } from '../blocklist';
 import { canManageDownloads } from '../downloadPermissions';
 import { useExtras } from '../extras';
 import { canViewFollowing } from '../followPermissions';
-import { useBack, usePublicSettings } from '../hooks';
+import {
+  useApi,
+  useBack,
+  usePublicSettings,
+  type PublicSettings,
+} from '../hooks';
 import { Icon, type IconName } from '../icons';
 import { canSearchIndexers } from '../indexerPermissions';
 import { canReadIssues } from '../issuePermissions';
+import { useLiveTvStatus } from '../liveTv';
 import { scrollBehavior } from '../motion';
 import { normalizeSearchParams } from '../searchParams';
 import { usePrefs } from '../settings';
+import { VideoAvailabilityProvider } from '../videoAvailability';
 import { BrandMark, brandName } from './brand';
-import { canChooseRequestOptions } from './detail';
+import { canManageRequests, canRequestMovies } from './detail';
 
 // scroll position of each history entry, for Back
 const scrollSpots = new Map<string, number>();
@@ -80,15 +87,29 @@ export function Avatar({ className = 'avatar' }: { className?: string }) {
 
 export default function Shell({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const { prefs, seerrPublicUrl } = usePrefs();
+  const liveTv = useLiveTvStatus();
+  const { prefs } = usePrefs();
   const extras = useExtras();
+  const swipeSettings = useApi<PublicSettings>('/settings/public', {
+    keepDuringRefresh: true,
+  });
+  const swipeEnabled = swipeSettings.data?.swipeEnabled;
+  const refreshPublicSettings = swipeSettings.refresh;
+  useEffect(() => {
+    window.addEventListener('lumen-settings-updated', refreshPublicSettings);
+    return () =>
+      window.removeEventListener(
+        'lumen-settings-updated',
+        refreshPublicSettings
+      );
+  }, [refreshPublicSettings]);
   const isBook = (h: string) => h === '/books' || h === '/audiobooks';
   const loc = useLocation();
   const showBlocklist = useBlocklistNavigation();
-  const canManageRequests = canChooseRequestOptions(user?.permissions);
+  const managesRequests = canManageRequests(user?.permissions);
   const [pendingRequests, setPendingRequests] = useState(0);
   useEffect(() => {
-    if (!canManageRequests) {
+    if (!managesRequests) {
       setPendingRequests(0);
       return;
     }
@@ -104,7 +125,7 @@ export default function Shell({ children }: { children: ReactNode }) {
       live = false;
       window.clearInterval(timer);
     };
-  }, [canManageRequests, loc.pathname]);
+  }, [managesRequests, loc.pathname]);
   const nav = useNavigate();
   const q = useRef<HTMLInputElement>(null);
   const detail =
@@ -285,10 +306,10 @@ export default function Shell({ children }: { children: ReactNode }) {
                 <Icon name="lock" />
                 Lumen Settings
               </Link>
-              <a href={fullSeerrUrl(seerrPublicUrl)}>
+              <Link to="/admin">
                 <Icon name="list" />
                 SeerrNG Administration
-              </a>
+              </Link>
             </>
           )}
           <div className="lbl">You</div>
@@ -342,6 +363,24 @@ export default function Shell({ children }: { children: ReactNode }) {
             <Icon name="book" />
             My Media
           </NavLink>
+          {swipeEnabled && (
+            <NavLink to="/swipe">
+              <Icon name="star" />
+              Swipe
+            </NavLink>
+          )}
+          {canRequestMovies(user?.permissions) && (
+            <NavLink to="/watch-sessions">
+              <Icon name="cal" />
+              Watch Sessions
+            </NavLink>
+          )}
+          {liveTv.data?.configured && (
+            <NavLink to="/recordings">
+              <Icon name="cal" />
+              Recordings
+            </NavLink>
+          )}
           <NavLink to="/calendar">
             <Icon name="cal" />
             Release Calendar
@@ -406,7 +445,9 @@ export default function Shell({ children }: { children: ReactNode }) {
                 </Link>
               </p>
             )}
-            {children}
+            <VideoAvailabilityProvider key={loc.pathname}>
+              {children}
+            </VideoAvailabilityProvider>
           </main>
         </div>
       </div>

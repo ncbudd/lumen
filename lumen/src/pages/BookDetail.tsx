@@ -5,6 +5,7 @@ import {
   audiobookEditionsPath,
   audiobookshelfLink,
   bookArt,
+  bookDetailPath,
   bookIdFor,
   bookMediaForFormat,
   englishAudioEdition,
@@ -16,12 +17,12 @@ import {
   type Edition,
   type EditionList,
 } from '../api';
-import { useAuth } from '../auth';
+import { isAdministrator, useAuth } from '../auth';
 import BlocklistButton from '../components/BlocklistButton';
 import { statusOf } from '../components/cards';
 import {
   ActionBar,
-  canChooseRequestOptions,
+  canManageRequests,
   DetailTop,
   Facts,
   fmtHrs,
@@ -29,6 +30,7 @@ import {
 } from '../components/detail';
 import { ServiceNote } from '../components/extra';
 import IndexerSearchLink from '../components/IndexerSearchLink';
+import ReaderDeliveryLink from '../components/ReaderDeliveryLink';
 import ReportIssueButton from '../components/ReportIssueButton';
 import { ReaderDownloads } from '../components/RequestFiles';
 import { useToast } from '../components/toast';
@@ -37,7 +39,44 @@ import { friendlyError } from '../errors';
 import { dropBookStates, useApi } from '../hooks';
 import { Icon } from '../icons';
 import { usePrefs } from '../settings';
+import { useLiveMediaProgress } from '../useLiveDownloadProgress';
 import { AssociationLink } from './Associations';
+
+interface BookRating {
+  average?: number;
+  count: number;
+  source: 'openlibrary' | 'bookshelf';
+  workId?: string;
+}
+
+function ratingLabel(rating: BookRating | null, book: BookDetails) {
+  const valid = (score: unknown, count: number): score is number =>
+    typeof score === 'number' &&
+    score >= 0 &&
+    score <= 5 &&
+    Number.isSafeInteger(count) &&
+    count > 0;
+  const score = rating?.average;
+  const localScore = book.ratingsAverage;
+  const localCount = book.ratingsCount ?? 0;
+  if (
+    rating &&
+    (rating.source === 'openlibrary' || rating.source === 'bookshelf') &&
+    valid(score, rating.count)
+  ) {
+    const library = rating.source === 'openlibrary';
+    const source = library ? 'Open Library' : 'Bookshelf';
+    const label = `${score.toFixed(1)}/5 · ${source}`;
+    const work = rating.workId ?? book.id;
+    return library && /^OL[0-9]+W$/.test(work) ? (
+      <a href={`https://openlibrary.org/works/${work}`}>{label}</a>
+    ) : (
+      label
+    );
+  }
+  if (book.provider === 'bookshelf' && valid(localScore, localCount))
+    return `${localScore.toFixed(1)}/5 · Bookshelf`;
+}
 
 const english = (e: Edition) =>
   !e.language || /^(en|eng|english|und)$/i.test(e.language);
@@ -130,20 +169,35 @@ export default function BookDetail() {
   const { id = '' } = useParams();
   const [p] = useSearchParams();
   const f: 'ebook' | 'audiobook' =
-    p.get('f') === 'audio' ? 'audiobook' : 'ebook';
+    p.get('f') === 'audio' || p.get('format') === 'audiobook'
+      ? 'audiobook'
+      : 'ebook';
   const { prefs, audiobookshelfUrl } = usePrefs();
   const toast = useToast();
   const { user } = useAuth();
   // useParams has already decoded it (decoding again breaks on a literal %)
   const plainId = bookIdFor(id, f);
-  const first = useApi<BookDetails>(`/book/${encodeURIComponent(plainId)}`);
+  const rawLookupTitle = plainId.startsWith('bookshelf:')
+    ? p.get('lookupTitle')?.trim()
+    : undefined;
+  const lookupTitle =
+    rawLookupTitle && rawLookupTitle.length <= 512 ? rawLookupTitle : undefined;
+  const lookup = lookupTitle ? `?${new URLSearchParams({ lookupTitle })}` : '';
+  const first = useApi<BookDetails>(
+    `/book/${encodeURIComponent(plainId)}${lookup}`,
+    { currentPathOnly: true }
+  );
+  const ratings = useApi<BookRating>(
+    first.data ? `/book/${encodeURIComponent(plainId)}/ratings${lookup}` : null,
+    { currentPathOnly: true }
+  );
   const bookId = plainId;
   // Books stored under a bare Hardcover id can come back without a description while the
   // "hc:" form of the same work has one: ask for that form once, and only to fill the blurb.
   const altId =
     first.data && !first.data.description ? hcFormId(plainId) : null;
   const alt = useApi<BookDetails>(
-    altId ? `/book/${encodeURIComponent(altId)}` : null
+    altId ? `/book/${encodeURIComponent(altId)}${lookup}` : null
   );
   const b = useMemo(
     () =>
@@ -152,7 +206,13 @@ export default function BookDetail() {
         : first.data,
     [first.data, alt.data, altId]
   );
+  const formatHref = (format: 'ebook' | 'audiobook') =>
+    bookDetailPath(id, format, lookupTitle ?? first.data?.title);
   const error = first.error;
+  const progressMedia = useLiveMediaProgress(
+    bookMediaForFormat(b?.mediaInfo, f),
+    isAdministrator(user?.permissions)
+  );
   const reload = first.reload;
   const work = hardcoverWorkId(bookId);
   const showNarr = f === 'audiobook' && prefs.narratorChoice;
@@ -201,10 +261,7 @@ export default function BookDetail() {
       <div className="empty">
         <b>No ebook edition found</b>ChaptarrNG only knows this book as an
         audiobook.{' '}
-        <Link
-          to={`/book/${encodeURIComponent(bookIdFor(bookId, 'audiobook'))}?f=audio`}
-          style={{ color: 'var(--accent)' }}
-        >
+        <Link to={formatHref('audiobook')} style={{ color: 'var(--accent)' }}>
           See the audiobook
         </Link>
       </div>
@@ -213,7 +270,7 @@ export default function BookDetail() {
     );
   if (!b) return <div className="detail-loading" aria-busy="true" />;
 
-  const s = statusOf(bookMediaForFormat(b.mediaInfo, f), true);
+  const s = statusOf(progressMedia, true);
   // copies in the library that the English list leaves out (another language)
   const unlisted = (eds.data?.editions || []).filter(
     (e) => e.format === 'audiobook' && e.owned && !english(e)
@@ -243,7 +300,7 @@ export default function BookDetail() {
   // owned in this format: an audiobook in the library doesn't make the ebook owned (or the reverse)
   const available =
     bookMediaForFormat(b.mediaInfo, f)?.status === MediaStatus.AVAILABLE;
-  const pendingRequest = canChooseRequestOptions(user?.permissions)
+  const pendingRequest = canManageRequests(user?.permissions)
     ? b.mediaInfo?.requests?.find(
         (request) =>
           request.status === 1 &&
@@ -405,12 +462,21 @@ export default function BookDetail() {
         square={audio}
         whole
         title={b.title}
-        by={b.author || undefined}
+        by={
+          b.authorId && b.author ? (
+            <Link to={`/author/${encodeURIComponent(b.authorId)}`}>
+              {b.author}
+            </Link>
+          ) : (
+            b.author || undefined
+          )
+        }
         line={[
           series?.title
             ? `${series.title}${series.position ? ' #' + series.position : ''}`
             : '',
           b.firstPublishYear,
+          ratingLabel(ratings.data, b),
           audio && longest ? fmtHrs(longest) + ' listen' : '',
           audio ? 'Audiobook' : 'Ebook',
         ]}
@@ -419,7 +485,7 @@ export default function BookDetail() {
         <div className="fmt">
           <Link
             replace
-            to={`/book/${encodeURIComponent(bookIdFor(bookId, 'ebook'))}`}
+            to={formatHref('ebook')}
             aria-current={!audio ? 'page' : undefined}
           >
             <b>
@@ -430,7 +496,7 @@ export default function BookDetail() {
           </Link>
           <Link
             replace
-            to={`/book/${encodeURIComponent(bookIdFor(bookId, 'audiobook'))}?f=audio`}
+            to={formatHref('audiobook')}
             aria-current={audio ? 'page' : undefined}
           >
             <b>
@@ -462,6 +528,7 @@ export default function BookDetail() {
             title={b.title}
             onChange={first.refresh}
           />
+          <ReaderDeliveryLink target={f} />
           <ReaderDownloads mediaId={b.mediaInfo?.id} type="book" format={f} />
           <ReportIssueButton type="book" title={b.title} media={b.mediaInfo} />
           <WatchlistButton mediaType="book" detail={b} requestedId={plainId} />
@@ -551,6 +618,7 @@ export default function BookDetail() {
                             {b.posterPath ? (
                               <img
                                 src={bookArt(b.posterPath)}
+                                referrerPolicy="no-referrer"
                                 alt=""
                                 loading="lazy"
                               />
@@ -620,6 +688,7 @@ export default function BookDetail() {
                           {b.posterPath ? (
                             <img
                               src={bookArt(b.posterPath)}
+                              referrerPolicy="no-referrer"
                               alt=""
                               loading="lazy"
                             />
@@ -685,9 +754,16 @@ export default function BookDetail() {
               rows={[
                 [
                   'Series',
-                  series?.title
-                    ? `${series.title}${series.position ? ' #' + series.position : ''}`
-                    : '',
+                  series?.id && series.title ? (
+                    <Link to={`/book-series/${encodeURIComponent(series.id)}`}>
+                      {series.title}
+                      {series.position ? ` #${series.position}` : ''}
+                    </Link>
+                  ) : series?.title ? (
+                    `${series.title}${series.position ? ' #' + series.position : ''}`
+                  ) : (
+                    ''
+                  ),
                 ],
                 ['First published', b.firstPublishYear],
                 ['Listening time', audio && longest ? fmtHrs(longest) : ''],

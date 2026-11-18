@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { artUrl, kavitaLink, MediaStatus } from '../api';
+import { useAuth } from '../auth';
 import BlocklistButton from '../components/BlocklistButton';
 import {
   GridSkeleton,
@@ -15,20 +16,27 @@ import {
   editionLabel,
   requestComicEdition,
 } from '../components/comics';
-import { DetailTop, Facts, Pill } from '../components/detail';
+import { ConfirmSheet } from '../components/ConfirmSheet';
+import {
+  canChooseRequestOptions,
+  DetailTop,
+  Facts,
+  Pill,
+} from '../components/detail';
 import {
   comicState,
-  ExtraCard,
   ExtraGate,
   ExtraHeader,
   ExtraSearch,
   extraStat,
-  RequestButton,
+  MagazineCard,
   ServiceNote,
   StatPill,
 } from '../components/extra';
 import { GenrePicker } from '../components/GenrePicker';
 import IndexerSearchLink from '../components/IndexerSearchLink';
+import ReaderDeliveryLink from '../components/ReaderDeliveryLink';
+import ReaderShelf from '../components/ReaderShelf';
 import ReportIssueButton from '../components/ReportIssueButton';
 import { ReaderDownloads } from '../components/RequestFiles';
 import { useToast } from '../components/toast';
@@ -49,28 +57,6 @@ import { Icon } from '../icons';
 import { usePrefs } from '../settings';
 
 // the search box writes ?q= after a pause, so typing doesn't fire a request per letter
-function useQueryParam() {
-  const [p, setP] = useSearchParams();
-  const query = p.get('q') || '';
-  const [q, setQ] = useState(query);
-  useEffect(() => {
-    const t = setTimeout(() => {
-      if (q.trim() === query) return;
-      const n = new URLSearchParams(p);
-      if (q.trim()) n.set('q', q.trim());
-      else n.delete('q');
-      setP(n, { replace: true });
-    }, 350);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q]);
-  // ?q= changed from outside (Back, Forward, a link): show that in the box
-  useEffect(() => {
-    setQ((x) => (x.trim() === query ? x : query));
-  }, [query]);
-  return { q, setQ, query, p, setP };
-}
-
 const MANGA_SORTS = [
   ['popular', 'Popular'],
   ['trending', 'Trending'],
@@ -133,6 +119,36 @@ const inLibrary = (w: ComicWork) =>
   w.mediaInfo?.status === MediaStatus.AVAILABLE ||
   w.mediaInfo?.status === MediaStatus.PARTIAL;
 
+interface ComicCatalogueStatus {
+  comicVineConfigured?: boolean;
+  indexing?: boolean;
+  indexedResults?: number;
+  expectedResults?: number;
+  indexError?: string;
+}
+
+const CATALOGUE_RECHECK_MS = 15_000;
+
+const COMIC_CATALOG_FIELDS = [
+  { key: 'query', label: 'Title', maxLength: 256 },
+  { key: 'publisher', label: 'Publisher', maxLength: 128 },
+  { key: 'startYear', label: 'Start Year', min: 1800, max: 2200 },
+  { key: 'minIssues', label: 'Minimum Issues', min: 0, max: 100000 },
+  { key: 'maxIssues', label: 'Maximum Issues', min: 0, max: 100000 },
+] as const;
+
+function catalogComicWork(volume: Comic | ComicWork): ComicWork {
+  if ('editions' in volume) return volume;
+  return {
+    ...volume,
+    kind: volume.manga ? 'manga' : 'comic',
+    editions: [volume],
+    editionsResolved: true,
+    recommendedId: String(volume.id),
+    id: String(volume.id),
+  };
+}
+
 // ---- comics and manga: manga from AniList, Western comics from ComicVine; one card per
 // work with its editions inside; searching is the top search bar's job ----
 export function Comics() {
@@ -142,9 +158,42 @@ export function Comics() {
   const show = (['library', 'not'] as const).find((s) => s === p.get('show'));
   const picked = (p.get('genre') || '').split(',').filter(Boolean);
   const status = p.get('status') || '';
+  const catalogFilters = new URLSearchParams();
+  for (const { key } of COMIC_CATALOG_FIELDS) {
+    const value = p.get(key)?.trim();
+    if (value) catalogFilters.set(key, value);
+  }
+  // The Western browse publisher dropdown uses the curated browse endpoint.
+  const catalogMode =
+    p.has('catalog') ||
+    COMIC_CATALOG_FIELDS.some(
+      ({ key }) => key !== 'publisher' && catalogFilters.has(key)
+    ) ||
+    (!type && catalogFilters.has('publisher'));
+  const catalogQuery = new URLSearchParams(catalogFilters);
+  if (catalogQuery.size === 1 && catalogQuery.has('query'))
+    catalogQuery.set('group', 'works');
+  const catalog = usePaged<Comic | ComicWork, ComicCatalogueStatus>(
+    catalogMode ? `/discover/comics?${catalogQuery}` : null
+  );
+  const catalogueStatus = catalogMode ? catalog.firstPage : undefined;
+  const indexing = catalogueStatus?.indexing === true;
+  const { recheckEmptyFirstPage } = catalog;
+  useEffect(() => {
+    if (!indexing || catalog.page !== 1) return;
+    const timer = setTimeout(recheckEmptyFirstPage, CATALOGUE_RECHECK_MS);
+    return () => clearTimeout(timer);
+  }, [indexing, catalog.page, recheckEmptyFirstPage]);
   const publisher = p.get('publisher') || '';
   const sort = p.get('sort') || '';
-  const filtered = !!(type || show || picked.length || status || sort);
+  const filtered = !!(
+    catalogMode ||
+    type ||
+    show ||
+    picked.length ||
+    status ||
+    sort
+  );
   const landing = useApi<ComicLanding>('/discover/comics/landing');
   const genres = landing.data?.genres?.length
     ? landing.data.genres
@@ -160,14 +209,22 @@ export function Comics() {
   if (kind === 'manga' && picked.length) q.set('genre', picked.join(','));
   if (kind === 'manga' && status) q.set('status', status);
   if (kind === 'comic' && publisher) q.set('publisher', publisher);
-  const list = usePaged<ComicWork>(`/discover/comics/browse?${q}`);
+  const browse = usePaged<ComicWork>(
+    catalogMode ? null : `/discover/comics/browse?${q}`
+  );
+  const list = catalogMode
+    ? { ...catalog, items: catalog.items.map(catalogComicWork) }
+    : browse;
   // a work can come back on a later page too
   const seen = new Set<string>();
   const items = list.items.filter((w) =>
-    seen.has(w.id) ? false : (seen.add(w.id), !(show === 'not' && inLibrary(w)))
+    seen.has(w.id)
+      ? false
+      : (seen.add(w.id), !(!catalogMode && show === 'not' && inLibrary(w)))
   );
   // Not yet: a page can be all owned works; fetch on until something shows or the feed ends
   const hiddenPage =
+    !catalogMode &&
     show === 'not' &&
     !items.length &&
     list.page > 0 &&
@@ -190,8 +247,9 @@ export function Comics() {
     upd({ ...changes, ...(type ? {} : { type: 'manga' }) });
   const noKey = landing.data?.comicVineConfigured === false;
   const sorts = kind === 'comic' ? COMIC_SORTS : MANGA_SORTS;
-  const gridTitle =
-    show === 'library'
+  const gridTitle = catalogMode
+    ? 'Comics Catalogue'
+    : show === 'library'
       ? 'In your library'
       : show === 'not'
         ? 'Not in your library yet'
@@ -218,117 +276,162 @@ export function Comics() {
           under Settings › General. You can still browse manga.
         </div>
       )}
-      <div className="toolbar">
-        <div className="seg" role="group" aria-label="Type">
-          {(
-            [
-              ['', 'All'],
-              ['manga', 'Manga'],
-              ['comic', 'Comics'],
-            ] as const
-          ).map(([v, t]) => (
-            <button
-              key={v || 'all'}
-              aria-pressed={(type || '') === v}
-              onClick={() =>
-                upd({
-                  type: v || null,
-                  sort: null,
-                  // manga filters don't apply to Western comics and back
-                  ...(v === 'comic' ? { genre: null, status: null } : {}),
-                  ...(v !== 'comic' ? { publisher: null } : {}),
-                })
+      <form
+        className="toolbar"
+        aria-label="Comics Catalogue Filters"
+        key={catalogFilters.toString()}
+        onSubmit={(event) => {
+          event.preventDefault();
+          const data = new FormData(event.currentTarget);
+          const next = new URLSearchParams({ catalog: '1' });
+          for (const { key } of COMIC_CATALOG_FIELDS) {
+            const value = String(data.get(key) ?? '').trim();
+            if (value) next.set(key, value);
+          }
+          setP(next, { replace: true });
+        }}
+      >
+        {COMIC_CATALOG_FIELDS.map((field) => (
+          <label className="sel" key={field.key}>
+            <span className="lbl">{field.label}</span>
+            <input
+              className="cfg-input"
+              type={'min' in field ? 'number' : 'search'}
+              name={field.key}
+              defaultValue={catalogFilters.get(field.key) ?? ''}
+              min={'min' in field ? field.min : undefined}
+              max={'max' in field ? field.max : undefined}
+              maxLength={'maxLength' in field ? field.maxLength : undefined}
+            />
+          </label>
+        ))}
+        <button type="submit" className="btn btn-tonal btn-sm">
+          Search Comics Catalogue
+        </button>
+        {catalogMode && (
+          <button
+            type="button"
+            className="chip"
+            onClick={() => setP({}, { replace: true })}
+          >
+            Back to Comics and Manga
+          </button>
+        )}
+      </form>
+      {!catalogMode && (
+        <div className="toolbar">
+          <div className="seg" role="group" aria-label="Type">
+            {(
+              [
+                ['', 'All'],
+                ['manga', 'Manga'],
+                ['comic', 'Comics'],
+              ] as const
+            ).map(([v, t]) => (
+              <button
+                key={v || 'all'}
+                aria-pressed={(type || '') === v}
+                onClick={() =>
+                  upd({
+                    type: v || null,
+                    sort: null,
+                    // manga filters don't apply to Western comics and back
+                    ...(v === 'comic' ? { genre: null, status: null } : {}),
+                    ...(v !== 'comic' ? { publisher: null } : {}),
+                  })
+                }
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+          <div className="seg" role="group" aria-label="Library">
+            {(
+              [
+                ['', 'All'],
+                ['library', 'In library'],
+                ['not', 'Not yet'],
+              ] as const
+            ).map(([v, t]) => (
+              <button
+                key={v || 'all'}
+                aria-pressed={(show || '') === v}
+                onClick={() => upd({ show: v || null })}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+          {show !== 'library' && (
+            <label className="sel">
+              <span className="lbl">Sort</span>
+              <select
+                value={sort || sorts[0][0]}
+                onChange={(e) =>
+                  kind === 'comic'
+                    ? upd({
+                        sort:
+                          e.target.value === 'issues' ? null : e.target.value,
+                      })
+                    : mangaOnly({
+                        sort:
+                          e.target.value === 'popular' && type
+                            ? null
+                            : e.target.value,
+                      })
+                }
+              >
+                {sorts.map(([v, t]) => (
+                  <option key={v} value={v}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {kind === 'manga' && show !== 'library' && (
+            <label className="sel">
+              <span className="lbl">Status</span>
+              <select
+                value={status}
+                onChange={(e) => mangaOnly({ status: e.target.value || null })}
+              >
+                <option value="">Any</option>
+                <option value="ongoing">Ongoing</option>
+                <option value="finished">Finished</option>
+              </select>
+            </label>
+          )}
+          {kind === 'comic' && !!publishers.length && (
+            <label className="sel">
+              <span className="lbl">Publisher</span>
+              <select
+                value={publisher}
+                onChange={(e) => upd({ publisher: e.target.value || null })}
+              >
+                <option value="">All</option>
+                {publishers.map((x) => (
+                  <option key={x} value={x}>
+                    {x}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {kind === 'manga' && (
+            <GenrePicker
+              options={genres.map((g) => ({ value: g, label: g }))}
+              picked={picked}
+              // a genre narrows All to manga; All genres only clears the genres
+              onChange={(next) =>
+                next.length
+                  ? mangaOnly({ genre: next.join(',') })
+                  : upd({ genre: null })
               }
-            >
-              {t}
-            </button>
-          ))}
+            />
+          )}
         </div>
-        <div className="seg" role="group" aria-label="Library">
-          {(
-            [
-              ['', 'All'],
-              ['library', 'In library'],
-              ['not', 'Not yet'],
-            ] as const
-          ).map(([v, t]) => (
-            <button
-              key={v || 'all'}
-              aria-pressed={(show || '') === v}
-              onClick={() => upd({ show: v || null })}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-        {show !== 'library' && (
-          <label className="sel">
-            <span className="lbl">Sort</span>
-            <select
-              value={sort || sorts[0][0]}
-              onChange={(e) =>
-                kind === 'comic'
-                  ? upd({
-                      sort: e.target.value === 'issues' ? null : e.target.value,
-                    })
-                  : mangaOnly({
-                      sort:
-                        e.target.value === 'popular' && type
-                          ? null
-                          : e.target.value,
-                    })
-              }
-            >
-              {sorts.map(([v, t]) => (
-                <option key={v} value={v}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {kind === 'manga' && show !== 'library' && (
-          <label className="sel">
-            <span className="lbl">Status</span>
-            <select
-              value={status}
-              onChange={(e) => mangaOnly({ status: e.target.value || null })}
-            >
-              <option value="">Any</option>
-              <option value="ongoing">Ongoing</option>
-              <option value="finished">Finished</option>
-            </select>
-          </label>
-        )}
-        {kind === 'comic' && !!publishers.length && (
-          <label className="sel">
-            <span className="lbl">Publisher</span>
-            <select
-              value={publisher}
-              onChange={(e) => upd({ publisher: e.target.value || null })}
-            >
-              <option value="">All</option>
-              {publishers.map((x) => (
-                <option key={x} value={x}>
-                  {x}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {kind === 'manga' && (
-          <GenrePicker
-            options={genres.map((g) => ({ value: g, label: g }))}
-            picked={picked}
-            // a genre narrows All to manga; All genres only clears the genres
-            onChange={(next) =>
-              next.length
-                ? mangaOnly({ genre: next.join(',') })
-                : upd({ genre: null })
-            }
-          />
-        )}
-      </div>
+      )}
       {!filtered && (
         <>
           <ComicRail
@@ -364,13 +467,40 @@ export function Comics() {
         {list.error && !items.length && (
           <ServiceNote error={list.error} what="comics" retry={list.retry} />
         )}
-        {!list.error &&
+        {indexing && (
+          <div className="empty" role="status">
+            <b>Comic catalogue indexing</b>
+            {typeof catalogueStatus.indexedResults === 'number' &&
+              (catalogueStatus.expectedResults
+                ? `${catalogueStatus.indexedResults} of ${catalogueStatus.expectedResults} volumes indexed.`
+                : `${catalogueStatus.indexedResults} volumes indexed.`)}
+            {catalogueStatus.indexError &&
+              ' Indexing encountered a problem. SeerrNG will retry.'}
+            <button
+              className="btn btn-tonal btn-sm"
+              type="button"
+              onClick={recheckEmptyFirstPage}
+              disabled={catalog.loading || catalog.page === 0}
+            >
+              Check Again
+            </button>
+          </div>
+        )}
+        {!indexing &&
+          !list.error &&
           !items.length &&
           !list.loading &&
           list.page > 0 &&
-          (show !== 'not' || list.done) && (
+          (catalogMode || show !== 'not' || list.done) && (
             <div className="empty">
-              {show === 'library' ? (
+              {catalogueStatus?.comicVineConfigured === false ? (
+                <b>The comic catalogue needs a ComicVine key</b>
+              ) : catalogMode ? (
+                <>
+                  <b>No comics found</b>Try different filters or check whether
+                  the catalogue has finished indexing.
+                </>
+              ) : show === 'library' ? (
                 <>
                   <b>Nothing in the library yet</b>
                   Request a series and it shows up here.
@@ -469,7 +599,11 @@ export function ComicDetail() {
     data: work,
     error: workError,
     reload,
-  } = useApi<ComicWork>(`/comic/work/${encodeURIComponent(id)}`);
+    refresh,
+  } = useApi<ComicWork>(`/comic/work/${encodeURIComponent(id)}`, {
+    currentPathOnly: true,
+    keepDuringRefresh: true,
+  });
   const [pick, setPick] = useState<string | null>(null);
   const [asked, setAsked] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
@@ -477,15 +611,16 @@ export function ComicDetail() {
   const sending = useRef(false);
   useEffect(() => setPick(null), [id]);
   // #editions (from a card's "Choose edition") scrolls to the picker once it's there
+  const workLoaded = !!work;
   useEffect(() => {
-    if (work && window.location.hash === '#editions')
+    if (workLoaded && window.location.hash === '#editions')
       document.getElementById('editions')?.scrollIntoView({ block: 'start' });
-  }, [work]);
+  }, [id, workLoaded]);
   const editions = work?.editions || [];
   const stateOf = (editionId: string) => {
     const e = editions.find((x) => x.id === editionId);
     const st = comicState(e?.mediaInfo).stat;
-    return asked.has(editionId) && st?.k !== 'ok'
+    return asked.has(editionId) && !st
       ? ({ k: 'wait', word: 'Requested', ico: 'clock' } as const)
       : st;
   };
@@ -500,6 +635,23 @@ export function ComicDetail() {
     chosen ? `/comic/${chosen.id}` : null
   );
   const c = edition?.id === chosen?.id ? edition : undefined;
+  // Keep queue progress tied to the selected edition.
+  const shown = chosen
+    ? (chosen.mediaInfo ??
+      (chosen.id === work?.mediaEditionId ? work?.mediaInfo : undefined))
+    : work?.mediaInfo;
+  const trackDownload =
+    shown?.status === MediaStatus.PENDING ||
+    shown?.status === MediaStatus.PROCESSING ||
+    (shown?.status === MediaStatus.PARTIAL && !!shown.downloadStatus?.length);
+  useEffect(() => {
+    if (!trackDownload) return;
+    // The server's Download Sync job updates these provider queues once a minute.
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') refresh();
+    }, 60_000);
+    return () => window.clearInterval(timer);
+  }, [id, chosenId, trackDownload, refresh]);
   if (workError)
     return (
       <ExtraGate k="comic">
@@ -509,12 +661,6 @@ export function ComicDetail() {
   if (!work) return <div className="detail-loading" aria-busy="true" />;
   const manga = work.kind === 'manga';
   const unit = manga ? 'vol' : 'issue';
-  // the chosen edition's own state: an edition not in the library doesn't show the owned
-  // edition's progress or reader link
-  const shown = chosen
-    ? (chosen.mediaInfo ??
-      (chosen.id === work.mediaEditionId ? work.mediaInfo : undefined))
-    : work.mediaInfo;
   const cs = comicState(shown);
   const s = chosen ? stateOf(chosen.id) : cs.stat;
   const about = work.description
@@ -530,6 +676,7 @@ export function ComicDetail() {
     try {
       toast(await requestComicEdition(work, chosen));
       setAsked((x) => new Set(x).add(chosen.id));
+      refresh();
     } catch (e) {
       toast(friendlyError(e, 'Request failed'));
     } finally {
@@ -620,19 +767,30 @@ export function ComicDetail() {
                 reload();
               }}
             />
+            {chosen && (
+              <ReaderShelf
+                key={`reader-shelf:${chosen.id}`}
+                target={{
+                  type: 'comic-series',
+                  id: chosen.id,
+                  name: chosen.title,
+                }}
+              />
+            )}
+            <ReaderDeliveryLink target="comic" />
             <ReaderDownloads
               mediaId={chosen ? shown?.id : undefined}
               type="comic"
             />
             <ReportIssueButton
-              key={chosen?.id}
+              key={`report-issue:${chosen?.id}`}
               type="comic"
               title={c?.title ?? work.title}
               media={c?.mediaInfo}
             />
             {c && chosen && (
               <WatchlistButton
-                key={chosen.id}
+                key={`watchlist:${chosen.id}`}
                 mediaType="comic"
                 detail={c}
                 requestedId={chosen.id}
@@ -709,6 +867,7 @@ export function ComicDetail() {
                             {e.posterPath ? (
                               <img
                                 src={artUrl(e.posterPath)}
+                                referrerPolicy="no-referrer"
                                 alt=""
                                 loading="lazy"
                               />
@@ -823,13 +982,222 @@ export function ComicDetail() {
 }
 
 // ---- magazines: the tracked list from LazyLibrarian, or a Google Books search ----
+const MAGAZINE_SEARCH_SUGGESTIONS = [
+  'National Geographic',
+  'Time',
+  'Vogue',
+  'The New Yorker',
+  'Scientific American',
+  'Wired',
+];
+
+function hasMagazinePermission(permissions: number, mask: bigint) {
+  return (
+    Number.isSafeInteger(permissions) &&
+    permissions >= 0 &&
+    (BigInt(permissions) & mask) !== 0n
+  );
+}
+
+function canRequestMagazines(permissions = 0) {
+  // Admin, Request, or Request Magazines.
+  return hasMagazinePermission(permissions, 2n | 32n | (1n << 41n));
+}
+
+function MagazineRequestSheet({
+  requestTitle,
+  onClose,
+  onRequested,
+}: {
+  requestTitle: string;
+  onClose: () => void;
+  onRequested: () => void;
+}) {
+  const { user } = useAuth();
+  const toast = useToast();
+  const [sending, setSending] = useState(false);
+  const activeRequest = useRef(false);
+  const permissions = user?.permissions ?? 0;
+  const quota = useApi<{
+    magazine?: {
+      limit?: number;
+      remaining?: number;
+      days?: number;
+      restricted: boolean;
+    };
+  }>(user?.id ? `/user/${user.id}/quota` : null, { currentPathOnly: true });
+  const existing = useApi<Magazine>(
+    `/magazine/${encodeURIComponent(requestTitle)}`,
+    { currentPathOnly: true }
+  );
+  const media = existing.data?.mediaInfo;
+  const available =
+    media?.status === MediaStatus.AVAILABLE ||
+    media?.status === MediaStatus.PARTIAL;
+  const blocked = media?.status === MediaStatus.BLOCKLISTED;
+  const covered =
+    media?.status === MediaStatus.PROCESSING ||
+    media?.status === MediaStatus.PENDING ||
+    media?.hasActiveRequest ||
+    media?.requests?.some(({ status }) => status === 1 || status === 2);
+  const unavailable = existing.data?.requestable === false;
+  const requestStatus = available
+    ? 'Already in the library'
+    : blocked
+      ? 'This magazine is blocklisted'
+      : covered
+        ? 'This magazine has already been requested'
+        : unavailable
+          ? 'This magazine is unavailable for requests'
+          : undefined;
+  const magazineQuota = quota.data?.magazine;
+  // Admin, Manage Requests, Auto Approve, or Auto Approve Magazines.
+  const autoApprove = hasMagazinePermission(
+    permissions,
+    2n | 16n | 128n | (1n << 40n)
+  );
+  const advanced = canChooseRequestOptions(permissions);
+  const [serviceId, setServiceId] = useState<number>();
+  const services = useApi<{ id: number; name: string; isDefault?: boolean }[]>(
+    advanced ? '/service/magazine' : null,
+    { currentPathOnly: true }
+  );
+  const selectedService =
+    advanced && services.data?.some(({ id }) => id === serviceId)
+      ? serviceId
+      : undefined;
+  return (
+    <ConfirmSheet
+      title="Request Magazine"
+      body={requestTitle}
+      confirm="Send Request"
+      cancel="Cancel"
+      busy={sending}
+      confirmDisabled={
+        (!quota.data && !quota.error) ||
+        (!existing.data && !existing.error) ||
+        !!requestStatus ||
+        magazineQuota?.restricted ||
+        (advanced && services.data?.length === 0)
+      }
+      onClose={() => {
+        if (!activeRequest.current) onClose();
+      }}
+      onConfirm={async () => {
+        if (activeRequest.current) return;
+        activeRequest.current = true;
+        setSending(true);
+        try {
+          const result = await requestExtra(
+            'magazine',
+            requestTitle,
+            selectedService
+          );
+          if ((result as { status?: number } | null)?.status === 4)
+            throw new Error('The magazine request failed.');
+          onRequested();
+          toast('Magazine requested');
+        } catch (error) {
+          toast(friendlyError(error, 'Request failed'));
+        } finally {
+          activeRequest.current = false;
+          setSending(false);
+        }
+      }}
+    >
+      {requestStatus ? (
+        <p className="sub" role="status">
+          {requestStatus}
+        </p>
+      ) : (
+        <p className="sub">
+          {autoApprove ? 'Automatically approved' : 'Approval required'}
+        </p>
+      )}
+      {!!magazineQuota?.limit && (
+        <p
+          className="sub"
+          role={magazineQuota.restricted ? 'status' : undefined}
+        >
+          {magazineQuota.restricted
+            ? 'Magazine request quota reached.'
+            : `${magazineQuota.remaining ?? 0} of ${magazineQuota.limit} magazine requests remaining.`}
+          {!!magazineQuota.days && ` Quota period: ${magazineQuota.days} days.`}
+        </p>
+      )}
+      {magazineQuota?.restricted && (
+        <button className="chip" type="button" onClick={quota.reload}>
+          Recheck Quota
+        </button>
+      )}
+      {advanced && !!services.data?.length && (
+        <div className="toolbar">
+          <label className="sel">
+            <span className="lbl">Magazine Service</span>
+            <select
+              value={selectedService ?? ''}
+              disabled={sending}
+              onChange={(event) =>
+                setServiceId(
+                  event.target.value ? Number(event.target.value) : undefined
+                )
+              }
+            >
+              <option value="">Default Service</option>
+              {services.data.map(({ id, name, isDefault }) => (
+                <option key={id} value={id}>
+                  {name}
+                  {isDefault ? ' (default)' : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+      {advanced && services.data?.length === 0 && (
+        <p role="status">No magazine service is configured.</p>
+      )}
+    </ConfirmSheet>
+  );
+}
+
 export function Magazines() {
-  const { q, setQ, query } = useQueryParam();
-  // tracked titles are listed by default; a search looks further afield
+  const [params, setParams] = useSearchParams();
+  const query = params.get('q') ?? params.get('query') ?? '';
+  const [q, setQ] = useState(query);
+  const { user } = useAuth();
+  const [requestTitle, setRequestTitle] = useState('');
+  const [requested, setRequested] = useState('');
+  const mayRequest = canRequestMagazines(user?.permissions);
+  const title = q.trim();
+  const mode = params.get('catalog');
+  const catalog =
+    mode === 'tracked' || mode === 'public'
+      ? mode
+      : query && params.has('q')
+        ? 'public'
+        : 'tracked';
+  useEffect(() => {
+    const value = q.trim();
+    if (value === query) return;
+    const timer = setTimeout(() => {
+      const next = new URLSearchParams(params);
+      if (next.has('query') && !next.has('catalog'))
+        next.set('catalog', 'tracked');
+      next.delete('query');
+      if (value) next.set('q', value);
+      else next.delete('q');
+      setParams(next, { replace: true });
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [params, q, query, setParams]);
+  useEffect(() => setQ(query), [query]);
+
+  const requestParams = new URLSearchParams({ catalog });
+  if (query) requestParams.set('query', query);
+  const needsPublicQuery = catalog === 'public' && !query;
   const list = usePaged<Magazine>(
-    query
-      ? `/discover/magazines?catalog=public&query=${encodeURIComponent(query)}`
-      : '/discover/magazines?catalog=tracked'
+    needsPublicQuery ? null : `/discover/magazines?${requestParams}`
   );
   return (
     <ExtraGate k="magazine">
@@ -838,7 +1206,9 @@ export function Magazines() {
         sub={
           query
             ? 'Search results. Request a title to start getting new issues.'
-            : 'Titles the library follows. Search to find more.'
+            : catalog === 'public'
+              ? 'Search Google Books for magazine titles.'
+              : 'Titles the library follows.'
         }
       >
         <ExtraSearch
@@ -847,36 +1217,94 @@ export function Magazines() {
           placeholder="Search magazines…"
         />
       </ExtraHeader>
+      <div className="toolbar">
+        <div className="seg" role="group" aria-label="Magazine Catalogue">
+          {(
+            [
+              ['tracked', 'Tracked Titles'],
+              ['public', 'Public Catalogue'],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={catalog === value}
+              onClick={() => {
+                const next = new URLSearchParams(params);
+                next.set('catalog', value);
+                setParams(next, { replace: true });
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {needsPublicQuery && !title && (
+        <div
+          className="toolbar"
+          role="group"
+          aria-label="Suggested Magazine Searches"
+        >
+          {MAGAZINE_SEARCH_SUGGESTIONS.map((suggestion) => (
+            <button
+              className="chip"
+              key={suggestion}
+              type="button"
+              onClick={() => {
+                const next = new URLSearchParams(params);
+                next.delete('query');
+                next.set('q', suggestion);
+                next.set('catalog', 'public');
+                setParams(next, { replace: true });
+              }}
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
+      {mayRequest && title && title.length <= 256 && (
+        <div className="toolbar">
+          <button
+            className="btn btn-tonal btn-sm"
+            type="button"
+            disabled={title === requested}
+            onClick={() => setRequestTitle(title)}
+          >
+            {title === requested ? `Requested ${title}` : `Request “${title}”`}
+          </button>
+        </div>
+      )}
+      {mayRequest && requestTitle && (
+        <MagazineRequestSheet
+          requestTitle={requestTitle}
+          onClose={() => setRequestTitle('')}
+          onRequested={() => {
+            setRequested(requestTitle);
+            setRequestTitle('');
+          }}
+        />
+      )}
       <ServiceNote
         error={list.items.length ? null : list.error}
         what="magazines"
         retry={list.retry}
       />
-      {!list.error && !list.items.length && !list.loading && (
-        <div className="empty">
-          <b>{query ? 'No magazines found' : 'No magazines yet'}</b>
-          {query
-            ? 'Try the magazine’s full title.'
-            : 'Search for a title to request it.'}
-        </div>
-      )}
+      {!needsPublicQuery &&
+        !list.error &&
+        !list.items.length &&
+        !list.loading && (
+          <div className="empty">
+            <b>{query ? 'No magazines found' : 'No magazines yet'}</b>
+            {query
+              ? 'Try the magazine’s full title.'
+              : 'Search for a title to request it.'}
+          </div>
+        )}
       <div className="grid">
-        {list.items.map((m) => (
-          <ExtraCard
-            key={m.id}
-            href={`/magazine/${encodeURIComponent(m.title)}`}
-            img={m.posterPath}
-            title={m.title}
-            shape="book"
-            icon="magazine"
-            stat={extraStat(m.mediaInfo)}
-            meta={[
-              m.publisher,
-              m.latestIssue ? `Latest ${m.latestIssue}` : m.firstPublishYear,
-            ]
-              .filter(Boolean)
-              .join(' · ')}
-          />
+        {list.items.map((magazine) => (
+          <MagazineCard key={magazine.id} magazine={magazine} />
         ))}
       </div>
       <MoreOnScroll
@@ -892,6 +1320,10 @@ export function Magazines() {
 
 export function MagazineDetail() {
   const { title = '' } = useParams();
+  const { user } = useAuth();
+  const [requestTitle, setRequestTitle] = useState('');
+  const [requested, setRequested] = useState('');
+  const mayRequest = canRequestMagazines(user?.permissions);
   const {
     data: m,
     error,
@@ -908,15 +1340,33 @@ export function MagazineDetail() {
   const s = extraStat(m.mediaInfo);
   const have = (m.issues || []).filter((i) => i.available).length;
   const main =
-    m.requestable === false ? null : (
-      <RequestButton
-        stat={s}
-        label="Request magazine"
-        request={() => requestExtra('magazine', m.title)}
-      />
-    );
+    m.requestable === false ? null : s || requested === m.title ? (
+      <button className="btn btn-tonal" disabled>
+        <Icon name={s?.ico || 'clock'} />
+        {s?.word || 'Requested'}
+      </button>
+    ) : mayRequest ? (
+      <button
+        className="btn btn-primary"
+        onClick={() => setRequestTitle(m.title)}
+      >
+        <Icon name="plus" />
+        Request magazine
+      </button>
+    ) : null;
   return (
     <ExtraGate k="magazine">
+      {mayRequest && requestTitle === m.title && (
+        <MagazineRequestSheet
+          requestTitle={requestTitle}
+          onClose={() => setRequestTitle('')}
+          onRequested={() => {
+            setRequested(requestTitle);
+            setRequestTitle('');
+            refresh();
+          }}
+        />
+      )}
       <article className="detail">
         <DetailTop
           status={s}
@@ -944,6 +1394,7 @@ export function MagazineDetail() {
               title={m.title}
               onChange={refresh}
             />
+            <ReaderDeliveryLink target="magazine" />
             <ReaderDownloads mediaId={m.mediaInfo?.id} type="magazine" />
             <ReportIssueButton
               type="magazine"

@@ -21,6 +21,7 @@ const SORT_LABELS = {
   'title-desc': 'Title (Z to A)',
 };
 interface WatchlistItem {
+  source?: 'local' | 'plex';
   id: number;
   ratingKey: string;
   mediaType: keyof typeof MEDIA_LABELS;
@@ -30,7 +31,7 @@ interface WatchlistItem {
   externalId?: string;
 }
 
-interface WatchlistData {
+export interface WatchlistData {
   results: WatchlistItem[];
   totalPages: number;
   filtersSupported: boolean;
@@ -40,7 +41,7 @@ export function canViewUserWatchlist(permissions: number) {
   return (permissions & (2 | 16 | 134217728)) !== 0;
 }
 
-function itemId(item: WatchlistItem) {
+export function itemId(item: WatchlistItem) {
   if (item.mediaType === 'movie' || item.mediaType === 'tv') {
     return Number.isSafeInteger(item.tmdbId) && (item.tmdbId ?? 0) > 0
       ? String(item.tmdbId)
@@ -63,7 +64,7 @@ function WatchlistPage({
   label: string;
   mediaTypes: string[];
   page: number;
-  movePage: (page: number) => void;
+  movePage: (page: number, replace?: boolean) => void;
   setFiltersSupported: (supported: boolean) => void;
   canRemove: boolean;
 }) {
@@ -77,8 +78,22 @@ function WatchlistPage({
     if (data) setFiltersSupported(data.filtersSupported);
   }, [data, setFiltersSupported]);
 
-  async function remove(mediaType: WatchlistItem['mediaType'], id: string) {
-    if (!canRemove || pending.current || !data?.filtersSupported) return;
+  useEffect(() => {
+    const lastPage = data?.totalPages;
+    if (!removing && lastPage && page > lastPage) movePage(lastPage, true);
+  }, [data?.totalPages, movePage, page, removing]);
+
+  function canRemoveItem(item: WatchlistItem) {
+    return (
+      canRemove &&
+      (item.source === 'local' ||
+        (item.source === undefined && data?.filtersSupported))
+    );
+  }
+
+  async function remove(item: WatchlistItem, id: string) {
+    if (!canRemoveItem(item) || pending.current) return;
+    const { mediaType } = item;
     const key = `${mediaType}:${id}`;
     pending.current = true;
     setRemoving(key);
@@ -86,7 +101,7 @@ function WatchlistPage({
       await api(`/watchlist/${encodeURIComponent(id)}?mediaType=${mediaType}`, {
         method: 'DELETE',
       });
-      setRemoved((previous) => [...previous, key]);
+      if (data?.filtersSupported) setRemoved((previous) => [...previous, key]);
       refresh();
     } catch (error) {
       toast(friendlyError(error, 'Couldn’t remove this title'));
@@ -130,13 +145,13 @@ function WatchlistPage({
                   )}
                   <small>{MEDIA_LABELS[item.mediaType]}</small>
                 </div>
-                {id && canRemove && data?.filtersSupported && (
+                {id && canRemoveItem(item) && (
                   <button
                     className="btn btn-quiet btn-sm"
                     type="button"
                     aria-label={`Remove ${item.title} from Watchlist`}
                     disabled={Boolean(removing)}
-                    onClick={() => void remove(item.mediaType, id)}
+                    onClick={() => void remove(item, id)}
                   >
                     {removing === `${item.mediaType}:${id}`
                       ? 'Removing…'
@@ -277,7 +292,7 @@ export default function Watchlist({
       {filtersSupported === false && (
         <p className="note">
           Plex and SeerrNG items share this list. Filters are unavailable in
-          this view.{!targetUserId && ' Local removal is also unavailable.'}
+          this view.
         </p>
       )}
       {filtersSupported && (
@@ -342,10 +357,10 @@ export default function Watchlist({
         label={label}
         mediaTypes={mediaTypes}
         page={page}
-        movePage={(next) => {
+        movePage={(next, replace) => {
           const selected = new URLSearchParams(filterKey);
           if (next > 1) selected.set('page', String(next));
-          setParams(selected);
+          setParams(selected, { replace });
         }}
         setFiltersSupported={setFiltersSupported}
         canRemove={targetUserId === undefined}

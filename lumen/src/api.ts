@@ -22,7 +22,9 @@ export class ApiError extends Error {
     public confirmationRequired?: string,
     public code?: string,
     public reason?: string,
-    public retryAt?: number
+    public retryAt?: number,
+    public testResults?: unknown,
+    public allowOverride = false
   ) {
     super(message);
   }
@@ -30,7 +32,10 @@ export class ApiError extends Error {
 
 export async function api<T>(
   path: string,
-  init: RequestInit = {},
+  {
+    invalidateCache = true,
+    ...init
+  }: RequestInit & { invalidateCache?: boolean } = {},
   response: 'json' | 'empty' = 'json'
 ): Promise<T> {
   const res = await fetch('/api/v1' + path, {
@@ -50,9 +55,13 @@ export async function api<T>(
     let confirmationRequired: string | undefined;
     let code: string | undefined;
     let reason: string | undefined;
+    let testResults: unknown;
+    let allowOverride = false;
     try {
       const b = await res.json();
       msg = b.message || b.error || msg;
+      testResults = b.tests;
+      allowOverride = b.allowOverride === true;
       if (typeof b.code === 'string') code = b.code;
       if (typeof b.reason === 'string') reason = b.reason;
       if (typeof b.confirmationRequired === 'string')
@@ -80,11 +89,13 @@ export async function api<T>(
       confirmationRequired,
       code,
       reason,
-      retryAt
+      retryAt,
+      testResults,
+      allowOverride
     );
   }
   // a request or other change: saved answers may now be out of date
-  if (init.method && init.method !== 'GET') markAllStale();
+  if (invalidateCache && init.method && init.method !== 'GET') markAllStale();
   return response === 'empty' || res.status === 204
     ? (undefined as T)
     : res.json();
@@ -101,7 +112,12 @@ export const MediaStatus = {
 } as const;
 
 export interface MediaInfo {
-  viewerRequestCoverage?: { standard?: boolean; fourK?: boolean };
+  hasActiveRequest?: boolean;
+  viewerRequestCoverage?: {
+    standard?: boolean;
+    fourK?: boolean;
+    seasons?: { seasonNumber: number; standard: boolean; fourK: boolean }[];
+  };
   id?: number;
   requests?: {
     id: number;
@@ -110,7 +126,11 @@ export interface MediaInfo {
     is4k?: boolean;
     createdAt?: string;
     requestedBy?: { displayName?: string };
-    seasons?: { seasonNumber: number; status?: number }[];
+    seasons?: {
+      seasonNumber: number;
+      status?: number;
+      episodeNumbers?: number[] | null;
+    }[];
   }[];
   hasPlexAudiobookFile?: boolean;
   availableEbookServiceIds?: number[] | null;
@@ -120,8 +140,9 @@ export interface MediaInfo {
   audiobookExternalServiceId?: number | null;
   audiobookLibraryServiceId?: number | null;
   audiobookLibraryItemId?: string | null;
-  downloadStatus?: { size: number; sizeLeft: number; percent?: number }[];
-  downloadStatus4k?: { size: number; sizeLeft: number }[];
+  downloadStatus?: DownloadItem[];
+  audiobookDownloadStatus?: DownloadItem[];
+  downloadStatus4k?: DownloadItem[];
   // comics: issues/volumes in the library out of those known (BackIssue)
   comicProgress?: { owned: number; total: number };
   // comics: the series in the reading server (Kavita), once any of it is in
@@ -147,6 +168,7 @@ export interface TitleResult {
   firstAirDate?: string;
   voteAverage?: number;
   genreIds?: number[];
+  originalLanguage?: string;
   mediaInfo?: MediaInfo;
 }
 export interface CollectionResult {
@@ -165,10 +187,17 @@ export interface BookResult {
   provider?: 'openlibrary' | 'bookshelf';
   title: string;
   author?: string;
+  authorId?: string;
+  isbn13?: string;
+  editionId?: string;
   posterPath?: string | null;
   bookFormat?: 'ebook' | 'audiobook' | string;
   firstPublishYear?: number;
-  series?: { title?: string; position?: string }[];
+  languages?: string[];
+  ratingsAverage?: number;
+  ratingsCount?: number;
+  subjects?: string[];
+  series?: { id?: string; title?: string; position?: string }[];
   mediaInfo?: MediaInfo;
 }
 export interface Paged<T> {
@@ -234,7 +263,8 @@ export interface Genre {
 const TMDB_IMAGE_SIZES = new Set(['w185', 'w342', 'w500', 'w780', 'w1280']);
 const THEAUDIODB_IMAGE_HOST = 'theaudiodb.com';
 // eslint-disable-next-line no-control-regex -- Reject control characters in provider URL paths.
-const UNSAFE_IMAGE_PATH_CHARACTERS = /[\u0000-\u001f\u007f?#]/;
+const IMAGE_URL_CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/;
+const UNSAFE_IMAGE_PATH_CHARACTERS = /[?#]/;
 const isSafeImagePath = (path: string) => {
   if (
     path.length > 2048 ||
@@ -242,6 +272,7 @@ const isSafeImagePath = (path: string) => {
     path.startsWith('//') ||
     path.includes('//') ||
     path.includes('\\') ||
+    IMAGE_URL_CONTROL_CHARACTERS.test(path) ||
     UNSAFE_IMAGE_PATH_CHARACTERS.test(path)
   ) {
     return false;
@@ -267,6 +298,7 @@ const isSafeImagePath = (path: string) => {
           decoded === '..' ||
           decoded.includes('/') ||
           decoded.includes('\\') ||
+          IMAGE_URL_CONTROL_CHARACTERS.test(decoded) ||
           UNSAFE_IMAGE_PATH_CHARACTERS.test(decoded)
         ) {
           return false;
@@ -354,13 +386,27 @@ export function proxiedArtPath(raw: string, host: string): string | undefined {
     return undefined;
   return u.pathname.slice(1) || undefined;
 }
+const LOCAL_ART_ROUTE =
+  /^(?:\/imageproxy\/.+|\/api\/v1\/(?:(?:sportarr|magazine)\/cover\/[^/]+\/[^/]+|(?:movie|author|adult)\/[^/]+\/cover|book-series\/covers\/image))$/;
+
+function localArt(raw: string) {
+  const path = raw.split(/[?#]/, 1)[0];
+  return LOCAL_ART_ROUTE.test(path) &&
+    !raw.includes('\\') &&
+    isSafeImagePath(path)
+    ? raw
+    : undefined;
+}
+
 export const artUrl = (url?: string | null) => {
-  if (!url) return undefined;
-  // already on this site (SeerrNG's own proxy paths)
-  if (url.startsWith('/') && !url.startsWith('//') && !url.includes('\\'))
-    return url;
+  if (typeof url !== 'string' || !url || IMAGE_URL_CONTROL_CHARACTERS.test(url))
+    return undefined;
+  // Preserve the query string on valid same-origin proxy paths.
+  if (url.startsWith('/')) return localArt(url);
   const u = httpsArt(url);
   if (!u) return undefined;
+  if (typeof location !== 'undefined' && u.origin === location.origin)
+    return localArt(u.pathname + u.search);
   const to = Object.hasOwn(PROXIED_ART, u.hostname)
     ? PROXIED_ART[u.hostname]
     : undefined;
@@ -383,11 +429,29 @@ export const yearOf = (r: TitleResult) =>
   (r.releaseDate || r.firstAirDate || '').slice(0, 4);
 
 // ---- requests ----
+export interface SeasonRequestSelection {
+  seasonNumber: number;
+  episodeNumbers?: number[];
+}
+
 export interface RequestOptions {
   is4k?: boolean;
   serverId?: number;
   profileId?: number;
   rootFolder?: string;
+  languageProfileId?: number;
+  metadataLanguageId?: number | null;
+  sonarrSeasonType?: string | null;
+  tags?: number[] | null;
+  requesterSelectedOptions?: {
+    tags: boolean;
+    profile?: boolean;
+    rootFolder?: boolean;
+    languageProfile?: boolean;
+  };
+  ignoreQuota?: boolean;
+  requestQuotaApproval?: boolean;
+  bypassStreamingRequestPolicy?: boolean;
   userId?: number; // request on someone else's behalf (admins)
 }
 const post = <T = { id: number }>(body: object) =>
@@ -397,19 +461,45 @@ const post = <T = { id: number }>(body: object) =>
   });
 // movies are one click
 export const requestMovie = (id: number, o: RequestOptions = {}) =>
-  post({ mediaType: 'movie', mediaId: id, ...o });
+  post<{ id: number; quotaException?: boolean }>({
+    mediaType: 'movie',
+    mediaId: id,
+    ...o,
+  });
 // series default to the whole show; a list asks for just those seasons
-export const requestSeries = (
+export const requestSeries = async (
   id: number,
   seasons: number[] | 'all' = 'all',
-  o: RequestOptions = {}
-) =>
-  post<{ id: number; seasons?: { seasonNumber: number }[] }>({
+  o: RequestOptions & {
+    tvdbId?: number;
+    seasonRequests?: SeasonRequestSelection[];
+  } = {}
+) => {
+  const result = await post<{
+    id: number;
+    quotaException?: boolean;
+    seasons?: { seasonNumber: number }[];
+  }>({
     mediaType: 'tv',
     mediaId: id,
     seasons,
     ...o,
   });
+  if (!Number.isSafeInteger(result?.id) || result.id <= 0) {
+    const unit = o.seasonRequests?.some(
+      ({ episodeNumbers }) => episodeNumbers?.length
+    )
+      ? 'episodes'
+      : 'seasons';
+    throw new ApiError(
+      202,
+      `No selected ${unit} were added.`,
+      undefined,
+      'REQUEST_NOT_CONFIRMED'
+    );
+  }
+  return result;
+};
 // books: the format decides which ChaptarrNG server; an edition pins one narration
 // policy 'only' = exactly that narration; 'either' = that edition is the target, other copies OK;
 // 'alongside' = add that narration as a separate copy next to the one already in the library
@@ -488,6 +578,19 @@ export const narratorKey = (names?: (string | null | undefined)[] | null) =>
 export const isBookshelf = (id: string) => id.startsWith('bookshelf:');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const bookIdFor = (id: string, _format: 'ebook' | 'audiobook') => id;
+export function bookDetailPath(
+  id: string,
+  format: 'ebook' | 'audiobook',
+  lookupTitle?: string | null
+) {
+  const params = new URLSearchParams();
+  if (format === 'audiobook') params.set('f', 'audio');
+  const title = lookupTitle?.trim();
+  if (isBookshelf(id) && title && title.length <= 512)
+    params.set('lookupTitle', title);
+  const suffix = params.toString();
+  return `/book/${encodeURIComponent(bookIdFor(id, format))}${suffix ? `?${suffix}` : ''}`;
+}
 export const hardcoverWorkId = (id: string) => {
   if (!isBookshelf(id)) return null;
   try {
@@ -497,35 +600,44 @@ export const hardcoverWorkId = (id: string) => {
     return null;
   }
 };
+export const readerServiceUrl = (raw: string) => {
+  if (
+    typeof raw !== 'string' ||
+    IMAGE_URL_CONTROL_CHARACTERS.test(raw) ||
+    !/^https?:\/\//i.test(raw) ||
+    raw.includes('\\')
+  )
+    return null;
+  try {
+    const url = new URL(raw);
+    return ['http:', 'https:'].includes(url.protocol) &&
+      !url.username &&
+      !url.password
+      ? url
+      : null;
+  } catch {
+    return null;
+  }
+};
+
 // "Read in Kavita": SeerrNG's link to the series (http/https only), moved onto the admin's
 // Kavita address when Lumen has one, the way the Audiobookshelf address works
 export const kavitaLink = (
   readerUrl?: string | null,
   base?: string
 ): string | null => {
-  const web = (raw: string) => {
-    try {
-      const url = new URL(raw);
-      return ['http:', 'https:'].includes(url.protocol) &&
-        !url.username &&
-        !url.password
-        ? url
-        : null;
-    } catch {
-      return null;
-    }
-  };
-  const link = readerUrl ? web(readerUrl) : null;
+  const link = readerUrl ? readerServiceUrl(readerUrl) : null;
   if (!link) return null;
   const series = /\/library\/(\d+)\/series\/(\d+)\/?$/.exec(link.pathname);
-  const own = base ? web(base) : null;
-  if (own && series) {
-    own.search = '';
-    own.hash = '';
+  if (!series) return null;
+  const own = base ? readerServiceUrl(base) : null;
+  const target = own ?? link;
+  target.search = '';
+  target.hash = '';
+  if (own) {
     own.pathname = `${own.pathname.replace(/\/+$/, '')}/library/${series[1]}/series/${series[2]}`;
-    return own.href;
   }
-  return link.href;
+  return target.href;
 };
 
 // The admin's Audiobookshelf address (http/https only), opening the item when SeerrNG knows it
@@ -533,36 +645,33 @@ export const audiobookshelfLink = (
   base?: string,
   itemId?: string | null
 ): string | null => {
-  if (!base) return null;
-  try {
-    const url = new URL(base);
-    if (
-      !['http:', 'https:'].includes(url.protocol) ||
-      url.username ||
-      url.password
-    )
-      return null;
-    url.search = '';
-    url.hash = '';
-    if (
-      itemId &&
-      itemId !== '.' &&
-      itemId !== '..' &&
-      // eslint-disable-next-line no-control-regex
-      !/[\x00-\x1f]/.test(itemId)
-    ) {
+  const url = base ? readerServiceUrl(base) : null;
+  if (!url) return null;
+  url.search = '';
+  url.hash = '';
+  if (
+    typeof itemId === 'string' &&
+    itemId &&
+    itemId !== '.' &&
+    itemId !== '..' &&
+    !IMAGE_URL_CONTROL_CHARACTERS.test(itemId)
+  ) {
+    try {
       url.pathname = `${url.pathname.replace(/\/+$/, '')}/item/${encodeURIComponent(itemId)}`;
+    } catch {
+      return null;
     }
-    return url.href;
-  } catch {
-    return null;
   }
+  return url.href;
 };
 export const bookMediaForFormat = (
   media: MediaInfo | undefined,
   format: 'ebook' | 'audiobook'
 ): MediaInfo | undefined => {
   if (!media || media.status === MediaStatus.BLOCKLISTED) return media;
+  if (format === 'audiobook') {
+    media = { ...media, downloadStatus: media.audiobookDownloadStatus };
+  }
   const hasRequests = Array.isArray((media as { requests?: unknown }).requests);
   if (
     media.status !== MediaStatus.AVAILABLE &&
@@ -639,6 +748,40 @@ export interface Credits {
   cast: Person[];
   crew: Person[];
 }
+type RelatedVideo = { site: string; key: string; type: string };
+
+export function youtubeTrailerUrl(
+  videos?: RelatedVideo[],
+  configuredBase?: string
+) {
+  const trailer = videos?.find(
+    (video) =>
+      video?.type === 'Trailer' &&
+      video.site === 'YouTube' &&
+      typeof video.key === 'string' &&
+      /^[a-zA-Z0-9_-]{11}$/.test(video.key)
+  );
+  if (!trailer) return;
+  if (configuredBase) {
+    try {
+      const base = new URL(configuredBase);
+      const destination = new URL(configuredBase + trailer.key);
+      if (
+        (base.protocol === 'https:' || base.protocol === 'http:') &&
+        !base.username &&
+        !base.password &&
+        !base.hash &&
+        destination.origin === base.origin
+      ) {
+        return destination.href;
+      }
+    } catch {
+      // An invalid configuration leaves the standard trailer destination usable.
+    }
+  }
+  return `https://www.youtube.com/watch?v=${trailer.key}`;
+}
+
 export interface SubjectTag {
   id: number;
   name: string;
@@ -649,7 +792,17 @@ export interface ProductionCountry {
   name: string;
 }
 
+export interface WatchProviderRegion {
+  iso_3166_1: string;
+  flatrate?: { id: number; name: string }[];
+}
+
 export interface MovieDetails extends TitleResult {
+  watchProviders?: WatchProviderRegion[];
+  originalTitle?: string;
+  status?: string;
+  budget?: number;
+  revenue?: number;
   onUserWatchlist?: boolean;
   runtime?: number;
   tagline?: string;
@@ -659,11 +812,15 @@ export interface MovieDetails extends TitleResult {
   keywords?: SubjectTag[];
   productionCompanies?: { id: number; name: string }[];
   productionCountries?: ProductionCountry[];
-  relatedVideos?: { site: string; key: string; type: string; url: string }[];
+  relatedVideos?: RelatedVideo[];
   releases?: {
     results: {
       iso_3166_1: string;
-      release_dates: { certification: string; type: number }[];
+      release_dates: {
+        certification: string;
+        type: number;
+        release_date?: string;
+      }[];
     }[];
   };
   collection?: { id: number; name: string };
@@ -675,6 +832,10 @@ export interface Season {
   name: string;
 }
 export interface TvDetails extends TitleResult {
+  watchProviders?: WatchProviderRegion[];
+  relatedVideos?: RelatedVideo[];
+  externalIds?: { tvdbId?: number | null };
+  originalName?: string;
   onUserWatchlist?: boolean;
   overview?: string;
   genres: { id: number; name: string }[];
@@ -705,7 +866,6 @@ export interface TvDetails extends TitleResult {
 export interface BookDetails extends BookResult {
   onUserWatchlist?: boolean;
   description?: string;
-  subjects?: string[];
   isbnCandidates?: string[];
 }
 export interface Edition {
@@ -730,12 +890,21 @@ export interface EditionList {
   source?: 'library' | 'lookup' | 'none';
 }
 export interface DownloadItem {
+  percent?: number;
+  liveDownloadToken?: string;
+  downloadId?: string;
   size: number;
   sizeLeft: number;
   timeLeft?: string; // "hh:mm:ss"
   status?: string;
 }
 export interface RequestItem {
+  quotaException?: boolean;
+  serverId?: number | null;
+  languageProfileId?: number | null;
+  metadataLanguageId?: number | null;
+  sonarrSeasonType?: string | null;
+  tags?: number[] | null;
   isAutoRequest?: boolean;
   watchAheadParentRequestId?: number | null;
   watchAheadEpisodeCount?: number;
@@ -803,4 +972,10 @@ export async function bookCovers(
   };
   await Promise.all([worker(), worker(), worker()]);
   return out;
+}
+
+export const connectionHostsPath = '/settings/connection-hosts';
+export interface Host {
+  name: string;
+  hostname: string;
 }

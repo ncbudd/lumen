@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Link,
+  Navigate,
   useLocation,
   useNavigationType,
   useSearchParams,
@@ -21,19 +22,35 @@ import {
 } from '../components/cards';
 import { CardTitleToggle } from '../components/CardTitleToggle';
 import { ComicCard } from '../components/comics';
-import { ServiceNote } from '../components/extra';
+import { MagazineCard, ServiceNote } from '../components/extra';
 import { friendlyError } from '../errors';
-import { useExtras, type ComicWork } from '../extras';
-import { useApi } from '../hooks';
+import {
+  useExtras,
+  type Album,
+  type ComicWork,
+  type League,
+  type Magazine,
+} from '../extras';
+import { cachedApi, useApi, usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
 import {
   clearRecentSearches,
   readRecentSearches,
   saveRecentSearches,
 } from '../recentSearches';
-import { normalizeSearchParams } from '../searchParams';
+import {
+  activeMusicSearchFilters,
+  musicSearchFilters,
+  normalizeSearchParams,
+  scopedSearchPath,
+  searchResultPage,
+  videoFilterKeys,
+} from '../searchParams';
 import { usePrefs } from '../settings';
+import { BookSeriesResults } from './BookSeriesSearch';
+import { AlbumCard } from './Music';
 import { PersonCard } from './People';
+import { LeagueCard } from './Sports';
 
 const SCOPES = {
   all: 'All',
@@ -42,22 +59,54 @@ const SCOPES = {
   ebook: 'Books',
   audio: 'Audiobooks',
   comic: 'Comics/Manga',
+  author: 'Authors',
+  music: 'Music',
+  magazine: 'Magazines',
+  sports: 'Sports',
 } as const;
+type AuthorResult = { mediaType: 'author'; id: string; name: string };
+type ArtistResult = { mediaType: 'artist'; id: string; name: string };
+type SearchResult =
+  VideoSearchResult | AuthorResult | ArtistResult | Album | Magazine | League;
 type Scope = keyof typeof SCOPES;
 // Search stays in the section you came from (?f=movie|tv|ebook|audio|comic); "All" widens it
 export default function Search() {
   const [params, setP] = useSearchParams();
   const p = useMemo(() => normalizeSearchParams(params), [params]);
+  if (p.get('f') === 'software') {
+    const search = new URLSearchParams();
+    for (const key of ['q', 'category', 'game', 'catalogProvider']) {
+      const value = p.get(key);
+      if (value && value.length <= 256) search.set(key, value);
+    }
+    return (
+      <Navigate
+        replace
+        to={{ pathname: '/software', search: search.toString() }}
+      />
+    );
+  }
+  return <SearchResults p={p} setP={setP} />;
+}
+
+function SearchResults({
+  p,
+  setP,
+}: {
+  p: URLSearchParams;
+  setP: ReturnType<typeof useSearchParams>[1];
+}) {
   const { prefs } = usePrefs();
   const [q, setQ] = useState(p.get('q') || '');
   const requestedScope = p.get('f') ?? '';
   const f = Object.hasOwn(SCOPES, requestedScope)
     ? (requestedScope as Scope)
     : 'all';
-  const [titles, setTitles] = useState<VideoSearchResult[] | null>(null);
+  const [titles, setTitles] = useState<SearchResult[] | null>(null);
   const [books, setBooks] = useState<BookResult[] | null>(null);
   const [comics, setComics] = useState<ComicWork[] | null>(null);
   const [recent, setRecent] = useState<string[]>(readRecentSearches);
+  const [totalPages, setTotalPages] = useState(1);
   const [searching, setSearching] = useState(false);
   // a lookup failed and nothing was found: an error with Retry, not "No matches"
   const [failed, setFailed] = useState<string | null>(null);
@@ -68,10 +117,45 @@ export default function Search() {
   const extras = useExtras();
   // comics join the search once the category is on and its catalogue answers
   const comicsOn = extras.list.some((e) => e.key === 'comic');
+  const musicOn = extras.list.some((e) => e.key === 'music');
+  const magazinesOn = extras.list.some((e) => e.key === 'magazine');
+  const sportsOn = extras.list.some((e) => e.key === 'sports');
   const term0 = (p.get('q') || '').trim();
+  const publicSettings = usePublicSettings();
+  const seriesFormat =
+    f === 'ebook' ? 'ebook' : f === 'audio' ? 'audiobook' : undefined;
+  const showSeries =
+    prefs.showBooks &&
+    publicSettings?.booksEnabled === true &&
+    (f === 'all' || seriesFormat !== undefined) &&
+    term0.length >= 2 &&
+    term0.length <= 200;
+  const [seriesTerm, setSeriesTerm] = useState('');
+  useEffect(() => {
+    if (!showSeries) return;
+    const timer = setTimeout(() => setSeriesTerm(term0), 300);
+    return () => clearTimeout(timer);
+  }, [showSeries, term0]);
+  const titlePath = scopedSearchPath(p, f, term0);
+  const hasVideoFilters =
+    (f === 'movie' || f === 'tv') && titlePath.startsWith('/discover/');
+  const hasMusicFilters = f === 'music' && activeMusicSearchFilters(p);
+  const hasDiscoveryFilters = hasVideoFilters || hasMusicFilters;
+  const resultPage = searchResultPage(p);
+  const hasSearch = !!term0 || hasDiscoveryFilters;
+  const wantsTitles =
+    hasSearch &&
+    (f === 'all' ||
+      f === 'movie' ||
+      f === 'tv' ||
+      f === 'author' ||
+      f === 'music' ||
+      f === 'magazine' ||
+      f === 'sports');
+  const cataloguePage = f === 'all' ? 1 : resultPage;
   // nothing typed yet: something to tap instead of an empty screen
   const trending = useApi<Paged<VideoSearchResult>>(
-    term0 ? null : '/discover/trending'
+    hasSearch ? null : '/discover/trending'
   ).data;
   // a search is remembered when it's finished (Enter, or a result opened), not on every keystroke,
   // so slow typing on a phone doesn't fill the list with "the off", "the offi"…
@@ -96,8 +180,11 @@ export default function Search() {
   }, [entryKey]);
   const scopes = (Object.keys(SCOPES) as Scope[]).filter(
     (s) =>
-      (prefs.showBooks || (s !== 'ebook' && s !== 'audio')) &&
-      (comicsOn || s !== 'comic' || f === 'comic')
+      (prefs.showBooks || (s !== 'ebook' && s !== 'audio' && s !== 'author')) &&
+      (comicsOn || s !== 'comic' || f === 'comic') &&
+      (musicOn || s !== 'music' || f === 'music') &&
+      (magazinesOn || s !== 'magazine' || f === 'magazine') &&
+      (sportsOn || s !== 'sports' || f === 'sports')
   );
 
   // The box follows the address only when something else changed it (Back, a recent search,
@@ -111,8 +198,8 @@ export default function Search() {
     setQ(fromUrl);
   }, [p, navType, entryKey]);
   useEffect(() => {
-    const term = (p.get('q') || '').trim();
-    if (!term) {
+    const term = term0;
+    if (!hasSearch) {
       setTitles(null);
       setBooks(null);
       setComics(null);
@@ -123,7 +210,6 @@ export default function Search() {
     let live = true;
     setSearching(true);
     const t = setTimeout(async () => {
-      const wantTitles = f === 'all' || f === 'movie' || f === 'tv';
       const wantBooks =
         prefs.showBooks && (f === 'all' || f === 'ebook' || f === 'audio');
       // one card per work, editions inside (AniList finds the manga)
@@ -138,20 +224,16 @@ export default function Search() {
         return null;
       };
       const comicsAsk = wantComics
-        ? api<Paged<ComicWork>>(
-            `/discover/comics?query=${encodeURIComponent(term)}&group=works&page=1`
+        ? cachedApi<Paged<ComicWork>>(
+            `/discover/comics?query=${encodeURIComponent(term)}&group=works&page=${cataloguePage}`
           ).catch(failure)
         : null;
       const [tr, ...brs] = await Promise.all([
-        wantTitles
-          ? api<Paged<VideoSearchResult>>(
-              `/search?query=${encodeURIComponent(term)}&page=1`
-            ).catch(failure)
-          : null,
+        wantsTitles ? api<Paged<SearchResult>>(titlePath).catch(failure) : null,
         ...formats.map((fmt) =>
           wantBooks
-            ? api<Paged<BookResult>>(
-                `/discover/books?format=${fmt}&query=${encodeURIComponent(term)}&page=1`
+            ? cachedApi<Paged<BookResult>>(
+                `/discover/books?format=${fmt}&query=${encodeURIComponent(term)}&page=${cataloguePage}`
               ).catch((e: unknown) => {
                 catalogueUnavailable ||=
                   e instanceof ApiError && e.status >= 500;
@@ -164,16 +246,23 @@ export default function Search() {
       const cr = await comicsAsk;
       if (!live) return;
       const foundComics = cr?.results || [];
-      const foundTitles = (tr?.results || []).filter((r) =>
-        f === 'movie'
-          ? r.mediaType === 'movie' || r.mediaType === 'collection'
-          : f === 'tv'
-            ? r.mediaType === 'tv'
-            : r.mediaType === 'movie' ||
-              r.mediaType === 'tv' ||
-              r.mediaType === 'person' ||
-              r.mediaType === 'collection'
-      );
+      const foundTitles = (tr?.results || []).filter(({ mediaType }) => {
+        if (f === 'music')
+          return mediaType === 'album' || mediaType === 'artist';
+        if (f === 'author' || f === 'tv' || f === 'magazine' || f === 'sports')
+          return mediaType === f;
+        if (f === 'movie')
+          return mediaType === 'movie' || mediaType === 'collection';
+        return (
+          mediaType === 'movie' ||
+          mediaType === 'tv' ||
+          mediaType === 'person' ||
+          mediaType === 'collection' ||
+          (prefs.showBooks && mediaType === 'author') ||
+          (musicOn && (mediaType === 'album' || mediaType === 'artist')) ||
+          (magazinesOn && mediaType === 'magazine')
+        );
+      });
       let foundBooks = brs.flatMap((r, i) =>
         (r?.results || [])
           .filter((b) => b.mediaType === 'book')
@@ -186,6 +275,7 @@ export default function Search() {
       // The format-neutral metadata endpoint also serves audiobook-only households.
       // Only canonical Open Library works can be retargeted as audiobook cards.
       if (
+        cataloguePage === 1 &&
         format === 'audiobook' &&
         wantBooks &&
         (br || catalogueUnavailable) &&
@@ -199,6 +289,8 @@ export default function Search() {
           .filter((b) => b.mediaType === 'book' && /^OL[1-9]\d*W$/.test(b.id))
           .map((b) => ({ ...b, bookFormat: 'audiobook' }));
       }
+      const pagedResults = wantsTitles ? tr : f === 'comic' ? cr : br;
+      setTotalPages(Math.min(500, pagedResults?.totalPages ?? 1));
       setTitles(foundTitles);
       setBooks(foundBooks);
       setComics(foundComics);
@@ -214,14 +306,34 @@ export default function Search() {
       clearTimeout(t);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [p, prefs.showBooks, attempt, comicsOn]);
+  }, [
+    titlePath,
+    f,
+    term0,
+    hasSearch,
+    wantsTitles,
+    cataloguePage,
+    prefs.showBooks,
+    attempt,
+    comicsOn,
+    musicOn,
+    magazinesOn,
+  ]);
 
   const setParam = (k: string, v: string) => {
     const n = new URLSearchParams(p);
+    if (k === 'q' || k === 'f') n.delete('page');
     if (!v || v === 'all') n.delete(k);
     else n.set(k, v);
     setP(n, { replace: true });
   };
+  function moveResultPage(page: number) {
+    const next = new URLSearchParams(p);
+    if (page === 1) next.delete('page');
+    else next.set('page', String(page));
+    setP(next);
+  }
+
   const ph =
     f === 'all'
       ? prefs.showBooks
@@ -247,6 +359,21 @@ export default function Search() {
   const shows = (titles || []).filter(
     (t): t is TitleResult => t.mediaType === 'tv'
   );
+  const authors = (titles || []).filter(
+    (item): item is AuthorResult => item.mediaType === 'author'
+  );
+  const albums = (titles || []).filter(
+    (item): item is Album => item.mediaType === 'album'
+  );
+  const artists = (titles || []).filter(
+    (item): item is ArtistResult => item.mediaType === 'artist'
+  );
+  const magazines = (titles || []).filter(
+    (item): item is Magazine => item.mediaType === 'magazine'
+  );
+  const leagues = (titles || []).filter(
+    (item): item is League => item.mediaType === 'sports'
+  );
   const bookCards = books || [];
   const comicCards = comics || [];
   const nothing =
@@ -257,6 +384,11 @@ export default function Search() {
     !collections.length &&
     !shows.length &&
     !people.length &&
+    !authors.length &&
+    !albums.length &&
+    !artists.length &&
+    !magazines.length &&
+    !leagues.length &&
     !bookCards.length &&
     !comicCards.length;
 
@@ -309,8 +441,38 @@ export default function Search() {
               {SCOPES[s]}
             </button>
           ))}
+          {extras.list.some(({ key }) => key === 'game') && (
+            <Link
+              className="chip"
+              to={
+                '/software' + (term0 ? '?q=' + encodeURIComponent(term0) : '')
+              }
+            >
+              Software
+            </Link>
+          )}
         </div>
-        {p.get('q') &&
+        {hasDiscoveryFilters && (
+          <div className="toolbar">
+            <button
+              type="button"
+              className="chip"
+              onClick={() => {
+                const next = new URLSearchParams(p);
+                for (const key of f === 'music'
+                  ? musicSearchFilters
+                  : videoFilterKeys)
+                  next.delete(key);
+                if (f !== 'music') next.delete('certificationMode');
+                next.delete('page');
+                setP(next, { replace: true });
+              }}
+            >
+              Clear Discovery Filters
+            </button>
+          </div>
+        )}
+        {hasSearch &&
           (f === 'all' ||
             f === 'movie' ||
             f === 'tv' ||
@@ -321,7 +483,7 @@ export default function Search() {
             </div>
           )}
       </header>
-      {!p.get('q') && !!recent.length && (
+      {!hasSearch && !!recent.length && (
         <Section
           title="Recent searches"
           action={
@@ -347,7 +509,7 @@ export default function Search() {
           </div>
         </Section>
       )}
-      {!term0 && (
+      {!hasSearch && (
         <Section title="Browse">
           <div className="chips wrap">
             {(
@@ -373,7 +535,7 @@ export default function Search() {
           </div>
         </Section>
       )}
-      {!term0 && !!trending?.results.length && (
+      {!hasSearch && !!trending?.results.length && (
         <Section title="Trending this week">
           <div className="grid">
             {trending.results
@@ -403,8 +565,9 @@ export default function Search() {
       {nothing && !searching && !failed && (
         <div className="empty">
           <b>
-            No {f === 'all' ? 'matches' : SCOPES[f].toLowerCase()} for “
-            {p.get('q')}”
+            {term0
+              ? `No ${f === 'all' ? 'matches' : SCOPES[f].toLowerCase()} for “${term0}”`
+              : 'No titles match these discovery filters.'}
           </b>
           {f !== 'all' ? (
             <button
@@ -418,6 +581,21 @@ export default function Search() {
             'Try fewer words, an author or a narrator.'
           )}
         </div>
+      )}
+      {showSeries && seriesTerm === term0 && (
+        <Section
+          title="Book Series"
+          link={[
+            'View All Series Results',
+            '/book-series?' +
+              new URLSearchParams({
+                query: term0,
+                ...(seriesFormat ? { format: seriesFormat } : {}),
+              }),
+          ]}
+        >
+          <BookSeriesResults query={term0} format={seriesFormat} limit={6} />
+        </Section>
       )}
       <div
         className={`results ${searching ? 'stale' : ''}`}
@@ -461,6 +639,45 @@ export default function Search() {
             </div>
           </Section>
         )}
+        {!!albums.length && (
+          <Section title="Albums">
+            <div className="sqg grid">
+              {albums.map((album) => (
+                <AlbumCard key={album.id} a={album} />
+              ))}
+            </div>
+          </Section>
+        )}
+        {!!artists.length && (
+          <Section title="Artists">
+            <div className="chips wrap">
+              {artists.map(({ id, name }) => (
+                <Link
+                  key={id}
+                  className="chip"
+                  to={'/artist/' + encodeURIComponent(id)}
+                >
+                  {name}
+                </Link>
+              ))}
+            </div>
+          </Section>
+        )}
+        {!!authors.length && (
+          <Section title="Authors">
+            <div className="chips wrap">
+              {authors.map(({ id, name }) => (
+                <Link
+                  key={id}
+                  className="chip"
+                  to={'/author/' + encodeURIComponent(id)}
+                >
+                  {name}
+                </Link>
+              ))}
+            </div>
+          </Section>
+        )}
         {!!bookCards.length && (
           <Section
             title={
@@ -478,6 +695,24 @@ export default function Search() {
             </div>
           </Section>
         )}
+        {!!leagues.length && (
+          <Section title="Leagues">
+            <div className="sqg grid">
+              {leagues.map((league) => (
+                <LeagueCard key={league.id} league={league} />
+              ))}
+            </div>
+          </Section>
+        )}
+        {!!magazines.length && (
+          <Section title="Magazines">
+            <div className="grid">
+              {magazines.map((magazine) => (
+                <MagazineCard key={magazine.id} magazine={magazine} />
+              ))}
+            </div>
+          </Section>
+        )}
         {!!comicCards.length && (
           <Section title="Comics & manga">
             <div className="comic-grid grid">
@@ -488,6 +723,27 @@ export default function Search() {
           </Section>
         )}
       </div>
+      {hasSearch && (resultPage > 1 || totalPages > 1) && (
+        <nav className="toolbar" aria-label="Search Result Pages">
+          <button
+            className="btn btn-quiet btn-sm"
+            type="button"
+            disabled={searching || resultPage <= 1}
+            onClick={() => moveResultPage(resultPage - 1)}
+          >
+            Previous Page
+          </button>
+          <span className="note">Page {resultPage}</span>
+          <button
+            className="btn btn-quiet btn-sm"
+            type="button"
+            disabled={searching || !!failed || resultPage >= totalPages}
+            onClick={() => moveResultPage(resultPage + 1)}
+          >
+            Next Page
+          </button>
+        </nav>
+      )}
     </>
   );
 }

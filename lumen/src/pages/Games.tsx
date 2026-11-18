@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { api } from '../api';
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
+import { api, artUrl } from '../api';
 import { GridSkeleton, MoreOnScroll, type Stat } from '../components/cards';
 import { DetailTop, Facts, fmtHrs, Pill } from '../components/detail';
 import {
@@ -101,6 +101,30 @@ function useGames(category: GameCategory | undefined, query: string) {
     setNext(failedAt.current);
   }, []);
   return { items, more, retry, loading, error, done: next === null };
+}
+
+export function SoftwareBookmark() {
+  const [params] = useSearchParams();
+  const category = params.get('category');
+  const knownCategory =
+    category === 'game' || category === 'retro' || category === 'modern';
+  const id = params.get('game') ?? '';
+  const dat = params.get('catalogProvider') === 'dat';
+  const validId = dat
+    ? category !== 'game' && /^dat-[0-9a-f]{64}$/.test(id)
+    : /^[1-9]\d{0,15}$/.test(id) && Number.isSafeInteger(Number(id));
+  if (knownCategory && validId) {
+    return (
+      <Navigate replace to={`/game/${category}/${id}${dat ? '?dat=1' : ''}`} />
+    );
+  }
+  const search = new URLSearchParams();
+  if (knownCategory) search.set('c', category);
+  const query = params.get('q')?.trim();
+  if (query && query.length <= 256) search.set('q', query);
+  return (
+    <Navigate replace to={{ pathname: '/games', search: search.toString() }} />
+  );
 }
 
 export function Games() {
@@ -228,30 +252,51 @@ export function GameDetail() {
   const [p] = useSearchParams();
   const cat = category as GameCategory;
   const dat = p.get('dat') === '1';
-  const { data: g, error } = useApi<Game>(
-    `/request/software/catalog/games/${encodeURIComponent(id)}?category=${cat}${dat ? '&catalogProvider=dat' : ''}`
+  return (
+    <GameDetailView
+      key={JSON.stringify([cat, id, dat])}
+      id={id}
+      cat={cat}
+      dat={dat}
+    />
   );
+}
+
+function GameDetailView({
+  id,
+  cat,
+  dat,
+}: {
+  id: string;
+  cat: GameCategory;
+  dat: boolean;
+}) {
+  const { data, error, reload } = useApi<Game | { game: Game }>(
+    `/request/software/catalog/games/${encodeURIComponent(id)}?category=${encodeURIComponent(cat)}${dat ? '&catalogProvider=dat' : ''}`
+  );
+  const g = data && ('game' in data ? data.game : data);
   const toast = useToast();
   const [os, setOs] = useState('');
   const [arch, setArch] = useState('');
   const [system, setSystem] = useState('');
   const [busy, setBusy] = useState(false);
+  const pending = useRef(false);
   const [done, setDone] = useState('');
   if (error)
     return (
       <ExtraGate k="game">
-        <div className="empty">
-          <b>Couldn’t load this game</b>
-          {error}
-        </div>
+        <ServiceNote what="this game" error={error} retry={reload} />
       </ExtraGate>
     );
   if (!g) return <div className="detail-loading" aria-busy="true" />;
   const s = statOf(g);
   const systems = (g.emulationSystems || []).filter((x) => x.group === cat);
-  const sys = system || systems[0]?.slug || '';
+  const sys =
+    systems.find(({ slug }) => slug === system)?.slug ?? systems[0]?.slug ?? '';
   const ready = cat === 'game' ? !!os && !!arch : !!sys;
   const go = async () => {
+    if (!ready || pending.current) return;
+    pending.current = true;
     setBusy(true);
     try {
       const r = await requestGame(cat, g, { os, arch, system: sys });
@@ -267,6 +312,7 @@ export function GameDetail() {
           : m || 'Request failed'
       );
     } finally {
+      pending.current = false;
       setBusy(false);
     }
   };
@@ -287,12 +333,19 @@ export function GameDetail() {
       </button>
     );
 
+  const screenshots = [
+    ...new Set(
+      (Array.isArray(g.screenshots) ? g.screenshots : [])
+        .map(artUrl)
+        .filter((url): url is string => !!url)
+    ),
+  ].slice(0, 6);
   return (
     <ExtraGate k="game">
       <article className="detail">
         <DetailTop
           status={s}
-          backdrop={g.screenshots?.[0]}
+          backdrop={screenshots[0]}
           poster={g.coverUrl}
           title={g.title}
           line={[
@@ -368,9 +421,9 @@ export function GameDetail() {
           <div className="dcols">
             <div style={{ display: 'grid', gap: 22 }}>
               {g.summary && <p className="ov">{g.summary}</p>}
-              {!!g.screenshots?.length && (
+              {!!screenshots.length && (
                 <div className="shots">
-                  {g.screenshots.slice(0, 6).map((u) => (
+                  {screenshots.map((u) => (
                     <img key={u} src={u} alt="" loading="lazy" />
                   ))}
                 </div>

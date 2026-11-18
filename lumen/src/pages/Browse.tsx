@@ -1,20 +1,28 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { MediaStatus, type TitleResult } from '../api';
+import { MediaStatus, type Genre, type TitleResult } from '../api';
+import { useAuth } from '../auth';
 import { GridSkeleton, MoreOnScroll, TitleCard } from '../components/cards';
 import { CardTitleToggle } from '../components/CardTitleToggle';
 import { ServiceNote } from '../components/extra';
 import { GenrePicker } from '../components/GenrePicker';
+import GenreTiles from '../components/GenreTiles';
 import { useAsksRequestOptions } from '../components/requestSheet';
 import { Avatar } from '../components/Shell';
 import { StreamingDiscoveryFilter } from '../components/StreamingDiscoveryFilter';
 import { StudioFilter } from '../components/StudioFilter';
 import { SubjectTagFilter } from '../components/SubjectTagFilter';
 import { tvNetworks } from '../discoverNetworks';
+import {
+  discoveryVisibility,
+  showDiscoveryTitle,
+} from '../discoveryVisibility';
 import { CAN_HOVER, useApi, usePaged, usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
+import { movieCertifications, tvCertifications } from '../maturityRatings';
 import { serverName } from '../mediaServer';
 import { usePrefs } from '../settings';
+import { useStreamingRegion } from '../streamingRegion';
 
 function keywordIds(value: string | null) {
   const ids = value?.split(',').map((part) => part.trim()) ?? [];
@@ -184,6 +192,11 @@ const BROWSE_FILTER_PARAMS = [
   'network',
   'country',
   'language',
+  'certification',
+  'certificationCountry',
+  'certificationGte',
+  'certificationLte',
+  'certificationMode',
 ] as const;
 
 const SERIES_STATUSES = [
@@ -195,16 +208,33 @@ const SERIES_STATUSES = [
   'Pilot',
 ];
 
+const commonSorts = [
+  ['popularity.desc', 'Popular'],
+  ['popularity.asc', 'Least Popular'],
+  ['vote_average.desc', 'Top rated'],
+  ['vote_average.asc', 'Lowest Rated'],
+  ['vote_count.desc', 'Most Votes'],
+  ['vote_count.asc', 'Fewest Votes'],
+] as const;
+
 const SORTS = {
   movie: [
-    ['popularity.desc', 'Popular'],
+    ...commonSorts,
     ['primary_release_date.desc', 'Newest'],
-    ['vote_average.desc', 'Top rated'],
+    ['primary_release_date.asc', 'Oldest'],
+    ['release_date.desc', 'Latest Release Date'],
+    ['release_date.asc', 'Earliest Release Date'],
+    ['original_title.asc', 'Original Title A–Z'],
+    ['original_title.desc', 'Original Title Z–A'],
+    ['revenue.desc', 'Highest Revenue'],
+    ['revenue.asc', 'Lowest Revenue'],
   ],
   tv: [
-    ['popularity.desc', 'Popular'],
+    ...commonSorts,
     ['first_air_date.desc', 'Newest'],
-    ['vote_average.desc', 'Top rated'],
+    ['first_air_date.asc', 'Oldest'],
+    ['original_name.asc', 'Original Title A–Z'],
+    ['original_name.desc', 'Original Title Z–A'],
   ],
 } as const;
 
@@ -218,6 +248,10 @@ function normalizeNativeFilters(params: URLSearchParams) {
     normalized.set('show', 'have');
     if (availability === '4k') normalized.set('quality', '4k');
     else normalized.delete('quality');
+  } else if (normalized.get('libraryView') === 'available') {
+    normalized.set('show', 'have');
+  } else if (normalized.get('libraryView') === 'missing') {
+    normalized.set('show', 'not');
   }
   const genre = normalized.get('genre');
   if (
@@ -232,7 +266,40 @@ function normalizeNativeFilters(params: URLSearchParams) {
   normalized.delete('nativeFilters');
   normalized.delete('sortBy');
   normalized.delete('availability');
+  normalized.delete('libraryView');
   return normalized;
+}
+
+export function GenreDirectory({ kind }: { kind: 'movie' | 'tv' }) {
+  const genres = useApi<{ id: number; name: string }[]>(`/genres/${kind}`);
+  const artwork = useApi<Genre[]>(`/discover/genreslider/${kind}`);
+  const backdrops = new Map(
+    artwork.data?.map((genre) => [genre.id, genre.backdrops])
+  );
+  const browse = kind === 'movie' ? '/movies' : '/series';
+  return (
+    <>
+      <header className="ph">
+        <h1>{kind === 'movie' ? 'Movie Genres' : 'Series Genres'}</h1>
+      </header>
+      <ServiceNote error={genres.error} what="genres" retry={genres.reload} />
+      {genres.data ? (
+        genres.data.length ? (
+          <GenreTiles
+            browse={browse}
+            genres={genres.data.map((genre) => ({
+              ...genre,
+              backdrops: backdrops.get(genre.id) ?? [],
+            }))}
+          />
+        ) : (
+          <p className="note">No genres found.</p>
+        )
+      ) : (
+        !genres.error && <div className="detail-loading" aria-busy="true" />
+      )}
+    </>
+  );
 }
 
 // Movies and Series share one page: availability switch, sort, genres, grid
@@ -261,20 +328,20 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
   const validRatingRange =
     !minRating || !maxRating || Number(minRating) <= Number(maxRating);
   const publicSettings = usePublicSettings();
+  const { user } = useAuth();
   const [showStudios, setShowStudios] = useState(false);
   const [showTags, setShowTags] = useState(false);
   const [showProviders, setShowProviders] = useState(false);
-  const rawRegion = p.get('watchRegion') ?? '';
-  const defaultRegion = publicSettings?.streamingRegion?.toUpperCase() ?? '';
-  const region = /^[A-Z]{2}$/.test(rawRegion)
-    ? rawRegion
-    : /^[A-Z]{2}$/.test(defaultRegion)
-      ? defaultRegion
-      : 'US';
   const providerParam = p.get('watchProviders') ?? '';
   const providers = /^\d{1,10}(?:[|,]\d{1,10}){0,49}$/.test(providerParam)
     ? [...new Set(providerParam.split(/[|,]/))]
     : [];
+  const { region, pending: regionPending } = useStreamingRegion(
+    user?.id,
+    publicSettings?.streamingRegion,
+    showProviders || providers.length > 0,
+    p.get('watchRegion')
+  );
   const excludeProviders = p.get('watchProviderMode') === 'exclude';
   const statusParam = p.get('status') ?? '';
   const status =
@@ -328,7 +395,28 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
   const languageOptions = (Array.isArray(languages.data) ? languages.data : [])
     .filter(({ iso_639_1 }) => /^[a-z]{2}$/.test(iso_639_1))
     .sort((a, b) => a.english_name.localeCompare(b.english_name));
-  const sort = p.get('sort') || 'popularity.desc';
+  const ratingOptions = [
+    'NR',
+    ...(kind === 'movie' ? movieCertifications : tvCertifications),
+  ];
+  const certification = p.get('certification') ?? '';
+  const certificationCountry = (
+    p.get('certificationCountry') ?? ''
+  ).toUpperCase();
+  const certificationFilters = Object.fromEntries(
+    ['certification', 'certificationGte', 'certificationLte'].flatMap((key) => {
+      const value = p.get(key);
+      return value && value.length <= 32 ? [[key, value]] : [];
+    })
+  );
+  const certificationRange =
+    !certification &&
+    (certificationFilters.certificationGte ||
+      certificationFilters.certificationLte);
+  const requestedSort = p.get('sort');
+  const sort =
+    SORTS[kind].find(([value]) => value === requestedSort)?.[0] ??
+    'popularity.desc';
   // several genres can be picked; "any" (default) or "all" of them
   const picked = (p.get('genre') || '').split(',').filter(Boolean);
   const matchAll = p.get('match') === 'all';
@@ -337,7 +425,11 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
   const genres =
     useApi<{ id: number; name: string }[]>(`/genres/${kind}`).data || [];
   const defaultVotes =
-    sort === 'vote_average.desc' ? (kind === 'movie' ? '500' : '200') : '';
+    sort === 'vote_average.desc' || sort === 'vote_average.asc'
+      ? kind === 'movie'
+        ? '500'
+        : '200'
+      : '';
   const minVotes = integerBound(p.get('voteCountGte'));
   const maxVotes = integerBound(p.get('voteCountLte'));
   const effectiveMinVotes = minVotes || (maxVotes ? '' : defaultVotes);
@@ -354,6 +446,14 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
     ...(network ? { network } : {}),
     ...(country ? { country } : {}),
     ...(language ? { language } : {}),
+    ...certificationFilters,
+    ...(Object.keys(certificationFilters).length
+      ? {
+          certificationCountry: /^[A-Z]{2}$/.test(certificationCountry)
+            ? certificationCountry
+            : 'US',
+        }
+      : {}),
     ...(validRuntime && minRuntime ? { withRuntimeGte: minRuntime } : {}),
     ...(validRuntime && maxRuntime ? { withRuntimeLte: maxRuntime } : {}),
     ...(validDates && start ? { [startKey]: start } : {}),
@@ -402,7 +502,9 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
     );
   if (libraryFirst) q.set('availability', quality);
   const list = usePaged<TitleResult>(
-    `/discover/${kind === 'movie' ? 'movies' : 'tv'}?${q}`
+    regionPending && providers.length
+      ? null
+      : `/discover/${kind === 'movie' ? 'movies' : 'tv'}?${q}`
   );
   const filterCatalogRows =
     !libraryFirst && (show === 'have' || show === 'not');
@@ -411,9 +513,14 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
       quality === '4k' ? x.mediaInfo?.status4k : x.mediaInfo?.status;
     return status === MediaStatus.AVAILABLE || status === MediaStatus.PARTIAL;
   };
+  const visibility = discoveryVisibility(publicSettings, user?.permissions);
+  if (show !== 'all') visibility.hideAvailable = false;
   const items = list.items.filter(
-    (x) => !filterCatalogRows || (show === 'have' ? onServer(x) : !onServer(x))
+    (x) =>
+      (!filterCatalogRows || (show === 'have' ? onServer(x) : !onServer(x))) &&
+      showDiscoveryTitle(x, visibility)
   );
+  const locallyFiltered = filterCatalogRows || items.length < list.items.length;
   // Catalog availability views read TMDB’s list a
   // page at a time. With a small library almost nothing matches, and an open-ended loop
   // would walk hundreds of pages and hit SeerrNG's rate limit for the whole account.
@@ -421,19 +528,19 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
   // finds less than a screenful stops and lets them ask for more.
   const PAGES_PER_LOOK = 5;
   const SCREENFUL = 18;
-  const filterKey = `${kind}|${show}|${quality}|${q}`;
+  const filterKey = `${kind}|${show}|${quality}|${visibility.hideAvailable}|${visibility.hideRequested}|${visibility.hideBlocklisted}|${q}`;
   const [look, setLook] = useState({ key: filterKey, page: 0, found: 0 });
   if (look.key !== filterKey) setLook({ key: filterKey, page: 0, found: 0 });
   else if (items.length - look.found >= SCREENFUL)
     setLook({ key: filterKey, page: list.page, found: items.length });
   const capped =
-    filterCatalogRows &&
+    locallyFiltered &&
     !list.done &&
     list.page - look.page >= PAGES_PER_LOOK &&
     items.length - look.found < SCREENFUL;
   useEffect(() => {
     if (
-      filterCatalogRows &&
+      locallyFiltered &&
       items.length < SCREENFUL &&
       !list.done &&
       !list.loading &&
@@ -442,7 +549,7 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
       !capped
     )
       void list.more();
-  }, [filterCatalogRows, items.length, list, capped]);
+  }, [locallyFiltered, items.length, list, capped]);
   const upd = (k: string, v: string) => {
     const n = new URLSearchParams(p);
     if (!v || v === 'all' || v === 'popularity.desc') n.delete(k);
@@ -656,6 +763,58 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
           </>
         )}
         <label className="sel">
+          <span className="lbl">Content Rating</span>
+          <select
+            value={certificationRange ? 'range' : certification}
+            onChange={(event) => {
+              const next = new URLSearchParams(p);
+              for (const key of [
+                'certification',
+                'certificationGte',
+                'certificationLte',
+                'certificationCountry',
+                'certificationMode',
+              ])
+                next.delete(key);
+              if (event.target.value) {
+                next.set('certification', event.target.value);
+                next.set('certificationCountry', 'US');
+              }
+              setP(next, { replace: true });
+            }}
+          >
+            <option value="">Any Rating</option>
+            {certificationRange && (
+              <option value="range" disabled>
+                {certificationFilters.certificationGte || 'Any'} to{' '}
+                {certificationFilters.certificationLte || 'Any'}
+              </option>
+            )}
+            {certification &&
+              (!ratingOptions.includes(certification) ||
+                (certificationCountry && certificationCountry !== 'US')) && (
+                <option value={certification}>
+                  {certification}
+                  {certificationCountry
+                    ? ' (' + certificationCountry + ')'
+                    : ''}
+                </option>
+              )}
+            {ratingOptions
+              .filter(
+                (value) =>
+                  value !== certification ||
+                  !certificationCountry ||
+                  certificationCountry === 'US'
+              )
+              .map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+          </select>
+        </label>
+        <label className="sel">
           <span className="lbl">Original Language</span>
           <select
             aria-label="Original Language"
@@ -722,6 +881,12 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
         />
       </div>
       <div className="toolbar">
+        <Link
+          className="chip"
+          to={kind === 'movie' ? '/movies/genres' : '/series/genres'}
+        >
+          Browse Genres
+        </Link>
         <button
           type="button"
           className="chip"
@@ -731,7 +896,12 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
           Streaming Services{providers.length ? ` (${providers.length})` : ''}
         </button>
       </div>
-      {showProviders && (
+      {showProviders && regionPending && (
+        <p className="note" role="status">
+          Loading streaming region…
+        </p>
+      )}
+      {showProviders && !regionPending && (
         <StreamingDiscoveryFilter
           key={`${region}:${providers.join('|')}:${excludeProviders}`}
           kind={kind}

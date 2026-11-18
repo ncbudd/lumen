@@ -1,9 +1,14 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { MediaStatus, type CardTitleKind, type MediaInfo } from '../api';
+import {
+  artUrl,
+  MediaStatus,
+  type CardTitleKind,
+  type MediaInfo,
+} from '../api';
 import { isAdministrator, useAuth } from '../auth';
 import { friendlyError } from '../errors';
-import { useExtras, type Extra } from '../extras';
+import { useExtras, type Extra, type Magazine } from '../extras';
 import { usePublicSettings } from '../hooks';
 import { Icon, type IconName } from '../icons';
 import { usePrefs } from '../settings';
@@ -37,7 +42,18 @@ export function comicState(mi?: MediaInfo): {
   const dls = mi.downloadStatus || [];
   if (dls.length) {
     const pcts = dls
-      .map((d) => d.percent)
+      .map((d) => {
+        if (typeof d.percent === 'number' && Number.isFinite(d.percent))
+          return d.percent;
+        if (
+          Number.isFinite(d.size) &&
+          d.size > 0 &&
+          Number.isFinite(d.sizeLeft) &&
+          d.sizeLeft >= 0 &&
+          d.sizeLeft <= d.size
+        )
+          return ((d.size - d.sizeLeft) / d.size) * 100;
+      })
       .filter((x): x is number => typeof x === 'number' && Number.isFinite(x));
     const pct =
       pcts.length === dls.length
@@ -75,6 +91,27 @@ export function comicState(mi?: MediaInfo): {
   return { stat: statusOf(mi, true) };
 }
 
+export function MagazineCard({ magazine }: { magazine: Magazine }) {
+  return (
+    <ExtraCard
+      href={'/magazine/' + encodeURIComponent(magazine.title)}
+      img={magazine.posterPath}
+      title={magazine.title}
+      shape="book"
+      icon="magazine"
+      stat={extraStat(magazine.mediaInfo)}
+      meta={[
+        magazine.publisher,
+        magazine.latestIssue
+          ? 'Latest ' + magazine.latestIssue
+          : magazine.firstPublishYear,
+      ]
+        .filter(Boolean)
+        .join(' · ')}
+    />
+  );
+}
+
 export function ExtraCard({
   href,
   img,
@@ -99,14 +136,20 @@ export function ExtraCard({
   pct?: number; // a download progress bar along the bottom of the art
 }) {
   const titleMode = useCardTitleMode(titleKind);
+  const safeImage = artUrl(img);
   return (
     <div
       className={`poster ${shape || ''}`}
-      data-title-mode={img ? titleMode : undefined}
+      data-title-mode={safeImage ? titleMode : undefined}
     >
       <div className="art">
-        {img ? (
-          <img loading="lazy" src={img} alt="" />
+        {safeImage ? (
+          <img
+            loading="lazy"
+            src={safeImage}
+            referrerPolicy="no-referrer"
+            alt=""
+          />
         ) : (
           <span className="art-ph">
             <Icon name={icon} />

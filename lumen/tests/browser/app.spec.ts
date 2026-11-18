@@ -647,15 +647,17 @@ test('Coming soon says when its lists fail and retries them', async ({
 }) => {
   const fixture = await fixtures(page);
   let fail = true;
-  await page.route(/\/api\/v1\/discover\/(movies|tv)\/upcoming$/, (route) =>
-    fail
-      ? route.fulfill({
-          status: 503,
-          json: { message: 'Provider unavailable' },
-        })
-      : route.fulfill({
-          json: paged([{ ...movie, releaseDate: '2099-03-04' }]),
-        })
+  await page.route(
+    /\/api\/v1\/discover\/(movies|tv)\/upcoming\?page=/,
+    (route) =>
+      fail
+        ? route.fulfill({
+            status: 503,
+            json: { message: 'Provider unavailable' },
+          })
+        : route.fulfill({
+            json: paged([{ ...movie, releaseDate: '2099-03-04' }]),
+          })
   );
   await page.goto('/soon');
   const movies = page
@@ -726,6 +728,258 @@ test('a double click on a poster’s Request sends one request', async ({
   await page.waitForTimeout(400);
   expect(posts).toHaveLength(1);
   expect(fixture.errors).toEqual([]);
+});
+
+test('movie posters distinguish or hide shared copies without offering duplicate requests', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.clock.install();
+  let mode = 'distinguish';
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { otherUsersAvailability: mode } })
+  );
+  await page.route(/\/api\/v1\/discover\/movies(?:\?|$)/, (route) =>
+    route.fulfill({
+      json: {
+        totalPages: 1,
+        results: [
+          {
+            id: 90,
+            title: 'Shared Movie',
+            mediaType: 'movie',
+            mediaInfo: {
+              status: 5,
+              viewerRequestCoverage: { standard: false },
+              mediaUrl: 'https://plex.example.test/shared',
+            },
+          },
+          {
+            id: 91,
+            title: 'Viewer Movie',
+            mediaType: 'movie',
+            mediaInfo: {
+              status: 5,
+              viewerRequestCoverage: { standard: true },
+            },
+          },
+        ],
+      },
+    })
+  );
+  await page.goto('/movies');
+  const poster = page.locator('.poster').filter({
+    has: page.getByRole('link', { name: 'Shared Movie', exact: true }),
+  });
+  const own = page.locator('.poster').filter({
+    has: page.getByRole('link', { name: 'Viewer Movie', exact: true }),
+  });
+  await expect(poster.getByTitle('Available to Other Users')).toBeVisible();
+  await expect(
+    poster.locator('a[href*="plex.example.test/shared"]')
+  ).toHaveCount(0);
+  await expect(poster.getByRole('button', { name: /request/i })).toHaveCount(0);
+  await expect(own.locator('.glyph.ok')).toBeVisible();
+
+  mode = 'hide';
+  await page.clock.fastForward(16_000);
+  await page.reload();
+  await expect(own.locator('.glyph.ok')).toBeVisible();
+  await expect(poster.locator('.glyph')).toHaveCount(0);
+  await expect(
+    poster.getByRole('link', { name: 'Shared Movie', exact: true })
+  ).toHaveAttribute('href', '/movie/90');
+  await expect(poster.getByRole('button', { name: /request/i })).toHaveCount(0);
+});
+
+test('movie details keep shared HD and viewer 4K availability separate', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.clock.install();
+  let mode = 'distinguish';
+  let own4k = false;
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { otherUsersAvailability: mode, movie4kEnabled: true },
+    })
+  );
+  await page.route('**/api/v1/movie/101', (route) =>
+    route.fulfill({
+      json: {
+        ...movie,
+        mediaInfo: {
+          ...available,
+          status4k: 5,
+          mediaUrl: 'https://plex.example.test/shared-hd',
+          iOSPlexUrl: undefined,
+          mediaUrl4k: 'https://plex.example.test/viewer-4k',
+          viewerRequestCoverage: { standard: false, fourK: own4k },
+        },
+      },
+    })
+  );
+  await page.goto('/movie/101');
+  const status = page.locator('.dstatus');
+  await expect(status.getByText('4K · Available to Other Users')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Watch on Plex' })).toHaveCount(
+    0
+  );
+  await expect(
+    page.getByRole('button', { name: 'Request', exact: true })
+  ).toHaveCount(0);
+
+  mode = 'hide';
+  own4k = true;
+  await page.clock.fastForward(181_000);
+  await page.reload();
+  await expect(status.getByText('4K on Plex', { exact: true })).toBeVisible();
+  await expect(page.getByText('4K · Available to Other Users')).toHaveCount(0);
+  await expect(page.locator('a[href*="shared-hd"]')).toHaveCount(0);
+  await expect(
+    page.getByRole('link', { name: 'Watch on Plex' }).first()
+  ).toHaveAttribute('href', 'https://plex.example.test/viewer-4k');
+  await expect(
+    page.getByRole('button', { name: 'Request', exact: true })
+  ).toHaveCount(0);
+});
+
+test('series details hide or mark shared seasons without reopening requests', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.clock.install();
+  let mode = 'distinguish';
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { otherUsersAvailability: mode, trackEpisodeAvailability: true },
+    })
+  );
+  await page.route('**/api/v1/tv/202', (route) =>
+    route.fulfill({
+      json: {
+        ...movie,
+        id: 202,
+        name: 'The Test Series',
+        firstAirDate: '2020-01-01',
+        seasons: [1, 2, 3].map((seasonNumber) => ({
+          id: seasonNumber,
+          seasonNumber,
+          episodeCount: 2,
+          name: `Season ${seasonNumber}`,
+        })),
+        mediaInfo: {
+          ...available,
+          seasons: [
+            { seasonNumber: 1, status: 5 },
+            { seasonNumber: 2, status: 5 },
+          ],
+          viewerRequestCoverage: {
+            standard: false,
+            seasons: [
+              { seasonNumber: 1, standard: true, fourK: false },
+              { seasonNumber: 2, standard: false, fourK: true },
+            ],
+          },
+        },
+      },
+    })
+  );
+  await page.route('**/api/v1/tv/202/season/*', (route) =>
+    route.fulfill({
+      json: {
+        episodes: [
+          {
+            episodeNumber: 1,
+            name: 'Fixture Episode',
+            availabilitySources: [
+              { sourceType: 'plex', hd: true, fourK: true },
+              { sourceType: 'sonarr', hd: true, fourK: false },
+            ],
+          },
+        ],
+      },
+    })
+  );
+  await page.goto('/tv/202');
+  const shared = page.getByRole('checkbox', { name: /Season 2/ });
+  const owned = page.getByRole('checkbox', { name: /Season 1/ });
+  const missing = page.getByRole('checkbox', { name: /Season 3/ });
+  await expect(shared.getByText('Available to Other Users')).toBeVisible();
+  await expect(shared).toBeDisabled();
+  await expect(owned.getByText('On Plex', { exact: true })).toBeVisible();
+  await expect(missing).toBeEnabled();
+  await expect(page.getByRole('link', { name: 'Watch on Plex' })).toHaveCount(
+    0
+  );
+  const panel = page.getByText('Episode Availability', { exact: true });
+  await panel.click();
+  await page.getByLabel('Availability Season').selectOption('2');
+  await expect(
+    page.getByText('Plex 4K · Shared HD', { exact: true })
+  ).toBeVisible();
+  mode = 'hide';
+  await page.clock.fastForward(181_000);
+  await page.reload();
+  await expect(owned.getByText('On Plex', { exact: true })).toBeVisible();
+  await expect(shared.getByText('Available to Other Users')).toHaveCount(0);
+  await expect(shared).toBeDisabled();
+  await expect(missing).toBeEnabled();
+  await panel.click();
+  await page.getByLabel('Availability Season').selectOption('2');
+  await expect(page.getByText('Plex 4K', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Shared HD|Plex HD|Sonarr HD/)).toHaveCount(0);
+});
+
+test('featured video cards distinguish and hide shared availability', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.clock.install();
+  let mode = 'distinguish';
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { otherUsersAvailability: mode } })
+  );
+  await page.route('**/api/v1/discover/trending', (route) =>
+    route.fulfill({
+      json: {
+        totalPages: 1,
+        results: [
+          {
+            id: 90,
+            title: 'Shared Feature',
+            mediaType: 'movie',
+            backdropPath: '/qa-backdrop.png',
+            mediaInfo: {
+              status: 5,
+              viewerRequestCoverage: { standard: false },
+              mediaUrl: 'https://plex.example.test/shared',
+            },
+          },
+        ],
+      },
+    })
+  );
+  await page.goto('/');
+  const feature = page.locator('.feat').filter({
+    has: page.getByRole('heading', { name: 'Shared Feature' }),
+  });
+  await expect(feature.getByText('Available to Other Users')).toBeVisible();
+  await expect(feature.getByRole('link', { name: 'Watch' })).toHaveCount(0);
+  await expect(feature.getByRole('button', { name: /request/i })).toHaveCount(
+    0
+  );
+  mode = 'hide';
+  await page.clock.fastForward(16_000);
+  await page.reload();
+  await expect(
+    feature.getByRole('link', { name: 'Shared Feature' })
+  ).toHaveAttribute('href', '/movie/90');
+  await expect(feature.getByText('Available to Other Users')).toHaveCount(0);
+  await expect(feature.getByRole('link', { name: 'Watch' })).toHaveCount(0);
+  await expect(feature.getByRole('button', { name: /request/i })).toHaveCount(
+    0
+  );
 });
 
 test('a category page says when SeerrNG’s settings fail and retries', async ({
@@ -1536,7 +1790,7 @@ for (const use4k of [false, true]) {
         json: { applicationTitle: 'SeerrNG', series4kEnabled: use4k },
       })
     );
-    await page.route('**/api/v1/discover/tv/upcoming', (route) =>
+    await page.route('**/api/v1/discover/tv/upcoming?page=*', (route) =>
       route.fulfill({
         json: paged([
           {
@@ -1651,17 +1905,317 @@ test('featured series can retry a watch-rule rejection and confirm accepted seas
   expect(writes).toEqual([expected, expected]);
 });
 
+test('Coming Soon applies shared availability without reopening requests', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.clock.install();
+  let mode = 'distinguish';
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { otherUsersAvailability: mode } })
+  );
+  await page.route('**/api/v1/discover/movies/upcoming?page=*', (route) =>
+    route.fulfill({
+      json: paged([
+        {
+          ...movie,
+          releaseDate: '2099-01-01',
+          mediaInfo: {
+            ...available,
+            viewerRequestCoverage: { standard: false },
+          },
+        },
+        {
+          ...movie,
+          id: 102,
+          title: 'Unrequested Film',
+          releaseDate: '2099-01-02',
+        },
+      ]),
+    })
+  );
+  await page.goto('/soon?media=movie');
+  const row = page
+    .locator('.si')
+    .filter({ has: page.getByRole('link', { name: movie.title }) });
+  await expect(row.getByText('Available to Other Users')).toBeVisible();
+  await expect(row.getByRole('button', { name: 'Request' })).toHaveCount(0);
+  mode = 'hide';
+  await page.clock.fastForward(16_000);
+  await page.reload();
+  await expect(row.getByRole('link', { name: movie.title })).toBeVisible();
+  await expect(row.getByText('Available to Other Users')).toHaveCount(0);
+  await expect(row.getByRole('button', { name: 'Request' })).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Request', exact: true })
+  ).toBeVisible();
+});
+
+test('adult scene details keep the catalog and default request sources distinct', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const scene = '12345678-1234-4123-8123-123456789abc';
+  const writes: unknown[] = [];
+  const reads: string[] = [];
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({
+      json: { id: 3, displayName: 'Viewer', permissions: 140737488355328 },
+    })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { adultEnabled: true, enabledMediaCategories: { adult: true } },
+    })
+  );
+  await page.route('**/api/v1/service/whisparr', (route) =>
+    route.fulfill({
+      json: [
+        { id: 1, isDefault: true },
+        { id: 2, isDefault: false },
+      ],
+    })
+  );
+  await page.route(`**/api/v1/adult/${scene}?*`, (route) => {
+    const source =
+      new URL(route.request().url()).searchParams.get('serverId') ?? '';
+    reads.push(source);
+    return route.fulfill({
+      json: {
+        id: scene,
+        mediaType: 'adult',
+        title: source === '2' ? 'Catalog Scene' : 'Default Scene',
+        serviceId: Number(source),
+        performers: [],
+        mediaInfo: source === '2' ? { status: 5 } : undefined,
+      },
+    });
+  });
+  await page.route('**/api/v1/request', (route) => {
+    if (route.request().method() !== 'POST') return route.fallback();
+    writes.push(route.request().postDataJSON());
+    return route.fulfill({ json: { id: 4 } });
+  });
+  await page.goto(`/adult/${scene}?serverId=2`);
+  await expect(
+    page.getByRole('heading', { name: 'Catalog Scene' })
+  ).toBeVisible();
+  const actions = page.getByRole('button', { name: 'Request', exact: true });
+  await actions.filter({ visible: true }).click();
+  await expect
+    .poll(() => writes)
+    .toEqual([{ mediaType: 'adult', mediaId: scene }]);
+  expect(reads.sort()).toEqual(['1', '2']);
+});
+
+test('book requests reopen the Bookshelf title and format', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/request?*', (route) =>
+    route.fulfill({
+      json: {
+        pageInfo: { pages: 1, results: 1 },
+        results: [
+          {
+            id: 615,
+            type: 'book',
+            status: 1,
+            bookFormat: 'audiobook',
+            is4k: false,
+            seasons: [],
+            createdAt: '2026-11-08T12:00:00Z',
+            requestedBy: { id: 1, displayName: 'Owner' },
+            media: {
+              mediaType: 'book',
+              status: 1,
+              identifiers: [
+                { provider: 'bookshelf', value: 'bookshelf:1:fixture' },
+              ],
+            },
+          },
+        ],
+      },
+    })
+  );
+  await page.route('**/api/v1/book/bookshelf%3A1%3Afixture', (route) =>
+    route.fulfill({
+      json: { id: 'bookshelf:1:fixture', title: 'Requested Audiobook' },
+    })
+  );
+  await page.goto('/requests?tab=active');
+  await expect(
+    page.getByRole('link', { name: 'Requested Audiobook', exact: true })
+  ).toHaveAttribute(
+    'href',
+    '/book/bookshelf%3A1%3Afixture?f=audio&lookupTitle=Requested+Audiobook'
+  );
+});
+
+test('adult request links use the saved Whisparr destination', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const scene = '12345678-1234-4123-8123-123456789abc';
+  await page.route('**/api/v1/request?*', (route) =>
+    route.fulfill({
+      json: {
+        pageInfo: { pages: 1, results: 1 },
+        results: [
+          {
+            id: 614,
+            type: 'adult',
+            status: 1,
+            serverId: 2,
+            is4k: false,
+            seasons: [],
+            createdAt: '2026-11-08T12:00:00Z',
+            requestedBy: { id: 1, displayName: 'Owner' },
+            media: {
+              mediaType: 'adult',
+              status: 1,
+              identifiers: [{ provider: 'stashdb', value: scene }],
+            },
+          },
+        ],
+      },
+    })
+  );
+  await page.route(`**/api/v1/adult/${scene}?serverId=2`, (route) =>
+    route.fulfill({
+      json: { id: scene, title: 'Destination Scene', serviceId: 2 },
+    })
+  );
+  await page.goto('/requests?tab=active');
+  await expect(
+    page.getByRole('link', { name: 'Destination Scene', exact: true })
+  ).toHaveAttribute('href', `/adult/${scene}?serverId=2`);
+});
+
+test('Sportarr league details show paginated event availability', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { sportsEnabled: true, enabledMediaCategories: { sports: true } },
+    })
+  );
+  await page.route('**/api/v1/sportarr/lg-000123', (route) =>
+    route.fulfill({
+      json: {
+        id: 'lg-000123',
+        title: 'Fixture League',
+        mediaType: 'sports',
+        libraryState: 'monitored',
+        eventsAvailable: true,
+      },
+    })
+  );
+  await page.route('**/api/v1/sportarr/lg-000123/events?*', (route) => {
+    const requestedPage = Number(
+      new URL(route.request().url()).searchParams.get('page')
+    );
+    const second = requestedPage === 2;
+    return route.fulfill({
+      json: {
+        eventsAvailable: true,
+        totalPages: 2,
+        totalRecords: 51,
+        results:
+          requestedPage > 2
+            ? []
+            : [
+                {
+                  id: second ? 2 : 1,
+                  title: second ? 'Final' : 'Opening Match',
+                  monitored: true,
+                  hasFile: !second,
+                  fileCount: second ? 0 : 3,
+                  quality: second ? undefined : 'HDTV',
+                },
+              ],
+      },
+    });
+  });
+  await page.goto('/sportarr/lg-000123');
+  await expect(
+    page.getByRole('heading', { name: 'Fixture League' })
+  ).toBeVisible();
+  await expect(page.getByText('Opening Match')).toBeVisible();
+  await expect(page.getByText('In Library · 3 files · HDTV')).toBeVisible();
+  await expect(page.getByText('51 events', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Next Page' }).click();
+  await expect(page.getByText('Final', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Next Page' })).toBeDisabled();
+  await expect(page).toHaveURL(/eventPage=2$/);
+  await page.reload();
+  await expect(page.getByText('Final', { exact: true })).toBeVisible();
+  await page.goBack();
+  await expect(page.getByText('Opening Match')).toBeVisible();
+  await page.goto('/sportarr/lg-000123?eventPage=9');
+  await expect(page).toHaveURL(/eventPage=2$/);
+  await expect(page.getByText('Final', { exact: true })).toBeVisible();
+});
+
+test('Coming Soon restores its media scope and loads only the selected feeds', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const reads: string[] = [];
+  await page.route('**/api/v1/discover/*/upcoming?page=*', (route) => {
+    const series = new URL(route.request().url()).pathname.includes('/tv/');
+    reads.push(series ? 'tv' : 'movie');
+    return route.fulfill({
+      json: paged(
+        series
+          ? [
+              {
+                ...movie,
+                id: 202,
+                title: undefined,
+                name: 'Upcoming Fixture Series',
+                firstAirDate: '2099-01-01',
+              },
+            ]
+          : [movie]
+      ),
+    });
+  });
+  await page.goto('/soon?media=tv');
+  const filters = page.getByRole('navigation', { name: 'Upcoming Media' });
+  const series = page.getByRole('link', { name: 'Upcoming Fixture Series' });
+  const film = page.getByRole('link', { name: 'The Test Film', exact: true });
+  await expect(series).toBeVisible();
+  await expect(filters.getByRole('link', { name: 'Series' })).toHaveAttribute(
+    'aria-current',
+    'page'
+  );
+  expect(reads).toEqual(['tv']);
+  await filters.getByRole('link', { name: 'Movies' }).click();
+  await expect(page).toHaveURL(/media=movie$/);
+  await expect(film).toBeVisible();
+  await expect(series).toHaveCount(0);
+  expect(reads).toEqual(['tv', 'movie']);
+  await page.goBack();
+  await expect(series).toBeVisible();
+  await expect(film).toHaveCount(0);
+  await filters.getByRole('link', { name: 'All', exact: true }).click();
+  await expect(film).toBeVisible();
+  await expect(series).toBeVisible();
+});
+
 test('Coming Soon retries a failed series feed without dropping movies', async ({
   page,
 }) => {
   await fixtures(page);
   let seriesReads = 0;
   let movieReads = 0;
-  await page.route('**/api/v1/discover/movies/upcoming', (route) => {
+  await page.route('**/api/v1/discover/movies/upcoming?page=*', (route) => {
     movieReads++;
     return route.fulfill({ json: paged([movie]) });
   });
-  await page.route('**/api/v1/discover/tv/upcoming', (route) => {
+  await page.route('**/api/v1/discover/tv/upcoming?page=*', (route) => {
     seriesReads++;
     return seriesReads === 1
       ? route.fulfill({
@@ -1757,6 +2311,9 @@ test('series streaming exclusion sends the selected providers and region', async
   page,
 }) => {
   await fixtures(page);
+  await page.route('**/api/v1/user/*/settings/main', (route) =>
+    route.fulfill({ json: { streamingRegion: 'GB' } })
+  );
   await page.route('**/api/v1/watchproviders/tv?watchRegion=CA', (route) =>
     route.fulfill({
       json: [
@@ -1769,6 +2326,7 @@ test('series streaming exclusion sends the selected providers and region', async
   await page
     .getByRole('button', { name: 'Streaming Services', exact: true })
     .click();
+  await expect(page.getByLabel('Streaming Region')).toHaveValue('GB');
   await page.getByLabel('Streaming Region').fill('ca');
   await page
     .getByLabel('Streaming Services', { exact: true })
@@ -1787,6 +2345,7 @@ test('series streaming exclusion sends the selected providers and region', async
   await query;
   await page.reload();
   await page.getByRole('button', { name: 'Streaming Services (2)' }).click();
+  await expect(page.getByLabel('Streaming Region')).toHaveValue('CA');
   await expect(page.getByLabel('Provider Match')).toHaveValue('exclude');
   await page.getByRole('button', { name: 'Clear Streaming Filter' }).click();
   await expect(page).toHaveURL(/\/series\?genre=18$/);
@@ -2497,13 +3056,13 @@ test('Coming soon scopes results and network requests by media', async ({
 }) => {
   await fixtures(page);
   let movieLoads = 0;
-  await page.route('**/api/v1/discover/movies/upcoming', (route) => {
+  await page.route('**/api/v1/discover/movies/upcoming?page=*', (route) => {
     movieLoads++;
     return route.fulfill({
       json: paged([{ ...movie, title: 'Upcoming Film' }]),
     });
   });
-  await page.route('**/api/v1/discover/tv/upcoming', (route) =>
+  await page.route('**/api/v1/discover/tv/upcoming?page=*', (route) =>
     route.fulfill({
       json: paged([
         { id: 202, name: 'Upcoming Series', firstAirDate: '2030-01-01' },
@@ -2915,6 +3474,243 @@ test('configured book shelves carry an arbitrary subject into both book formats'
   await expect(page).toHaveURL(/\/audiobooks\?sort=ranked$/);
 });
 
+test('comic catalogue indexing refreshes into filtered results', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { comic: true } } })
+  );
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { comic: true } } })
+  );
+  let reads = 0;
+  await page.route('**/api/v1/discover/comics?*', (route) => {
+    const params = new URL(route.request().url()).searchParams;
+    expect(params.get('publisher')).toBe('Image');
+    expect(params.get('page')).toBe('1');
+    reads += 1;
+    if (reads < 3) {
+      return route.fulfill({
+        json: {
+          ...paged([]),
+          totalPages: 0,
+          indexing: true,
+          indexedResults: 6 * reads,
+          expectedResults: 20,
+          indexError: reads === 1 ? 'unstable-order' : undefined,
+        },
+      });
+    }
+    return route.fulfill({
+      json: paged([{ id: '1234', mediaType: 'comic', title: 'Indexed Comic' }]),
+    });
+  });
+  await page.clock.install();
+  await page.goto('/comics?publisher=Image');
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Comic catalogue indexing' })
+  ).toContainText('6 of 20 volumes indexed');
+  await expect(page.getByText('No comics found')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Check Again' }).click();
+  await expect(
+    page.getByText('12 of 20 volumes indexed', { exact: false })
+  ).toBeVisible();
+  await page.clock.fastForward(15000);
+  await expect(
+    page.getByRole('link', { name: 'Indexed Comic' })
+  ).toHaveAttribute('href', '/comic/1234');
+  await expect(page.getByText('Comic catalogue indexing')).toHaveCount(0);
+});
+
+test('Classic comic discovery bookmarks restore catalogue filters and results', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { comic: true } } })
+  );
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { comic: true } } })
+  );
+  const reads: URLSearchParams[] = [];
+  await page.route('**/api/v1/discover/comics?*', (route) => {
+    const params = new URL(route.request().url()).searchParams;
+    reads.push(params);
+    if (params.get('group') === 'works') {
+      return route.fulfill({
+        json: paged([
+          {
+            id: 'al-42',
+            mediaType: 'comic',
+            kind: 'manga',
+            title: 'Fixture Manga',
+            editions: [],
+            editionsResolved: false,
+          },
+        ]),
+      });
+    }
+    return route.fulfill({
+      json: paged([
+        {
+          id: '1234',
+          mediaType: 'comic',
+          title: 'Night Tales',
+          publisher: 'Image',
+        },
+      ]),
+    });
+  });
+  await page.goto(
+    '/comics?query=Night&publisher=Image&startYear=2010&minIssues=1&maxIssues=12'
+  );
+  const filterForm = page.getByRole('form', {
+    name: 'Comics Catalogue Filters',
+  });
+  await expect(page.getByRole('link', { name: 'Night Tales' })).toHaveAttribute(
+    'href',
+    '/comic/1234'
+  );
+  await expect(
+    filterForm.getByRole('searchbox', { name: 'Publisher' })
+  ).toHaveValue('Image');
+  expect(Object.fromEntries(reads[0])).toMatchObject({
+    query: 'Night',
+    publisher: 'Image',
+    startYear: '2010',
+    minIssues: '1',
+    maxIssues: '12',
+  });
+  await filterForm
+    .getByRole('spinbutton', { name: 'Maximum Issues' })
+    .fill('20');
+  await filterForm
+    .getByRole('button', { name: 'Search Comics Catalogue' })
+    .click();
+  await expect.poll(() => reads.at(-1)?.get('maxIssues')).toBe('20');
+  await filterForm
+    .getByRole('button', { name: 'Back to Comics and Manga' })
+    .click();
+  await expect(page).toHaveURL(/\/comics$/);
+  await expect(
+    filterForm.getByRole('searchbox', { name: 'Publisher' })
+  ).toHaveValue('');
+  await expect(
+    page.getByRole('heading', { name: 'Comics Catalogue', exact: true })
+  ).toHaveCount(0);
+  await filterForm
+    .getByRole('searchbox', { name: 'Title', exact: true })
+    .fill('Fixture Manga');
+  await filterForm
+    .getByRole('button', { name: 'Search Comics Catalogue' })
+    .click();
+  await expect(
+    page.getByRole('link', { name: 'Fixture Manga' })
+  ).toHaveAttribute('href', '/comic/al-42');
+  expect(reads.at(-1)?.get('group')).toBe('works');
+});
+
+test('Classic music discovery bookmarks retain catalogue filters', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+    })
+  );
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { music: true } } })
+  );
+  const artistId = '5b36cb67-befa-41ca-a91d-a6dcf1f68062';
+  const filters = {
+    query: 'Jazz',
+    artist: 'Fixture Artist',
+    artistId,
+    availability: 'flac',
+    primaryReleaseDateGte: '1990-01-01',
+    primaryReleaseDateLte: '2000-12-31',
+    genre: 'jazz',
+    sortBy: 'release_date.asc',
+  };
+  const observed: URLSearchParams[] = [];
+  await page.route('**/api/v1/discover/music?*', (route) => {
+    observed.push(new URL(route.request().url()).searchParams);
+    return route.fulfill({ json: paged([]) });
+  });
+  const { query, ...bookmark } = filters;
+  const params = new URLSearchParams({
+    ...bookmark,
+    search: query,
+    releaseType: 'EP,Soundtrack',
+  });
+  await page.goto('/music?' + params);
+  await expect(page.getByPlaceholder('Search albums and artists…')).toHaveValue(
+    query
+  );
+  await expect(
+    page.getByRole('combobox', { name: 'Sort', exact: true })
+  ).toHaveValue(filters.sortBy);
+  await expect
+    .poll(() =>
+      observed.some(
+        (read) =>
+          read.get('releaseType') === 'ep,soundtrack' &&
+          Object.entries(filters).every(
+            ([key, value]) => read.get(key) === value
+          )
+      )
+    )
+    .toBe(true);
+  await page
+    .getByRole('button', { name: 'Release Types: EP + 1', exact: true })
+    .click();
+  const releaseTypes = page.getByRole('dialog', { name: 'Release Types' });
+  await expect(
+    releaseTypes.getByRole('button', { name: 'EP', exact: true })
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    releaseTypes.getByRole('button', { name: 'Soundtrack', exact: true })
+  ).toHaveAttribute('aria-pressed', 'true');
+  await releaseTypes
+    .getByRole('button', { name: 'Compilation', exact: true })
+    .click();
+  await expect
+    .poll(() => observed.at(-1)?.get('releaseType'))
+    .toBe('ep,soundtrack,compilation');
+  await releaseTypes
+    .getByRole('button', { name: 'Any Release Type', exact: true })
+    .click();
+  await expect.poll(() => observed.at(-1)?.get('releaseType')).toBeNull();
+  await releaseTypes.getByRole('button', { name: 'Done', exact: true }).click();
+  const form = page.getByRole('form', { name: 'Music Discovery Filters' });
+  await expect(form.getByRole('searchbox', { name: 'Artist' })).toHaveValue(
+    filters.artist
+  );
+  await expect(form.getByRole('combobox', { name: 'In Library' })).toHaveValue(
+    'flac'
+  );
+  await form.getByRole('searchbox', { name: 'Artist' }).fill('New Artist');
+  await form.getByLabel('Released From').fill('2001-01-01');
+  await form.getByLabel('Released Through').fill('2010-12-31');
+  await form.getByRole('combobox', { name: 'In Library' }).selectOption('mp3');
+  await form.getByRole('button', { name: 'Apply Music Filters' }).click();
+  await expect
+    .poll(() => Object.fromEntries(observed.at(-1) ?? []))
+    .toMatchObject({
+      artist: 'New Artist',
+      availability: 'mp3',
+      primaryReleaseDateGte: '2001-01-01',
+      primaryReleaseDateLte: '2010-12-31',
+      query,
+    });
+  expect(observed.at(-1)?.has('artistId')).toBe(false);
+  await form.getByRole('button', { name: 'Clear Music Filters' }).click();
+  await expect.poll(() => observed.at(-1)?.has('availability')).toBe(false);
+  expect(observed.at(-1)?.get('query')).toBe(query);
+});
+
 test('configured music shelves preserve genre and yearly chart in Music', async ({
   page,
 }) => {
@@ -3103,14 +3899,16 @@ test('music and Open Library book details open Associations with exact identity'
       json: { id: 'OL123W', title: 'Fixture Book', description: 'Description' },
     })
   );
-  await page.route('**/api/v1/book/bookshelf%3A1%3Afixture', (route) =>
-    route.fulfill({
-      json: {
-        id: 'bookshelf:1:fixture',
-        title: 'Local Book',
-        description: 'Description',
-      },
-    })
+  await page.route(
+    '**/api/v1/book/bookshelf%3A1%3Afixture?lookupTitle=Local+Book',
+    (route) =>
+      route.fulfill({
+        json: {
+          id: 'bookshelf:1:fixture',
+          title: 'Local Book',
+          description: 'Description',
+        },
+      })
   );
   await page.route(
     '**/api/v1/association/book/OL123W?includeWeak=true',
@@ -3129,7 +3927,7 @@ test('music and Open Library book details open Associations with exact identity'
     'href',
     `/associations/artist/${artist}`
   );
-  await page.goto('/book/OL123W?f=audio');
+  await page.goto('/book/OL123W?format=audiobook');
   await association.click();
   await expect(
     page.getByRole('heading', { name: 'Associations for Fixture Book' })
@@ -3138,9 +3936,47 @@ test('music and Open Library book details open Associations with exact identity'
   await expect(
     page.getByRole('link', { name: 'Back to Details' })
   ).toHaveAttribute('href', '/book/OL123W?f=audio');
+  await page.route('**/api/v1/book/bookshelf%3A1%3Afixture', (route) =>
+    route.fulfill({
+      json: {
+        id: 'bookshelf:1:fixture',
+        title: 'Local Book',
+        description: 'Description',
+      },
+    })
+  );
   await page.goto('/book/bookshelf%3A1%3Afixture');
+  await expect(page.getByRole('link', { name: /^Audiobook / })).toHaveAttribute(
+    'href',
+    '/book/bookshelf%3A1%3Afixture?f=audio&lookupTitle=Local+Book'
+  );
+  await page.route(
+    '**/api/v1/book/bookshelf%3A1%3Afixture/ratings?lookupTitle=Local+Book',
+    (route) =>
+      route.fulfill({
+        json: {
+          average: 4.2,
+          count: 24,
+          source: 'openlibrary',
+          workId: 'OL123W',
+        },
+      })
+  );
+  await page.goto('/book/bookshelf%3A1%3Afixture?lookupTitle=Local+Book');
   await expect(page.getByRole('heading', { name: 'Local Book' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: '4.2/5 · Open Library' })
+  ).toHaveAttribute('href', 'https://openlibrary.org/works/OL123W');
   await expect(association).toHaveCount(0);
+  await page.getByRole('link', { name: /^Audiobook / }).click();
+  const audio = new URL(page.url());
+  expect(audio.searchParams.get('f')).toBe('audio');
+  expect(audio.searchParams.get('lookupTitle')).toBe('Local Book');
+  await expect(page.getByRole('heading', { name: 'Local Book' })).toBeVisible();
+  await page.getByRole('link', { name: /Ebook.*EPUB/i }).click();
+  const ebook = new URL(page.url());
+  expect(ebook.searchParams.has('f')).toBe(false);
+  expect(ebook.searchParams.get('lookupTitle')).toBe('Local Book');
 });
 
 test('native companion discovery filters retain genre matching and clear without reapplying aliases', async ({
@@ -3167,6 +4003,27 @@ test('native companion discovery filters retain genre matching and clear without
   expect(reads.at(-1)?.has('genre')).toBe(false);
   expect(reads.at(-1)?.has('keywords')).toBe(false);
   await expect(page).toHaveURL(/\/movies$/);
+});
+
+test('native companion discovery bookmarks retain library availability', async ({
+  page,
+}) => {
+  await fixtures(page);
+  for (const [search, selected] of [
+    ['libraryView=missing', /^Not on /],
+    ['libraryView=available', /^On /],
+    ['libraryView=missing&availability=4k', /^On /],
+  ] as const) {
+    await page.goto(`/movies?nativeFilters=1&${search}`);
+    const availability = page.getByRole('group', { name: 'Availability' });
+    await expect(
+      availability.getByRole('button', { name: selected })
+    ).toHaveAttribute('aria-pressed', 'true');
+    const all = availability.getByRole('button', { name: 'All', exact: true });
+    await all.click();
+    await expect(all).toHaveAttribute('aria-pressed', 'true');
+    expect(new URL(page.url()).searchParams.has('libraryView')).toBe(false);
+  }
 });
 
 test('native search bookmarks retain the decoded term and media scope', async ({
@@ -4290,6 +5147,161 @@ test('System Logs filters server entries and excludes non-admins', async ({
   expect(reads).toBe(adminReads);
 });
 
+test('Media Categories saves only changed instance switches and excludes non-admins', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let permissions = 2;
+  let reads = 0;
+  const writes: unknown[] = [];
+  const categories = { movie: true, tv: true, adult: false };
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({ json: { id: 1, displayName: 'Viewer', permissions } })
+  );
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      Object.assign(categories, body.enabledMediaCategories);
+    } else reads++;
+    return route.fulfill({ json: { enabledMediaCategories: categories } });
+  });
+  await page.goto('/me');
+  await page.getByRole('link', { name: 'Open Media Categories' }).click();
+  await page.getByRole('checkbox', { name: 'Movies', exact: true }).uncheck();
+  await page.getByRole('button', { name: 'Save Categories' }).click();
+  await expect(page.getByText('Category settings saved.')).toBeVisible();
+  expect(writes).toEqual([{ enabledMediaCategories: { movie: false } }]);
+  await expect(page.getByRole('checkbox', { name: 'Series' })).toBeChecked();
+  await page.reload();
+  await expect(
+    page.getByRole('checkbox', { name: 'Movies', exact: true })
+  ).not.toBeChecked();
+
+  const adminReads = reads;
+  permissions = 8;
+  await page.goto('/admin/categories');
+  await expect(page).toHaveURL(/\/me$/);
+  expect(reads).toBe(adminReads);
+});
+
+test('Default user categories save independently of instance availability', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const response = {
+    enabledMediaCategories: { movie: true, tv: true },
+    defaultEnabledMediaCategories: { movie: true, tv: true },
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      Object.assign(
+        response.defaultEnabledMediaCategories,
+        body.defaultEnabledMediaCategories
+      );
+    }
+    return route.fulfill({ json: response });
+  });
+  await page.goto('/admin/categories');
+  const available = page.locator('section').filter({
+    has: page.getByRole('heading', { name: 'Available Categories' }),
+  });
+  const defaults = page.locator('section').filter({
+    has: page.getByRole('heading', { name: 'Default User Categories' }),
+  });
+  await available.getByRole('checkbox', { name: 'Series' }).uncheck();
+  await defaults
+    .getByRole('checkbox', { name: 'Movies', exact: true })
+    .uncheck();
+  await defaults
+    .getByRole('button', { name: 'Save Default Categories' })
+    .click();
+  await expect(defaults.getByText('Default categories saved.')).toBeVisible();
+  expect(writes).toEqual([{ defaultEnabledMediaCategories: { movie: false } }]);
+  await expect(
+    available.getByRole('button', { name: 'Save Categories' })
+  ).toBeEnabled();
+  await page.reload();
+  await expect(
+    defaults.getByRole('checkbox', { name: 'Movies', exact: true })
+  ).not.toBeChecked();
+  await expect(
+    available.getByRole('checkbox', { name: 'Series' })
+  ).toBeChecked();
+});
+
+test('Instance Age Gate saves changed settings without submitting category drafts', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const ageGate = {
+    defaultRestricted: false,
+    maxMovieCertification: 'PG-13',
+    maxTvCertification: 'TV-14',
+    certificationCountry: 'US',
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      if (writes.length === 1) {
+        return route.fulfill({
+          status: 503,
+          json: { message: 'Could not save settings.' },
+        });
+      }
+      Object.assign(ageGate, body.ageGate);
+    }
+    return route.fulfill({
+      json: { enabledMediaCategories: { movie: true }, ageGate },
+    });
+  });
+  await page.goto('/admin/categories');
+  const movies = page.getByRole('checkbox', { name: 'Movies', exact: true });
+  const restricted = page.getByRole('checkbox', {
+    name: 'Restrict Accounts by Default',
+  });
+  const movieLimit = page.getByLabel('Highest Movie Rating');
+  const country = page.getByLabel('Rating Country');
+  const save = page.getByRole('button', { name: 'Save Age Gate' });
+  await movies.uncheck();
+  await restricted.check();
+  await movieLimit.selectOption('PG');
+  await country.fill('c');
+  await expect(save).toBeDisabled();
+  await country.fill('ca');
+  await save.click();
+  await expect(page.getByRole('alert')).toContainText(
+    'Could not save settings.'
+  );
+  await expect(restricted).toBeChecked();
+  await expect(country).toHaveValue('ca');
+  await save.click();
+  await expect(page.getByText('Age Gate settings saved.')).toBeVisible();
+  await expect(country).toHaveValue('CA');
+  await expect(movies).not.toBeChecked();
+  await expect(
+    page.getByRole('button', { name: 'Save Categories' })
+  ).toBeEnabled();
+  const patch = {
+    ageGate: {
+      defaultRestricted: true,
+      maxMovieCertification: 'PG',
+      certificationCountry: 'CA',
+    },
+  };
+  expect(writes).toEqual([patch, patch]);
+  await page.reload();
+  await expect(restricted).toBeChecked();
+  await expect(movieLimit).toHaveValue('PG');
+  await expect(page.getByLabel('Highest Series Rating')).toHaveValue('TV-14');
+  await expect(movies).toBeChecked();
+});
+
 test('General Settings retains application edits after failure and saves only changed fields', async ({
   page,
 }) => {
@@ -4297,6 +5309,9 @@ test('General Settings retains application edits after failure and saves only ch
   const saved = {
     applicationTitle: 'SeerrNG',
     applicationUrl: 'https://seerr.example.test',
+    cacheImages: true,
+    versionCheck: true,
+    otherUsersAvailability: 'show',
   };
   const writes: unknown[] = [];
   await page.route('**/api/v1/settings/main', (route) => {
@@ -4331,14 +5346,615 @@ test('General Settings retains application edits after failure and saves only ch
   const address = page.getByLabel('Application URL');
   await expect(address).toHaveValue('https://seerr.example.test');
   await address.clear();
+  await page.getByRole('checkbox', { name: 'Cache Images' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Version Check' }).uncheck();
+  await page
+    .getByLabel('Other Users’ Availability')
+    .selectOption('distinguish');
   await save.click();
   await expect(page.getByText('Application settings saved.')).toBeVisible();
   await expect(save).toBeDisabled();
   expect(writes).toEqual([
     { applicationTitle: 'Family Library' },
     { applicationTitle: 'Family Library' },
-    { applicationUrl: '' },
+    {
+      applicationUrl: '',
+      cacheImages: false,
+      versionCheck: false,
+      otherUsersAvailability: 'distinguish',
+    },
   ]);
+  await page.reload();
+  await expect(
+    page.getByRole('checkbox', { name: 'Cache Images' })
+  ).not.toBeChecked();
+  await expect(
+    page.getByRole('checkbox', { name: 'Version Check' })
+  ).not.toBeChecked();
+  await expect(page.getByLabel('Other Users’ Availability')).toHaveValue(
+    'distinguish'
+  );
+});
+
+test('General Settings selects bundled or standalone Lumen and scopes the native lock', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const saved = {
+    applicationTitle: 'SeerrNG',
+    defaultFrontend: 'native',
+    enforceDefaultFrontend: false,
+    lockLumenForNonAdmins: false,
+    lumenPublicUrl: '',
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      Object.assign(saved, body);
+    }
+    return route.fulfill({ json: saved });
+  });
+  await page.goto('/admin/general');
+  const frontend = page.getByLabel('Default Interface', { exact: true });
+  const lock = page.getByRole('checkbox', {
+    name: 'Keep Non-Administrators in Lumen',
+  });
+  const save = page.getByRole('button', { name: 'Save Application Settings' });
+  await frontend.selectOption('lumen');
+  await lock.check();
+  await page
+    .getByRole('checkbox', { name: 'Enforce Default Interface' })
+    .check();
+  await save.click();
+  await expect(page.getByText('Application settings saved.')).toBeVisible();
+  await frontend.selectOption('external');
+  await expect(lock).toHaveCount(0);
+  await expect(save).toBeDisabled();
+  await page
+    .getByLabel('Lumen Companion URL')
+    .fill('https://lumen.example.test');
+  await save.click();
+  await expect(page.getByText('Application settings saved.')).toBeVisible();
+  expect(writes).toEqual([
+    {
+      defaultFrontend: 'lumen',
+      enforceDefaultFrontend: true,
+      lockLumenForNonAdmins: true,
+    },
+    {
+      defaultFrontend: 'external',
+      lockLumenForNonAdmins: false,
+      lumenPublicUrl: 'https://lumen.example.test',
+    },
+  ]);
+  await page.reload();
+  await expect(frontend).toHaveValue('external');
+  await expect(page.getByLabel('Lumen Companion URL')).toHaveValue(
+    'https://lumen.example.test'
+  );
+});
+
+test('General Settings preserves a sign-in method and saves Jellyfin Quick Connect policy', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const saved = {
+    applicationTitle: 'SeerrNG',
+    mediaServerType: 2,
+    localLogin: true,
+    mediaServerLogin: true,
+    newPlexLogin: true,
+    jellyfinQuickConnectOnly: false,
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      Object.assign(saved, body);
+    }
+    return route.fulfill({ json: saved });
+  });
+  await page.goto('/admin/general');
+  const local = page.getByRole('checkbox', { name: 'Local Sign-In' });
+  const media = page.getByRole('checkbox', { name: 'Media Server Sign-In' });
+  const admission = page.getByRole('checkbox', {
+    name: 'Allow New Media Server Users',
+  });
+  const quick = page.getByRole('checkbox', {
+    name: 'Require Jellyfin Quick Connect',
+  });
+  const save = page.getByRole('button', { name: 'Save Application Settings' });
+  await local.uncheck();
+  await media.uncheck();
+  await expect(save).toBeDisabled();
+  await expect(page.getByRole('alert')).toContainText(
+    'Keep at least one sign-in method enabled.'
+  );
+  await expect(quick).toHaveCount(0);
+  await expect(admission).toHaveCount(0);
+  expect(writes).toEqual([]);
+  await media.check();
+  await quick.check();
+  await admission.uncheck();
+  await save.click();
+  await expect(page.getByText('Application settings saved.')).toBeVisible();
+  expect(writes).toEqual([
+    { localLogin: false, newPlexLogin: false, jellyfinQuickConnectOnly: true },
+  ]);
+  await page.reload();
+  await expect(local).not.toBeChecked();
+  await expect(media).toBeChecked();
+  await expect(quick).toBeChecked();
+  await expect(admission).not.toBeChecked();
+});
+
+test('Share opens a Bookshelf match with the title and format', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/resolve/capabilities', (route) =>
+    route.fulfill({ json: { enabled: true } })
+  );
+  await page.route('**/api/v1/resolve', (route) =>
+    route.fulfill({
+      json: {
+        groups: [
+          {
+            input: 'Fixture Book',
+            autoSelected: 0,
+            candidates: [
+              {
+                id: 'bookshelf:1:fixture',
+                mediaType: 'book',
+                title: 'Fixture Book',
+                formatHint: 'audiobook',
+                evidence: 'Title match',
+                href: '/book/bookshelf%3A1%3Afixture',
+              },
+            ],
+          },
+        ],
+      },
+    })
+  );
+  await page.goto('/share?title=Fixture+Book');
+  await page.getByRole('button', { name: 'Find Matches' }).click();
+  const open = page.getByRole('link', { name: 'Open Title' });
+  await expect(open).toHaveAttribute(
+    'href',
+    '/book/bookshelf%3A1%3Afixture?f=audio&lookupTitle=Fixture+Book'
+  );
+});
+
+test('book recommendations recover an unavailable feed bookmark', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let reads = 0;
+  let opened = 0;
+  await page.route('**/api/v1/book-recommendations', (route) =>
+    route.fulfill({
+      json: {
+        available: true,
+        results:
+          ++reads > 1
+            ? [{ id: 18, title: 'Personal Picks', source: 'mine', likes: 0 }]
+            : [],
+      },
+    })
+  );
+  await page.route('**/api/v1/book-recommendations/18/books', (route) => {
+    opened += 1;
+    return route.fulfill({
+      json: {
+        available: true,
+        books: [{ id: 44, title: 'Recovered Book' }],
+        total: 1,
+      },
+    });
+  });
+  await page.goto('/books/recommendations?format=audiobook&feed=18');
+  await expect(
+    page.getByText('This recommendation feed is unavailable.')
+  ).toBeVisible();
+  expect(opened).toBe(0);
+  await page.getByRole('button', { name: 'Refresh Feeds' }).click();
+  await expect(page.getByText('Recovered Book', { exact: true })).toBeVisible();
+  expect(opened).toBe(1);
+  await page.goto('/books/recommendations?format=audiobook&feed=999');
+  await page.getByRole('button', { name: 'Clear Feed Selection' }).click();
+  await expect(page).toHaveURL(/format=audiobook$/);
+  await expect(
+    page.getByText('This recommendation feed is unavailable.')
+  ).toHaveCount(0);
+});
+
+test('book recommendations open a newly created feed', async ({ page }) => {
+  await fixtures(page);
+  const posts: unknown[] = [];
+  await page.route('**/api/v1/book-recommendations', (route) => {
+    if (route.request().method() === 'POST') {
+      posts.push(route.request().postDataJSON());
+      if (posts.length === 1)
+        return route.fulfill({ json: { available: false, code: 'rejected' } });
+      return route.fulfill({ status: 201, json: { id: 18 } });
+    }
+    return route.fulfill({
+      json: {
+        available: true,
+        results:
+          posts.length > 1
+            ? [{ id: 18, title: 'Personal Picks', source: 'mine', likes: 0 }]
+            : [],
+      },
+    });
+  });
+  await page.route('**/api/v1/book-recommendations/18/books', (route) =>
+    route.fulfill({
+      json: {
+        available: true,
+        books: [{ id: 44, title: 'Recommended Book' }],
+        total: 1,
+      },
+    })
+  );
+  await page.goto('/books/recommendations?format=audiobook');
+  const title = page.getByRole('textbox', { name: 'Title', exact: true });
+  const create = page.getByRole('button', { name: 'Create on Hardcover' });
+  await title.fill('Personal Picks');
+  await page.getByLabel('Description (optional)').fill('My reading list');
+  await page.getByLabel('Genres to Include').fill('Fantasy, History');
+  await page.getByLabel('Genres to Avoid').fill('Horror');
+  await page.getByLabel('Series Position').selectOption('standalone');
+  await page.getByLabel('Prefer Less Popular Books').check();
+  await create.click();
+  await expect(page.getByRole('alert')).toHaveText(
+    'Hardcover rejected your API token.'
+  );
+  await expect(title).toHaveValue('Personal Picks');
+  await create.click();
+  await expect(page).toHaveURL(/format=audiobook&feed=18$/);
+  await expect(
+    page.getByText('Recommended Book', { exact: true })
+  ).toBeVisible();
+  expect(posts).toHaveLength(2);
+  expect(posts[1]).toMatchObject({
+    title: 'Personal Picks',
+    description: 'My reading list',
+    genres: ['Fantasy', 'History'],
+    avoidGenres: ['Horror'],
+    seriesPosition: 'standalone',
+    lessPopular: true,
+  });
+});
+
+test('book recommendations preserve results when a feedback refresh fails', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/book-recommendations', (route) =>
+    route.fulfill({
+      json: {
+        available: true,
+        results: [
+          { id: 11, title: 'Fixture Feed', source: 'featured', likes: 1 },
+        ],
+      },
+    })
+  );
+  let feedbackReads = 0;
+  await page.route('**/api/v1/book-recommendations/11/books', (route) => {
+    const { tuning } = route.request().postDataJSON();
+    if (tuning.moreLike.length && ++feedbackReads === 1)
+      return route.fulfill({ json: { available: false, code: 'rejected' } });
+    return route.fulfill({
+      json: {
+        available: true,
+        books: [{ id: 44, title: 'Fixture Book' }],
+        total: 1,
+      },
+    });
+  });
+  await page.goto('/books/recommendations');
+  await page.getByRole('button', { name: 'Show Books: Fixture Feed' }).click();
+  await expect(page).toHaveURL(/feed=11$/);
+  const format = page.getByRole('combobox', { name: 'Format', exact: true });
+  await format.selectOption('audiobook');
+  await expect(page).toHaveURL(/format=audiobook$/);
+  await page.reload();
+  await expect(page.getByText('Fixture Book', { exact: true })).toBeVisible();
+  await expect(format).toHaveValue('audiobook');
+  const vote = page.getByRole('button', { name: 'More Like This' });
+  await vote.click();
+  await expect(page.getByRole('alert')).toHaveText(
+    'Hardcover rejected your API token.'
+  );
+  await expect(page.getByText('Fixture Book', { exact: true })).toBeVisible();
+  await expect(vote).toHaveAttribute('aria-pressed', 'false');
+  await vote.click();
+  await expect(vote).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  expect(feedbackReads).toBe(2);
+  await page.route('**/api/v1/resolve', (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      text: 'Fixture Book',
+      types: ['book'],
+      formatHint: 'audiobook',
+    });
+    return route.fulfill({
+      json: {
+        groups: [
+          {
+            candidates: [
+              {
+                id: 'bookshelf:1:fixture',
+                mediaType: 'book',
+                title: 'Matched Book',
+              },
+            ],
+          },
+        ],
+      },
+    });
+  });
+  const detailRead = page.waitForRequest((request) => {
+    const url = new URL(request.url());
+    return (
+      url.pathname.endsWith('/book/bookshelf%3A1%3Afixture') &&
+      url.searchParams.get('lookupTitle') === 'Matched Book'
+    );
+  });
+  await page.getByRole('button', { name: 'Open Book' }).click();
+  await expect(page).toHaveURL(/f=audio&lookupTitle=Matched\+Book$/);
+  await detailRead;
+});
+
+test('standalone user request bookmarks keep the user from the path', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const pendingReads: URLSearchParams[] = [];
+  await page.route('**/api/v1/request/status?*', (route) => {
+    const params = new URL(route.request().url()).searchParams;
+    if (params.get('filter') === 'pending') pendingReads.push(params);
+    return route.fulfill({
+      json: { pageInfo: { pages: 1, results: 0 }, results: [] },
+    });
+  });
+  await page.goto(
+    '/requests/by-user/19?userId=12&requestedBy=11&filter=pending&mediaType=audiobook&bookFormat=ebook&search=Night+%26+Day'
+  );
+  await expect(page).toHaveURL(/\/requests\?/);
+  const params = new URL(page.url()).searchParams;
+  expect(params.getAll('requestedBy')).toEqual(['19']);
+  expect(params.has('userId')).toBe(false);
+  expect(params.get('show') ?? params.get('filter')).toBe('pending');
+  await expect.poll(() => pendingReads.length).toBeGreaterThan(0);
+  for (const request of pendingReads) {
+    expect(request.getAll('requestedBy')).toEqual(['19']);
+    expect(request.has('userId')).toBe(false);
+    expect(request.get('mediaType')).toBe('book');
+    expect(request.get('bookFormat')).toBe('ebook');
+    expect(request.get('search')).toBe('Night & Day');
+  }
+});
+
+test('standalone request bookmarks preserve explicit software category and status', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const reads: URLSearchParams[] = [];
+  await page.route('**/api/v1/request/software/status?*', (route) => {
+    reads.push(new URL(route.request().url()).searchParams);
+    return route.fulfill({
+      json: { pageInfo: { pages: 1, results: 0 }, results: [] },
+    });
+  });
+  await page.goto(
+    '/requests/by-user/19?mediaType=retro&category=modern&filter=pending&softwareStatus=failed'
+  );
+  await expect.poll(() => reads.length).toBeGreaterThan(0);
+  for (const read of reads) {
+    expect(read.get('requestedBy')).toBe('19');
+    expect(read.get('category')).toBe('modern');
+    expect(read.get('filter')).toBe('failed');
+  }
+});
+
+test('account permissions bookmarks show the signed-in users assigned permissions', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({
+      json: { id: 1, displayName: 'Viewer', permissions: 2199023255552 },
+    })
+  );
+  await page.route('**/api/v1/user/1/settings/password', (route) =>
+    route.fulfill({ json: { hasPassword: true } })
+  );
+  await page.goto('/me/account#account-permissions');
+  const section = page.locator('#account-permissions');
+  await expect(section.getByRole('heading')).toBeInViewport();
+  await expect(
+    section.getByText('Request Magazine', { exact: true })
+  ).toBeVisible();
+  await expect(section.getByRole('checkbox')).toHaveCount(0);
+});
+
+test('Classic service category bookmarks filter the Lumen administration menu', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.goto('/admin?serviceCategory=music');
+  await expect(
+    page.getByRole('heading', { name: 'Music', exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Open Lidarr Services' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Open Radarr Services' })
+  ).toHaveCount(0);
+  await page.getByRole('link', { name: 'All Settings and Tools' }).click();
+  await expect(
+    page.getByRole('link', { name: 'Open Radarr Services' })
+  ).toBeVisible();
+  const categories = page.getByRole('navigation', {
+    name: 'Administration Categories',
+  });
+  await categories.getByRole('link', { name: 'TV and Movies' }).click();
+  await expect(page).toHaveURL(/serviceCategory=tv-movies$/);
+  await expect(
+    categories.getByRole('link', { name: 'TV and Movies' })
+  ).toHaveAttribute('aria-current', 'page');
+  await expect(
+    page.getByRole('link', { name: 'Open Jellystat Settings' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Open Lidarr Services' })
+  ).toHaveCount(0);
+});
+
+test('Steam settings bookmark brings the key field into view', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/software-acquisition', (route) =>
+    route.fulfill({
+      json: {
+        romarr: { hostname: '', port: 8080, useSsl: false, baseUrl: '' },
+        questarr: { hostname: '', port: 8080, useSsl: false, baseUrl: '' },
+        steamApiKeyConfigured: true,
+      },
+    })
+  );
+  await page.goto('/admin/software-acquisition#steam-library-import');
+  await expect(
+    page.getByRole('heading', { name: 'Steam Library Import' })
+  ).toBeInViewport();
+  const key = page.getByLabel('Steam Web API Key', { exact: true });
+  await expect(key).toBeInViewport();
+  await expect(key).toHaveValue('');
+});
+
+test('General Settings saves default request quotas without changing other media drafts', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const defaultQuotas = {
+    movie: { quotaLimit: 4, quotaDays: 7 },
+    adult: { quotaLimit: 1, quotaDays: 14 },
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      Object.assign(defaultQuotas.adult, body.defaultQuotas.adult);
+    }
+    return route.fulfill({
+      json: {
+        applicationTitle: 'SeerrNG',
+        defaultQuotas,
+        defaultEnabledMediaCategories: { movie: true },
+      },
+    });
+  });
+  await page.goto('/admin/general#default-request-quotas');
+  await expect(
+    page.getByRole('heading', { name: 'Default Request Quotas' })
+  ).toBeInViewport();
+  const category = page.getByLabel('Quota Media Type');
+  const limit = page.getByLabel('Request Limit', { exact: true });
+  const days = page.getByLabel('Quota Days');
+  const save = page.getByRole('button', { name: 'Save Default Quota' });
+  await limit.fill('5');
+  await category.selectOption('adult');
+  await expect(days).toHaveValue('14');
+  await limit.fill('10001');
+  await expect(save).toBeDisabled();
+  await limit.fill('1');
+  await days.fill('0');
+  await expect(
+    page.getByText('counts requests across all time', { exact: false })
+  ).toBeVisible();
+  await save.click();
+  await expect(page.getByText('Default request quota saved.')).toBeVisible();
+  expect(writes).toEqual([{ defaultQuotas: { adult: { quotaDays: 0 } } }]);
+  await limit.fill('0');
+  await save.click();
+  await expect(page.getByText('Default request quota saved.')).toBeVisible();
+  expect(writes).toEqual([
+    { defaultQuotas: { adult: { quotaDays: 0 } } },
+    { defaultQuotas: { adult: { quotaLimit: 0 } } },
+  ]);
+  await category.selectOption('movie');
+  await expect(limit).toHaveValue('5');
+  await page.reload();
+  await expect(limit).toHaveValue('4');
+  await category.selectOption('adult');
+  await expect(limit).toHaveValue('0');
+  await expect(days).toHaveValue('0');
+  await page.getByRole('link', { name: 'Default User Categories' }).click();
+  await expect(page).toHaveURL(/\/admin\/categories#default-user-categories$/);
+  await expect(
+    page.getByRole('heading', { name: 'Default User Categories' })
+  ).toBeInViewport();
+});
+
+test('General Settings confirms default permissions and preserves higher permission bits', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let defaultPermissions = 4398046511104 + 32;
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      defaultPermissions = body.defaultPermissions;
+    }
+    return route.fulfill({
+      json: {
+        applicationTitle: 'SeerrNG',
+        defaultPermissions,
+        defaultQuotas: { movie: { quotaLimit: 4, quotaDays: 7 } },
+      },
+    });
+  });
+  await page.goto('/admin/general#default-request-quotas');
+  await page.getByRole('link', { name: 'Default User Permissions' }).click();
+  await expect(page).toHaveURL(/#default-user-permissions$/);
+  await expect(
+    page.getByRole('heading', { name: 'Default User Permissions' })
+  ).toBeInViewport();
+  await expect(
+    page.getByRole('checkbox', { name: 'Admin', exact: true })
+  ).toBeDisabled();
+  await expect(
+    page.getByRole('checkbox', { name: 'Auto Request Magazine' })
+  ).toBeChecked();
+  await page
+    .getByRole('checkbox', { name: 'Request Book', exact: true })
+    .check();
+  await page.getByRole('button', { name: 'Save Default Permissions' }).click();
+  expect(writes).toEqual([]);
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Save Default Permissions' })
+    .click();
+  await expect(page.getByText('Default permissions saved.')).toBeVisible();
+  expect(writes).toEqual([
+    { defaultPermissions: 4398046511104 + 34359738368 + 32 },
+  ]);
+  await page.reload();
+  await expect(
+    page.getByRole('checkbox', { name: 'Request Book', exact: true })
+  ).toBeChecked();
 });
 
 test('Scheduled Jobs confirms a run and saves an edited schedule', async ({
@@ -5324,4 +6940,1655 @@ test('Managed notifications save for the selected user without touching browser 
     page.getByRole('heading', { name: 'Registered Browser Devices' })
   ).toHaveCount(0);
   expect(deviceReads).toBe(0);
+});
+
+test('administrators create and revoke a one-time Lumen sign-in link for a selected user', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  await page.route(/\/api\/v1\/user\?/, (route) =>
+    route.fulfill({
+      json: {
+        pageInfo: { pages: 1 },
+        results: [{ id: 19, displayName: 'Viewer', permissions: 32 }],
+      },
+    })
+  );
+  let link: { id: number; status: string; expiresAt: string } | undefined;
+  const token = 'A'.repeat(43);
+  await page.route('**/api/v1/settings/login-links?userId=19', (route) =>
+    route.fulfill({ json: link ? [link] : [] })
+  );
+  await page.route('**/api/v1/settings/login-links', (route) => {
+    expect(route.request().postDataJSON()).toEqual({ userId: 19 });
+    link = { id: 42, status: 'active', expiresAt: '2027-03-01T12:30:00Z' };
+    return route.fulfill({ status: 201, json: { ...link, token } });
+  });
+  await page.route('**/api/v1/settings/login-links/42/revoke', (route) => {
+    expect(route.request().method()).toBe('POST');
+    link = { id: 42, status: 'revoked', expiresAt: '2027-03-01T12:30:00Z' };
+    return route.fulfill({ json: link });
+  });
+
+  await page.goto('/admin/users/19');
+  await page
+    .getByRole('button', { name: 'Sign-in Links', exact: true })
+    .click();
+  await expect(page.getByText('No sign-in links yet.')).toBeVisible();
+  await page.getByRole('button', { name: 'Create Sign-in Link' }).click();
+  await expect(page.getByLabel('New sign-in link')).toHaveValue(
+    `${new URL(page.url()).origin}/#loginToken=${token}`
+  );
+  await expect(page.getByRole('button', { name: 'Revoke Link' })).toBeVisible();
+  await page.screenshot({ path: info.outputPath('managed-login-link.png') });
+  await page.getByRole('button', { name: 'Revoke Link' }).click();
+  await expect(
+    page.getByText('Sign-in link revoked.', { exact: true })
+  ).toBeVisible();
+  await expect(page.getByLabel('New sign-in link')).toHaveCount(0);
+  await expect(page.getByText('Revoked', { exact: true })).toBeVisible();
+});
+
+test('Spotify credentials retain a saved secret on ID changes and allow explicit removal', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  const saved = {
+    applicationTitle: 'SeerrNG',
+    applicationUrl: 'https://seerr.example.test',
+    spotifyClientId: 'previous-client',
+    spotifyClientSecret: '********',
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      if (writes.length === 1)
+        return route.fulfill({
+          status: 503,
+          json: { message: 'Temporary Spotify settings error.' },
+        });
+      Object.assign(saved, body);
+    }
+    return route.fulfill({ json: saved });
+  });
+  await page.goto('/admin/general#spotifyClientId');
+  const id = page.getByLabel('Spotify Client ID', { exact: true });
+  const secret = page.getByLabel('Spotify Client Secret');
+  const save = page.getByRole('button', { name: 'Save Spotify Credentials' });
+  await expect(secret).toHaveValue('');
+  await id.fill('replacement-client');
+  await save.click();
+  await expect(
+    page.getByText('Temporary Spotify settings error.')
+  ).toBeVisible();
+  await expect(id).toHaveValue('replacement-client');
+  await save.click();
+  await expect(page.getByText('Spotify credentials saved.')).toBeVisible();
+  expect(writes).toEqual([
+    { spotifyClientId: 'replacement-client' },
+    { spotifyClientId: 'replacement-client' },
+  ]);
+  await save.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: info.outputPath('spotify-credentials.png') });
+  await page.getByLabel('Remove saved Spotify secret').check();
+  await save.click();
+  await expect(page.getByLabel('Remove saved Spotify secret')).toHaveCount(0);
+  expect(writes.at(-1)).toEqual({ spotifyClientSecret: '' });
+});
+
+test('application API key is masked and regeneration requires confirmation', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/main', (route) =>
+    route.fulfill({
+      json: { applicationTitle: 'SeerrNG', apiKey: 'fixture-original-key' },
+    })
+  );
+  let rotations = 0;
+  await page.route('**/api/v1/settings/main/regenerate', (route) => {
+    expect(route.request().method()).toBe('POST');
+    rotations++;
+    return route.fulfill({ json: { apiKey: 'fixture-replacement-key' } });
+  });
+
+  await page.goto('/admin/general#apiKey');
+  const input = page.getByLabel('API Key', { exact: true });
+  await expect(input).toHaveValue('••••••••••••••••');
+  const regenerate = page.getByRole('button', { name: 'Regenerate Key' });
+  await regenerate.click();
+  const confirmation = page.getByRole('alertdialog');
+  await confirmation.getByRole('button', { name: 'Keep Current Key' }).click();
+  expect(rotations).toBe(0);
+  await page.getByRole('button', { name: 'Reveal Key' }).click();
+  await expect(input).toHaveValue('fixture-original-key');
+  await regenerate.click();
+  await confirmation.getByRole('button', { name: 'Regenerate Key' }).click();
+  await expect(input).toHaveValue('••••••••••••••••');
+  await expect(
+    page.getByText('Application API key regenerated.')
+  ).toBeVisible();
+  await page.screenshot({ path: info.outputPath('application-api-key.png') });
+  await page.getByRole('button', { name: 'Reveal Key' }).click();
+  await expect(input).toHaveValue('fixture-replacement-key');
+  expect(rotations).toBe(1);
+});
+
+test('General Settings shortcuts scroll to their controls after settings load', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/main', (route) =>
+    route.fulfill({
+      json: {
+        applicationTitle: 'SeerrNG',
+        apiKey: 'fixture-masked-key',
+        spotifyClientId: 'fixture-client',
+      },
+    })
+  );
+  for (const [anchor, label] of [
+    ['enable4k', 'Enable 4K'],
+    ['spotifyClientId', 'Spotify Client ID'],
+    ['apiKey', 'API Key'],
+  ] as const) {
+    await page.goto(`/admin/general#${anchor}`);
+    const control = page.getByLabel(label, { exact: true });
+    await expect(control).toBeInViewport({ ratio: 1 });
+    await page.screenshot({ path: info.outputPath(`settings-${anchor}.png`) });
+  }
+});
+
+test('Library Path Mappings retains rejected edits and uses the server-normalized mappings', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  const writes: unknown[] = [];
+  const mapping = {
+    serviceType: 'radarr',
+    serviceId: 1,
+    remoteRoot: '/movies',
+    localRoot: '/mnt/media/movies',
+  };
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'GET')
+      return route.fulfill({
+        json: { applicationTitle: 'SeerrNG', downloadPathMappings: [] },
+      });
+    const body = route.request().postDataJSON();
+    writes.push(body);
+    if (writes.length === 1)
+      return route.fulfill({
+        status: 400,
+        json: { message: 'The selected library path is invalid.' },
+      });
+    return route.fulfill({ json: { downloadPathMappings: [mapping] } });
+  });
+
+  await page.goto('/admin/general');
+  const editor = page.getByLabel('Library Path Mappings', { exact: true });
+  const save = page.getByRole('button', { name: 'Save Library Path Mappings' });
+  await editor.fill('{');
+  await save.click();
+  await expect(
+    page.getByText('Enter a JSON array of path mappings.')
+  ).toBeVisible();
+  expect(writes).toHaveLength(0);
+
+  const draft = [{ ...mapping, remoteRoot: '/movies/' }];
+  await editor.fill(JSON.stringify(draft));
+  await save.click();
+  await expect(
+    page.getByText('The selected library path is invalid.')
+  ).toBeVisible();
+  await expect(editor).toHaveValue(JSON.stringify(draft));
+  await save.click();
+  await expect(page.getByText('Library path mappings saved.')).toBeVisible();
+  await expect(editor).toHaveValue(JSON.stringify([mapping], null, 2));
+  await expect(save).toBeDisabled();
+  expect(writes).toEqual([
+    { downloadPathMappings: draft },
+    { downloadPathMappings: draft },
+  ]);
+  await page.screenshot({
+    path: info.outputPath('download-path-mappings.png'),
+  });
+});
+
+test('Metadata Credentials preserves untouched credentials and retries replacements', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  const saved = {
+    comicVineApiKey: '********',
+    metronToken: '********',
+    googleBooksApiKey: '',
+    youtubeApiKey: '********',
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      if (writes.length === 1)
+        return route.fulfill({
+          status: 503,
+          json: { message: 'Metadata settings are temporarily unavailable.' },
+        });
+      if (body.comicVineApiKey) saved.comicVineApiKey = '********';
+      if (body.metronToken === '') saved.metronToken = '';
+    }
+    return route.fulfill({ json: saved });
+  });
+  await page.goto('/admin/metadata');
+  const comicVine = page.getByLabel('ComicVine API Key', { exact: true });
+  const metron = page.getByLabel('Metron API Token', { exact: true });
+  const youtube = page.getByLabel('YouTube Data API Key', { exact: true });
+  const save = page.getByRole('button', { name: 'Save Metadata Credentials' });
+  await expect(comicVine).toHaveValue('');
+  await expect(metron).toHaveValue('');
+  await expect(youtube).toHaveValue('');
+  await comicVine.fill('fixture-new-key');
+  await page.getByLabel('Remove saved Metron API Token').check();
+  await save.click();
+  await expect(
+    page.getByText('Metadata settings are temporarily unavailable.')
+  ).toBeVisible();
+  await expect(comicVine).toHaveValue('fixture-new-key');
+  await expect(page.getByLabel('Remove saved Metron API Token')).toBeChecked();
+  await save.click();
+  await expect(page.getByText('Metadata credentials saved.')).toBeVisible();
+  await expect(comicVine).toHaveValue('');
+  await expect(page.getByLabel('Remove saved Metron API Token')).toHaveCount(0);
+  await expect(
+    page.getByLabel('Remove saved YouTube Data API Key')
+  ).toBeVisible();
+  expect(writes).toEqual([
+    { comicVineApiKey: 'fixture-new-key', metronToken: '' },
+    { comicVineApiKey: 'fixture-new-key', metronToken: '' },
+  ]);
+  await page.screenshot({ path: info.outputPath('metadata-credentials.png') });
+});
+
+test('Discovery region settings preserve legacy values and retry only changed fields', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  await page.route('**/api/v1/regions', (route) =>
+    route.fulfill({
+      json: [
+        { iso_3166_1: 'CA', english_name: 'Canada' },
+        { iso_3166_1: 'US', english_name: 'United States' },
+      ],
+    })
+  );
+  await page.route('**/api/v1/languages', (route) =>
+    route.fulfill({
+      json: [
+        { iso_639_1: 'en', english_name: 'English' },
+        { iso_639_1: 'fr', english_name: 'French' },
+      ],
+    })
+  );
+  const saved = {
+    discoverRegion: 'ZZ',
+    streamingRegion: 'US',
+    originalLanguage: 'en',
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      if (writes.length === 1)
+        return route.fulfill({
+          status: 503,
+          json: { message: 'Could not save regions.' },
+        });
+      Object.assign(saved, body);
+    }
+    return route.fulfill({ json: saved });
+  });
+  await page.goto('/admin/discovery');
+  const discover = page.getByLabel('Discover Region', { exact: true });
+  const streaming = page.getByLabel('Streaming Region', { exact: true });
+  const language = page.getByLabel('Original Language', { exact: true });
+  const save = page.getByRole('button', {
+    name: 'Save Discovery Region Settings',
+  });
+  const includeAdult = page.getByRole('checkbox', {
+    name: 'Include Adult Content in TMDB Search and Discovery',
+  });
+  await expect(includeAdult).not.toBeChecked();
+  await expect(discover).toHaveValue('ZZ');
+  await discover.selectOption('CA');
+  await discover.selectOption('ZZ');
+  await expect(save).toBeDisabled();
+  await streaming.selectOption('CA');
+  await language.selectOption('fr');
+  await includeAdult.check();
+  await page.getByLabel('Hide Requested Titles', { exact: true }).check();
+  await save.click();
+  await expect(page.getByText('Could not save regions.')).toBeVisible();
+  await expect(streaming).toHaveValue('CA');
+  await expect(language).toHaveValue('fr');
+  await expect(includeAdult).toBeChecked();
+  await save.click();
+  await expect(
+    page.getByText('Discovery region settings saved.')
+  ).toBeVisible();
+  expect(writes).toEqual([
+    {
+      streamingRegion: 'CA',
+      originalLanguage: 'fr',
+      hideRequested: true,
+      includeAdult: true,
+    },
+    {
+      streamingRegion: 'CA',
+      originalLanguage: 'fr',
+      hideRequested: true,
+      includeAdult: true,
+    },
+  ]);
+  await page.reload();
+  await expect(includeAdult).toBeChecked();
+  await page.screenshot({
+    path: info.outputPath('discovery-region-settings.png'),
+  });
+});
+
+test('Discover and Movies apply visibility defaults while the library view still shows owned titles', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { hideAvailable: true, hideRequested: true, hideBlocklisted: true },
+    })
+  );
+  const titles = [
+    { ...movie, id: 101, title: 'Owned fixture', mediaInfo: { status: 5 } },
+    {
+      ...movie,
+      id: 102,
+      title: 'Requested fixture',
+      mediaInfo: { hasActiveRequest: true },
+    },
+    { ...movie, id: 103, title: 'Blocked fixture', mediaInfo: { status: 6 } },
+    { ...movie, id: 104, title: 'Visible fixture', mediaInfo: undefined },
+  ];
+  await page.route(
+    /\/api\/v1\/discover\/(movies|trending)(?:\?|$)/,
+    (route) => {
+      const library = new URL(route.request().url()).searchParams.has(
+        'availability'
+      );
+      return route.fulfill({
+        json: paged(library ? titles.slice(0, 1) : titles),
+      });
+    }
+  );
+  await page.goto('/');
+  const rail = page.getByRole('heading', {
+    name: 'Trending movies',
+    exact: true,
+  });
+  await expect(rail).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Visible fixture' }).first()
+  ).toBeVisible();
+  for (const title of [
+    'Owned fixture',
+    'Requested fixture',
+    'Blocked fixture',
+  ]) {
+    await expect(page.getByRole('link', { name: title })).toHaveCount(0);
+  }
+  await page.goto('/movies');
+  await expect(
+    page.getByRole('link', { name: 'Visible fixture' })
+  ).toBeVisible();
+  for (const title of [
+    'Owned fixture',
+    'Requested fixture',
+    'Blocked fixture',
+  ]) {
+    await expect(page.getByRole('link', { name: title })).toHaveCount(0);
+  }
+  await page.getByRole('button', { name: /^On / }).click();
+  await expect(page.getByRole('link', { name: 'Owned fixture' })).toBeVisible();
+});
+
+test('Trending and Coming Soon apply discovery visibility and keep later pages reachable', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { hideRequested: true } })
+  );
+  const seen: string[] = [];
+  await page.route(
+    /\/api\/v1\/discover\/(trending|movies\/upcoming)\?/,
+    (route) => {
+      const url = new URL(route.request().url());
+      const number = Number(url.searchParams.get('page'));
+      seen.push(`${url.pathname}:${number}`);
+      return route.fulfill({
+        json: {
+          page: number,
+          totalPages: 2,
+          totalResults: 2,
+          results: [
+            number === 1
+              ? {
+                  ...movie,
+                  title: 'Requested fixture',
+                  releaseDate: '2099-01-01',
+                  mediaInfo: { hasActiveRequest: true },
+                }
+              : {
+                  ...movie,
+                  id: movie.id + 1,
+                  title: 'Later fixture',
+                  releaseDate: '2099-01-02',
+                },
+          ],
+        },
+      });
+    }
+  );
+  for (const [path, button] of [
+    ['/trending?mediaType=movie', 'Show more trending titles'],
+    ['/soon?media=movie', 'Show more upcoming movies'],
+  ] as const) {
+    await page.goto(path);
+    const more = page.getByRole('button', { name: button });
+    await expect(more).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Requested fixture' })
+    ).toHaveCount(0);
+    await expect(page.getByText('No upcoming titles found.')).toHaveCount(0);
+    await more.click();
+    await expect(
+      page.getByRole('link', { name: 'Later fixture' })
+    ).toBeVisible();
+  }
+  expect(seen).toEqual([
+    '/api/v1/discover/trending:1',
+    '/api/v1/discover/trending:2',
+    '/api/v1/discover/movies/upcoming:1',
+    '/api/v1/discover/movies/upcoming:2',
+  ]);
+});
+
+test('Streaming Request Policy preserves edits across a failed save', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  let policy = {
+    enabled: false,
+    condition: 'available',
+    action: 'reject',
+    rejectionMessage: '',
+    allowUserOverride: false,
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      if (writes.length === 1)
+        return route.fulfill({
+          status: 503,
+          json: { message: 'Policy settings temporarily unavailable.' },
+        });
+      policy = body.streamingRequestPolicy;
+    }
+    return route.fulfill({ json: { streamingRequestPolicy: policy } });
+  });
+
+  await page.goto('/admin/discovery');
+  const enable = page.getByLabel('Enable Streaming Request Policy');
+  await expect(enable).not.toBeChecked();
+  await enable.check();
+  const condition = page.getByLabel('When the title is');
+  await condition.selectOption('unavailable');
+  await page.getByLabel('Allow per-user overrides').check();
+  await page.getByLabel('Rejection message').fill('Review your subscriptions.');
+  const save = page.getByRole('button', {
+    name: 'Save Streaming Request Policy',
+  });
+  await save.click();
+  await expect(
+    page.getByText('Policy settings temporarily unavailable.')
+  ).toBeVisible();
+  await expect(condition).toHaveValue('unavailable');
+  await expect(page.getByLabel('Rejection message')).toHaveValue(
+    'Review your subscriptions.'
+  );
+  await save.click();
+  await expect(page.getByText('Streaming request policy saved.')).toBeVisible();
+  expect(writes).toEqual([
+    { streamingRequestPolicy: policy },
+    { streamingRequestPolicy: policy },
+  ]);
+  expect(policy).toEqual({
+    enabled: true,
+    condition: 'unavailable',
+    action: 'reject',
+    rejectionMessage: 'Review your subscriptions.',
+    allowUserOverride: true,
+  });
+  await expect(save).toBeDisabled();
+  await page.screenshot({
+    path: info.outputPath('streaming-request-policy.png'),
+  });
+});
+
+test('movie and series details use separate account regions for providers and ratings', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  const watchProviders = [
+    { iso_3166_1: 'US', flatrate: [{ id: 3, name: 'US Stream' }] },
+    { iso_3166_1: 'CA', flatrate: [{ id: 7, name: 'Canada Stream' }] },
+  ];
+  await page.route('**/api/v1/user/*/settings/main', (route) =>
+    route.fulfill({ json: { streamingRegion: 'CA', discoverRegion: 'GB' } })
+  );
+  await page.route('**/api/v1/movie/101', (route) =>
+    route.fulfill({
+      json: {
+        ...movie,
+        originalLanguage: 'fr',
+        status: 'Released',
+        budget: 1_000_000,
+        revenue: 4_500_000,
+        genres: [],
+        watchProviders,
+        releases: {
+          results: [
+            {
+              iso_3166_1: 'US',
+              release_dates: [
+                {
+                  certification: 'PG-13',
+                  type: 3,
+                  release_date: '2020-05-01T00:00:00Z',
+                },
+              ],
+            },
+            {
+              iso_3166_1: 'GB',
+              release_dates: [
+                {
+                  certification: '12A',
+                  type: 3,
+                  release_date: '2020-05-08T00:00:00Z',
+                },
+                {
+                  certification: '',
+                  type: 4,
+                  release_date: '2020-06-01T00:00:00Z',
+                },
+                {
+                  certification: '',
+                  type: 1,
+                  release_date: '2020-04-22T00:00:00Z',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    })
+  );
+  await page.route('**/api/v1/tv/202', (route) =>
+    route.fulfill({
+      json: {
+        id: 202,
+        name: 'Series Fixture',
+        originalLanguage: 'fr',
+        genres: [],
+        seasons: [],
+        watchProviders,
+        contentRatings: {
+          results: [
+            { iso_3166_1: 'US', rating: 'TV-MA' },
+            { iso_3166_1: 'GB', rating: '15' },
+          ],
+        },
+      },
+    })
+  );
+  for (const [path, rating, wrongRating, capture] of [
+    ['/movie/101', '12A', 'PG-13', 'movie'],
+    ['/tv/202', '15', 'TV-MA', 'series'],
+  ]) {
+    await page.goto(path);
+    await expect(
+      page.getByText('Streaming Providers', { exact: true })
+    ).toBeVisible();
+    await expect(
+      page.getByText('Canada Stream', { exact: true })
+    ).toBeVisible();
+    await expect(page.getByText('US Stream', { exact: true })).toHaveCount(0);
+    await expect(page.locator('.cert')).toHaveText(rating);
+    await expect(
+      page.getByRole('link', { name: 'French', exact: true })
+    ).toHaveAttribute(
+      'href',
+      capture === 'movie' ? '/movies?language=fr' : '/series?language=fr'
+    );
+    if (capture === 'movie') {
+      await expect(page.getByText('$1,000,000', { exact: true })).toBeVisible();
+      await expect(page.getByText('$4,500,000', { exact: true })).toBeVisible();
+      await expect(page.getByText('Theatrical · May 8, 2020')).toBeVisible();
+      await expect(page.getByText('Digital · Jun 1, 2020')).toBeVisible();
+      await expect(page.getByText('Theatrical · May 1, 2020')).toHaveCount(0);
+      await expect(page.getByText(/Apr 22, 2020/)).toHaveCount(0);
+    }
+    await expect(page.getByText(wrongRating, { exact: true })).toHaveCount(0);
+    await page.screenshot({
+      path: info.outputPath(capture + '-regional-details.png'),
+    });
+  }
+});
+
+test('discovery sort displays Classic bookmark orders and sends changes to the catalog', async ({
+  page,
+}) => {
+  await fixtures(page);
+  for (const [route, apiPath, initial, next] of [
+    ['/movies', '/discover/movies', 'original_title.asc', 'release_date.asc'],
+    ['/series', '/discover/tv', 'original_name.asc', 'first_air_date.asc'],
+  ]) {
+    await page.goto(`${route}?nativeFilters=1&sortBy=${initial}&language=fr`);
+    const sort = page.getByRole('combobox', { name: 'Sort', exact: true });
+    await expect(sort).toHaveValue(initial);
+    const request = page.waitForRequest((item) => {
+      const url = new URL(item.url());
+      return (
+        url.pathname === '/api/v1' + apiPath &&
+        url.searchParams.get('sortBy') === next &&
+        url.searchParams.get('language') === 'fr'
+      );
+    });
+    await sort.selectOption(next);
+    await request;
+    await page.reload();
+    await expect(sort).toHaveValue(next);
+  }
+});
+
+test('discovery content ratings preserve Classic filters and apply exact ratings', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.goto(
+    '/movies?nativeFilters=1&certificationGte=PG&certificationLte=R&certificationCountry=US&genre=18'
+  );
+  const select = page.getByRole('combobox', { name: 'Content Rating' });
+  await expect(select).toHaveValue('range');
+  const exact = page.waitForRequest((request) => {
+    const url = new URL(request.url());
+    return (
+      url.pathname === '/api/v1/discover/movies' &&
+      url.searchParams.get('certification') === 'PG-13' &&
+      url.searchParams.get('certificationCountry') === 'US' &&
+      !url.searchParams.has('certificationGte') &&
+      url.searchParams.get('genre') === '18'
+    );
+  });
+  await select.selectOption('PG-13');
+  await exact;
+  await page.reload();
+  await expect(select).toHaveValue('PG-13');
+  await select.selectOption('');
+  await expect(page).toHaveURL(/\/movies\?genre=18$/);
+});
+
+test('Classic video search bookmarks apply discovery constraints until cleared', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const filtered = page.waitForRequest((request) => {
+    const url = new URL(request.url());
+    return (
+      url.pathname === '/api/v1/discover/movies' &&
+      url.searchParams.get('search') === 'Test' &&
+      url.searchParams.get('genre') === '18' &&
+      url.searchParams.get('language') === 'fr'
+    );
+  });
+  await page.goto('/search?query=Test&type=movie&genre=18&language=fr');
+  await filtered;
+  const unfiltered = page.waitForRequest((request) => {
+    const url = new URL(request.url());
+    return (
+      url.pathname === '/api/v1/search' &&
+      url.searchParams.get('query') === 'Test'
+    );
+  });
+  await page.getByRole('button', { name: 'Clear Discovery Filters' }).click();
+  await unfiltered;
+  await expect(page).toHaveURL(/\/search\?q=Test&f=movie$/);
+});
+
+test('a filter-only Classic series bookmark shows matching titles without a search term', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/discover/tv?*', (route) => {
+    const url = new URL(route.request().url());
+    expect(url.searchParams.get('genre')).toBe('18');
+    expect(url.searchParams.get('language')).toBe('fr');
+    expect(url.searchParams.has('search')).toBe(false);
+    const second = url.searchParams.get('page') === '2';
+    return route.fulfill({
+      json: {
+        ...paged([
+          {
+            mediaType: 'tv',
+            id: second ? 92 : 91,
+            name: second ? 'Second Filtered Series' : 'Filtered Series Fixture',
+          },
+        ]),
+        totalPages: 2,
+      },
+    });
+  });
+  await page.goto('/search?type=tv&genre=18&language=fr');
+  await expect(
+    page.getByRole('link', { name: 'Filtered Series Fixture' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Trending this week' })
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: 'Next Page' }).click();
+  await expect(
+    page.getByRole('link', { name: 'Second Filtered Series' })
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole('link', { name: 'Second Filtered Series' })
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Next Page' })).toBeDisabled();
+  await page.getByRole('button', { name: 'Clear Discovery Filters' }).click();
+  await expect(
+    page.getByRole('link', { name: 'Filtered Series Fixture' })
+  ).toHaveCount(0);
+  await expect(page).toHaveURL(/\/search\?f=tv$/);
+});
+
+test('regular video search links to later pages and resets on scope change', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/search?**', (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    const second = query.get('page') === '2';
+    return route.fulfill({
+      json: {
+        ...paged([
+          {
+            ...movie,
+            id: second ? 102 : 101,
+            title: second ? 'Second Page Film' : 'First Page Film',
+          },
+        ]),
+        totalPages: 2,
+      },
+    });
+  });
+  await page.goto('/search?q=Test');
+  await expect(
+    page.getByRole('link', { name: 'First Page Film' })
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Next Page' }).click();
+  await expect(
+    page.getByRole('link', { name: 'Second Page Film' })
+  ).toBeVisible();
+  await expect(page).toHaveURL(/page=2$/);
+  await page.reload();
+  await expect(
+    page.getByRole('link', { name: 'Second Page Film' })
+  ).toBeVisible();
+  await page
+    .getByRole('group', { name: 'Search in' })
+    .getByRole('button', { name: 'Movies' })
+    .click();
+  await expect(
+    page.getByRole('link', { name: 'First Page Film' })
+  ).toBeVisible();
+  await expect(page).toHaveURL(/q=Test&f=movie$/);
+});
+
+test('scoped book and comic searches retain their catalogue page in the URL', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/book/search?*', (route) =>
+    route.fulfill({ json: paged([]) })
+  );
+  for (const [scope, endpoint, format] of [
+    ['ebook', 'books', 'ebook'],
+    ['audio', 'books', 'audiobook'],
+    ['comic', 'comics', ''],
+  ]) {
+    const matches = (request: { url: () => string }, number: string) => {
+      const url = new URL(request.url());
+      return (
+        url.pathname === '/api/v1/discover/' + endpoint &&
+        url.searchParams.get('query') === 'Fixture' &&
+        url.searchParams.get('page') === number &&
+        (format
+          ? url.searchParams.get('format') === format
+          : url.searchParams.get('group') === 'works')
+      );
+    };
+    await page.route(
+      (url) => url.pathname === '/api/v1/discover/' + endpoint,
+      (route) => route.fulfill({ json: { ...paged([]), totalPages: 2 } })
+    );
+    const first = page.waitForRequest((request) => matches(request, '1'));
+    await page.goto('/search?q=Fixture&f=' + scope);
+    await first;
+    const second = page.waitForRequest((request) => matches(request, '2'));
+    await page.getByRole('button', { name: 'Next Page' }).click();
+    await second;
+    await expect(page).toHaveURL(/page=2$/);
+    await expect(
+      page.getByRole('button', { name: 'Next Page' })
+    ).toBeDisabled();
+    await page.reload();
+    await expect(
+      page.getByRole('navigation', { name: 'Search Result Pages' })
+    ).toContainText('Page 2');
+  }
+});
+
+test('Classic author search bookmarks open the Authors scope and link to author details', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const requests: string[] = [];
+  await page.route('**/api/v1/search?*', (route) => {
+    const type = new URL(route.request().url()).searchParams.get('type');
+    requests.push(type ?? '');
+    return route.fulfill({
+      json: paged([
+        { mediaType: 'author', id: 'OL123A', name: 'Fixture Author' },
+      ]),
+    });
+  });
+  await page.goto('/search?query=Fixture&type=author');
+  await expect(page.getByRole('button', { name: 'Authors' })).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  );
+  await expect(
+    page.getByRole('link', { name: 'Fixture Author' })
+  ).toHaveAttribute('href', '/author/OL123A');
+  expect(requests).toEqual(['author']);
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await expect.poll(() => requests.at(-1)).toBe('');
+  await expect(
+    page.getByRole('link', { name: 'Fixture Author' })
+  ).toBeVisible();
+});
+
+test('Classic music search bookmarks open the Music scope with album and artist results', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const albumId = 'ca52c0ec-764d-4705-9fac-6315533215a2';
+  const artistId = '8a7ca096-0778-49cb-8a0e-02cdabd91735';
+  await page.route('**/api/v1/search?*', (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    expect(query.get('type')).toBe('music');
+    expect(query.get('genre')).toBe('jazz');
+    return route.fulfill({
+      json: paged([
+        { mediaType: 'album', id: albumId, title: 'Fixture Album' },
+        { mediaType: 'artist', id: artistId, name: 'Fixture Artist' },
+      ]),
+    });
+  });
+  await page.goto('/search?query=Fixture&type=music&genre=jazz');
+  await expect(
+    page.getByRole('button', { name: 'Music', exact: true })
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    page.getByRole('link', { name: 'Fixture Album' })
+  ).toHaveAttribute('href', '/music/' + albumId);
+  await expect(
+    page.getByRole('link', { name: 'Fixture Artist' })
+  ).toHaveAttribute('href', '/artist/' + artistId);
+  await page.route('**/api/v1/discover/music?*', (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    expect(query.get('genre')).toBe('jazz');
+    expect(query.get('page')).toBe('2');
+    expect(query.has('query')).toBe(false);
+    return route.fulfill({
+      json: {
+        ...paged([
+          { mediaType: 'album', id: albumId, title: 'Jazz Catalogue Album' },
+        ]),
+        page: 2,
+        totalPages: 2,
+      },
+    });
+  });
+  await page.goto('/search?type=music&genre=jazz&page=2');
+  await expect(
+    page.getByRole('link', { name: 'Jazz Catalogue Album' })
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Clear Discovery Filters' }).click();
+  await expect(page).toHaveURL(/\/search\?f=music$/);
+  await expect(
+    page.getByRole('link', { name: 'Jazz Catalogue Album' })
+  ).toHaveCount(0);
+});
+
+for (const { advanced, detail } of [
+  { advanced: false, detail: false },
+  { advanced: true, detail: false },
+  { advanced: true, detail: true },
+]) {
+  test(`magazine ${detail ? 'detail' : 'discovery'} requests a title with ${advanced ? 'a selected service' : 'the default service'}`, async ({
+    page,
+  }) => {
+    await fixtures(page);
+    await page.route('**/api/v1/auth/me', (route) =>
+      route.fulfill({
+        json: {
+          id: 1,
+          displayName: 'Subscriber',
+          permissions: 2199023255552 + (advanced ? 8192 : 0),
+        },
+      })
+    );
+    await page.route('**/api/v1/settings/public', (route) =>
+      route.fulfill({ json: { enabledMediaCategories: { magazine: true } } })
+    );
+    await page.route('**/api/v1/user/1/settings/main', (route) =>
+      route.fulfill({ json: { enabledMediaCategories: { magazine: true } } })
+    );
+    await page.route('**/api/v1/discover/magazines?*', (route) =>
+      route.fulfill({ json: paged([]) })
+    );
+    let restricted = true;
+    await page.route('**/api/v1/user/1/quota', (route) =>
+      route.fulfill({
+        json: {
+          magazine: {
+            limit: 3,
+            remaining: restricted ? 0 : 2,
+            days: 7,
+            restricted,
+          },
+        },
+      })
+    );
+    let serviceReads = 0;
+    await page.route('**/api/v1/service/magazine', (route) => {
+      serviceReads += 1;
+      return route.fulfill({
+        json: [
+          { id: 3, name: 'Default Library', isDefault: true },
+          { id: 7, name: 'Alternate Library', isDefault: false },
+        ],
+      });
+    });
+    const posts: unknown[] = [];
+    await page.route('**/api/v1/request', (route) => {
+      expect(route.request().method()).toBe('POST');
+      posts.push(route.request().postDataJSON());
+      return route.fulfill({ json: { id: 123, status: 1 } });
+    });
+    await page.route('**/api/v1/magazine/Unlisted', (route) =>
+      route.fulfill({
+        json: {
+          id: 'Unlisted',
+          title: 'Unlisted',
+          mediaType: 'magazine',
+          provider: 'googlebooks',
+          requestable: true,
+        },
+      })
+    );
+    await page.goto(
+      detail ? '/magazine/Unlisted' : '/magazines?query=Unlisted'
+    );
+    const request = page.getByRole('button', {
+      name: detail ? 'Request magazine' : 'Request “Unlisted”',
+      exact: true,
+    });
+    await request.click();
+    const sheet = page.getByRole('alertdialog', { name: 'Request Magazine' });
+    await expect(sheet).toContainText('Unlisted');
+    await expect(sheet).toContainText('Approval required');
+    await expect(
+      sheet.getByText('Magazine request quota reached.', { exact: false })
+    ).toBeVisible();
+    await expect(
+      sheet.getByRole('button', { name: 'Send Request' })
+    ).toBeDisabled();
+    await sheet.getByRole('button', { name: 'Cancel' }).click();
+    expect(posts).toHaveLength(0);
+    restricted = false;
+    await request.click();
+    await sheet.getByRole('button', { name: 'Recheck Quota' }).click();
+    await expect(sheet).toContainText('2 of 3 magazine requests remaining.');
+    const service = sheet.getByRole('combobox', { name: 'Magazine Service' });
+    if (advanced) await service.selectOption('7');
+    else await expect(service).toHaveCount(0);
+    await sheet.getByRole('button', { name: 'Send Request' }).click();
+    await expect(
+      page.getByRole('button', {
+        name: detail ? 'Requested' : 'Requested Unlisted',
+        exact: true,
+      })
+    ).toBeDisabled();
+    expect(posts).toEqual([
+      {
+        mediaType: 'magazine',
+        mediaId: 'Unlisted',
+        ...(advanced ? { serverId: 7 } : {}),
+      },
+    ]);
+    expect(serviceReads > 0).toBe(advanced);
+  });
+}
+
+test('magazine discovery prevents duplicate title requests', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { magazine: true } } })
+  );
+  await page.route('**/api/v1/discover/magazines?*', (route) =>
+    route.fulfill({ json: paged([]) })
+  );
+  await page.route('**/api/v1/user/1/quota', (route) =>
+    route.fulfill({ json: { magazine: { restricted: false } } })
+  );
+  let reads = 0;
+  await page.route('**/api/v1/magazine/Existing', (route) => {
+    reads += 1;
+    return route.fulfill({
+      json: {
+        id: 'Existing',
+        title: 'Existing',
+        mediaType: 'magazine',
+        mediaInfo: { hasActiveRequest: true },
+      },
+    });
+  });
+  await page.goto('/magazines?query=Existing');
+  await page.getByRole('button', { name: 'Request “Existing”' }).click();
+  const sheet = page.getByRole('alertdialog', { name: 'Request Magazine' });
+  await expect(sheet.getByRole('status')).toHaveText(
+    'This magazine has already been requested'
+  );
+  await expect(
+    sheet.getByRole('button', { name: 'Send Request' })
+  ).toBeDisabled();
+  expect(reads).toBe(1);
+});
+
+test('magazine discovery bookmarks keep the catalogue when editing a search', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { magazine: true } } })
+  );
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { magazine: true } } })
+  );
+  const reads: URLSearchParams[] = [];
+  await page.route('**/api/v1/discover/magazines?*', (route) => {
+    const params = new URL(route.request().url()).searchParams;
+    reads.push(params);
+    return route.fulfill({ json: paged([]) });
+  });
+  await page.goto('/magazines?query=Garden');
+  const search = page.getByPlaceholder('Search magazines…');
+  await expect(search).toHaveValue('Garden');
+  await expect.poll(() => reads.at(-1)?.get('catalog')).toBe('tracked');
+  await search.fill('Garden Design');
+  await expect
+    .poll(() => Object.fromEntries(reads.at(-1) ?? []))
+    .toMatchObject({ catalog: 'tracked', query: 'Garden Design' });
+  await page.getByRole('button', { name: 'Public Catalogue' }).click();
+  await expect
+    .poll(() => Object.fromEntries(reads.at(-1) ?? []))
+    .toMatchObject({ catalog: 'public', query: 'Garden Design' });
+  await expect(search).toHaveValue('Garden Design');
+  await search.fill('');
+  const suggestions = page.getByRole('group', {
+    name: 'Suggested Magazine Searches',
+  });
+  await expect(
+    suggestions.getByRole('button', { name: 'National Geographic' })
+  ).toBeVisible();
+  await expect(page.getByText('No magazines yet')).toHaveCount(0);
+  await expect(page).toHaveURL(/\/magazines\?catalog=public$/);
+  expect(
+    reads.some((read) => read.get('catalog') === 'public' && !read.has('query'))
+  ).toBe(false);
+  await suggestions
+    .getByRole('button', { name: 'National Geographic' })
+    .click();
+  await expect(search).toHaveValue('National Geographic');
+  await expect
+    .poll(() => Object.fromEntries(reads.at(-1) ?? []))
+    .toMatchObject({
+      catalog: 'public',
+      query: 'National Geographic',
+    });
+  await expect(suggestions).toHaveCount(0);
+});
+
+test('Classic magazine bookmarks keep the search scope and link to magazine details', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/search?*', (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    expect(query.get('type')).toBe('magazine');
+    expect(query.get('page')).toBe('2');
+    return route.fulfill({
+      json: {
+        ...paged([
+          {
+            mediaType: 'magazine',
+            id: 'fixture',
+            provider: 'googlebooks',
+            title: 'Fixture Magazine',
+          },
+        ]),
+        page: 2,
+        totalPages: 2,
+      },
+    });
+  });
+  await page.goto('/search?query=Fixture&type=magazine&page=2');
+  await expect(
+    page.getByRole('button', { name: 'Magazines', exact: true })
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    page.getByRole('link', { name: 'Fixture Magazine' })
+  ).toHaveAttribute('href', '/magazine/Fixture%20Magazine');
+});
+
+test('adult discovery bookmarks retain the selected Whisparr service', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { adultEnabled: true, enabledMediaCategories: { adult: true } },
+    })
+  );
+  await page.route('**/api/v1/service/whisparr', (route) =>
+    route.fulfill({
+      json: [
+        { id: 1, name: 'First Service' },
+        { id: 2, name: 'Second Service' },
+      ],
+    })
+  );
+  const reads: URLSearchParams[] = [];
+  await page.route('**/api/v1/adult/search?*', (route) => {
+    const params = new URL(route.request().url()).searchParams;
+    reads.push(params);
+    const partial = !params.has('serverId');
+    return route.fulfill({
+      json: {
+        ...paged(
+          partial
+            ? [
+                {
+                  id: '12345678-1234-4123-8123-123456789abc',
+                  mediaType: 'adult',
+                  title: 'Fixture Result',
+                  serviceId: 1,
+                },
+              ]
+            : []
+        ),
+        partial,
+      },
+    });
+  });
+  await page.goto('/adult?query=Fixture&serverId=2');
+  const service = page.getByRole('combobox', { name: 'Whisparr Service' });
+  await expect(service).toHaveValue('2');
+  await expect
+    .poll(() => Object.fromEntries(reads.at(-1) ?? []))
+    .toMatchObject({ query: 'Fixture', serverId: '2' });
+  await service.selectOption('');
+  await expect.poll(() => reads.at(-1)?.has('serverId')).toBe(false);
+  expect(reads.at(-1)?.get('query')).toBe('Fixture');
+  const notice = page.getByText('Whisparr returned partial results.', {
+    exact: false,
+  });
+  await expect(notice).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Fixture Result' })
+  ).toBeVisible();
+  await service.selectOption('2');
+  await expect(notice).toHaveCount(0);
+  await expect(page.getByText('Nothing found')).toBeVisible();
+});
+
+test('Sportarr league details explain unmonitored schedules and show event dates', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { sports: true } } })
+  );
+  await page.route(/\/api\/v1\/sportarr\/lg-12345[67]$/, (route) => {
+    const monitored = route.request().url().endsWith('7');
+    return route.fulfill({
+      json: {
+        id: monitored ? 'lg-123457' : 'lg-123456',
+        title: 'Fixture League',
+        mediaType: 'sports',
+        requestable: false,
+        eventsAvailable: monitored,
+        libraryState: monitored ? 'monitored' : 'unmonitored',
+      },
+    });
+  });
+  let eventReads = 0;
+  await page.route('**/api/v1/sportarr/*/events?*', (route) => {
+    eventReads += 1;
+    return route.fulfill({
+      json: {
+        eventsAvailable: true,
+        totalPages: 1,
+        results: [
+          {
+            id: 1,
+            title: 'Scheduled Event',
+            season: 2026,
+            broadcastDate: '2026-06-01T01:00:00Z',
+            broadcastTimezone: 'America/New_York',
+            monitored: true,
+            hasFile: false,
+          },
+          {
+            id: 2,
+            title: 'Unscheduled Event',
+            monitored: false,
+            hasFile: false,
+          },
+        ],
+      },
+    });
+  });
+  await page.goto('/sportarr/lg-123456');
+  await expect(
+    page.getByText('Enable monitoring in Sportarr', { exact: false })
+  ).toBeVisible();
+  expect(eventReads).toBe(0);
+  await page.goto('/sportarr/lg-123457');
+  const scheduled = page
+    .getByRole('listitem')
+    .filter({ has: page.getByText('Scheduled Event', { exact: true }) });
+  await expect(scheduled.locator('time')).toHaveAttribute(
+    'datetime',
+    '2026-06-01T01:00:00Z'
+  );
+  await expect(scheduled).toContainText('Season 2026');
+  await expect(scheduled).toContainText('May 31');
+  await expect(page.getByText('Date not announced')).toBeVisible();
+});
+
+for (const autoApprove of [false, true]) {
+  test(`Sportarr league follow checks the selected destination and ${autoApprove ? 'automatic approval' : 'required approval'}`, async ({
+    page,
+  }) => {
+    await fixtures(page);
+    await page.route('**/api/v1/auth/me', (route) =>
+      route.fulfill({
+        json: {
+          id: 1,
+          displayName: 'Viewer',
+          permissions: 32 + 8192 + (autoApprove ? 2 ** 44 : 0),
+        },
+      })
+    );
+    let restricted = true;
+    await page.route('**/api/v1/user/1/quota', (route) =>
+      route.fulfill({
+        json: { tv: { limit: 4, remaining: restricted ? 0 : 2, restricted } },
+      })
+    );
+    await page.route('**/api/v1/settings/public', (route) =>
+      route.fulfill({ json: { enabledMediaCategories: { sports: true } } })
+    );
+    await page.route('**/api/v1/service/sportarr', (route) =>
+      route.fulfill({
+        json: [
+          { id: 1, name: 'Already Following' },
+          { id: 2, name: 'Alternate Service' },
+        ],
+      })
+    );
+    await page.route(/\/api\/v1\/sportarr\/lg-123456(?:\?|$)/, (route) => {
+      const source = new URL(route.request().url()).searchParams.get(
+        'serverId'
+      );
+      return route.fulfill({
+        json: {
+          id: 'lg-123456',
+          title: 'Fixture League',
+          mediaType: 'sports',
+          requestable: source === '2',
+          libraryState: source === '2' ? 'not-added' : 'monitored',
+          mediaInfo: { status: 5 },
+        },
+      });
+    });
+    const writes: unknown[] = [];
+    await page.route('**/api/v1/request', (route) => {
+      writes.push(route.request().postDataJSON());
+      return route.fulfill({
+        json: { id: 8, status: writes.length === 1 ? 4 : 1 },
+      });
+    });
+    await page.goto('/sportarr/lg-123456');
+    await page
+      .getByRole('button', { name: 'Choose Sportarr Service', exact: true })
+      .click();
+    const sheet = page.getByRole('alertdialog', { name: 'Follow League' });
+    const choice = sheet.getByRole('combobox', { name: 'Sportarr Service' });
+    await choice.selectOption('1');
+    await expect(
+      sheet.getByRole('status').filter({ hasText: /In library|Followed/i })
+    ).toBeVisible();
+    await expect(
+      sheet.getByRole('button', { name: 'Send Request' })
+    ).toBeDisabled();
+    expect(writes).toHaveLength(0);
+    await choice.selectOption('2');
+    await expect(
+      sheet.getByText(
+        autoApprove ? 'Automatically approved' : 'Approval required',
+        { exact: true }
+      )
+    ).toBeVisible();
+    await expect(
+      sheet.getByText('TV request quota reached.', { exact: false })
+    ).toBeVisible();
+    await expect(
+      sheet.getByRole('button', { name: 'Send Request' })
+    ).toBeDisabled();
+    restricted = false;
+    await sheet.getByRole('button', { name: 'Recheck Quota' }).click();
+    await expect(
+      sheet.getByText('2 of 4 TV requests remaining.', { exact: false })
+    ).toBeVisible();
+    await sheet.getByRole('button', { name: 'Send Request' }).click();
+    await expect(sheet.getByRole('alert')).toHaveText(
+      'The league request failed.'
+    );
+    await expect(choice).toHaveValue('2');
+    await sheet.getByRole('button', { name: 'Send Request' }).click();
+    await expect(sheet).toHaveCount(0);
+    expect(writes).toEqual([
+      { mediaType: 'sports', mediaId: 'lg-123456', serverId: 2 },
+      { mediaType: 'sports', mediaId: 'lg-123456', serverId: 2 },
+    ]);
+  });
+}
+
+test('Classic sports discovery bookmarks preserve the editable league search', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { sports: true } } })
+  );
+  const queries: string[] = [];
+  await page.route('**/api/v1/discover/sports?*', (route) => {
+    const query = new URL(route.request().url()).searchParams.get('query');
+    if (query) queries.push(query);
+    return route.fulfill({
+      json: paged(
+        query
+          ? [
+              {
+                mediaType: 'sports',
+                id: 'lg-123456',
+                title: query,
+              },
+            ]
+          : []
+      ),
+    });
+  });
+  await page.goto('/sports?query=Fixture+League');
+  const search = page.getByPlaceholder(
+    'Search leagues — Premier League, NFL, F1…'
+  );
+  await expect(search).toHaveValue('Fixture League');
+  await expect(
+    page.getByRole('link', { name: 'Fixture League' })
+  ).toHaveAttribute('href', '/sportarr/lg-123456');
+  await search.fill('Another League');
+  await expect(
+    page.getByRole('link', { name: 'Another League' })
+  ).toBeVisible();
+  await search.fill('');
+  await expect(page).toHaveURL(/\/sports$/);
+  await expect(page.getByRole('link', { name: 'Fixture League' })).toHaveCount(
+    0
+  );
+  expect(queries).toContain('Another League');
+});
+
+test('Classic sports search bookmarks open the requested page of Sportarr leagues', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/discover/sports?*', (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    expect(query.get('query')).toBe('Fixture');
+    expect(query.get('page')).toBe('2');
+    return route.fulfill({
+      json: {
+        ...paged([
+          {
+            mediaType: 'sports',
+            id: '42',
+            title: 'Fixture League',
+            libraryState: 'monitored',
+          },
+        ]),
+        page: 2,
+        totalPages: 2,
+      },
+    });
+  });
+  await page.goto('/search?query=Fixture&type=sports&page=2');
+  await expect(
+    page.getByRole('button', { name: 'Sports', exact: true })
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    page.getByRole('link', { name: 'Fixture League' })
+  ).toHaveAttribute('href', '/sportarr/42');
+  await expect(
+    page.getByRole('navigation', { name: 'Search Result Pages' })
+  ).toContainText('Page 2');
+});
+
+test('Classic Software search bookmarks open the matching Lumen catalog and query', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.goto('/search?type=software&query=Fixture+Game&category=retro');
+  await expect(page).toHaveURL(/\/games\?c=retro&q=Fixture\+Game$/);
+});
+
+test('audiobook search includes exact series matches and a format-preserving results link', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: {
+        initialized: true,
+        booksEnabled: true,
+        audiobookServiceEnabled: true,
+      },
+    })
+  );
+  await page.route('**/api/v1/book-series/search?*', (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    expect(query.get('format')).toBe('audiobook');
+    expect(query.get('query')).toBe('Fixture Series');
+    return route.fulfill({
+      json: {
+        status: 'ok',
+        results: [
+          {
+            key: 'fixture',
+            title: 'Fixture Series',
+            serverName: 'Book Service',
+            format: 'audiobook',
+            source: 'library',
+            href: '/book-series/42',
+          },
+        ],
+      },
+    });
+  });
+  await page.goto('/search?type=book&format=audiobook&query=Fixture+Series');
+  await expect(
+    page.getByRole('link', { name: 'Open Fixture Series from Book Service' })
+  ).toHaveAttribute('href', '/book-series/42');
+  await expect(
+    page.getByRole('link', { name: 'View All Series Results' })
+  ).toHaveAttribute(
+    'href',
+    '/book-series?query=Fixture+Series&format=audiobook'
+  );
+});
+
+test('book series catalog preserves matched Bookshelf lookup titles', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/book-series/catalog?*', (route) =>
+    route.fulfill({
+      json: {
+        title: 'Fixture Series',
+        serverName: 'Fixture Bookshelf',
+        format: 'audiobook',
+        bookCount: 1,
+        resolutionTruncated: false,
+        entries: [
+          {
+            title: 'Series Listing Title',
+            matchStatus: 'matched',
+            book: { id: 'bookshelf:1:fixture', title: 'Matched Book Title' },
+          },
+        ],
+      },
+    })
+  );
+  await page.route('**/api/v1/book-series/watch?*', (route) =>
+    route.fulfill({ json: { supported: false } })
+  );
+  await page.goto(
+    '/book-series/catalog?serverId=1&scope=series&providerId=hc:42'
+  );
+  await expect(page.getByRole('link', { name: 'View Book' })).toHaveAttribute(
+    'href',
+    '/book/bookshelf%3A1%3Afixture?f=audio&lookupTitle=Matched+Book+Title'
+  );
+});
+
+test('audiobook discovery bookmarks apply search, author and narrator and show series matches', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/book-series/search?*', (route) =>
+    route.fulfill({ json: { status: 'ok', results: [] } })
+  );
+  await page.route('**/api/v1/discover/books?*', (route) =>
+    route.fulfill({
+      json: paged([
+        {
+          id: 'bookshelf:1:fixture',
+          title: 'Fixture Audiobook',
+          mediaType: 'book',
+          bookFormat: 'audiobook',
+        },
+      ]),
+    })
+  );
+  const filtered = page.waitForRequest((request) => {
+    const url = new URL(request.url());
+    return (
+      url.pathname === '/api/v1/discover/books' &&
+      url.searchParams.get('format') === 'audiobook' &&
+      url.searchParams.get('query') === 'Fixture Series' &&
+      url.searchParams.get('author') === 'Author' &&
+      url.searchParams.get('narrator') === 'Reader' &&
+      url.searchParams.get('firstPublishYear') === 'before-1970' &&
+      url.searchParams.get('language') === 'eng' &&
+      url.searchParams.get('minRating') === '3.5' &&
+      url.searchParams.get('sortBy') === 'oldest'
+    );
+  });
+  await page.goto(
+    '/books?format=audiobook&sortBy=oldest&search=Fixture+Series&author=Author&narrator=Reader&firstPublishYear=before-1970&language=eng&minRating=3.5'
+  );
+  await filtered;
+  await expect(
+    page.getByRole('link', { name: 'Fixture Audiobook', exact: true })
+  ).toHaveAttribute(
+    'href',
+    '/book/bookshelf%3A1%3Afixture?f=audio&lookupTitle=Fixture+Audiobook'
+  );
+  await expect(page).toHaveURL(/\/audiobooks\?sortBy=oldest/);
+  await expect(
+    page.getByRole('link', { name: 'View All Series Results' })
+  ).toHaveAttribute(
+    'href',
+    '/book-series?query=Fixture+Series&format=audiobook'
+  );
+  const form = page.getByRole('form', { name: 'Book Discovery Search' });
+  await expect(form.getByLabel('Narrator')).toHaveValue('Reader');
+  await form.getByLabel('Narrator').fill('Another Reader');
+  await form.getByLabel('Minimum Book Rating').fill('4.5');
+  const edited = page.waitForRequest((request) => {
+    const url = new URL(request.url());
+    return (
+      url.pathname === '/api/v1/discover/books' &&
+      url.searchParams.get('narrator') === 'Another Reader' &&
+      url.searchParams.get('minRating') === '4.5' &&
+      url.searchParams.get('author') === 'Author'
+    );
+  });
+  await form.getByRole('button', { name: 'Search Books' }).click();
+  await edited;
+  await page.reload();
+  await expect(form.getByLabel('Narrator')).toHaveValue('Another Reader');
+  await page.getByRole('button', { name: 'Clear Book Search' }).click();
+  await expect(page).not.toHaveURL(
+    /search=|author=|narrator=|firstPublishYear=|language=|minRating=/
+  );
 });

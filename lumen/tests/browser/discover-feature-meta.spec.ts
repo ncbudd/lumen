@@ -75,3 +75,50 @@ test('Discover feature card meta is not cut off on narrow screens', async ({
     expect(r.inside, `${width}px overflow`).toBe(true);
   }
 });
+
+test('movie and series genre directories open the matching filtered browse', async ({
+  page,
+}) => {
+  await page.route('**/lumen-config.json', (route) =>
+    route.fulfill({ json: {} })
+  );
+  await page.route('**/api/v1/**', (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.endsWith('/auth/me'))
+      return route.fulfill({
+        json: { id: 1, displayName: 'test', permissions: 2 },
+      });
+    if (path.endsWith('/settings/public'))
+      return route.fulfill({ json: { applicationTitle: 'SeerrNG' } });
+    if (path.endsWith('/discover/genreslider/movie'))
+      return route.fulfill({
+        json: [{ id: 28, name: 'Action', backdrops: ['/action.jpg'] }],
+      });
+    if (path.endsWith('/discover/genreslider/tv'))
+      return route.fulfill({ status: 503, json: {} });
+    if (path.endsWith('/genres/movie'))
+      return route.fulfill({ json: [{ id: 28, name: 'Action' }] });
+    if (path.endsWith('/genres/tv'))
+      return route.fulfill({ json: [{ id: 18, name: 'Drama' }] });
+    return route.fulfill({ json: paged([]) });
+  });
+  for (const [path, title, genre, id] of [
+    ['/movies', 'Movie Genres', 'Action', 28],
+    ['/series', 'Series Genres', 'Drama', 18],
+  ] as const) {
+    await page.goto(path);
+    await page.getByRole('link', { name: 'Browse Genres' }).click();
+    await expect(page.getByRole('heading', { name: title })).toBeVisible();
+    const tile = page.getByRole('link', { name: `Browse ${genre}` });
+    if (path === '/movies') {
+      await expect(tile.locator('img')).toHaveAttribute(
+        'src',
+        '/imageproxy/tmdb/t/p/w780/action.jpg'
+      );
+    } else {
+      await expect(tile.locator('img')).toHaveCount(0);
+    }
+    await tile.click();
+    await expect(page).toHaveURL(`${path}?genre=${id}`);
+  }
+});

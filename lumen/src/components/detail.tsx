@@ -1,16 +1,19 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import {
   api,
+  artUrl,
   tmdbImg,
   type Person,
   type ProductionCountry,
   type RequestOptions,
   type SubjectTag,
+  type TvDetails,
   type VideoDetailPins,
 } from '../api';
 import { useAuth } from '../auth';
 import { friendlyError } from '../errors';
+import { useApi } from '../hooks';
 import { Icon, type IconName } from '../icons';
 import { sessionGeneration } from '../sessionState';
 import { Glyph, type Stat } from './cards';
@@ -35,6 +38,20 @@ export const fmtRun = (m?: number) =>
 export const fmtHrs = (sec?: number | null) =>
   !sec ? '' : fmtRun(Math.round(sec / 60));
 
+export function TrailerButton({ href }: { href: string }) {
+  return (
+    <a
+      className="btn btn-quiet"
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Icon name="play" />
+      Trailer
+    </a>
+  );
+}
+
 export function Pill({
   k,
   icon,
@@ -52,10 +69,16 @@ export function Pill({
   );
 }
 
-function People({ list }: { list: Person[] }) {
+export function People({
+  list,
+  full = false,
+}: {
+  list: Person[];
+  full?: boolean;
+}) {
   const listId = useId();
   const [expanded, setExpanded] = useState(false);
-  const visible = expanded ? list : list.slice(0, 10);
+  const visible = full || expanded ? list : list.slice(0, 10);
   return (
     <>
       <div id={listId} className="people">
@@ -94,7 +117,7 @@ function People({ list }: { list: Person[] }) {
           );
         })}
       </div>
-      {list.length > 10 && (
+      {!full && list.length > 10 && (
         <div className="toolbar">
           <button
             className="chip"
@@ -123,6 +146,7 @@ export function CreditsDisclosure({
   people?: Person[];
 }) {
   const { hash } = useLocation();
+  const { id } = useParams();
   if (!people?.length && hash !== `#${credit}`) return null;
 
   return (
@@ -132,6 +156,13 @@ export function CreditsDisclosure({
       label={credit === 'cast' ? 'Starring' : 'Crew'}
     >
       {people?.length ? <People list={people} /> : <p>No credits available.</p>}
+      {id && !!people?.length && (
+        <div className="toolbar">
+          <Link className="chip" to={`/${media}/${id}/${credit}`}>
+            {credit === 'cast' ? 'Open Full Cast' : 'Open Full Crew'}
+          </Link>
+        </div>
+      )}
     </VideoDisclosure>
   );
 }
@@ -286,6 +317,20 @@ function VideoDisclosure({
   );
 }
 
+const languageNames = new Intl.DisplayNames(['en'], { type: 'language' });
+
+export function originalLanguageLink(
+  language: string | undefined,
+  path: '/movies' | '/series'
+) {
+  if (!language || !/^[a-z]{2}$/.test(language)) return null;
+  return (
+    <Link to={path + '?language=' + language}>
+      {languageNames.of(language) ?? language}
+    </Link>
+  );
+}
+
 export function productionCountryLinks(
   countries: ProductionCountry[] | undefined,
   browse: '/movies' | '/series'
@@ -346,17 +391,33 @@ export function DetailTop({
   const [failed, setFailed] = useState<string[]>([]);
   const ok = (src?: string) => (src && !failed.includes(src) ? src : undefined);
   const drop = (src: string) => () => setFailed((f) => f.concat(src));
-  const hero = ok(backdrop) || ok(poster);
+  const safeBackdrop = artUrl(backdrop);
+  const safePoster = ok(artUrl(poster));
+  const hero = ok(safeBackdrop) || safePoster;
   return (
     <>
-      <div className={`dhero ${backdrop ? '' : 'blur'}`}>
-        {hero && <img src={hero} alt="" onError={drop(hero)} />}
+      <div className={`dhero ${safeBackdrop ? '' : 'blur'}`}>
+        {hero && (
+          <img
+            src={hero}
+            referrerPolicy="no-referrer"
+            alt=""
+            onError={drop(hero)}
+          />
+        )}
       </div>
       <div className="dtop">
         <div
           className={`dposter ${square ? 'sq' : ''} ${whole ? 'whole' : ''}`}
         >
-          {ok(poster) && <img src={poster} alt="" onError={drop(poster!)} />}
+          {safePoster && (
+            <img
+              src={safePoster}
+              referrerPolicy="no-referrer"
+              alt=""
+              onError={drop(safePoster)}
+            />
+          )}
           <Glyph s={status ?? null} />
         </div>
         <div className="dtitle">
@@ -403,7 +464,15 @@ interface Server {
 interface ServerDetail {
   profiles: { id: number; name: string }[];
   rootFolders: { id: number; path: string }[];
-  server: { activeProfileId: number; activeDirectory: string };
+  languageProfiles?: { id: number; name: string }[] | null;
+  metadataLanguages?: { id: number; name: string }[];
+  tags?: { id: number; label: string }[];
+  server: {
+    activeProfileId: number;
+    activeDirectory: string;
+    activeLanguageProfileId?: number;
+    activeTags?: number[];
+  };
 }
 
 const permissionBits = (permissions?: number) =>
@@ -414,12 +483,16 @@ const permissionBits = (permissions?: number) =>
     : 0;
 
 // who may pick the Radarr/Sonarr server, quality and folder for a request
-export const canChooseRequestOptions = (permissions?: number) =>
+export const canManageRequests = (permissions?: number) =>
   (permissionBits(permissions) & MANAGE) !== 0;
+export const canChooseRequestOptions = (permissions?: number) =>
+  (permissionBits(permissions) & (MANAGE | 8192)) !== 0;
 export const canViewAllRequests = (permissions?: number) =>
   (permissionBits(permissions) & (MANAGE | REQUEST_VIEW)) !== 0;
 export const canRequestMovies = (permissions?: number) =>
   (permissionBits(permissions) & (2 | 32 | 262144)) !== 0;
+export const canRequestSeries = (permissions?: number) =>
+  (permissionBits(permissions) & (2 | 32 | 524288)) !== 0;
 // who may request in 4K: Admin, Request 4K, or Request 4K Movies / Request 4K Series
 export const canRequest4k = (
   permissions: number | undefined,
@@ -437,6 +510,7 @@ export const canRequestAs = (permissions?: number) => {
 interface RequestUser {
   id: number;
   displayName: string;
+  permissions?: number;
 }
 
 export function AdvancedOptions({
@@ -447,8 +521,10 @@ export function AdvancedOptions({
   onReady,
   initial,
   allow4k = false,
+  series,
 }: {
   kind: 'movie' | 'tv';
+  series?: { id: number; tvdbId?: number | null };
   is4k: boolean;
   // also list the 4K servers (for people who may request 4K); picking one makes it a 4K request
   allow4k?: boolean;
@@ -470,14 +546,14 @@ export function AdvancedOptions({
   const [people, setPeople] = useState<RequestUser[] | null>(null);
   const [asUser, setAsUser] = useState<number | undefined>(initial?.userId);
   useEffect(() => {
-    if (!open || !asAllowed || people) return;
+    if (!allowed || !open || !asAllowed || people) return;
     api<{ results: RequestUser[] }>('/user?take=100&skip=0&sort=displayname')
       .then((d) => setPeople(d.results))
       .catch(() => setPeople([])); // the picker just stays hidden
-  }, [open, asAllowed, people]);
+  }, [allowed, open, asAllowed, people]);
 
   useEffect(() => {
-    if (!open || servers) return;
+    if (!allowed || !open || servers) return;
     api<Server[]>(`/service/${svc}`)
       .then((s) => {
         const mine = allow4k
@@ -492,7 +568,7 @@ export function AdvancedOptions({
         if (d) setO((x) => ({ ...x, serverId: d.id }));
       })
       .catch((e) => setErr(friendlyError(e)));
-  }, [open, servers, svc, is4k, allow4k]);
+  }, [allowed, open, servers, svc, is4k, allow4k]);
   useEffect(() => {
     if (o.serverId == null) return;
     let live = true;
@@ -520,6 +596,32 @@ export function AdvancedOptions({
                   d.rootFolders.some((r) => r.path === initial?.rootFolder)
                     ? initial?.rootFolder
                     : d.server.activeDirectory),
+                languageProfileId:
+                  serverId === initial?.serverId &&
+                  d.languageProfiles?.some(
+                    ({ id }) => id === initial.languageProfileId
+                  )
+                    ? initial.languageProfileId
+                    : d.languageProfiles?.find(
+                        ({ id }) => id === d.server.activeLanguageProfileId
+                      )?.id,
+                metadataLanguageId:
+                  serverId === initial?.serverId &&
+                  d.metadataLanguages?.some(
+                    ({ id }) => id === initial.metadataLanguageId
+                  )
+                    ? initial.metadataLanguageId
+                    : initial?.metadataLanguageId == null
+                      ? undefined
+                      : null,
+                tags:
+                  serverId === initial?.serverId && initial.tags != null
+                    ? initial.tags.filter((id) =>
+                        d.tags?.some((tag) => tag.id === id)
+                      )
+                    : initial?.tags != null
+                      ? null
+                      : undefined,
               }
         );
       })
@@ -538,9 +640,94 @@ export function AdvancedOptions({
   const picked4k = allow4k
     ? servers?.find((x) => x.id === o.serverId)?.is4k
     : undefined;
+  const seriesId = series?.id;
+  const { data: lookupDetails } = useApi<TvDetails>(
+    open &&
+      allowed &&
+      detail &&
+      kind === 'tv' &&
+      series &&
+      series.tvdbId === undefined
+      ? `/tv/${series.id}`
+      : null,
+    { currentPathOnly: true }
+  );
+  const tvdbId = series?.tvdbId ?? lookupDetails?.externalIds?.tvdbId;
+  const lookupPath =
+    open &&
+    allowed &&
+    kind === 'tv' &&
+    detail &&
+    series &&
+    tvdbId &&
+    o.serverId != null
+      ? `/service/sonarr/lookup/${series.id}?${new URLSearchParams({
+          is4k: String(picked4k ?? is4k),
+          serverId: String(o.serverId),
+          ...(o.metadataLanguageId != null
+            ? { language: String(o.metadataLanguageId) }
+            : {}),
+        })}`
+      : null;
+  const { data: lookup } = useApi<
+    { tvdbId: number; seasonTypes?: { type: string; name: string }[] }[]
+  >(lookupPath, { currentPathOnly: true });
+  const seasonTypes =
+    (Array.isArray(lookup) ? lookup : []).find((item) => item.tvdbId === tvdbId)
+      ?.seasonTypes ?? [];
+  const [order, setOrder] = useState<{ path: string; type: string }>();
+  const proposedOrder =
+    order && order.path === lookupPath
+      ? order.type
+      : o.serverId === initial?.serverId && order === undefined
+        ? initial?.sonarrSeasonType
+        : undefined;
+  const selectedOrder = seasonTypes.find(
+    ({ type }) => type === proposedOrder
+  )?.type;
+  const seasonOverride =
+    selectedOrder ??
+    (initial?.sonarrSeasonType &&
+    (o.serverId !== initial.serverId || (order && order.path === lookupPath))
+      ? null
+      : undefined);
+  // The API evaluates the quota override against the user receiving the request.
+  const requesterId = (asAllowed ? asUser : undefined) ?? user?.id;
+  const requesterPermissions =
+    requesterId === user?.id
+      ? user?.permissions
+      : people?.find(({ id }) => id === requesterId)?.permissions;
+  const quotaRequesterId =
+    !initial &&
+    open &&
+    canManageRequests(user?.permissions) &&
+    canManageRequests(requesterPermissions)
+      ? requesterId
+      : undefined;
+  const { data: quotas } = useApi<
+    Partial<Record<'movie' | 'tv', { limit?: number }>>
+  >(quotaRequesterId ? `/user/${quotaRequesterId}/quota` : null, {
+    currentPathOnly: true,
+  });
+  const canOverrideQuota =
+    quotaRequesterId !== undefined && (quotas?.[kind]?.limit ?? 0) > 0;
+  const [overrideQuota, setOverrideQuota] = useState(false);
+  const ignoreQuota = canOverrideQuota && overrideQuota;
   useEffect(() => {
     if (!open) return onChange({});
-    const base = picked4k === undefined ? o : { ...o, is4k: picked4k };
+    const base = picked4k === undefined ? { ...o } : { ...o, is4k: picked4k };
+    if (ignoreQuota) base.ignoreQuota = true;
+    if (seriesId) base.sonarrSeasonType = seasonOverride;
+    if (!initial && o.tags) {
+      base.requesterSelectedOptions = {
+        tags: true,
+        profile: o.profileId !== undefined,
+        rootFolder: !!o.rootFolder,
+        ...(kind === 'tv'
+          ? { languageProfile: o.languageProfileId !== undefined }
+          : {}),
+      };
+    }
     onChange(
       // a new request is the admin's own unless someone else is picked; a request being
       // changed always says whose it is (picking "Me" moves it to the admin)
@@ -548,7 +735,19 @@ export function AdvancedOptions({
         ? { ...base, userId: asUser }
         : base
     );
-  }, [o, open, asUser, user?.id, initial?.userId, onChange, picked4k]);
+  }, [
+    o,
+    open,
+    asUser,
+    user?.id,
+    initial,
+    kind,
+    onChange,
+    picked4k,
+    seriesId,
+    seasonOverride,
+    ignoreQuota,
+  ]);
   // no server of this kind set up: nothing to choose, SeerrNG decides (as its own dialog does)
   const none = !!servers && !servers.length;
   useEffect(() => {
@@ -563,6 +762,11 @@ export function AdvancedOptions({
   }, [detail, err, o, onReady, none]);
 
   if (!allowed) return null;
+  const defaultTags =
+    detail?.server.activeTags?.filter((id) =>
+      detail.tags?.some((tag) => tag.id === id)
+    ) ?? [];
+  const selectedTags = o.tags ?? defaultTags;
   const body = (
     <>
       {err && <p className="note">{err}</p>}
@@ -580,7 +784,10 @@ export function AdvancedOptions({
               <span className="lbl">Request as</span>
               <select
                 value={asUser ?? user.id}
-                onChange={(e) => setAsUser(+e.target.value)}
+                onChange={(e) => {
+                  setOverrideQuota(false);
+                  setAsUser(Number(e.target.value));
+                }}
               >
                 <option value={user.id}>Me ({user.displayName})</option>
                 {people
@@ -597,7 +804,11 @@ export function AdvancedOptions({
             <span className="lbl">Server</span>
             <select
               value={o.serverId ?? ''}
-              onChange={(e) => setO({ serverId: +e.target.value })}
+              onChange={(e) => {
+                setDetail(null);
+                setOrder(undefined);
+                setO({ serverId: +e.target.value });
+              }}
             >
               {servers.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -640,8 +851,114 @@ export function AdvancedOptions({
                   ))}
                 </select>
               </label>
+              {kind === 'tv' && !!detail.languageProfiles?.length && (
+                <label className="sel">
+                  <span className="lbl">Language Profile</span>
+                  <select
+                    value={o.languageProfileId ?? ''}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setO((previous) => ({
+                        ...previous,
+                        languageProfileId:
+                          value === '' ? undefined : Number(value),
+                      }));
+                    }}
+                  >
+                    <option value="" disabled>
+                      Sonarr Default
+                    </option>
+                    {detail.languageProfiles.map(({ id, name }) => (
+                      <option key={id} value={id}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {kind === 'tv' && !!detail.metadataLanguages?.length && (
+                <label className="sel">
+                  <span className="lbl">Metadata Language</span>
+                  <select
+                    value={o.metadataLanguageId ?? ''}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setOrder(undefined);
+                      setO((previous) => ({
+                        ...previous,
+                        metadataLanguageId: value === '' ? null : Number(value),
+                      }));
+                    }}
+                  >
+                    <option value="">Sonarr Default</option>
+                    {detail.metadataLanguages.map(({ id, name }) => (
+                      <option key={id} value={id}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {lookupPath && seasonTypes.length > 1 && (
+                <label className="sel">
+                  <span className="lbl">Season Order</span>
+                  <select
+                    value={selectedOrder ?? ''}
+                    onChange={(event) =>
+                      setOrder({ path: lookupPath, type: event.target.value })
+                    }
+                  >
+                    <option value="">Sonarr Default</option>
+                    {seasonTypes.map(({ type, name }) => (
+                      <option key={type} value={type}>
+                        {name === type ? name : `${name} (${type})`}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
             </>
           )}
+        </div>
+      )}
+      {canOverrideQuota && (
+        <div className="setlist">
+          <label className="set cfg-row">
+            <span>Ignore Request Quota</span>
+            <input
+              type="checkbox"
+              checked={ignoreQuota}
+              onChange={(event) => setOverrideQuota(event.target.checked)}
+            />
+          </label>
+        </div>
+      )}
+      {!!detail?.tags?.length && (
+        <div role="group" aria-label="Request Tags">
+          <p className="note">Request Tags</p>
+          <div className="setlist">
+            {detail.tags.map(({ id, label }) => (
+              <label key={id} className="set cfg-row">
+                <span>{label}</span>
+                <input
+                  type="checkbox"
+                  checked={selectedTags.includes(id)}
+                  onChange={(event) => {
+                    const checked = event.target.checked;
+                    setO((previous) => {
+                      const tags = previous.tags ?? defaultTags;
+                      return {
+                        ...previous,
+                        tags: checked
+                          ? [...new Set([...tags, id])]
+                          : tags.filter((tag) => tag !== id),
+                      };
+                    });
+                  }}
+                />
+              </label>
+            ))}
+          </div>
         </div>
       )}
     </>
@@ -654,7 +971,7 @@ export function AdvancedOptions({
     >
       <summary>
         <Icon name="info" size="sm" />
-        Advanced (admins)
+        Advanced Request Options
       </summary>
       {body}
     </details>

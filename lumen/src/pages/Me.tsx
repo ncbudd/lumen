@@ -4,14 +4,19 @@ import { isAdministrator, useAuth } from '../auth';
 import { useBlocklistNavigation } from '../blocklist';
 import { Section } from '../components/cards';
 import { ConfirmSheet } from '../components/ConfirmSheet';
-import { canChooseRequestOptions } from '../components/detail';
+import {
+  canChooseRequestOptions,
+  canRequestMovies,
+} from '../components/detail';
+import RequestLimits from '../components/RequestLimits';
 import { fullSeerrUrl, initials } from '../components/Shell';
 import { useToast } from '../components/toast';
 import { canManageDownloads } from '../downloadPermissions';
 import { canViewFollowing } from '../followPermissions';
-import { CAN_HOVER, useApi, usePublicSettings } from '../hooks';
+import { CAN_HOVER, usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
 import { canReadIssues } from '../issuePermissions';
+import { useLiveTvStatus } from '../liveTv';
 import { mediaServer, services } from '../mediaServer';
 import {
   DISCOVER_ROWS,
@@ -19,12 +24,8 @@ import {
   usePrefs,
   type DiscoverRow,
 } from '../settings';
+import { AdminLinks } from './AdminHome';
 import { canSeeRecent } from './Discover';
-
-type Quota = Record<
-  string,
-  { limit: number; used: number; days?: number; restricted: boolean }
->;
 
 function Toggle({
   path,
@@ -65,42 +66,15 @@ function Toggle({
 
 export default function Me() {
   const { user, signOut } = useAuth();
+  const liveTv = useLiveTvStatus();
   const showBlocklist = useBlocklistNavigation();
   const toast = useToast();
   const { prefs, set, reset, locked, seerrPublicUrl } = usePrefs();
   const [askReset, setAskReset] = useState(false);
-  const quota = useApi<Quota>(user ? `/user/${user.id}/quota` : null).data;
   const full = fullSeerrUrl(seerrPublicUrl);
   const isAdmin = isAdministrator(user?.permissions);
-  const lockedToLumen = usePublicSettings()?.lockLumenForNonAdmins && !isAdmin;
-  const q = (k: string, label: string) => {
-    const x = quota?.[k];
-    if (!x) return null;
-    const unlimited = !x.limit;
-    return (
-      <div className="qbox" key={k}>
-        <span>{label}</span>
-        <b>
-          {unlimited ? (
-            'No limit'
-          ) : (
-            <>
-              {Math.max(0, x.limit - x.used)} <small>of {x.limit} left</small>
-            </>
-          )}
-        </b>
-        {!unlimited && (
-          <div className="progress">
-            <i
-              style={{ width: `${Math.min(100, (x.used / x.limit) * 100)}%` }}
-            />
-          </div>
-        )}
-        {!unlimited && x.days ? <span>Every {x.days} days</span> : null}
-      </div>
-    );
-  };
-
+  const publicSettings = usePublicSettings();
+  const lockedToLumen = publicSettings?.lockLumenForNonAdmins && !isAdmin;
   return (
     <>
       <header className="ph">
@@ -118,7 +92,7 @@ export default function Me() {
         </div>
       </div>
 
-      {((user?.permissions ?? 0) & (2 | 8)) !== 0 && (
+      {!isAdmin && ((user?.permissions ?? 0) & 8) !== 0 && (
         <Section title="User Management">
           <div className="setlist">
             <div className="set">
@@ -135,76 +109,17 @@ export default function Me() {
         <Section title="Administration">
           <div className="setlist">
             <div className="set">
-              <b>General Settings</b>
+              <b>SeerrNG Administration</b>
               <Link
                 className="go"
-                to="/admin/general"
-                aria-label="Open General Settings"
-              >
-                Open <Icon name="chev" size="sm" />
-              </Link>
-            </div>
-            <div className="set">
-              <span>
-                <b>Lumen Settings</b>
-                <small>
-                  Defaults, locks, sign-in, media server, logo and tab icon
-                </small>
-              </span>
-              <Link
-                className="go"
-                to="/me/lumen"
-                aria-label="Open Lumen Settings"
-              >
-                Open <Icon name="chev" size="sm" />
-              </Link>
-            </div>
-            <div className="set">
-              <b>Scheduled Jobs</b>
-              <Link
-                className="go"
-                to="/admin/jobs"
-                aria-label="Open Scheduled Jobs"
-              >
-                Open <Icon name="chev" size="sm" />
-              </Link>
-            </div>
-            <div className="set">
-              <b>About SeerrNG</b>
-              <Link
-                className="go"
-                to="/admin/about"
-                aria-label="Open About SeerrNG"
-              >
-                Open <Icon name="chev" size="sm" />
-              </Link>
-            </div>
-            <div className="set">
-              <b>System Logs</b>
-              <Link
-                className="go"
-                to="/admin/logs"
-                aria-label="Open System Logs"
-              >
-                Open <Icon name="chev" size="sm" />
-              </Link>
-            </div>
-            <div className="set">
-              <span>
-                <b>SeerrNG Administration</b>
-                <small>
-                  Full settings, users, services, logs and other admin tools
-                </small>
-              </span>
-              <a
-                className="go"
-                href={full}
+                to="/admin"
                 aria-label="Open SeerrNG Administration"
               >
                 Open <Icon name="chev" size="sm" />
-              </a>
+              </Link>
             </div>
           </div>
+          <AdminLinks />
         </Section>
       )}
 
@@ -216,6 +131,38 @@ export default function Me() {
               Open <Icon name="chev" size="sm" />
             </Link>
           </div>
+          {publicSettings?.swipeEnabled && (
+            <div className="set">
+              <b>Swipe</b>
+              <Link className="go" to="/swipe" aria-label="Open Swipe">
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+          )}
+          {canRequestMovies(user?.permissions) && (
+            <div className="set">
+              <b>Watch Sessions</b>
+              <Link
+                className="go"
+                to="/watch-sessions"
+                aria-label="Open Watch Sessions"
+              >
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+          )}
+          {liveTv.data?.configured && (
+            <div className="set">
+              <b>Recordings</b>
+              <Link
+                className="go"
+                to="/recordings"
+                aria-label="Open Recordings"
+              >
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+          )}
           <div className="set">
             <b>Release Calendar</b>
             <Link
@@ -307,13 +254,14 @@ export default function Me() {
           </div>
         </div>
       </Section>
-      <Section title="Request limits">
-        <div className="quota">
-          {q('movie', 'Movies')}
-          {q('tv', 'Seasons')}
-          {prefs.showBooks && q('book', 'Books')}
-        </div>
-      </Section>
+      {user && (
+        <RequestLimits
+          id={user.id}
+          categories={
+            prefs.showBooks ? ['movie', 'tv', 'book'] : ['movie', 'tv']
+          }
+        />
+      )}
 
       <Section title="Appearance">
         <div className="setlist">
@@ -442,7 +390,7 @@ export default function Me() {
                 <b>Full SeerrNG</b>
                 <small>Issues, watchlists, settings and admin tools</small>
               </span>
-              <a className="go" href={full}>
+              <a className="go" href={full} aria-label="Open Full SeerrNG">
                 Open <Icon name="chev" size="sm" />
               </a>
             </div>

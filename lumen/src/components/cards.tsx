@@ -7,15 +7,15 @@ import {
 } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
+  artUrl,
   bookArt,
+  bookDetailPath,
   englishAudioEdition,
   hardcoverWorkId,
   mediaLink,
   MediaStatus,
   plexUrl,
   requestBook,
-  requestMovie,
-  requestSeries,
   titleOf,
   tmdbImg,
   yearOf,
@@ -40,6 +40,12 @@ import { scrollBehavior } from '../motion';
 import { seriesRequestSummary } from '../seriesRequestSummary';
 import { onSessionReset, sessionGeneration } from '../sessionState';
 import { usePrefs } from '../settings';
+import {
+  isSharedVideoCopy,
+  useVideoAvailability,
+  videoPlaybackMedia,
+  type AvailabilityMode,
+} from '../videoAvailability';
 import { useQuickRequest } from './requestSheet';
 import { useToast } from './toast';
 
@@ -66,12 +72,14 @@ export function Cover({
 }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [src]);
-  if (src && !failed)
+  const artwork = artUrl(src);
+  if (artwork && !failed)
     return (
       <img
         loading="lazy"
         decoding="async"
-        src={src}
+        src={artwork}
+        referrerPolicy="no-referrer"
         alt=""
         onError={() => setFailed(true)}
       />
@@ -98,7 +106,8 @@ export type Stat = {
 export function statusOf(
   mi: MediaInfo | undefined,
   book = false,
-  serverName = 'Plex'
+  serverName = 'Plex',
+  availability?: AvailabilityMode
 ): Stat {
   if (mi?.status === MediaStatus.BLOCKLISTED)
     return { k: 'wait', word: 'Blocklisted', ico: 'lock' };
@@ -108,11 +117,23 @@ export function statusOf(
     !!x && x >= MediaStatus.PENDING && x <= MediaStatus.AVAILABLE;
   const have = (x?: number) =>
     x === MediaStatus.AVAILABLE || x === MediaStatus.PARTIAL;
+  const standardShared = !book && isSharedVideoCopy(mi, false, availability);
+  const fourKShared = !book && isSharedVideoCopy(mi, true, availability);
+  const standard =
+    availability === 'hide' && standardShared ? undefined : mi?.status;
+  const fourK =
+    availability === 'hide' && fourKShared ? undefined : mi?.status4k;
   const use4k =
     !book &&
-    shown(mi?.status4k) &&
-    (!shown(mi?.status) || (have(mi?.status4k) && !have(mi?.status)));
-  const s = use4k ? mi?.status4k : mi?.status;
+    shown(fourK) &&
+    (!shown(standard) || (have(fourK) && !have(standard)));
+  const s = use4k ? fourK : standard;
+  if (
+    availability === 'distinguish' &&
+    (use4k ? fourKShared : standardShared)
+  ) {
+    return { k: 'wait', word: 'Available to Other Users', ico: 'user' };
+  }
   const downloads = use4k ? mi?.downloadStatus4k : mi?.downloadStatus;
   if (s === MediaStatus.AVAILABLE)
     return {
@@ -270,11 +291,17 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
   const { prefs } = usePrefs();
   const tv = it.mediaType === 'tv';
   const titleMode = useCardTitleMode(tv ? 'tv' : 'movie');
-  // the glyph still shows a 4K-only request; the request buttons follow HD alone
-  const shown = statusOf(it.mediaInfo, false, serverName);
+  const availability = useVideoAvailability();
+  const media = it.mediaInfo;
+  const requestMedia = withoutPending4k(media);
+  // Presentation never changes whether the server already has or is acquiring a copy.
+  const shown = statusOf(media, false, serverName, availability);
   const [s, markRequested] = useRequested(
-    statusOf(withoutPending4k(it.mediaInfo), false, serverName)
+    statusOf(requestMedia, false, serverName)
   );
+  const visibleRequestStatus =
+    s?.k === 'ok' ? statusOf(requestMedia, false, serverName, availability) : s;
+  const playbackMedia = videoPlaybackMedia(media, availability);
   const date = it.releaseDate || it.firstAirDate;
   const unreleased = !!date && date > localToday();
   const href = `/${tv ? 'tv' : 'movie'}/${it.id}`;
@@ -289,24 +316,14 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
   ]
     .filter(Boolean)
     .join(' · ');
-  const go = async () => {
-    try {
-      let message = `Requested ${titleOf(it)}`;
-      if (tv)
-        message = seriesRequestSummary(titleOf(it), await requestSeries(it.id));
-      else await requestMovie(it.id);
-      markRequested();
-      toast(message);
-    } catch (e) {
-      toast(friendlyError(e, 'Request failed'));
-    }
-  };
-  const quick = useQuickRequest(it, go, (is4k, series) => {
+  const quick = useQuickRequest(it, (is4k, series, quotaException) => {
     markRequested(is4k ? '4K Requested' : 'Requested');
     toast(
-      tv
-        ? seriesRequestSummary(titleOf(it), series, is4k)
-        : `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}`
+      quotaException
+        ? `Approval requested for ${titleOf(it)}`
+        : tv
+          ? seriesRequestSummary(titleOf(it), series, is4k)
+          : `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}`
     );
   });
   const [request, busy] = useBusy(quick.request);
@@ -323,22 +340,23 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
     }
   }, [sheetOpen, hold]);
   let qb: ReactNode;
-  const plex = plexUrl(it.mediaInfo);
+  const plex = plexUrl(playbackMedia);
   if (s?.k === 'ok')
-    qb = plex ? (
-      <a
-        className="qbtn okb"
-        {...mediaLink(it.mediaInfo, false, tv ? 'tv' : 'movie')}
-      >
-        <Icon name="play" size="sm" />
-        Watch on {serverName}
-      </a>
-    ) : (
-      <Link className="qbtn okb" to={href}>
-        <Icon name="play" size="sm" />
-        On {serverName}
-      </Link>
-    );
+    qb =
+      visibleRequestStatus?.k !== 'ok' ? null : plex ? (
+        <a
+          className="qbtn okb"
+          {...mediaLink(playbackMedia, false, tv ? 'tv' : 'movie')}
+        >
+          <Icon name="play" size="sm" />
+          Watch on {serverName}
+        </a>
+      ) : (
+        <Link className="qbtn okb" to={href}>
+          <Icon name="play" size="sm" />
+          On {serverName}
+        </Link>
+      );
   else if (s)
     qb = (
       <button className="qbtn done" disabled>
@@ -389,7 +407,7 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
           sub={yearOf(it)}
           icon={tv ? 'tv' : 'film'}
         />
-        <Glyph s={s || shown} />
+        <Glyph s={visibleRequestStatus || shown} />
         <Link className="hit" to={href} aria-label={titleOf(it)} />
         {prefs.hoverRequest && !s && (!tv || prefs.wholeSeriesDefault) && (
           <TouchQuick
@@ -473,7 +491,7 @@ export function BookCard({ b }: { b: BookResult }) {
     }
   };
   const [request, busy] = useBusy(go);
-  const href = `/book/${encodeURIComponent(b.id)}${audio ? '?f=audio' : ''}`;
+  const href = bookDetailPath(b.id, format, b.title);
   const series = b.series?.[0];
   return (
     <div
@@ -588,7 +606,11 @@ export function FeatCard({
 }) {
   const serverName = useMediaServerName();
   const tv = it.mediaType === 'tv';
-  const s = statusOf(withoutPending4k(it.mediaInfo), false, serverName);
+  const availability = useVideoAvailability();
+  const requestMedia = withoutPending4k(it.mediaInfo);
+  const s = statusOf(requestMedia, false, serverName);
+  const shown = statusOf(requestMedia, false, serverName, availability);
+  const playbackMedia = videoPlaybackMedia(it.mediaInfo, availability);
   const toast = useToast();
   const { prefs } = usePrefs();
   const [done, setDone] = useState('');
@@ -599,24 +621,14 @@ export function FeatCard({
   ]
     .filter(Boolean)
     .join(' · ');
-  const go = async () => {
-    try {
-      let message = `Requested ${titleOf(it)}`;
-      if (tv)
-        message = seriesRequestSummary(titleOf(it), await requestSeries(it.id));
-      else await requestMovie(it.id);
-      setDone('Requested');
-      toast(message);
-    } catch (e) {
-      toast(friendlyError(e, 'Request failed'));
-    }
-  };
-  const quick = useQuickRequest(it, go, (is4k, series) => {
+  const quick = useQuickRequest(it, (is4k, series, quotaException) => {
     setDone(is4k ? '4K Requested' : 'Requested');
     toast(
-      tv
-        ? seriesRequestSummary(titleOf(it), series, is4k)
-        : `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}`
+      quotaException
+        ? `Approval requested for ${titleOf(it)}`
+        : tv
+          ? seriesRequestSummary(titleOf(it), series, is4k)
+          : `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}`
     );
   });
   const [request, busy] = useBusy(quick.request);
@@ -638,12 +650,12 @@ export function FeatCard({
         <h3>{titleOf(it)}</h3>
         <span className="row">
           <span className="mm">{mm}</span>
-          {s?.k === 'ok' ? (
+          {s?.k === 'ok' && shown?.k === 'ok' ? (
             // this button used to do nothing: open Plex when we have a link, else the title page
-            plexUrl(it.mediaInfo) ? (
+            plexUrl(playbackMedia) ? (
               <a
                 className="btn go"
-                {...mediaLink(it.mediaInfo, false, tv ? 'tv' : 'movie')}
+                {...mediaLink(playbackMedia, false, tv ? 'tv' : 'movie')}
               >
                 <Icon name="play" size="sm" />
                 Watch
@@ -655,10 +667,12 @@ export function FeatCard({
               </Link>
             )
           ) : s || done ? (
-            <span className="btn go done">
-              <Icon name={s?.ico || 'clock'} size="sm" />
-              {s?.word || done}
-            </span>
+            (shown || done) && (
+              <span className="btn go done">
+                <Icon name={shown?.ico || 'clock'} size="sm" />
+                {shown?.word || done}
+              </span>
+            )
           ) : tv && !prefs.wholeSeriesDefault ? (
             <Link className="btn go" to={`/tv/${it.id}#seasons`}>
               <Icon name="list" size="sm" />

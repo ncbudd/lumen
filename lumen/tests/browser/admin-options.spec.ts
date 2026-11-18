@@ -67,6 +67,10 @@ async function fixtures(
         movie(302, 'Fresh Pick'),
       ]);
     else if (path === '/discover/genreslider/movie') json = [];
+    else if (path === '/languages')
+      json = [{ iso_639_1: 'en', english_name: 'English' }];
+    else if (path === '/watchproviders/regions')
+      json = [{ iso_3166_1: 'US', english_name: 'United States' }];
     else if (/^\/discover\//.test(path) || path === '/media') json = paged([]);
     else if (path === '/service/radarr')
       json = [
@@ -501,8 +505,10 @@ test('admin settings page builds lumen-config.json', async ({ page }) => {
     permissions: 2,
     config: { seerrPublicUrl: 'https://seerr.example.com', custom: 1 },
   });
-  await page.goto('/me');
-  await page.getByRole('link', { name: /Open/ }).first().click();
+  await page.goto('/admin');
+  await page
+    .getByRole('link', { name: 'Open Lumen Settings', exact: true })
+    .click();
   await expect(
     page.getByRole('heading', { name: 'Lumen settings for everyone' })
   ).toBeVisible();
@@ -919,13 +925,17 @@ test('a failed page stops endless scrolling until Retry', async ({ page }) => {
   await page.goto('/movies');
   await expect(page.getByRole('link', { name: 'Popular 1-0' })).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
+  const retry = page
+    .getByRole('alert')
+    .filter({ hasText: 'Couldn’t load more.' })
+    .getByRole('button', { name: 'Retry', exact: true });
+  await expect(retry).toBeVisible();
   await page.waitForTimeout(1500);
   // asked for page 2 once, not over and over
   expect(asked.filter((n) => n === 2)).toHaveLength(1);
-  await page.getByRole('button', { name: 'Retry' }).click();
+  await retry.click();
   await expect(page.getByRole('link', { name: 'Popular 2-0' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Retry' })).toHaveCount(0);
+  await expect(retry).toHaveCount(0);
   expect(asked.filter((n) => n === 2)).toHaveLength(2);
 });
 
@@ -1203,7 +1213,7 @@ const waitingRequest = {
   requestedBy: { id: 5, displayName: 'Sam' },
   media: { mediaType: 'movie', tmdbId: 301, status: 2 },
 };
-async function requestRoutes(page: Page) {
+async function requestRoutes(page: Page, quotaException = false) {
   const asked: string[] = [];
   await page.route('**/api/v1/request**', async (route) => {
     const req = route.request();
@@ -1213,13 +1223,22 @@ async function requestRoutes(page: Page) {
     asked.push(path + url.search);
     if (path === '/request/count')
       return route.fulfill({ json: { total: 1, pending: 1 } });
+    if (path === '/request/status/77' && quotaException)
+      return route.fulfill({
+        json: {
+          request: { ...waitingRequest, quotaException },
+          current: { stage: 'requested', attempt: 1 },
+          history: { results: [], total: 0 },
+        },
+      });
     if (path !== '/request') return route.fallback();
     const mine = url.searchParams.has('requestedBy');
     const pending = url.searchParams.get('filter') === 'pending';
     return route.fulfill({
       json: {
         pageInfo: { pages: 1, results: 1 },
-        results: !mine && pending ? [waitingRequest] : [],
+        results:
+          !mine && pending ? [{ ...waitingRequest, quotaException }] : [],
       },
     });
   });
@@ -1231,9 +1250,9 @@ async function requestRoutes(page: Page) {
 
 test('admins see everyone’s requests and approve or decline them', async ({
   page,
-}) => {
+}, info) => {
   const { posts, errors } = await fixtures(page, { permissions: 2 });
-  await requestRoutes(page);
+  await requestRoutes(page, true);
   await page.route('**/api/v1/request/77/*', (route) => {
     if (route.request().method() !== 'POST') return route.fallback();
     posts.push({
@@ -1249,6 +1268,15 @@ test('admins see everyone’s requests and approve or decline them', async ({
   const row = page.locator('.rq', { hasText: 'Only In 4K' });
   await expect(row).toContainText('Sam');
   await expect(row).toContainText('Waiting for approval');
+  await expect(row.getByText('Over Quota', { exact: true })).toBeVisible();
+  await row.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: info.outputPath('quota-review-list.png') });
+  await row.getByRole('button', { name: 'History' }).click();
+  const history = page.getByRole('dialog', { name: 'Request history' });
+  await expect(history.getByText('Over Quota', { exact: true })).toBeVisible();
+  await settleVisuals(page);
+  await page.screenshot({ path: info.outputPath('quota-review-history.png') });
+  await history.getByRole('button', { name: 'Close' }).click();
   await row.getByRole('button', { name: 'Approve' }).click();
   await expect
     .poll(() => posts.map((p) => p.path))
@@ -1303,6 +1331,58 @@ test('admins can request on someone else’s behalf', async ({ page }) => {
     mediaType: 'movie',
     mediaId: 302,
     userId: 5,
+  });
+});
+
+test('quota override clears when the selected requester changes', async ({
+  page,
+}, info) => {
+  const { posts } = await fixtures(page, { permissions: 2 });
+  let allowQuota!: () => void;
+  const heldQuota = new Promise<void>((resolve) => {
+    allowQuota = resolve;
+  });
+  await page.route('**/api/v1/user/1/quota', async (route) => {
+    await heldQuota;
+    await route.fulfill({
+      json: { movie: { limit: 1, remaining: 0, restricted: true } },
+    });
+  });
+  await page.route('**/api/v1/user?*', (route) =>
+    route.fulfill({
+      json: { results: [{ id: 5, displayName: 'Sam', permissions: 32 }] },
+    })
+  );
+  await page.goto('/movies');
+  await quickRequest(page, 'Fresh Pick');
+  const sheet = page.getByRole('dialog', { name: 'Request Fresh Pick' });
+  const who = sheet.getByLabel('Request as');
+  await expect(who).toHaveValue('1');
+  await expect(sheet.getByLabel('Folder')).toBeVisible();
+  await settleVisuals(page);
+  await page.screenshot({
+    path: info.outputPath('quota-override-baseline.png'),
+  });
+  allowQuota();
+  const override = sheet.getByRole('checkbox', {
+    name: 'Ignore Request Quota',
+  });
+  await expect(override).not.toBeChecked();
+  await override.check();
+  await page.screenshot({
+    path: info.outputPath('quota-override-checked.png'),
+  });
+  await who.selectOption('5');
+  await expect(override).toHaveCount(0);
+  await who.selectOption('1');
+  await expect(override).not.toBeChecked();
+  await override.check();
+  await sheet.getByRole('button', { name: 'Request', exact: true }).click();
+  await expect(sheet).toHaveCount(0);
+  expect(posts.find((post) => post.path === '/request')?.body).toMatchObject({
+    mediaType: 'movie',
+    mediaId: 302,
+    ignoreQuota: true,
   });
 });
 
@@ -1368,7 +1448,7 @@ test('Request 4K is offered before the HD copy exists, and goes to the 4K server
   ).toBeVisible();
   await expect(fourK).toBeVisible();
   // the admin's Advanced options belong to the HD server; the 4K request must not reuse them
-  await page.getByText('Advanced (admins)').click();
+  await page.getByText('Advanced Request Options').click();
   await expect(page.getByLabel('Folder')).toBeVisible();
   state.status4k = 2;
   await fourK.click();
@@ -1585,7 +1665,7 @@ test('Advanced options on a movie list the 4K server, and picking it requests 4K
     route.fulfill({ json: paged([]) })
   );
   await page.goto('/movie/302');
-  await page.getByText('Advanced (admins)').click();
+  await page.getByText('Advanced Request Options').click();
   const server = page.getByLabel('Server');
   await expect(server).toContainText('Radarr UHD');
   await expect(server.locator('option[value="2"]')).toHaveText(
@@ -1815,14 +1895,17 @@ test('admins change a waiting request, then approve it', async ({ page }) => {
   });
 });
 
-test('changing a series request picks its seasons', async ({ page }) => {
+test('changing a series request picks its seasons', async ({ page }, info) => {
   await fixtures(page, { permissions: 2 });
   await requestRoutes(page);
   const series = {
     ...waitingRequest,
     id: 79,
     type: 'tv',
-    seasons: [{ seasonNumber: 1 }],
+    seasons: [
+      { seasonNumber: 1, episodeNumbers: [2, 5] },
+      { seasonNumber: 2, status: 3 },
+    ],
     media: { mediaType: 'tv', tmdbId: 400, status: 2 },
   };
   const calls = await adminActionRoutes(page, [series]);
@@ -1866,14 +1949,28 @@ test('changing a series request picks its seasons', async ({ page }) => {
   await expect(
     seasons.getByRole('checkbox', { name: /Season 1/ })
   ).toHaveAttribute('aria-checked', 'true');
-  await seasons.getByRole('checkbox', { name: /Season 2/ }).click();
+  await expect(
+    seasons.getByRole('checkbox', { name: /Season 1/ })
+  ).toContainText('2 requested episodes');
+  const season2 = seasons.getByRole('checkbox', { name: /Season 2/ });
+  await expect(season2).toHaveAttribute('aria-checked', 'false');
+  await settleVisuals(page);
+  await page.screenshot({ path: info.outputPath('edit-series-episodes.png') });
+  await season2.click();
   await expect(sheet.getByLabel('Folder')).toBeVisible();
   await sheet.getByRole('button', { name: 'Save' }).click();
   await expect(sheet).toHaveCount(0);
   expect(calls.map((c) => `${c.method} ${c.path}`)).toEqual([
     'PUT /request/79',
   ]);
-  expect(calls[0].body).toMatchObject({ mediaType: 'tv', seasons: [1, 2] });
+  expect(calls[0].body).toMatchObject({
+    mediaType: 'tv',
+    seasons: [1, 2],
+    seasonRequests: [
+      { seasonNumber: 1, episodeNumbers: [2, 5] },
+      { seasonNumber: 2 },
+    ],
+  });
 });
 
 test('failed requests can be retried, and Remove asks in a dialog', async ({
@@ -2465,14 +2562,14 @@ test('HD controls reset after a 4K advanced request becomes pending', async ({
     })
   );
   await page.goto('/movie/302');
-  await page.getByText('Advanced (admins)').click();
+  await page.getByText('Advanced Request Options').click();
   await page.getByLabel('Server').selectOption('2');
   await expect(page.getByLabel('Folder')).toHaveValue('/uhd');
   pending = true;
   await page.getByRole('button', { name: 'Request', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Request 4K' })).toHaveCount(0);
   if (!(await page.getByLabel('Server').isVisible()))
-    await page.getByText('Advanced (admins)').click();
+    await page.getByText('Advanced Request Options').click();
   await expect(page.getByLabel('Server')).toHaveValue('0');
   await expect(page.getByLabel('Folder')).toHaveValue('/movies');
   await page.screenshot({
@@ -2563,7 +2660,7 @@ test('4K series selection uses 4K season ownership even when every HD season is 
     .getByRole('group', { name: 'Quality' })
     .getByRole('button', { name: '4K' })
     .click();
-  await page.getByText('Advanced (admins)').click();
+  await page.getByText('Advanced Request Options').click();
   await expect(page.getByLabel('Server')).toHaveValue('2');
   await expect(page.getByLabel('Folder')).toHaveValue('/tv4k');
   await page.screenshot({
@@ -2708,4 +2805,83 @@ test('storage recovery keeps the draft and enables visible Save and Upload contr
   await expect(page.getByPlaceholder('SeerrNG', { exact: true })).toHaveValue(
     'Keep this draft'
   );
+});
+
+test('a movie over quota offers approval on its detail page', async ({
+  page,
+}, info) => {
+  const { posts } = await fixtures(page, { permissions: 32 });
+  await page.route('**/api/v1/user/1/quota', (route) =>
+    route.fulfill({
+      json: { movie: { limit: 1, remaining: 0, restricted: true } },
+    })
+  );
+  await page.route('**/api/v1/movie/302', (route) =>
+    route.fulfill({ json: { ...movie(302, 'Fresh Pick'), genres: [] } })
+  );
+  await page.route('**/api/v1/request', (route) => {
+    posts.push({ path: '/request', body: route.request().postDataJSON() });
+    return route.fulfill({ json: { id: 44, status: 1, quotaException: true } });
+  });
+  await page.goto('/movie/302');
+  const approval = page.getByRole('button', {
+    name: 'Request Approval',
+    exact: true,
+  });
+  await expect(approval).toBeVisible();
+  await approval.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: info.outputPath('movie-quota-approval.png') });
+  await approval.click();
+  await expect(
+    page.getByText('Approval requested for Fresh Pick')
+  ).toBeVisible();
+  expect(posts).toEqual([
+    {
+      path: '/request',
+      body: {
+        mediaType: 'movie',
+        mediaId: 302,
+        is4k: false,
+        requestQuotaApproval: true,
+      },
+    },
+  ]);
+});
+
+test('a poster quota denial offers an explicit approval request', async ({
+  page,
+}, info) => {
+  await fixtures(page, { permissions: 32 });
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/request', (route) => {
+    const body = route.request().postDataJSON();
+    writes.push(body);
+    return route.fulfill(
+      body.requestQuotaApproval
+        ? { status: 201, json: { id: 30, quotaException: true } }
+        : {
+            status: 403,
+            json: {
+              code: 'REQUEST_QUOTA_EXCEEDED',
+              message: 'Movie Quota exceeded.',
+            },
+          }
+    );
+  });
+  await page.goto('/movies');
+  await quickRequest(page, 'Fresh Pick');
+  const sheet = page.getByRole('dialog', { name: 'Request Fresh Pick' });
+  const approve = sheet.getByRole('button', { name: 'Request Approval' });
+  await expect(approve).toBeVisible();
+  expect(writes).toEqual([{ mediaType: 'movie', mediaId: 302 }]);
+  await settleVisuals(page);
+  await page.screenshot({ path: info.outputPath('poster-quota-approval.png') });
+  await approve.click();
+  await expect(
+    page.getByText('Approval requested for Fresh Pick')
+  ).toBeVisible();
+  expect(writes).toEqual([
+    { mediaType: 'movie', mediaId: 302 },
+    { mediaType: 'movie', mediaId: 302, requestQuotaApproval: true },
+  ]);
 });

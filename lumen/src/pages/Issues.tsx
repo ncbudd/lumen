@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Link,
   useNavigate,
@@ -21,6 +21,50 @@ interface Reporter {
   id: number;
   displayName?: string;
 }
+interface IssueMedia {
+  mediaType: string;
+  tmdbId?: number;
+  mbId?: string | null;
+  identifiers?: { provider: string; value: string }[];
+}
+
+function issueTitleLink(media?: IssueMedia) {
+  if (!media) return;
+  const { mediaType, tmdbId } = media;
+  if (mediaType === 'movie' || mediaType === 'tv') {
+    if (!tmdbId || !Number.isSafeInteger(tmdbId) || tmdbId < 1) return;
+    return {
+      path: `/${mediaType}/${tmdbId}`,
+      label: mediaType === 'tv' ? 'Series' : 'Movie',
+    };
+  }
+  const idFor = (provider: string) =>
+    media.identifiers?.find((id) => id.provider === provider)?.value;
+  const openLibrary = idFor('openlibrary');
+  const bookshelf = idFor('bookshelf');
+  const id =
+    mediaType === 'book'
+      ? openLibrary || bookshelf
+      : mediaType === 'music'
+        ? media.mbId || idFor('musicbrainz')
+        : mediaType === 'comic'
+          ? idFor('comicvine')
+          : mediaType === 'magazine'
+            ? idFor('lazylibrarian')
+            : undefined;
+  if (!id || id === '.' || id === '..') return;
+  const labels: Record<string, string> = {
+    book: 'Book',
+    music: 'Album',
+    comic: 'Comic',
+    magazine: 'Magazine',
+  };
+  return {
+    path: `/${mediaType}/${encodeURIComponent(id)}`,
+    label: labels[mediaType],
+  };
+}
+
 interface Issue {
   id: number;
   status: number;
@@ -28,7 +72,7 @@ interface Issue {
   issueSubtype?: string;
   createdAt: string;
   createdBy: Reporter;
-  media?: { mediaType: string; tmdbId?: number };
+  media?: IssueMedia;
   is4k?: boolean;
   problemSeason?: number;
   problemEpisode?: number;
@@ -65,54 +109,207 @@ function IssueStatus({ status }: { status: number }) {
   );
 }
 
+const issueFilters = [
+  {
+    key: 'filter',
+    label: 'Issue Status',
+    options: { all: 'All Statuses', open: 'Open', resolved: 'Resolved' },
+  },
+  {
+    key: 'mediaType',
+    label: 'Media Type',
+    options: {
+      all: 'All Media',
+      movie: 'Movies',
+      tv: 'Series',
+      music: 'Music',
+      book: 'Books',
+      comic: 'Comics',
+      magazine: 'Magazines',
+    },
+  },
+  {
+    key: 'issueType',
+    label: 'Issue Type',
+    options: {
+      all: 'All Issue Types',
+      video: 'Video',
+      audio: 'Audio',
+      subtitle: 'Subtitles',
+      other: 'Other',
+    },
+  },
+  {
+    key: 'timeFrame',
+    label: 'Reported Within',
+    options: {
+      all: 'Any Time',
+      '7d': '7 Days',
+      '14d': '14 Days',
+      '30d': '30 Days',
+      '6m': '6 Months',
+    },
+  },
+  {
+    key: 'sort',
+    label: 'Sort Issues',
+    options: {
+      all: 'Date Reported',
+      modified: 'Last Updated',
+      status: 'Status',
+    },
+  },
+  {
+    key: 'sortDirection',
+    label: 'Sort Direction',
+    options: { all: 'Descending', asc: 'Ascending' },
+  },
+];
+
+const issueMetadata = [
+  {
+    key: 'releaseYear',
+    label: 'Release Year',
+    media: ['movie', 'tv', 'music', 'book'],
+  },
+  { key: 'genre', label: 'Genre', media: ['movie', 'tv', 'music', 'book'] },
+  { key: 'studio', label: 'Studio', media: ['movie'] },
+  { key: 'network', label: 'Network', media: ['tv'] },
+  { key: 'albumType', label: 'Album Type', media: ['music'] },
+] as const;
+
 function IssueList() {
-  const [filter, setFilter] = useState('all');
-  const [query, setQuery] = useState('');
-  const [submitted, setSubmitted] = useState('');
-  const [page, setPage] = useState(1);
+  const [bookmark, setBookmark] = useSearchParams();
+  const submitted = (bookmark.get('search') ?? '').trim().slice(0, 512);
+  const parsedPage = Number(bookmark.get('page'));
+  const page =
+    Number.isSafeInteger(parsedPage) && parsedPage >= 1
+      ? Math.min(parsedPage, 1000)
+      : 1;
   const params = new URLSearchParams({
     take: String(PAGE_SIZE),
     skip: String((page - 1) * PAGE_SIZE),
-    filter,
+    filter: 'all',
     search: submitted,
   });
-  const { data, error, reload } = useApi<IssuePage>(
-    '/issue?' + params.toString()
+  for (const { key, options } of issueFilters) {
+    const value = bookmark.get(key);
+    if (value && value !== 'all' && Object.hasOwn(options, value))
+      params.set(key, value);
+  }
+  const media = params.get('mediaType') ?? 'all';
+  const metadata = issueMetadata.filter(({ media: types }) =>
+    (types as readonly string[]).includes(media)
   );
+  for (const { key } of metadata) {
+    const value = (bookmark.get(key) ?? '').trim().slice(0, 128);
+    if (value && (key !== 'releaseYear' || /^(\d{4}|before-1970)$/.test(value)))
+      params.set(key, value);
+  }
+  function update(key: string, value: string) {
+    const next = new URLSearchParams(bookmark);
+    if (value) next.set(key, value);
+    else next.delete(key);
+    if (key === 'mediaType') {
+      for (const { key: metadataKey, media: types } of issueMetadata) {
+        if (!(types as readonly string[]).includes(value))
+          next.delete(metadataKey);
+      }
+    }
+    if (key !== 'page') next.delete('page');
+    setBookmark(next);
+  }
+  const { data, error, reload } = useApi<IssuePage>(
+    '/issue?' + params.toString(),
+    { currentPathOnly: true }
+  );
+  const pages = data?.pageInfo.pages;
+  useEffect(() => {
+    if (pages === undefined || page <= Math.max(1, pages)) return;
+    setBookmark(
+      (current) => {
+        const next = new URLSearchParams(current);
+        if (pages > 1) next.set('page', String(pages));
+        else next.delete('page');
+        return next;
+      },
+      { replace: true }
+    );
+  }, [page, pages, setBookmark]);
   return (
     <>
       <form
         className="toolbar"
         onSubmit={(event) => {
           event.preventDefault();
-          setPage(1);
-          setSubmitted(query.trim());
+          const form = new FormData(event.currentTarget);
+          const next = new URLSearchParams(bookmark);
+          for (const key of ['search', ...metadata.map(({ key }) => key)]) {
+            const value = String(form.get(key) ?? '').trim();
+            if (value) next.set(key, value);
+            else next.delete(key);
+          }
+          next.delete('page');
+          setBookmark(next);
         }}
       >
-        <label className="sel">
-          <select
-            aria-label="Issue Status"
-            value={filter}
-            onChange={(event) => {
-              setFilter(event.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="all">All Statuses</option>
-            <option value="open">Open</option>
-            <option value="resolved">Resolved</option>
-          </select>
-        </label>
+        {issueFilters.map(({ key, label, options }) => (
+          <label className="sel" key={key}>
+            <select
+              aria-label={label}
+              value={params.get(key) ?? 'all'}
+              onChange={(event) =>
+                update(
+                  key,
+                  event.target.value === 'all' ? '' : event.target.value
+                )
+              }
+            >
+              {Object.entries(options).map(([value, name]) => (
+                <option key={value} value={value}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ))}
         <label className="search">
           <input
             type="search"
             aria-label="Search Issues"
             placeholder="Search issues"
             maxLength={512}
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            key={submitted}
+            name="search"
+            defaultValue={submitted}
           />
         </label>
+        {metadata.map(({ key, label }) => (
+          <label className="sel" key={`${key}:${bookmark.get(key) ?? ''}`}>
+            <span className="lbl">{label}</span>
+            {key === 'albumType' ? (
+              <select name={key} defaultValue={params.get(key) ?? ''}>
+                <option value="">Any Album Type</option>
+                <option value="album">Album</option>
+                <option value="ep">EP</option>
+                <option value="single">Single</option>
+              </select>
+            ) : (
+              <input
+                className="cfg-json"
+                name={key}
+                defaultValue={params.get(key) ?? ''}
+                maxLength={key === 'releaseYear' ? 11 : 128}
+                pattern={
+                  key === 'releaseYear' ? '[0-9]{4}|before-1970' : undefined
+                }
+                placeholder={
+                  key === 'releaseYear' ? 'YYYY or before-1970' : undefined
+                }
+              />
+            )}
+          </label>
+        ))}
         <button className="btn btn-tonal btn-sm">Search</button>
       </form>
       <ServiceNote error={error} what="issues" retry={reload} />
@@ -129,7 +326,12 @@ function IssueList() {
           {data.results.map((issue) => (
             <li className="set" key={issue.id}>
               <div>
-                <Link to={`/issues/${issue.id}`}>
+                <Link
+                  to={{
+                    pathname: `/issues/${issue.id}`,
+                    search: bookmark.toString(),
+                  }}
+                >
                   <b>
                     {TYPES[issue.issueType] ?? 'Issue'} #{issue.id}
                   </b>
@@ -152,7 +354,7 @@ function IssueList() {
           <button
             className="btn btn-quiet btn-sm"
             disabled={page <= 1}
-            onClick={() => setPage(page - 1)}
+            onClick={() => update('page', page > 2 ? String(page - 1) : '')}
           >
             Previous Page
           </button>
@@ -160,7 +362,7 @@ function IssueList() {
           <button
             className="btn btn-quiet btn-sm"
             disabled={page >= data.pageInfo.pages}
-            onClick={() => setPage(page + 1)}
+            onClick={() => update('page', String(page + 1))}
           >
             Next Page
           </button>
@@ -177,6 +379,11 @@ type IssueAction =
 function Discussion({ id }: { id: number }) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const listParams = new URLSearchParams(params);
+  listParams.delete('issue');
+  const listSearch = listParams.toString();
+  const issueList = { pathname: '/issues', search: listSearch };
   const path = '/issue/' + id;
   const { data, error, reload, refresh } = useApi<Issue>(path);
   const [message, setMessage] = useState('');
@@ -249,7 +456,7 @@ function Discussion({ id }: { id: number }) {
     try {
       await api(endpoint, init);
       if (action.kind === 'delete-issue') {
-        navigate('/issues', { replace: true });
+        navigate(issueList, { replace: true });
         return;
       }
       if (action.kind === 'comment') setMessage('');
@@ -267,20 +474,13 @@ function Discussion({ id }: { id: number }) {
     }
   }
 
-  const media = data?.media;
-  const mediaPath =
-    media &&
-    (media.mediaType === 'movie' || media.mediaType === 'tv') &&
-    Number.isSafeInteger(media.tmdbId) &&
-    (media.tmdbId ?? 0) > 0
-      ? `/${media.mediaType}/${media.tmdbId}`
-      : undefined;
+  const titleLink = issueTitleLink(data?.media);
 
   return (
     <>
       <div className="toolbar">
-        <Link className="btn btn-quiet btn-sm" to="/issues">
-          All Issues
+        <Link className="btn btn-quiet btn-sm" to={issueList}>
+          {listSearch ? 'Back to Issues' : 'All Issues'}
         </Link>
       </div>
       <ServiceNote error={error} what="the issue" retry={reload} />
@@ -329,9 +529,9 @@ function Discussion({ id }: { id: number }) {
                 : ''}
               {data.is4k ? ' · 4K' : ''}
             </span>
-            {mediaPath && (
-              <Link className="btn btn-quiet btn-sm" to={mediaPath}>
-                Open {media?.mediaType === 'tv' ? 'Series' : 'Movie'}
+            {titleLink && (
+              <Link className="btn btn-quiet btn-sm" to={titleLink.path}>
+                Open {titleLink.label}
               </Link>
             )}
             {editable && (

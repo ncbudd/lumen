@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import {
   ApiError,
@@ -6,12 +6,14 @@ import {
   MediaStatus,
   requestSeries,
   tmdbImg,
+  youtubeTrailerUrl,
   type Paged,
   type RequestOptions,
+  type SeasonRequestSelection,
   type TitleResult,
   type TvDetails,
 } from '../api';
-import { useAuth, useMediaServerName } from '../auth';
+import { isAdministrator, useAuth, useMediaServerName } from '../auth';
 import BlocklistButton from '../components/BlocklistButton';
 import {
   Rail,
@@ -20,23 +22,30 @@ import {
   statusOf,
   TitleCard,
 } from '../components/cards';
+import { ConfirmSheet } from '../components/ConfirmSheet';
 import {
   ActionBar,
   AdvancedOptions,
+  canRequestSeries,
   CreditsDisclosure,
   DetailTop,
   Facts,
   fmtRun,
+  originalLanguageLink,
   Pill,
   productionCountryLinks,
   SubjectTagsDisclosure,
+  TrailerButton,
 } from '../components/detail';
 import { EpisodeAvailabilityPanel } from '../components/EpisodeAvailabilityPanel';
 import { ServiceNote } from '../components/extra';
 import IndexerSearchLink from '../components/IndexerSearchLink';
+import LiveTvAirings from '../components/LiveTvAirings';
 import ReportIssueButton from '../components/ReportIssueButton';
-import { useOffers4k } from '../components/requestSheet';
+import { useOffers4k, useVideoRequestQuota } from '../components/requestSheet';
 import { useToast } from '../components/toast';
+import TvCollectionLinks from '../components/TvCollectionLinks';
+import TvEpisodeRequestSheet from '../components/TvEpisodeRequestSheet';
 import WatchlistButton from '../components/WatchlistButton';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
@@ -45,6 +54,13 @@ import { Icon } from '../icons';
 import { scrollBehavior } from '../motion';
 import { seasonList, seriesRequestSummary } from '../seriesRequestSummary';
 import { usePrefs } from '../settings';
+import { useTitleRegions } from '../streamingRegion';
+import { useLiveMediaProgress } from '../useLiveDownloadProgress';
+import {
+  isSharedVideoCopy,
+  isSharedVideoSeason,
+  videoPlaybackMedia,
+} from '../videoAvailability';
 import { AssociationLink } from './Associations';
 
 type SeasonState = 'have' | 'part' | 'asked' | 'none';
@@ -63,16 +79,41 @@ const live = (status?: number) => status === 1 || status === 2;
 export default function TvDetail() {
   const serverName = useMediaServerName();
   const { user } = useAuth();
+
   const { id } = useParams();
   const loc = useLocation();
   const { data: t, error, reload, refresh } = useApi<TvDetails>(`/tv/${id}`);
   const like = useApi<Paged<TitleResult>>(`/tv/${id}/recommendations`).data;
+  const progressMedia = useLiveMediaProgress(
+    t?.mediaInfo,
+    isAdministrator(user?.permissions)
+  );
   const pub = usePublicSettings();
+  const { ratingRegion, streamingProviders } = useTitleRegions(
+    t?.watchProviders,
+    !!t?.contentRatings?.results.length,
+    user?.id,
+    pub
+  );
   const { prefs } = usePrefs();
   const toast = useToast();
   const [sel, setSel] = useState<Set<number>>(new Set());
+  const quota = useVideoRequestQuota('tv');
   const [opts, setOpts] = useState<RequestOptions>({});
   const [busy, setBusy] = useState(false);
+  const episodeSubmission = useRef(false);
+  const [episodesOpen, setEpisodesOpen] = useState(false);
+  const [episodeError, setEpisodeError] = useState<string>();
+  const [episodeOverride, setEpisodeOverride] = useState<{
+    message: string;
+    confirm: () => Promise<void>;
+  }>();
+  const [streamingOverride, setStreamingOverride] = useState<{
+    seriesId: number;
+    seasons: number[] | 'all';
+    options: RequestOptions;
+    message: string;
+  }>();
   const [watchFailure, setWatchFailure] = useState<{
     selection: string;
     message: string;
@@ -125,14 +166,30 @@ export default function TvDetail() {
       );
     })
     .map((s) => s.seasonNumber);
+  const mode = pub?.otherUsersAvailability;
+  const coverage = t?.mediaInfo?.viewerRequestCoverage;
+  const sharedSeasons = new Set(
+    seasons
+      .filter(({ seasonNumber }) => {
+        const state = stat.get(seasonNumber);
+        return (
+          (state === 'have' || state === 'part') &&
+          isSharedVideoSeason(coverage, seasonNumber, !!is4k, mode)
+        );
+      })
+      .map(({ seasonNumber }) => seasonNumber)
+  );
   const have = seasons.filter(
-    (s) => stat.get(s.seasonNumber) === 'have'
+    ({ seasonNumber }) =>
+      !sharedSeasons.has(seasonNumber) && stat.get(seasonNumber) === 'have'
   ).length;
-  // some episodes on the server count too: there's something to watch
   const part = seasons.filter(
-    (s) => stat.get(s.seasonNumber) === 'part'
+    ({ seasonNumber }) =>
+      !sharedSeasons.has(seasonNumber) && stat.get(seasonNumber) === 'part'
   ).length;
   const watchable = have + part > 0;
+  // A series link opens the whole library entry, including any shared seasons.
+  const canPlay = watchable && sharedSeasons.size === 0;
   const asked = seasons.filter(
     (s) =>
       stat.get(s.seasonNumber) === 'asked' ||
@@ -169,6 +226,10 @@ export default function TvDetail() {
   if (!t) return <div className="detail-loading" aria-busy="true" />;
 
   const n = sel.size;
+  const requireApproval =
+    !!n &&
+    (quota.status?.restricted === true ||
+      (!!quota.status?.limit && n > (quota.status.remaining ?? 0)));
   const selectedSeasons = [...sel].sort((a, b) => a - b);
   const selectionKey = JSON.stringify([
     t.id,
@@ -198,21 +259,130 @@ export default function TvDetail() {
     });
   };
   const blocklisted = t.mediaInfo?.status === MediaStatus.BLOCKLISTED;
-  const request = async () => {
-    if (!n || blocklisted || busy) return;
+  const pendingEpisodes = new Map<number, Set<number>>();
+  const wholeRequests = new Set<number>();
+  for (const request of t.mediaInfo?.requests ?? []) {
+    if (!!request.is4k !== is4k || !live(request.status)) continue;
+    for (const season of request.seasons ?? []) {
+      if (!live(season.status ?? request.status)) continue;
+      if (season.episodeNumbers == null) wholeRequests.add(season.seasonNumber);
+      else {
+        const covered =
+          pendingEpisodes.get(season.seasonNumber) ?? new Set<number>();
+        season.episodeNumbers.forEach((episode) => covered.add(episode));
+        pendingEpisodes.set(season.seasonNumber, covered);
+      }
+    }
+  }
+  const episodeSeasons = seasons.filter(({ seasonNumber, episodeCount }) => {
+    const media = t.mediaInfo?.seasons?.find(
+      (item) => item.seasonNumber === seasonNumber
+    );
+    const status = is4k ? media?.status4k : media?.status;
+    return (
+      episodeCount > 0 &&
+      !wholeRequests.has(seasonNumber) &&
+      status !== MediaStatus.AVAILABLE &&
+      status !== MediaStatus.BLOCKLISTED &&
+      (status !== MediaStatus.PROCESSING || pendingEpisodes.has(seasonNumber))
+    );
+  });
+  const canPickEpisodes =
+    pub?.partialRequestsEnabled === true &&
+    !blocklisted &&
+    !(is4k && t.mediaInfo?.status4k === MediaStatus.BLOCKLISTED) &&
+    !!episodeSeasons.length &&
+    (is4k || canRequestSeries(user?.permissions));
+  const episodeApproval =
+    quota.status?.restricted === true ||
+    (!!quota.status?.limit && (quota.status.remaining ?? 0) < 1);
+  const submitEpisodes = async (
+    selection: SeasonRequestSelection,
+    options: RequestOptions & { seasonRequests: SeasonRequestSelection[] } = {
+      ...opts,
+      is4k,
+      seasonRequests: [selection],
+      requestQuotaApproval: episodeApproval || undefined,
+    }
+  ) => {
+    if (busy || episodeSubmission.current || !canPickEpisodes) return;
+    episodeSubmission.current = true;
+    setBusy(true);
+    setEpisodeError(undefined);
+    try {
+      const result = await requestSeries(
+        t.id,
+        [selection.seasonNumber],
+        options
+      );
+      toast(
+        result.quotaException
+          ? `Approval requested for ${t.name || 'this series'}`
+          : `Episodes requested for ${t.name || 'this series'}`
+      );
+      setEpisodesOpen(false);
+      refresh();
+      quota.refresh();
+    } catch (error) {
+      if (
+        !options.bypassStreamingRequestPolicy &&
+        error instanceof ApiError &&
+        error.code === 'STREAMING_REQUEST_POLICY_REJECTED' &&
+        error.allowOverride
+      ) {
+        setEpisodeOverride({
+          message: error.message,
+          confirm: () =>
+            submitEpisodes(selection, {
+              ...options,
+              bypassStreamingRequestPolicy: true,
+            }),
+        });
+      } else {
+        setEpisodeError(friendlyError(error, 'Could not request episodes'));
+      }
+      if (error instanceof ApiError && error.code === 'REQUEST_NOT_CONFIRMED')
+        refresh();
+    } finally {
+      episodeSubmission.current = false;
+      setBusy(false);
+    }
+  };
+  const submitSeasons = async (
+    requestedSeasons: number[] | 'all',
+    options: RequestOptions
+  ) => {
+    if (busy) return;
+    setStreamingOverride(undefined);
     setWatchFailure(undefined);
     setBusy(true);
     try {
-      const whole = !partialOk || n === seasons.length;
-      const result = await requestSeries(
-        t.id,
-        whole ? 'all' : selectedSeasons,
-        is4k ? { ...opts, is4k: true } : opts
+      const result = await requestSeries(t.id, requestedSeasons, options);
+      toast(
+        result.quotaException
+          ? `Approval requested for ${t.name || 'this series'}`
+          : seriesRequestSummary(
+              t.name || 'this series',
+              result,
+              !!options.is4k
+            )
       );
-      toast(seriesRequestSummary(t.name || 'this series', result, is4k));
       refresh();
+      quota.refresh();
     } catch (e) {
-      if (e instanceof ApiError && e.code === 'TV_SEASON_WATCH_GATE') {
+      if (
+        !options.bypassStreamingRequestPolicy &&
+        e instanceof ApiError &&
+        e.code === 'STREAMING_REQUEST_POLICY_REJECTED' &&
+        e.allowOverride
+      ) {
+        setStreamingOverride({
+          seriesId: t.id,
+          seasons: requestedSeasons,
+          options,
+          message: e.message,
+        });
+      } else if (e instanceof ApiError && e.code === 'TV_SEASON_WATCH_GATE') {
         setWatchFailure({
           selection: selectionKey,
           message: friendlyError(
@@ -226,10 +396,22 @@ export default function TvDetail() {
           ?.scrollIntoView({ behavior: scrollBehavior() });
       } else {
         toast(friendlyError(e, 'Request failed'));
+        if (e instanceof ApiError && e.code === 'REQUEST_NOT_CONFIRMED')
+          refresh();
       }
     } finally {
       setBusy(false);
     }
+  };
+
+  const request = () => {
+    if (!n || blocklisted) return;
+    const whole = !partialOk || n === seasons.length;
+    return submitSeasons(whole ? 'all' : selectedSeasons, {
+      ...opts,
+      ...(is4k ? { is4k: true } : {}),
+      requestQuotaApproval: requireApproval || undefined,
+    });
   };
 
   const today = localToday();
@@ -240,7 +422,7 @@ export default function TvDetail() {
       : '',
   ].filter(Boolean);
   const rating = t.contentRatings?.results.find(
-    (r) => r.iso_3166_1 === 'US'
+    (r) => r.iso_3166_1 === ratingRegion
   )?.rating;
   const statusLine = have
     ? `${have === seasons.length ? 'Every season' : `${have} of ${seasons.length} seasons`} on ${serverName}`
@@ -249,17 +431,34 @@ export default function TvDetail() {
       : '';
   // the series' own state, as the poster glyph says it (downloading x%, requested, ...)
   const mine = statusOf(
-    is4k && t.mediaInfo
+    is4k && progressMedia
       ? {
-          ...t.mediaInfo,
-          status: t.mediaInfo.status4k ?? 1,
+          ...progressMedia,
+          status: progressMedia.status4k ?? 1,
           status4k: undefined,
-          downloadStatus: t.mediaInfo.downloadStatus4k,
+          downloadStatus: progressMedia.downloadStatus4k,
         }
-      : t.mediaInfo,
+      : progressMedia,
     false,
     serverName
   );
+  const sharedAvailability =
+    sharedSeasons.size > 0 ||
+    (!watchable && isSharedVideoCopy(t.mediaInfo, !!is4k, mode));
+  const visibleStatus =
+    mine?.k === 'ok' && sharedAvailability
+      ? watchable
+        ? { ...mine, word: statusLine }
+        : mode === 'distinguish'
+          ? ({
+              k: 'wait',
+              word: 'Available to Other Users',
+              ico: 'user',
+            } as const)
+          : null
+      : mine;
+  const playbackMedia = videoPlaybackMedia(t.mediaInfo, mode);
+  const trailer = youtubeTrailerUrl(t.relatedVideos, pub?.youtubeUrl);
   const asks = (t.mediaInfo?.requests || []).filter(
     (r) => !!r.is4k === !!is4k && live(r.status)
   );
@@ -270,18 +469,18 @@ export default function TvDetail() {
   ) : missing.length ? (
     <button className="btn btn-primary" disabled={!n || busy} onClick={request}>
       <Icon name="plus" />
-      {label}
+      {requireApproval ? 'Request Approval' : label}
       {is4k ? ' in 4K' : ''}
     </button>
-  ) : watchable ? (
+  ) : canPlay ? (
     <a
       className="btn btn-primary"
-      {...mediaLink(t.mediaInfo, !!is4k, 'tv', serverName)}
+      {...mediaLink(playbackMedia, !!is4k, 'tv', serverName)}
     >
       <Icon name="play" />
       Watch on {serverName}
     </a>
-  ) : (
+  ) : sharedAvailability ? null : (
     <button className="btn btn-tonal" disabled>
       <Icon name={mine?.ico || 'clock'} />
       {mine?.word || 'Requested'}
@@ -290,18 +489,7 @@ export default function TvDetail() {
   return (
     <article className="detail">
       <DetailTop
-        status={statusOf(
-          is4k && t.mediaInfo
-            ? {
-                ...t.mediaInfo,
-                status: t.mediaInfo.status4k ?? 1,
-                status4k: undefined,
-                downloadStatus: t.mediaInfo.downloadStatus4k,
-              }
-            : t.mediaInfo,
-          false,
-          serverName
-        )}
+        status={visibleStatus}
         backdrop={tmdbImg(t.backdropPath, 'w1280')}
         poster={tmdbImg(t.posterPath)}
         title={t.name || ''}
@@ -326,6 +514,11 @@ export default function TvDetail() {
               {statusLine}
             </Pill>
           )}
+          {mode === 'distinguish' && sharedAvailability && (
+            <Pill k="wait" icon="user">
+              Available to Other Users
+            </Pill>
+          )}
           {asked > 0 && (
             <Pill k="wait" icon="clock">
               {asked === 1 ? '1 season' : asked + ' seasons'} requested
@@ -336,6 +529,13 @@ export default function TvDetail() {
               {t.voteAverage.toFixed(1)} / 10
             </Pill>
           )}
+          <LiveTvAirings
+            key={`live-tv:${t.id}`}
+            tmdbId={t.id}
+            mediaType="tv"
+            title={t.name}
+            original={t.originalName}
+          />
           <IndexerSearchLink category="tv" title={t.name} />
           <BlocklistButton
             mediaType="tv"
@@ -353,12 +553,14 @@ export default function TvDetail() {
           />
           <WatchlistButton key={t.id} mediaType="tv" detail={t} />
         </div>
+        <TvCollectionLinks key={t.id} id={t.id} />
         <div className="dacts pc">
           {main}
-          {watchable && missing.length > 0 && (
+          {trailer && <TrailerButton href={trailer} />}
+          {canPlay && missing.length > 0 && (
             <a
               className="btn btn-quiet"
-              {...mediaLink(t.mediaInfo, !!is4k, 'tv', serverName)}
+              {...mediaLink(playbackMedia, !!is4k, 'tv', serverName)}
             >
               <Icon name="play" />
               Watch on {serverName}
@@ -421,6 +623,7 @@ export default function TvDetail() {
           <AdvancedOptions
             key={is4k ? '4k' : 'hd'}
             kind="tv"
+            series={{ id: t.id, tvdbId: t.externalIds?.tvdbId ?? null }}
             is4k={is4k}
             onChange={onOpts}
           />
@@ -484,11 +687,45 @@ export default function TvDetail() {
                   </button>
                 </div>
               )}
+              {canPickEpisodes && (
+                <div className="toolbar">
+                  <button
+                    className="btn btn-tonal btn-sm"
+                    type="button"
+                    disabled={busy}
+                    onClick={() => {
+                      setEpisodeError(undefined);
+                      setEpisodeOverride(undefined);
+                      setEpisodesOpen(true);
+                    }}
+                  >
+                    Request Episodes
+                  </button>
+                </div>
+              )}
+              {episodesOpen && canPickEpisodes && (
+                <TvEpisodeRequestSheet
+                  key={String(is4k)}
+                  tvId={t.id}
+                  seasons={episodeSeasons}
+                  pending={pendingEpisodes}
+                  is4k={is4k}
+                  approval={episodeApproval}
+                  busy={busy}
+                  error={episodeError}
+                  streamingOverride={episodeOverride}
+                  close={() => {
+                    if (!busy) setEpisodesOpen(false);
+                  }}
+                  submit={submitEpisodes}
+                />
+              )}
               <div className="slist" role="group" aria-label="Seasons">
                 {seasons.map((s) => {
                   const st = stat.get(s.seasonNumber) || 'none';
                   const requested =
                     st === 'asked' || activeRequestSeasons.has(s.seasonNumber);
+                  const shared = sharedSeasons.has(s.seasonNumber);
                   const locked = st === 'have' || requested;
                   const on = locked || sel.has(s.seasonNumber);
                   const yr = s.airDate
@@ -527,26 +764,32 @@ export default function TvDetail() {
                           {s.episodeCount === 1 ? '' : 's'} · {yr}
                         </small>
                       </span>
-                      {st === 'have' && (
+                      {shared && mode === 'distinguish' && (
+                        <Pill k="wait" icon="user">
+                          Available to Other Users
+                        </Pill>
+                      )}
+                      {!shared && st === 'have' && (
                         <Pill k="ok" icon="check">
                           On {serverName}
                         </Pill>
                       )}
-                      {st === 'part' && !requested && (
+                      {!shared && st === 'part' && !requested && (
                         <Pill k="ok" icon="check">
                           Partly on {serverName}
                         </Pill>
                       )}
-                      {st === 'part' && requested && (
+                      {!shared && st === 'part' && requested && (
                         <Pill k="wait" icon="clock">
                           Partly on {serverName} · Requested
                         </Pill>
                       )}
-                      {requested && st !== 'have' && st !== 'part' && (
-                        <Pill k="wait" icon="clock">
-                          Requested
-                        </Pill>
-                      )}
+                      {requested &&
+                        (shared || (st !== 'have' && st !== 'part')) && (
+                          <Pill k="wait" icon="clock">
+                            Requested
+                          </Pill>
+                        )}
                     </div>
                   );
                 })}
@@ -557,6 +800,7 @@ export default function TvDetail() {
                 key={t.id}
                 tvId={t.id}
                 seasons={seasons}
+                coverage={coverage}
               />
             )}
             <CreditsDisclosure
@@ -576,10 +820,20 @@ export default function TvDetail() {
               media="tv"
               tags={t.keywords}
             />
+            {trailer && (
+              <div className="ph-only-row">
+                <TrailerButton href={trailer} />
+              </div>
+            )}
           </div>
           <aside>
             <Facts
               rows={[
+                ['Streaming Providers', streamingProviders],
+                [
+                  'Original Language',
+                  originalLanguageLink(t.originalLanguage, '/series'),
+                ],
                 [
                   'Production Countries',
                   productionCountryLinks(t.productionCountries, '/series'),
@@ -649,18 +903,33 @@ export default function TvDetail() {
         meta={statusLine || `${seasons.length} seasons`}
       >
         {/* phones only get this bar: keep a way to watch the seasons already there */}
-        {watchable && missing.length > 0 && (
+        {canPlay && missing.length > 0 && (
           <a
             className="icon-btn"
             aria-label={`Watch on ${serverName}`}
             title={`Watch on ${serverName}`}
-            {...mediaLink(t.mediaInfo, !!is4k, 'tv', serverName)}
+            {...mediaLink(playbackMedia, !!is4k, 'tv', serverName)}
           >
             <Icon name="play" />
           </a>
         )}
         {main}
       </ActionBar>
+      {streamingOverride?.seriesId === t.id && (
+        <ConfirmSheet
+          title="Streaming Request Policy"
+          body={streamingOverride.message}
+          confirm="Request Anyway"
+          cancel="Cancel"
+          onClose={() => setStreamingOverride(undefined)}
+          onConfirm={() =>
+            submitSeasons(streamingOverride.seasons, {
+              ...streamingOverride.options,
+              bypassStreamingRequestPolicy: true,
+            })
+          }
+        />
+      )}
     </article>
   );
 }

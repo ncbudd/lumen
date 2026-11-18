@@ -89,7 +89,7 @@ test('Request 4K Series without request management can pick 4K on the series pag
   await page.goto('/tv/84773');
   const quality = page.getByRole('group', { name: 'Quality' });
   await expect(quality).toBeVisible();
-  await expect(page.getByText('Advanced (admins)')).toHaveCount(0);
+  await expect(page.getByText('Advanced Request Options')).toHaveCount(0);
   await quality.getByRole('button', { name: '4K' }).click();
   await expect(quality.getByRole('button', { name: '4K' })).toHaveAttribute(
     'aria-pressed',
@@ -543,6 +543,49 @@ const comicPub = {
   enabledMediaCategories: { comic: true },
 };
 
+test('Kavita links require a series route', async ({ page }, info) => {
+  await fixtures(page, {
+    pub: comicPub,
+    handle: (path) => {
+      if (path.startsWith('/comic/work/') && !path.endsWith('/issues')) {
+        const valid = path === '/comic/work/al-1';
+        const mediaInfo = {
+          ...owned,
+          readerUrl: valid
+            ? 'https://manga.example.com/kavita/library/2/series/41'
+            : 'https://manga.example.com/settings',
+        };
+        return {
+          json: work({
+            mediaInfo,
+            editions: [ed('11', 'English', { recommended: true, mediaInfo })],
+          }),
+        };
+      }
+      if (path.endsWith('/issues')) return { json: paged([]) };
+    },
+  });
+  const read = page
+    .getByRole('link', { name: 'Read in Kavita' })
+    .filter({ visible: true });
+  await page.goto('/comic/al-1');
+  await expect(read).toHaveAttribute(
+    'href',
+    'https://manga.example.com/kavita/library/2/series/41'
+  );
+  await page.screenshot({
+    path: info.outputPath('kavita-series-link.png'),
+    animations: 'disabled',
+  });
+  await page.goto('/comic/al-2');
+  await expect(page.getByRole('heading', { name: 'Blade Saga' })).toBeVisible();
+  await expect(read).toHaveCount(0);
+  await page.screenshot({
+    path: info.outputPath('kavita-nonseries-link.png'),
+    animations: 'disabled',
+  });
+});
+
 test('an edition not in the library shows its own state, not the owned one', async ({
   page,
 }) => {
@@ -569,6 +612,65 @@ test('an edition not in the library shows its own state, not the owned one', asy
       .getByRole('button', { name: 'Request · Pub 12, French' })
       .filter({ visible: true })
   ).toBeVisible();
+});
+
+test('comic download progress combines percentage and byte-based queue items', async ({
+  page,
+}, info) => {
+  await page.clock.install();
+  let reads = 0;
+  let failing = false;
+  let media = {
+    ...owned,
+    downloadStatus: [{ percent: 80 }, { size: 100, sizeLeft: 60 }],
+  };
+  await fixtures(page, {
+    pub: comicPub,
+    handle: (path) => {
+      if (path === '/comic/work/al-1') {
+        reads++;
+        if (failing) return { status: 500, json: { message: 'Offline' } };
+        return {
+          json: work({
+            mediaInfo: media,
+            editions: [ed('11', 'English', { mediaInfo: media })],
+          }),
+        };
+      }
+      if (path.endsWith('/issues')) return { json: paged([]) };
+      if (path.startsWith('/comic/')) return { json: {} };
+    },
+  });
+  await page.goto('/comic/al-1');
+  await expect(page.locator('.dstatus')).toContainText('Downloading');
+  await page.screenshot({
+    path: info.outputPath('comic-progress.png'),
+    fullPage: true,
+  });
+  await expect(page.locator('.dstatus')).toContainText('Downloading 60%');
+  await expect(
+    page.getByRole('progressbar', { name: 'Download progress' })
+  ).toHaveAttribute('aria-valuenow', '60');
+  failing = true;
+  await page.clock.fastForward(60_000);
+  await expect.poll(() => reads).toBe(2);
+  await expect(page.locator('.dstatus')).toContainText('Downloading 60%');
+  failing = false;
+  media = {
+    ...media,
+    downloadStatus: [{ percent: 100 }, { size: 100, sizeLeft: 40 }],
+  };
+  await page.clock.fastForward(60_000);
+  await expect(page.locator('.dstatus')).toContainText('Downloading 80%');
+  await page.screenshot({
+    path: info.outputPath('comic-progress-updated.png'),
+    fullPage: true,
+  });
+  media = { ...media, status: 5, downloadStatus: [] };
+  await page.clock.fastForward(60_000);
+  await expect(page.locator('.dstatus')).toContainText('Complete');
+  await page.clock.fastForward(120_000);
+  expect(reads).toBe(4);
 });
 
 test('comic pages that fail offer Retry, volumes included', async ({
@@ -807,4 +909,84 @@ test('the magazine search box follows ?q= on Back and Forward', async ({
   await expect(box).toHaveValue('news');
   await page.goBack();
   await expect(box).toHaveValue('time');
+});
+
+test('comic reader shelves preview the selected edition and require empty shelf consent', async ({
+  page,
+}, info) => {
+  const path = '/settings/reader-delivery';
+  const posts = await fixtures(page, {
+    pub: comicPub,
+    handle: (url) => {
+      if (url === '/comic/work/al-1') return { json: work() };
+      if (url === path)
+        return {
+          json: {
+            preferredProvider: 'grimmory',
+            bookorbitUrl: 'https://reader.example.test',
+          },
+        };
+      if (url === path + '/groupings/preview')
+        return {
+          json: {
+            matchedCount: 0,
+            ruleSummary: 'Series match',
+            sampleTitles: [],
+          },
+        };
+      if (url === path + '/groupings')
+        return {
+          json: posts.some((post) => post.path === url)
+            ? {
+                grouping: {
+                  serviceUrl: 'https://reader.example.test',
+                  countVerified: true,
+                  lastMatchCount: 0,
+                },
+              }
+            : [],
+        };
+      if (url.endsWith('/issues')) return { json: paged([]) };
+      if (url.startsWith('/comic/')) return { json: {} };
+    },
+  });
+  await page.goto('/comic/al-1');
+  await page.getByRole('radio', { name: /French/ }).click();
+  await page.getByRole('button', { name: 'Manage Reader Shelf' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Reader Shelf' });
+  await expect(dialog.getByLabel('Reader Service')).toHaveValue('bookorbit');
+  await dialog.getByLabel('Sync to Kobo').check();
+  await dialog.getByRole('button', { name: 'Preview Matches' }).click();
+  await expect(dialog.getByText('0 current matches')).toBeVisible();
+  const create = dialog.getByRole('button', {
+    name: 'Create Shelf',
+    exact: true,
+  });
+  await expect(create).toBeDisabled();
+  await dialog.getByLabel('Create an Empty Shelf for Future Matches').check();
+  await page.screenshot({ path: info.outputPath('reader-shelf.png') });
+  await create.click();
+  await expect(dialog.getByText('Reader shelf saved')).toBeVisible();
+  await expect(
+    dialog.getByRole('link', { name: 'Open BookOrbit' })
+  ).toHaveAttribute('href', 'https://reader.example.test/');
+  expect(posts).toEqual([
+    {
+      path: path + '/groupings/preview',
+      body: {
+        provider: 'bookorbit',
+        target: { id: '12', name: 'Blade Saga', type: 'comic-series' },
+      },
+    },
+    {
+      path: path + '/groupings',
+      body: {
+        provider: 'bookorbit',
+        target: { id: '12', name: 'Blade Saga', type: 'comic-series' },
+        isPublic: true,
+        allowEmpty: true,
+        syncToKobo: true,
+      },
+    },
+  ]);
 });

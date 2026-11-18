@@ -7,6 +7,7 @@ import {
   type TvDetails,
 } from '../api';
 import { friendlyError } from '../errors';
+import { usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
 import { AdvancedOptions } from './detail';
 import { useBackCloses } from './requestSheet';
@@ -40,11 +41,24 @@ export function RequestEditSheet({
   useDialog(box, onClose);
   const tv = r.type === 'tv';
   const waiting = r.status === 1;
+  const specialsEnabled = usePublicSettings()?.enableSpecialEpisodes === true;
+  const [existingSeasons] = useState(
+    () =>
+      new Map(
+        r.seasons
+          .filter((season) => season.status !== 3)
+          .map((season) => [season.seasonNumber, season])
+      )
+  );
   const d = r as RequestItem & Destination;
   const [initial] = useState<RequestOptions>(() => ({
     serverId: d.serverId ?? undefined,
     profileId: d.profileId ?? undefined,
     rootFolder: d.rootFolder ?? undefined,
+    languageProfileId: r.languageProfileId ?? undefined,
+    metadataLanguageId: r.metadataLanguageId ?? undefined,
+    tags: r.tags,
+    sonarrSeasonType: r.sonarrSeasonType,
     userId: r.requestedBy?.id,
   }));
   const [opts, setOpts] = useState<RequestOptions>({});
@@ -56,22 +70,17 @@ export function RequestEditSheet({
   const [seasons, setSeasons] = useState<
     { seasonNumber: number; name?: string; episodeCount?: number }[] | null
   >(null);
-  const [picked, setPicked] = useState(
-    () => new Set(r.seasons.map((s) => s.seasonNumber))
-  );
+  const [tvdbId, setTvdbId] = useState<number | null>(null);
+  const [picked, setPicked] = useState(() => new Set(existingSeasons.keys()));
   useEffect(() => {
     if (!tv) return;
     let live = true;
     api<TvDetails>(`/tv/${r.media.tmdbId}`)
-      .then(
-        (t) =>
-          live &&
-          setSeasons(
-            (t.seasons || []).filter(
-              (s) => s.seasonNumber > 0 && (s.episodeCount ?? 1) > 0
-            )
-          )
-      )
+      .then((t) => {
+        if (!live) return;
+        setTvdbId(t.externalIds?.tvdbId ?? null);
+        setSeasons((t.seasons || []).filter((s) => (s.episodeCount ?? 1) > 0));
+      })
       .catch(() => live && setSeasons([]));
     return () => {
       live = false;
@@ -87,6 +96,12 @@ export function RequestEditSheet({
 
   const go = async (then?: 'approve' | 'retry') => {
     if (busy || !ready || (tv && !picked.size)) return;
+    const selectedSeasons = [...picked].sort((a, b) => a - b);
+    const seasonRequests = selectedSeasons.map((seasonNumber) => ({
+      seasonNumber,
+      episodeNumbers:
+        existingSeasons.get(seasonNumber)?.episodeNumbers ?? undefined,
+    }));
     setBusy(true);
     setErr('');
     try {
@@ -96,7 +111,16 @@ export function RequestEditSheet({
           mediaType: r.type,
           is4k: r.is4k,
           ...opts,
-          ...(tv ? { seasons: [...picked].sort((a, b) => a - b) } : {}),
+          ...(tv
+            ? {
+                seasons: selectedSeasons,
+                seasonRequests: seasonRequests.some(
+                  ({ episodeNumbers }) => episodeNumbers?.length
+                )
+                  ? seasonRequests
+                  : undefined,
+              }
+            : {}),
         }),
       });
       if (then)
@@ -143,6 +167,7 @@ export function RequestEditSheet({
           </div>
           <AdvancedOptions
             kind={tv ? 'tv' : 'movie'}
+            series={tv ? { id: r.media.tmdbId, tvdbId } : undefined}
             is4k={r.is4k}
             onChange={onOpts}
             inline
@@ -152,38 +177,54 @@ export function RequestEditSheet({
           {tv && (
             <div className="slist" role="group" aria-label="Seasons">
               {!seasons && <p className="note">Loading seasons…</p>}
-              {seasons?.map((s) => {
-                const on = picked.has(s.seasonNumber);
-                return (
-                  <div
-                    key={s.seasonNumber}
-                    className="srow"
-                    role="checkbox"
-                    aria-checked={on}
-                    tabIndex={0}
-                    onClick={() => toggle(s.seasonNumber)}
-                    onKeyDown={(e) => {
-                      if (e.key === ' ' || e.key === 'Enter') {
-                        e.preventDefault();
-                        toggle(s.seasonNumber);
-                      }
-                    }}
-                  >
-                    <span className="cbx">
-                      <Icon name="check" />
-                    </span>
-                    <span>
-                      <b>{s.name || `Season ${s.seasonNumber}`}</b>
-                      {!!s.episodeCount && (
-                        <small>
-                          {s.episodeCount} episode
-                          {s.episodeCount === 1 ? '' : 's'}
-                        </small>
-                      )}
-                    </span>
-                  </div>
-                );
-              })}
+              {seasons
+                ?.filter(
+                  ({ seasonNumber }) =>
+                    seasonNumber > 0 ||
+                    (seasonNumber === 0 &&
+                      (specialsEnabled || existingSeasons.has(0)))
+                )
+                .map((s) => {
+                  const on = picked.has(s.seasonNumber);
+                  const requestedEpisodes = existingSeasons.get(s.seasonNumber)
+                    ?.episodeNumbers?.length;
+                  return (
+                    <div
+                      key={s.seasonNumber}
+                      className="srow"
+                      role="checkbox"
+                      aria-checked={on}
+                      tabIndex={0}
+                      onClick={() => toggle(s.seasonNumber)}
+                      onKeyDown={(e) => {
+                        if (e.key === ' ' || e.key === 'Enter') {
+                          e.preventDefault();
+                          toggle(s.seasonNumber);
+                        }
+                      }}
+                    >
+                      <span className="cbx">
+                        <Icon name="check" />
+                      </span>
+                      <span>
+                        <b>{s.name || `Season ${s.seasonNumber}`}</b>
+                        {on && requestedEpisodes ? (
+                          <small>
+                            {requestedEpisodes} requested{' '}
+                            {requestedEpisodes === 1 ? 'episode' : 'episodes'}
+                          </small>
+                        ) : (
+                          !!s.episodeCount && (
+                            <small>
+                              {s.episodeCount} episode
+                              {s.episodeCount === 1 ? '' : 's'}
+                            </small>
+                          )
+                        )}
+                      </span>
+                    </div>
+                  );
+                })}
             </div>
           )}
           {err && (

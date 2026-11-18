@@ -5,6 +5,7 @@ import {
   ApiError,
   artUrl,
   bookArt,
+  bookDetailPath,
   bookMediaForFormat,
   cancelRequest,
   mediaLink,
@@ -16,11 +17,11 @@ import {
   type TvDetails,
 } from '../api';
 import { forget } from '../apiCache';
-import { useAuth, useMediaServerName } from '../auth';
+import { isAdministrator, useAuth, useMediaServerName } from '../auth';
 import { Cover, shortDate } from '../components/cards';
 import { ConfirmSheet } from '../components/ConfirmSheet';
 import {
-  canChooseRequestOptions,
+  canManageRequests,
   canViewAllRequests,
   Pill,
 } from '../components/detail';
@@ -35,6 +36,7 @@ import { useToast } from '../components/toast';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
 import {
+  adultScenePath,
   GAME_LABEL,
   patchHref,
   useExtras,
@@ -47,12 +49,18 @@ import {
 } from '../extras';
 import { useApi, usePullToRefresh } from '../hooks';
 import { Icon, type IconName } from '../icons';
+import type { LiveDownload } from '../liveDownloadStore';
 import { canRetryRequest, requestFailureMessage } from '../requestRetry';
 import {
   onSessionReset,
   sessionGeneration,
   sessionUserId,
 } from '../sessionState';
+import {
+  applyLiveDownloadProgress,
+  downloadSubscriptionId,
+  useLiveDownloadProgress,
+} from '../useLiveDownloadProgress';
 
 // the glyph on a drawn cover when a request has no artwork
 const coverIcon = (type: string, format?: string): IconName =>
@@ -276,9 +284,21 @@ function otherEditionInLibrary(r: RequestItem): boolean {
       : ebook;
 }
 
+function requestDownloads(r: RequestItem) {
+  return (
+    (r.is4k
+      ? r.media.downloadStatus4k
+      : r.bookFormat === 'audiobook'
+        ? r.media.audiobookDownloadStatus
+        : r.media.downloadStatus) ?? []
+  );
+}
+
 function state(
   x: Row,
-  serverName = 'Plex'
+  serverName = 'Plex',
+  live?: ReadonlyMap<string, LiveDownload>,
+  allowRawHashes = false
 ): {
   k: 'ok' | 'dl' | 'wait' | 'bad';
   word: string;
@@ -289,6 +309,19 @@ function state(
 } {
   const r = x.r;
   const current = r.currentStatus;
+  const scheduled = requestDownloads(r);
+  const dls = live?.size
+    ? scheduled.map((download) =>
+        applyLiveDownloadProgress(download, live, allowRawHashes)
+      )
+    : scheduled;
+  const downloading = dls.length;
+  const size = dls.reduce((a, d) => a + (d.size || 0), 0);
+  const left = dls.reduce((a, d) => a + (d.sizeLeft || 0), 0);
+  const pct = size
+    ? Math.max(0, Math.min(100, Math.round((1 - left / size) * 100)))
+    : undefined;
+
   // a comic or manga series with part of it in the library and nothing downloading
   if (
     r.type === 'comic' &&
@@ -335,24 +368,27 @@ function state(
       case 'searching':
         return { ...base, k: 'wait', word: 'Searching', ico: 'clock' };
       case 'downloading': {
-        const pct =
-          typeof current.percent === 'number' &&
-          Number.isFinite(current.percent) &&
-          current.percent >= 0 &&
-          current.percent <= 100
+        const displayedPct = dls.some(
+          (item, index) => item !== scheduled[index]
+        )
+          ? pct
+          : typeof current.percent === 'number' &&
+              Number.isFinite(current.percent) &&
+              current.percent >= 0 &&
+              current.percent <= 100
             ? Math.round(current.percent)
             : undefined;
         return {
           ...base,
           k: 'dl',
           word:
-            pct === 0
+            displayedPct === 0
               ? 'Queued'
-              : pct === undefined
+              : displayedPct === undefined
                 ? 'Downloading'
-                : `Downloading ${pct}%`,
+                : `Downloading ${displayedPct}%`,
           ico: 'down',
-          pct,
+          pct: displayedPct,
         };
       }
       case 'importing':
@@ -405,18 +441,6 @@ function state(
       : r.is4k
         ? r.media.status4k
         : r.media.status;
-  const dls =
-    (r.is4k
-      ? r.media.downloadStatus4k
-      : r.bookFormat === 'audiobook'
-        ? r.media.audiobookDownloadStatus
-        : r.media.downloadStatus) || [];
-  const downloading = dls.length;
-  const size = dls.reduce((a, d) => a + (d.size || 0), 0);
-  const left = dls.reduce((a, d) => a + (d.sizeLeft || 0), 0);
-  const pct = size
-    ? Math.max(0, Math.min(100, Math.round((1 - left / size) * 100)))
-    : undefined;
   if (ms === MediaStatus.AVAILABLE)
     return {
       k: 'ok',
@@ -487,12 +511,7 @@ function state(
 // download client's queue "downloading", so this is what tells a running download from a
 // queued one.
 function progress(r: RequestItem) {
-  const dls =
-    (r.is4k
-      ? r.media.downloadStatus4k
-      : r.bookFormat === 'audiobook'
-        ? r.media.audiobookDownloadStatus
-        : r.media.downloadStatus) || [];
+  const dls = requestDownloads(r);
   const size = dls.reduce((a, d) => a + (d.size || 0), 0);
   const left = dls.reduce((a, d) => a + (d.sizeLeft || 0), 0);
   return size ? 1 - left / size : 0;
@@ -586,21 +605,38 @@ const saveDescribed = () => {
 };
 // lookups that failed for a passing reason (rate limit, outage): not kept, tried again next visit
 const retryLater = new Set<number>();
+function cachedRow(r: RequestItem, known: Omit<Row, 'r'>): Row {
+  return {
+    ...known,
+    r,
+    href:
+      r.type === 'book'
+        ? requestBookPath(r, known.title === 'Book' ? undefined : known.title)
+        : known.href,
+  };
+}
+
 async function describe(r: RequestItem): Promise<Row> {
   const generation = sessionGeneration();
   const known = described.get(r.id);
   // series kept before seasons were remembered get looked up once more
-  if (known && isDescribed(r)) return { ...known, r };
+  if (known && isDescribed(r)) return cachedRow(r, known);
   const row = await describeOnce(r);
   if (generation !== sessionGeneration()) return row;
   const { r: _ignored, ...rest } = row;
   void _ignored;
   if (!retryLater.delete(r.id)) described.set(r.id, rest);
-  else if (known) return { ...known, r }; // keep the old name until a lookup works
+  else if (known && (r.type !== 'adult' || known.href === row.href))
+    return cachedRow(r, known); // keep the old name until a lookup works
   return row;
 }
 const isDescribed = (r: RequestItem) =>
-  !!described.get(r.id) && (r.type !== 'tv' || !!described.get(r.id)?.unaired);
+  !!described.get(r.id) &&
+  (r.type !== 'tv' || !!described.get(r.id)?.unaired) &&
+  (r.type !== 'adult' ||
+    r.serverId == null ||
+    described.get(r.id)?.href ===
+      adultScenePath(idOf(r, 'stashdb') || '', r.serverId));
 // SeerrNG rate-limits bursts (and book lookups to 30 a minute), so look a few up at a time and
 // at most 12 new books per visit; the rest show a plain label now and get named next time.
 const BOOK_LOOKUPS_PER_VISIT = 12; // an ebook can take 2 calls (plain id, then the Hardcover form)
@@ -627,7 +663,7 @@ let limited = false;
 // A slow lookup (a title SeerrNG has to fetch, a book while the metadata service is busy) shouldn't
 // hold back the whole list: `partial` gets the rows at once, with names already known or a plain
 // label, and again as lookups finish. Other categories join as their names arrive.
-async function describeAll(
+export async function describeAll(
   list: RequestItem[],
   partial?: (rows: Row[]) => void
 ): Promise<Row[]> {
@@ -640,7 +676,7 @@ async function describeAll(
   limited = false;
   const first = list.map((r): Row | null =>
     described.has(r.id)
-      ? { ...described.get(r.id)!, r }
+      ? cachedRow(r, described.get(r.id)!)
       : r.type === 'book'
         ? bookPlaceholder(r)
         : r.type === 'movie' || r.type === 'tv'
@@ -690,6 +726,13 @@ const bookId = (r: RequestItem) =>
   r.media.identifiers?.find((i) => i.provider === 'bookshelf')?.value ||
   r.media.identifiers?.[0]?.value ||
   '';
+function requestBookPath(r: RequestItem, title?: string) {
+  return bookDetailPath(
+    bookId(r),
+    r.bookFormat === 'audiobook' ? 'audiobook' : 'ebook',
+    title
+  );
+}
 function titlePlaceholder(r: RequestItem): Row {
   const kind = r.type === 'tv' ? 'tv' : 'movie';
   return {
@@ -700,13 +743,12 @@ function titlePlaceholder(r: RequestItem): Row {
   };
 }
 function bookPlaceholder(r: RequestItem): Row {
-  const id = bookId(r);
   const audio = r.bookFormat === 'audiobook';
   return {
     r,
     title: 'Book',
     cover: true,
-    href: `/book/${encodeURIComponent(id)}${audio ? '?f=audio' : ''}`,
+    href: requestBookPath(r),
     sub: audio ? 'Audiobook' : 'Ebook',
   };
 }
@@ -741,7 +783,7 @@ async function describeOnce(r: RequestItem): Promise<Row> {
       title: b?.title || 'Book',
       art: bookArt(b?.posterPath),
       cover: true,
-      href: `/book/${encodeURIComponent(id)}${audio ? '?f=audio' : ''}`,
+      href: requestBookPath(r, b?.title),
       sub: audio ? 'Audiobook' : 'Ebook',
     };
   }
@@ -839,12 +881,13 @@ async function describeExtra(r: RequestItem): Promise<Row | null> {
   }
   if (r.type === 'adult') {
     const id = idOf(r, 'stashdb') || '';
-    const x = id ? await get<Scene>(`/adult/${encodeURIComponent(id)}`) : null;
+    const href = adultScenePath(id, r.serverId);
+    const x = id ? await get<Scene>(href) : null;
     return {
       r,
       title: x?.title || 'Scene',
       art: x?.posterPath,
-      href: `/adult/${encodeURIComponent(id)}`,
+      href: r.serverId == null ? adultScenePath(id, x?.serviceId) : href,
       sub: ['Adult', x?.studio].filter(Boolean).join(' · '),
     };
   }
@@ -988,7 +1031,7 @@ function RequesterFilter({
         </button>
       )}
       {!!data &&
-        data.pageInfo.page === page + 1 &&
+        data.pageInfo?.page === page + 1 &&
         data.pageInfo.pages > page + 1 && (
           <button
             className="btn btn-quiet btn-sm"
@@ -1006,7 +1049,7 @@ function RequesterFilter({
   );
 }
 
-async function householdSoftwareRequests(
+async function loadSoftwareRequests(
   pages: number,
   category: string,
   status: string,
@@ -1033,11 +1076,59 @@ async function householdSoftwareRequests(
   return { rows, more };
 }
 
+function normalizeClassicRequestFilters(params: URLSearchParams) {
+  const next = new URLSearchParams(params);
+  for (const [classic, lumen] of [
+    ['filter', 'show'],
+    ['userId', 'requestedBy'],
+  ]) {
+    const value = next.get(classic);
+    if (value && !next.has(lumen) && next.getAll(classic).length === 1)
+      next.set(lumen, value);
+    next.delete(classic);
+  }
+  const type = next.get('mediaType');
+  if (type === 'audiobook') {
+    next.set('mediaType', 'book');
+    const format = next.get('bookFormat');
+    if (format !== 'ebook' && format !== 'audiobook')
+      next.set('bookFormat', 'audiobook');
+  }
+  if (type === 'game' || type === 'retro' || type === 'modern') {
+    const status = next.get('show');
+    if (
+      status &&
+      !next.has('softwareStatus') &&
+      SOFTWARE_STATUSES.some(([value]) => value === status)
+    ) {
+      next.set('softwareStatus', status);
+    }
+    next.set('show', 'software');
+    if (!SOFTWARE_CATEGORIES.some(([value]) => value === next.get('category')))
+      next.set('category', type);
+    next.delete('mediaType');
+  }
+
+  const sort = next.get('sort');
+  const direction = next.get('sortDirection');
+  if (!next.has('order') && (direction === 'asc' || direction === 'desc')) {
+    if (sort === 'added')
+      next.set('order', direction === 'asc' ? 'oldest' : 'newest');
+    if (sort === 'modified' && direction === 'desc')
+      next.set('order', 'updated');
+    if (sort === 'title') next.set('order', `title-${direction}`);
+  }
+  next.delete('sort');
+  next.delete('sortDirection');
+  return next;
+}
+
 export default function Requests() {
   const serverName = useMediaServerName();
   const { user } = useAuth();
   const toast = useToast();
-  const [p, setP] = useSearchParams();
+  const [params, setP] = useSearchParams();
+  const p = normalizeClassicRequestFilters(params);
   const requestKey = p.has('softwareRequestId')
     ? 'softwareRequestId'
     : 'requestId';
@@ -1076,7 +1167,7 @@ export default function Requests() {
     setTick((t) => t + 1);
   });
   const extras = useExtras();
-  const manage = canChooseRequestOptions(user?.permissions);
+  const manage = canManageRequests(user?.permissions);
   const everyone = viewAll && tab === 'everyone';
   const [others, setOthers] = useState<Row[] | null>(null);
   const [othersError, setOthersError] = useState(false);
@@ -1101,6 +1192,12 @@ export default function Requests() {
       ? requesterParam
       : 'all';
   const requesterQuery = requester === 'all' ? '' : `&requestedBy=${requester}`;
+  const ownSoftware =
+    !everyone && (tab === 'software' || (!requestedTab && show === 'software'));
+  const browseRequests = everyone || ownSoftware;
+  const softwareView = ownSoftware || (everyone && show === 'software');
+  const softwareRequester = ownSoftware ? String(user?.id ?? '') : requester;
+
   const permissions = user?.permissions ?? 0;
   const canViewAdult =
     manage ||
@@ -1160,7 +1257,8 @@ export default function Requests() {
     setOthers(null);
   }, [
     show,
-    everyone,
+    browseRequests,
+    softwareRequester,
     softwareCategory,
     softwareStatus,
     requester,
@@ -1208,7 +1306,7 @@ export default function Requests() {
   }, [viewAll, tick]);
 
   useEffect(() => {
-    if (!everyone) return;
+    if (!browseRequests || !softwareRequester) return;
     let live = true;
     setOthersError(false);
     // the newest `take` requests of one filter, in SeerrNG's pages of up to 100
@@ -1237,12 +1335,12 @@ export default function Requests() {
     // All: waiting for approval, then downloads that have started (furthest along first), then
     // the newest of the rest. Downloading: started ones first too. Others: newest first.
     const load = async () => {
-      if (show === 'software')
-        return householdSoftwareRequests(
+      if (softwareView)
+        return loadSoftwareRequests(
           pages,
           softwareCategory,
           softwareStatus,
-          requester
+          softwareRequester
         );
       const started =
         priorityOrder && (show === 'all' || show === 'processing')
@@ -1287,7 +1385,9 @@ export default function Requests() {
       live = false;
     };
   }, [
-    everyone,
+    browseRequests,
+    softwareView,
+    softwareRequester,
     show,
     pages,
     tick,
@@ -1300,7 +1400,7 @@ export default function Requests() {
   ]);
 
   useEffect(() => {
-    if (!user || everyone) return;
+    if (!user || browseRequests) return;
     let live = true;
     setOwnError(false);
     loads.current++;
@@ -1343,25 +1443,37 @@ export default function Requests() {
     return () => {
       live = false;
     };
-  }, [user, everyone, tick, extras.games.length]);
+  }, [user, browseRequests, tick, extras.games.length]);
 
   const all = rows || [];
   const act = all.filter((x) => state(x, serverName).active);
   const ready = all.filter(
     (x) => state(x, serverName).k === 'ok' && !state(x, serverName).active
   );
-  const list = everyone
-    ? (others || []).filter((row) =>
-        show === 'available'
-          ? state(row, serverName).k === 'ok' && !state(row, serverName).active
-          : show !== 'processing' || state(row, serverName).active
+  const list = ownSoftware
+    ? others || []
+    : everyone
+      ? (others || []).filter((row) =>
+          show === 'available'
+            ? state(row, serverName).k === 'ok' &&
+              !state(row, serverName).active
+            : show !== 'processing' || state(row, serverName).active
+        )
+      : tab === 'ready'
+        ? ready
+        : tab === 'all'
+          ? all
+          : act;
+  const allowRawHashes = isAdministrator(user?.permissions);
+  const liveDownloads = useLiveDownloadProgress(
+    list.flatMap(({ r }) =>
+      requestDownloads(r).map((download) =>
+        downloadSubscriptionId(download, allowRawHashes)
       )
-    : tab === 'ready'
-      ? ready
-      : tab === 'all'
-        ? all
-        : act;
-  const shown = everyone ? others : rows;
+    )
+  );
+
+  const shown = browseRequests ? others : rows;
 
   // keep download percentages moving while anything shown is downloading
   const busy = list.some((x) => state(x, serverName).pct != null);
@@ -1391,7 +1503,7 @@ export default function Requests() {
   useEffect(() => {
     // a full load still on its way would land over the poll's newer numbers: skip this one
     if (!poll || !user || loads.current) return;
-    if (everyone && (show === 'software' || sortMode === 'updated')) {
+    if (softwareView || (everyone && sortMode === 'updated')) {
       setTick((n) => n + 1);
       return;
     }
@@ -1486,7 +1598,8 @@ export default function Requests() {
       toast('Request cancelled');
       if (requestKey === 'requestId' && focusedId === id) closeHistory();
       // gone now, not after the list has refreshed
-      setRows((list) => list && list.filter((x) => x.r.id !== id));
+      const updateRows = ownSoftware ? setOthers : setRows;
+      updateRows((list) => list && list.filter((x) => x.r.id !== id));
       setTick((t) => t + 1);
     } catch (e) {
       toast(friendlyError(e, 'Couldn’t cancel'));
@@ -1497,7 +1610,7 @@ export default function Requests() {
   };
 
   const renderRequestActions = (x: Row, moderate: boolean) => {
-    const st = state(x, serverName);
+    const st = state(x, serverName, liveDownloads, allowRawHashes);
     return (
       <>
         {canEditEpisodeQueue(x.r, user?.permissions) && (
@@ -1609,19 +1722,24 @@ export default function Requests() {
         <div className="ph-row">
           <div>
             <h1>Requests</h1>
+            <Link className="chip" to="/book-series/requests">
+              Book Series Requests
+            </Link>
           </div>
           <Avatar className="avatar ph-only-avatar" />
         </div>
         <p className="sub">
-          {everyone
-            ? show === 'software'
-              ? 'Software and game requests from everyone, newest first.'
-              : !priorityOrder
-                ? 'Everyone’s requests in the selected order.'
-                : show === 'all'
-                  ? 'Everyone’s requests: waiting ones first, then downloads, then the newest.'
-                  : 'Everyone’s requests, newest first.'
-            : 'Everything you’ve asked for, newest first.'}
+          {ownSoftware
+            ? 'Your software and game requests, newest first.'
+            : everyone
+              ? show === 'software'
+                ? 'Software and game requests from everyone, newest first.'
+                : !priorityOrder
+                  ? 'Everyone’s requests in the selected order.'
+                  : show === 'all'
+                    ? 'Everyone’s requests: waiting ones first, then downloads, then the newest.'
+                    : 'Everyone’s requests, newest first.'
+              : 'Everything you’ve asked for, newest first.'}
         </p>
       </header>
       {/* pull-to-refresh pill: fixed, so it never shifts the page layout */}
@@ -1649,7 +1767,7 @@ export default function Requests() {
         ].map(([v, t, n]) => (
           <button
             key={v as string}
-            aria-pressed={tab === v}
+            aria-pressed={!ownSoftware && tab === v}
             onClick={() =>
               setP(v === defaultTab ? {} : { tab: v as string }, {
                 replace: true,
@@ -1663,12 +1781,25 @@ export default function Requests() {
           </button>
         ))}
       </div>
-      {!shown && !(everyone ? othersError : ownError) && (
+      {(extras.games.length > 0 || ownSoftware) && (
+        <div className="chips wrap">
+          <button
+            className="chip"
+            aria-pressed={ownSoftware}
+            onClick={() =>
+              setP(ownSoftware ? {} : { tab: 'software' }, { replace: true })
+            }
+          >
+            My Software
+          </button>
+        </div>
+      )}
+      {!shown && !(browseRequests ? othersError : ownError) && (
         <p className="note">
           {everyone ? 'Loading everyone’s requests…' : 'Loading your requests…'}
         </p>
       )}
-      {(everyone ? othersError : ownError) && (
+      {(browseRequests ? othersError : ownError) && (
         <div className="empty" role="alert">
           <b>Couldn’t load requests</b>
           <p>
@@ -1807,7 +1938,7 @@ export default function Requests() {
           )}
         </form>
       )}
-      {everyone && show === 'software' && (
+      {softwareView && (
         <div
           className="toolbar"
           role="group"
@@ -1845,15 +1976,19 @@ export default function Requests() {
           </label>
         </div>
       )}
-      {shown && !list.length && everyone && (
+      {shown && !list.length && browseRequests && (
         <div className="empty">
-          <b>{show === 'all' ? 'No requests yet' : 'Nothing here'}</b>
-          {show === 'all'
+          <b>
+            {!softwareView && show === 'all'
+              ? 'No requests yet'
+              : 'Nothing here'}
+          </b>
+          {!softwareView && show === 'all'
             ? 'Nobody has asked for anything.'
             : 'No requests match this filter right now.'}
         </div>
       )}
-      {shown && !list.length && !everyone && (
+      {shown && !list.length && !browseRequests && (
         <div className="empty">
           <b>{tab === 'ready' ? 'Nothing ready yet' : 'No active requests'}</b>
           Find something on{' '}
@@ -1865,15 +2000,17 @@ export default function Requests() {
       )}
       <div className="rqlist">
         {list.map((x) => {
-          const st = state(x, serverName);
+          const st = state(x, serverName, liveDownloads, allowRawHashes);
           const detail = requestFailureMessage(x.r) ?? st.detail;
+          const artwork = artUrl(x.art);
           return (
             <div className="rq" key={x.r.id}>
               <div className={`art ${x.cover ? 'cover' : ''}`}>
-                {x.cover && x.art && (
+                {x.cover && artwork && (
                   <img
                     className="art-fill"
-                    src={x.art}
+                    src={artwork}
+                    referrerPolicy="no-referrer"
                     alt=""
                     aria-hidden="true"
                     loading="lazy"
@@ -1882,7 +2019,7 @@ export default function Requests() {
                   />
                 )}
                 <Cover
-                  src={x.art}
+                  src={artwork}
                   title={x.title}
                   sub={x.sub}
                   icon={coverIcon(x.r.type, x.r.bookFormat)}
@@ -1914,6 +2051,9 @@ export default function Requests() {
                   <Pill k={st.k} icon={st.ico}>
                     {st.word}
                   </Pill>
+                  {x.r.status === 1 && x.r.quotaException && (
+                    <Pill k="wait">Over Quota</Pill>
+                  )}
                   {x.r.watchAheadParentRequestId ? (
                     <span className="d">Auto-Queued</span>
                   ) : (x.r.watchAheadEpisodeCount ?? 0) > 0 ? (
@@ -1939,7 +2079,7 @@ export default function Requests() {
           );
         })}
       </div>
-      {everyone && hasMore && shown && (
+      {browseRequests && hasMore && shown && (
         <div className="more-scroll">
           <button
             className="btn btn-tonal"

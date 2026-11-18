@@ -1,27 +1,28 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import {
-  requestMovie,
-  requestSeries,
-  tmdbImg,
-  type Paged,
-  type TitleResult,
-} from '../api';
-import { useMediaServerName } from '../auth';
+import { requestMovie, requestSeries, tmdbImg, type TitleResult } from '../api';
+import { useAuth, useMediaServerName } from '../auth';
 import { statusOf } from '../components/cards';
-import { Pill } from '../components/detail';
+import { canManageRequests, Pill } from '../components/detail';
 import { ServiceNote } from '../components/extra';
 import {
+  isQuotaDenial,
   RequestSheet,
+  streamingOverrideMessage,
   useAsksRequestOptions,
   useOffers4k,
 } from '../components/requestSheet';
 import { Avatar } from '../components/Shell';
 import { useToast } from '../components/toast';
+import {
+  discoveryVisibility,
+  showDiscoveryTitle,
+} from '../discoveryVisibility';
 import { friendlyError } from '../errors';
-import { useApi } from '../hooks';
+import { usePaged, usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
 import { seriesRequestSummary } from '../seriesRequestSummary';
+import { useVideoAvailability } from '../videoAvailability';
 
 const MONTHS = [
   'January',
@@ -40,42 +41,53 @@ const MONTHS = [
 
 // upcoming movies and series, grouped by month, requestable ahead of release
 export default function Soon() {
+  const { user } = useAuth();
   const serverName = useMediaServerName();
+  const availability = useVideoAvailability();
   const [params] = useSearchParams();
   const scope = params.get('media');
   const showMovies = scope !== 'tv';
   const showTv = scope !== 'movie';
-  const movieList = useApi<Paged<TitleResult>>(
+  const movieList = usePaged<TitleResult>(
     showMovies ? '/discover/movies/upcoming' : null
   );
-  const tvList = useApi<Paged<TitleResult>>(
-    showTv ? '/discover/tv/upcoming' : null
+  const tvList = usePaged<TitleResult>(showTv ? '/discover/tv/upcoming' : null);
+  const lists = [
+    { label: 'upcoming movies', visible: showMovies, list: movieList },
+    { label: 'upcoming series', visible: showTv, list: tvList },
+  ].filter(({ visible }) => visible);
+  const loading = lists.some(({ list }) => !list.page && !list.error);
+  const allSelectedListsLoaded = lists.every(
+    ({ list }) => list.page > 0 && list.done && !list.error
   );
-  const movies = showMovies ? movieList.data : null;
-  const tv = showTv ? tvList.data : null;
-  const loading =
-    (showMovies && !movies && !movieList.error) ||
-    (showTv && !tv && !tvList.error);
-  const allSelectedListsLoaded = (!showMovies || !!movies) && (!showTv || !!tv);
+  const visibility = discoveryVisibility(
+    usePublicSettings(),
+    user?.permissions
+  );
   const toast = useToast();
   const [asked, setAsked] = useState<Set<string>>(new Set());
   const asks = useAsksRequestOptions();
   const offers4kMovie = useOffers4k('movie');
   const offers4kTv = useOffers4k('tv');
-  const [choosing, setChoosing] = useState<TitleResult | null>(null);
+  const [choice, setChoice] = useState<{
+    title: TitleResult;
+    quotaDenied?: boolean;
+    streamingDenial?: string;
+  }>();
+  const choosing = choice?.title;
   const items = [
-    ...(movies?.results || []).map((m) => ({
+    ...(showMovies ? movieList.items : []).map((m) => ({
       ...m,
       mediaType: 'movie' as const,
       date: m.releaseDate || '',
     })),
-    ...(tv?.results || []).map((t) => ({
+    ...(showTv ? tvList.items : []).map((t) => ({
       ...t,
       mediaType: 'tv' as const,
       date: t.firstAirDate || '',
     })),
   ]
-    .filter((x) => x.date)
+    .filter((x) => x.date && showDiscoveryTitle(x, visibility))
     .sort((a, b) => a.date.localeCompare(b.date));
   const months = new Map<string, typeof items>();
   for (const it of items) {
@@ -102,7 +114,12 @@ export default function Soon() {
       }
     } catch (e) {
       unask();
-      toast(friendlyError(e, 'Request failed'));
+      const streamingDenial = streamingOverrideMessage(e);
+      if (streamingDenial !== undefined)
+        setChoice((current) => current ?? { title: it, streamingDenial });
+      else if (user && !canManageRequests(user.permissions) && isQuotaDenial(e))
+        setChoice((current) => current ?? { title: it, quotaDenied: true });
+      else toast(friendlyError(e, 'Request failed'));
     }
   };
 
@@ -145,35 +162,37 @@ export default function Soon() {
           Loading upcoming titles…
         </p>
       )}
-      <ServiceNote
-        error={showMovies ? movieList.error : null}
-        what="upcoming movies"
-        retry={movieList.reload}
-      />
-      <ServiceNote
-        error={showTv ? tvList.error : null}
-        what="upcoming series"
-        retry={tvList.reload}
-      />
+      {lists.map(({ label, list }) => (
+        <ServiceNote
+          key={label}
+          error={list.error}
+          what={label}
+          retry={list.retry}
+        />
+      ))}
       {allSelectedListsLoaded && !months.size && (
         <p className="note">No upcoming titles found.</p>
       )}
       {choosing && (
         <RequestSheet
           it={choosing}
-          onClose={() => setChoosing(null)}
-          onDone={(is4k, series) => {
+          quotaDenied={choice?.quotaDenied}
+          streamingDenial={choice?.streamingDenial}
+          onClose={() => setChoice(undefined)}
+          onDone={(is4k, series, quotaException) => {
             setAsked((a) => new Set(a).add(choosing.mediaType + choosing.id));
             toast(
-              choosing.mediaType === 'tv'
-                ? seriesRequestSummary(
-                    choosing.name || 'this series',
-                    series,
-                    is4k
-                  )
-                : `Requested ${choosing.title || choosing.name}. It downloads when it’s out.`
+              quotaException
+                ? `Approval requested for ${choosing.title || choosing.name}`
+                : choosing.mediaType === 'tv'
+                  ? seriesRequestSummary(
+                      choosing.name || 'this series',
+                      series,
+                      is4k
+                    )
+                  : `Requested ${choosing.title || choosing.name}. It downloads when it’s out.`
             );
-            setChoosing(null);
+            setChoice(undefined);
           }}
         />
       )}
@@ -189,6 +208,10 @@ export default function Soon() {
                 (asked.has(it.mediaType + it.id)
                   ? ({ k: 'wait', word: 'Requested', ico: 'clock' } as const)
                   : null);
+              const visible =
+                s?.k === 'ok'
+                  ? statusOf(it.mediaInfo, false, serverName, availability)
+                  : s;
               return (
                 <div className="si" key={it.mediaType + it.id}>
                   <div className="date">
@@ -219,9 +242,11 @@ export default function Soon() {
                     </div>
                     <div className="act">
                       {s ? (
-                        <Pill k={s.k} icon={s.ico}>
-                          {s.word}
-                        </Pill>
+                        visible && (
+                          <Pill k={visible.k} icon={visible.ico}>
+                            {visible.word}
+                          </Pill>
+                        )
                       ) : (
                         <button
                           className="btn btn-sm btn-tonal"
@@ -229,7 +254,7 @@ export default function Soon() {
                           onClick={() =>
                             asks ||
                             (it.mediaType === 'tv' ? offers4kTv : offers4kMovie)
-                              ? setChoosing(it)
+                              ? setChoice({ title: it })
                               : req(it)
                           }
                         >
@@ -245,6 +270,19 @@ export default function Soon() {
           </div>
         </section>
       ))}
+      {lists.map(({ label, list }) =>
+        list.page > 0 && !list.done ? (
+          <div className="more-scroll" key={label}>
+            <button
+              className="btn btn-tonal"
+              disabled={list.loading}
+              onClick={list.more}
+            >
+              {list.loading ? 'Loading…' : `Show more ${label}`}
+            </button>
+          </div>
+        ) : null
+      )}
     </>
   );
 }

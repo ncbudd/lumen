@@ -13,9 +13,11 @@ import { BrandMark } from '../components/brand';
 import { fullSeerrUrl } from '../components/Shell';
 import { embedded } from '../deployment';
 import { usePublicSettings } from '../hooks';
+import { clearLoginLinkFromAddress } from '../loginLink';
 import { mediaServer, services, site } from '../mediaServer';
 import { completeOidc, readOidcCallback, startOidcSignIn } from '../oidc';
 import { usePrefs } from '../settings';
+import { captureWatchSessionInviteTokenFromHash } from '../watchSessionInvite';
 
 type Mode = 'start' | 'server' | 'local' | 'quick';
 type Method = 'server' | 'local' | 'quick';
@@ -71,6 +73,15 @@ export default function Login() {
   const [callback] = useState(() =>
     location.pathname === '/login' ? readOidcCallback() : null
   );
+  const [loginLinkToken, setLoginLinkToken] = useState(() => {
+    const tokens = new URLSearchParams(location.hash.slice(1)).getAll(
+      'loginToken'
+    );
+    return tokens.length === 1 && /^[A-Za-z0-9_-]{43}$/.test(tokens[0])
+      ? tokens[0]
+      : null;
+  });
+  useEffect(clearLoginLinkFromAddress, []);
   const callbackWork = useRef<Promise<string> | undefined>(undefined);
   const callbackDelivered = useRef(false);
   const server = mediaServer();
@@ -136,9 +147,11 @@ export default function Login() {
     setBusy(true);
     setErr('');
     try {
+      if (location.pathname === '/watch-sessions/join')
+        captureWatchSessionInviteTokenFromHash();
       await startOidcSignIn(
         slug,
-        location.pathname + location.search + location.hash
+        location.pathname + location.search + window.location.hash
       );
     } catch {
       setErr(
@@ -172,6 +185,16 @@ export default function Login() {
       active.current = false;
       setBusy(false);
     }
+  };
+  const useLoginLink = () => {
+    if (!loginLinkToken || active.current) return;
+    setLoginLinkToken(null);
+    void run(() =>
+      api('/auth/login-link', {
+        method: 'POST',
+        body: JSON.stringify({ token: loginLinkToken }),
+      })
+    );
   };
   const local = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -259,6 +282,16 @@ export default function Login() {
           <p className="login-err" role="alert">
             {err}
           </p>
+        )}
+
+        {loginLinkToken && (
+          <button
+            className="btn btn-primary login-primary"
+            disabled={busy}
+            onClick={useLoginLink}
+          >
+            Continue with sign-in link
+          </button>
         )}
 
         {mode === 'quick' ? (

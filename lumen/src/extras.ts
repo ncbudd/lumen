@@ -228,11 +228,12 @@ export function useExtras() {
 // one request call for every extra except games: the media type and its own id
 export const requestExtra = (
   mediaType: Exclude<Extra, 'game'>,
-  mediaId: string | number
+  mediaId: string | number,
+  serverId?: number
 ) =>
   api('/request', {
     method: 'POST',
-    body: JSON.stringify({ mediaType, mediaId }),
+    body: JSON.stringify({ mediaType, mediaId, serverId }),
   });
 
 // ---- music (MusicBrainz release groups, requested through Lidarr) ----
@@ -397,18 +398,26 @@ export interface Magazine {
   mediaInfo?: MediaInfo;
 }
 
-// ComicVine descriptions are HTML; show them as plain paragraphs
+const comicDescriptionEntities: Record<string, string> = {
+  '&nbsp;': ' ',
+  '&amp;': '&',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&#039;': "'",
+  '&lt;': '<',
+  '&gt;': '>',
+};
+
+// ComicVine descriptions are HTML; show them as plain paragraphs.
 export const plainText = (html?: string) =>
-  (html || '')
+  (typeof html === 'string' ? html : '')
     .replace(/<\/(p|h\d|li|div)>/gi, '\n')
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#0?39;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
+    .replace(
+      /&(?:nbsp|amp|quot|#0?39|lt|gt);/g,
+      (entity) => comicDescriptionEntities[entity]
+    )
     .split('\n')
     .map((s) => s.trim())
     .filter(Boolean);
@@ -535,6 +544,15 @@ export interface SoftwareRequest {
 }
 
 // ---- sports (Sportarr leagues) and adult (Whisparr scenes, StashDB ids) ----
+export function adultScenePath(id: string, serverId?: number | null) {
+  const scoped =
+    typeof serverId === 'number' &&
+    Number.isSafeInteger(serverId) &&
+    serverId >= 0 &&
+    serverId <= 1_000_000_000;
+  return `/adult/${encodeURIComponent(id)}${scoped ? `?serverId=${serverId}` : ''}`;
+}
+
 export interface League {
   id: string;
   mediaType: 'sports';

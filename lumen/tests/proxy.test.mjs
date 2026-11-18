@@ -99,7 +99,13 @@ const args = (settings = {}) => [
   ...Object.entries(settings).flatMap(([k, v]) => ['-e', `${k}=${v}`]),
   image,
 ];
-const paths = ['/api/v1/probe', '/imageproxy/probe', '/avatarproxy/probe'];
+const packPath = '/api/v1/integrations/discovery/mappings/packs';
+const paths = [
+  '/api/v1/probe',
+  '/imageproxy/probe',
+  '/avatarproxy/probe',
+  packPath,
+];
 async function check(settings, clientIp, scheme, headers = {}) {
   const id = await docker(
     'run',
@@ -132,8 +138,10 @@ async function check(settings, clientIp, scheme, headers = {}) {
       'https://seerr.example.test/?interface=classic'
     );
     for (const [path, target] of [
+      ['/users/19/', '/household/19'],
       ['/profile/', '/me'],
       ['/profile/settings/', '/me/account'],
+      ['/profile/settings/permissions', '/me/account#account-permissions'],
       ['/profile/settings/password/', '/me/account#password'],
       [
         '/profile/settings/episode-queue/',
@@ -146,8 +154,8 @@ async function check(settings, clientIp, scheme, headers = {}) {
       ['/profile/watchlist/?page=2', '/watchlist?page=2'],
       ['/users/19/watchlist/?page=2', '/watchlist/user/19?page=2'],
       [
-        '/users/19/requests/?requestedBy=11&filter=pending&mediaType=movie',
-        '/requests?requestedBy=19&show=pending&mediaType=movie',
+        '/users/19/requests/?requestedBy=11&filter=pending&mediaType=movie&timeFrame=7d&sort=added&sortDirection=asc',
+        '/requests/by-user/19?requestedBy=11&filter=pending&mediaType=movie&timeFrame=7d&sort=added&sortDirection=asc',
       ],
       ['/discover/comics?q=Example', '/comics?q=Example'],
       ['/discover/watchlist/?page=3', '/watchlist/discover?page=3'],
@@ -168,15 +176,22 @@ async function check(settings, clientIp, scheme, headers = {}) {
         '/movies?nativeFilters=1&keywords=17',
       ],
       ['/coming-soon/', '/soon'],
+      ['/coming-soon/?media=tv&extra=1', '/soon?media=tv'],
       ['/discover/movies/upcoming/', '/soon?media=movie'],
       ['/discover/tv/upcoming', '/soon?media=tv'],
-      ['/movie/12/cast', '/movie/12#cast'],
-      ['/tv/1000000000/crew/', '/tv/1000000000#crew'],
       ['/discover/trending?mediaType=audiobook', '/audiobooks'],
       ['/discover/list/12345/?page=2', '/list/12345?page=2'],
       ['/discover/trending?mediaType=tv', '/trending?mediaType=tv'],
       ['/discover/patches?kind=hack', '/patches?kind=hack'],
+      ['/discover/book-recommendations/', '/books/recommendations'],
+      [
+        '/discover/book-recommendations?feed=11&format=audiobook',
+        '/books/recommendations?feed=11&format=audiobook',
+      ],
+      ['/discover/collectors/', '/music/collectors'],
       ['/discover/providers', '/providers'],
+      ['/discover/movies/genres/', '/movies/genres'],
+      ['/discover/tv/genres', '/series/genres'],
       ['/settings/jobs/', '/admin/jobs'],
       ['/users/', '/admin/users'],
       ['/users/19/settings', '/admin/users/19/main'],
@@ -188,7 +203,49 @@ async function check(settings, clientIp, scheme, headers = {}) {
       ],
       ['/users/19/settings/notifications/', '/admin/users/19/notifications'],
       ['/settings/logs', '/admin/logs'],
+      [
+        '/settings/main?settingsSearchTarget=spotifyClientId',
+        '/admin/general#spotifyClientId',
+      ],
+      ['/settings/main?settingsSearchTarget=apiKey', '/admin/general#apiKey'],
+      [
+        '/settings/main?settingsSearchTarget=enable4k',
+        '/admin/general#enable4k',
+      ],
       ['/settings/main', '/admin/general'],
+      ['/settings/users/', '/admin/general#default-request-quotas'],
+      ['/settings/categories', '/admin/categories'],
+      ['/settings/network/', '/admin/network'],
+      ['/settings/discovery', '/admin/discovery'],
+      ['/settings/metadata', '/admin/metadata'],
+      ['/settings/notifications/', '/admin/notifications'],
+      ['/settings/notifications/webhook/', '/admin/notifications/webhook'],
+      ['/settings/library-migration', '/admin/library-migration'],
+      ['/settings/prowlarr', '/admin/prowlarr'],
+      ['/settings/services/', '/admin'],
+      [
+        '/settings/services?serviceCategory=music',
+        '/admin?serviceCategory=music',
+      ],
+      [
+        '/series/bookshelf-series%3A1%3AU2VyaWVz%3A42/',
+        '/book-series/bookshelf-series:1:U2VyaWVz:42',
+      ],
+      ['/settings/plex', '/admin/media-libraries'],
+      ['/settings/jellyfin/', '/admin/media-libraries'],
+      ['/settings/services?settingsSearchTarget=prowlarr', '/admin/prowlarr'],
+      ...[
+        ['prowlarr-settings-title', 'prowlarr'],
+        ['download-clients-settings-title', 'download-clients'],
+        ['slskdn-settings-title', 'soulseek'],
+        ['tunerr-settings-title', 'tunerr'],
+        ['reader-settings-title', 'reader-delivery'],
+        ['readmeabook-settings-title', 'readmeabook'],
+        ['steamApiKey', 'software-acquisition#steam-library-import'],
+      ].map(([searchTarget, service]) => [
+        `/settings/services?settingsSearchTarget=${searchTarget}`,
+        `/admin/${service}`,
+      ]),
     ]) {
       const response = await fetch(base + path, { redirect: 'manual' });
       assert.equal(response.status, 302, path);
@@ -198,6 +255,9 @@ async function check(settings, clientIp, scheme, headers = {}) {
         path
       );
     }
+    const setup = await fetch(base + '/setup', { redirect: 'manual' });
+    assert.equal(setup.status, 200);
+    assert.match(await setup.text(), /<div id="root"><\/div>/);
     const frontend = await fetch(base + '/');
     assert.equal(frontend.status, 200);
     assert.match(await frontend.text(), /<div id="root"><\/div>/);
@@ -205,6 +265,36 @@ async function check(settings, clientIp, scheme, headers = {}) {
       frontend.headers.get('content-security-policy'),
       /script-src 'self'/
     );
+    for (const pathname of [
+      '/admin',
+      '/swipe',
+      '/swipe/',
+      '/recordings',
+      '/movie/12/cast',
+      '/tv/1000000000/crew/',
+      '/collections/tv/19',
+      '/software?category=retro&game=42',
+      '/author/OL42A',
+      '/book-series/bookshelf-series%3A1%3AU2VyaWVz',
+    ]) {
+      const response = await fetch(base + pathname, { redirect: 'manual' });
+      assert.equal(response.status, 200, pathname);
+      assert.match(await response.text(), /<div id="root"><\/div>/);
+    }
+    const supportedPack = await fetch(base + packPath, {
+      method: 'POST',
+      headers: { 'content-type': 'text/plain' },
+      body: ' '.repeat(2 * 1024 * 1024),
+    });
+    assert.equal(supportedPack.status, 200);
+    await supportedPack.text();
+    const oversizedPack = await fetch(base + packPath, {
+      method: 'POST',
+      headers: { 'content-type': 'text/plain' },
+      body: ' '.repeat(5 * 1024 * 1024 + 1),
+    });
+    assert.equal(oversizedPack.status, 413);
+    await oversizedPack.text();
     for (const path of paths) {
       const response = await fetch(base + path, {
         headers: {

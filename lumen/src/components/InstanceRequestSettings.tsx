@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api, ApiError } from '../api';
 import { forget } from '../apiCache';
 import { useApi, type PublicSettings } from '../hooks';
@@ -47,7 +47,13 @@ const policies = [
 ] as const;
 type Policies = Record<(typeof policies)[number]['key'], boolean>;
 
-function RequestSettingsForm({ initial }: { initial: Policies }) {
+function RequestSettingsForm({
+  initial,
+  anchorReady,
+}: {
+  initial: Policies;
+  anchorReady: boolean;
+}) {
   const [saved, setSaved] = useState(initial);
   const [draft, setDraft] = useState(initial);
   const changed = policies.filter(({ key }) => draft[key] !== saved[key]);
@@ -55,6 +61,11 @@ function RequestSettingsForm({ initial }: { initial: Policies }) {
   const [notice, setNotice] = useState('');
   const [failure, setFailure] = useState('');
   const pending = useRef(false);
+
+  useEffect(() => {
+    if (anchorReady && window.location.hash === '#enable4k')
+      document.getElementById('enable4k')?.scrollIntoView({ block: 'start' });
+  }, [anchorReady]);
 
   async function save() {
     if (pending.current || !changed.length) return;
@@ -102,7 +113,11 @@ function RequestSettingsForm({ initial }: { initial: Policies }) {
     >
       <div className="setlist">
         {policies.map(({ key, label, description }) => (
-          <label className="set cfg-row" key={key}>
+          <label
+            className="set cfg-row"
+            key={key}
+            id={key === 'enable4k' ? key : undefined}
+          >
             <span>
               <b>{label}</b>
               <small>{description}</small>
@@ -143,7 +158,11 @@ function RequestSettingsForm({ initial }: { initial: Policies }) {
   );
 }
 
-export function InstanceRequestSettings() {
+export function InstanceRequestSettings({
+  anchorReady = true,
+}: {
+  anchorReady?: boolean;
+}) {
   const settings = useApi<PublicSettings>(publicPath);
   return (
     <Section title="Instance Request Settings">
@@ -154,6 +173,7 @@ export function InstanceRequestSettings() {
       />
       {settings.data ? (
         <RequestSettingsForm
+          anchorReady={anchorReady}
           initial={{
             personMovieBulkRequestsEnabled:
               settings.data.personMovieBulkRequestsEnabled === true,

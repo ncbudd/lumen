@@ -1,7 +1,13 @@
 import { useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { api, MediaStatus, tmdbImg } from '../api';
-import { useAuth } from '../auth';
+import {
+  api,
+  MediaStatus,
+  tmdbImg,
+  youtubeTrailerUrl,
+  type MovieDetails,
+} from '../api';
+import { isAdministrator, useAuth } from '../auth';
 import { canManageBlocklist, notifyBlocklistChanged } from '../blocklist';
 import { Section, TitleCard } from '../components/cards';
 import CollectionPlaybackSheet, {
@@ -11,6 +17,9 @@ import CollectionQueueSheet from '../components/CollectionQueueSheet';
 import CollectionRequestSheet, {
   type MovieCollection,
 } from '../components/CollectionRequestSheet';
+import CollectionServerActions, {
+  type CollectionSync,
+} from '../components/CollectionServerSheet';
 import { ConfirmSheet } from '../components/ConfirmSheet';
 import {
   canRequest4k,
@@ -19,7 +28,10 @@ import {
 } from '../components/detail';
 import { ServiceNote } from '../components/extra';
 import { useToast } from '../components/toast';
+import { friendlyError } from '../errors';
 import { useApi, usePublicSettings } from '../hooks';
+import { sessionGeneration } from '../sessionState';
+import { CollectionAssociations } from './Associations';
 
 function CollectionContent({ id }: { id: number }) {
   const { user } = useAuth();
@@ -27,13 +39,67 @@ function CollectionContent({ id }: { id: number }) {
   const { data, error, reload, refresh } = useApi<MovieCollection>(
     `/collection/${id}`
   );
+  const firstMovie = data?.id === id ? data.parts[0] : undefined;
+  const firstMovieDetails = useApi<MovieDetails>(
+    firstMovie &&
+      Number.isSafeInteger(firstMovie.id) &&
+      firstMovie.id > 0 &&
+      firstMovie.id <= 1_000_000_000
+      ? `/movie/${firstMovie.id}`
+      : null,
+    { currentPathOnly: true }
+  );
   const [confirm, setConfirm] = useState<'add' | 'remove'>();
   const settings = usePublicSettings();
+  const trailer = youtubeTrailerUrl(
+    firstMovieDetails.data?.relatedVideos,
+    settings?.youtubeUrl
+  );
   const [requestOpen, setRequestOpen] = useState(false);
   const [playOpen, setPlayOpen] = useState(false);
   const [queueOpen, setQueueOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const working = useRef(false);
+  const checkingServer = useRef(false);
+  const [serverBusy, setServerBusy] = useState(false);
+  const [serverSync, setServerSync] = useState<CollectionSync>();
+  const [serverError, setServerError] = useState('');
+  const canSync =
+    isAdministrator(user?.permissions) &&
+    [1, 2, 3].includes(settings?.mediaServerType ?? 0);
+
+  async function checkServer() {
+    if (!canSync || checkingServer.current) return;
+    checkingServer.current = true;
+    setServerBusy(true);
+    setServerError('');
+    const generation = sessionGeneration();
+    try {
+      const result = await api<{
+        collection: MovieCollection;
+        sync: CollectionSync;
+      }>(`/collection/${id}/availability`, {
+        method: 'POST',
+        invalidateCache: false,
+      });
+      if (generation !== sessionGeneration()) return;
+      if (result.collection?.id !== id || !result.sync)
+        throw new Error(
+          'Could not verify this collection on the media server.'
+        );
+      setServerSync(result.sync);
+    } catch (error) {
+      if (generation === sessionGeneration()) {
+        setServerSync(undefined);
+        setServerError(
+          friendlyError(error, 'Could not check the media server.')
+        );
+      }
+    } finally {
+      checkingServer.current = false;
+      if (generation === sessionGeneration()) setServerBusy(false);
+    }
+  }
   const qualities: ('hd' | '4k')[] = [];
   if (canRequestMovies(user?.permissions)) qualities.push('hd');
   if (settings?.movie4kEnabled && canRequest4k(user?.permissions, 'movie'))
@@ -111,8 +177,54 @@ function CollectionContent({ id }: { id: number }) {
         ]}
       />
       <div className="dbody">
+        {canSync && data.parts.length > 0 && (
+          <details
+            className="adv"
+            onToggle={(event) => {
+              if (event.currentTarget.open && !serverSync) void checkServer();
+            }}
+          >
+            <summary>Media Server Collection</summary>
+            {serverBusy && (
+              <p className="note" role="status">
+                Checking media-server libraries…
+              </p>
+            )}
+            <ServiceNote
+              what="media-server libraries"
+              error={serverError || null}
+              retry={() => void checkServer()}
+            />
+            {serverSync && !serverSync.supported && (
+              <p className="note">
+                This media server does not support collection changes.
+              </p>
+            )}
+            <CollectionServerActions
+              endpoint={`/collection/${id}/server`}
+              sync={serverBusy ? undefined : serverSync}
+              visibleIds={data.parts.map(({ id }) => String(id))}
+              onComplete={() => void checkServer()}
+            />
+          </details>
+        )}
+        <CollectionAssociations
+          key={data.parts.map(({ id }) => id).join(',')}
+          mediaType="movie"
+          parts={data.parts}
+        />
         {data.parts.length > 0 && (
           <div className="dstatus">
+            {trailer && (
+              <a
+                className="btn btn-quiet btn-sm"
+                href={trailer}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Watch Trailer
+              </a>
+            )}
             {playableQualities.length > 0 && (
               <button
                 className="btn btn-tonal btn-sm"

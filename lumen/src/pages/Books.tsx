@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { MediaStatus, type BookResult, type Paged } from '../api';
 import {
   BookCard,
@@ -21,6 +21,7 @@ import {
 } from '../hooks';
 import { Icon } from '../icons';
 import { usePrefs } from '../settings';
+import { BookSeriesResults } from './BookSeriesSearch';
 
 // the sorts SeerrNG's book feed takes (the same four the SeerrNG web app offers); the first is
 // the default, which the feed is asked for without a sortBy
@@ -29,6 +30,12 @@ const SORTS = [
   ['trending', 'Trending'],
   ['newest', 'Newest'],
   ['rating.desc', 'Rating'],
+  ['rating.asc', 'Lowest Rated'],
+  ['oldest', 'Oldest'],
+  ['ranked.asc', 'Least Popular'],
+  ['editions', 'Most Editions'],
+  ['editions.asc', 'Fewest Editions'],
+  ['random', 'Random'],
 ] as const;
 // what the full list of each sort is called ("Trending" + "fantasy" + "ebooks")
 const SORT_TITLES: Record<string, string> = {
@@ -36,6 +43,12 @@ const SORT_TITLES: Record<string, string> = {
   trending: 'Trending',
   newest: 'New',
   'rating.desc': 'Top rated',
+  'rating.asc': 'Lowest rated',
+  oldest: 'Oldest',
+  'ranked.asc': 'Least popular',
+  editions: 'Most editions',
+  'editions.asc': 'Fewest editions',
+  random: 'Random',
 };
 // genres that work for both catalogues: SeerrNG sends the genre to Open Library as a
 // subject: clause (ebooks) and matches it, case-insensitively, against each ChaptarrNG
@@ -103,10 +116,55 @@ export default function Books({ format }: { format: 'ebook' | 'audiobook' }) {
   const [p] = useSearchParams();
   const { prefs } = usePrefs();
   const audio = format === 'audiobook';
-  const grid =
-    p.has('show') || p.has('sort') || p.has('genre') || p.has('subject');
-  const subject = p.get('subject');
-  const formatQuery = subject ? `?${new URLSearchParams({ subject })}` : '';
+  const requestedFormat = p.get('format');
+  if (
+    requestedFormat &&
+    requestedFormat !== format &&
+    (requestedFormat === 'ebook' || requestedFormat === 'audiobook')
+  ) {
+    const search = new URLSearchParams(p);
+    search.delete('format');
+    if (requestedFormat === 'ebook') search.delete('narrator');
+    return (
+      <Navigate
+        replace
+        to={{
+          pathname: requestedFormat === 'audiobook' ? '/audiobooks' : '/books',
+          search: search.toString(),
+        }}
+      />
+    );
+  }
+  const grid = [
+    'show',
+    'sort',
+    'sortBy',
+    'genre',
+    'subject',
+    'search',
+    'author',
+    'narrator',
+    'firstPublishYear',
+    'language',
+    'minRating',
+  ].some((key) => p.has(key));
+  function formatQuery(target: 'ebook' | 'audiobook') {
+    const query = new URLSearchParams();
+    for (const key of [
+      'subject',
+      'search',
+      'author',
+      'narrator',
+      'firstPublishYear',
+      'language',
+      'minRating',
+    ]) {
+      const value = p.get(key);
+      if (value && (key !== 'narrator' || target === 'audiobook'))
+        query.set(key, value);
+    }
+    return query.size ? '?' + query : '';
+  }
   const note = (
     <p className="note" style={{ margin: '-4px 0 14px' }}>
       {audio
@@ -126,16 +184,27 @@ export default function Books({ format }: { format: 'ebook' | 'audiobook' }) {
           </div>
           <Avatar className="avatar ph-only-avatar" />
         </div>
+        <div className="toolbar">
+          <Link className="btn btn-quiet btn-sm" to="/books/recommendations">
+            Book Recommendations
+          </Link>
+          <Link
+            className="btn btn-quiet btn-sm"
+            to={`/book-series?format=${format}`}
+          >
+            Find a Book Series
+          </Link>
+        </div>
         <div className="seg wide" role="group" aria-label="Format">
           <Link
-            to={`/books${formatQuery}`}
+            to={`/books${formatQuery('ebook')}`}
             aria-current={!audio ? 'page' : undefined}
           >
             <Icon name="book" size="sm" />
             Ebooks
           </Link>
           <Link
-            to={`/audiobooks${formatQuery}`}
+            to={`/audiobooks${formatQuery('audiobook')}`}
             aria-current={audio ? 'page' : undefined}
           >
             <Icon name="headphones" size="sm" />
@@ -369,7 +438,8 @@ function BooksGrid({
   const [p, setP] = useSearchParams();
   const location = useLocation();
   const show = p.get('show') || 'all';
-  const sortParam = p.get('sort');
+  const rawSort = p.get('sort') || p.get('sortBy');
+  const sortParam = rawSort === 'rating' ? 'rating.desc' : rawSort;
   const sort = SORTS.some(([v]) => v === sortParam) ? sortParam! : 'ranked';
   // the library list has no sort of its own, so the menu only applies to the catalogue
   const sorted = show !== 'have' && sort !== 'ranked';
@@ -377,10 +447,54 @@ function BooksGrid({
   const genres = show === 'have' ? [] : genresOf(p);
   const rawSubject = p.get('subject')?.trim() ?? '';
   const subject = show !== 'have' && rawSubject.length <= 512 ? rawSubject : '';
+  const searchFields = [
+    { key: 'search', apiKey: 'query', label: 'Title' },
+    { key: 'author', apiKey: 'author', label: 'Author' },
+    ...(format === 'audiobook'
+      ? [{ key: 'narrator', apiKey: 'narrator', label: 'Narrator' }]
+      : []),
+    {
+      key: 'firstPublishYear',
+      apiKey: 'firstPublishYear',
+      label: 'First Publish Year',
+      pattern: '[0-9]{4}|before-1970',
+      maxLength: 11,
+      hint: 'Four digits or before-1970',
+    },
+    {
+      key: 'language',
+      apiKey: 'language',
+      label: 'Book Language Code',
+      pattern: '[a-z]{3}',
+      maxLength: 3,
+      hint: 'Three-letter code, such as eng',
+    },
+    {
+      key: 'minRating',
+      apiKey: 'minRating',
+      label: 'Minimum Book Rating',
+      pattern: '[1-4](\\.[05])?|5(\\.0)?',
+      maxLength: 3,
+      hint: '1 to 5 in half-star steps',
+    },
+  ];
+  const filters = new URLSearchParams();
+  for (const { key, apiKey, maxLength, pattern } of searchFields) {
+    const value = p.get(key)?.trim();
+    if (
+      show !== 'have' &&
+      value &&
+      value.length <= (maxLength ?? 256) &&
+      (!pattern || new RegExp('^(?:' + pattern + ')$').test(value))
+    )
+      filters.set(apiKey, value);
+  }
+  const search = filters.get('query') ?? '';
+  const seriesQuery = new URLSearchParams({ query: search, format });
   const list = usePaged<BookResult>(
     show === 'have'
       ? `/book/library?format=${format}`
-      : `/discover/books?format=${format}${sorted ? `&sortBy=${sort}` : ''}${subject ? `&subject=${encodeURIComponent(subject)}` : subjectParam(genres)}`
+      : `/discover/books?format=${format}${sorted ? `&sortBy=${sort}` : ''}${subject ? `&subject=${encodeURIComponent(subject)}` : subjectParam(genres)}${filters.size ? '&' + filters : ''}`
   );
   const audio = format === 'audiobook';
   // the popular feed doesn't say which books are owned: "Not yet" checks the owned list
@@ -413,7 +527,7 @@ function BooksGrid({
   // Not yet hides owned books here, page by page: with most of a feed owned the grid stays
   // short and scrolling would fetch page after page. As on Movies and Series, a run of pages
   // that finds less than a screenful stops and asks first.
-  const filterKey = `${format}|${show}|${sort}|${genres.join(',')}`;
+  const filterKey = `${format}|${show}|${sort}|${subject}|${genres.join(',')}|${filters}`;
   const [look, setLook] = useState({ key: filterKey, page: 0, found: 0 });
   if (look.key !== filterKey) setLook({ key: filterKey, page: 0, found: 0 });
   else if (items.length - look.found >= SCREENFUL)
@@ -448,6 +562,7 @@ function BooksGrid({
   const noun = audio ? 'audiobooks' : 'ebooks';
   const setSort = (v: string) => {
     const n = new URLSearchParams(p);
+    n.delete('sortBy');
     n.set('sort', v);
     setP(n, { replace: true });
   };
@@ -467,6 +582,65 @@ function BooksGrid({
         <Link to={audio ? '/audiobooks' : '/books'}>Overview</Link>
       </div>
       {note}
+      {search.length >= 2 && search.length <= 200 && (
+        <Section
+          title="Book Series"
+          link={['View All Series Results', '/book-series?' + seriesQuery]}
+        >
+          <BookSeriesResults query={search} format={format} limit={6} />
+        </Section>
+      )}
+      {show !== 'have' && (
+        <form
+          className="toolbar"
+          aria-label="Book Discovery Search"
+          key={format + ':' + filters}
+          onSubmit={(event) => {
+            event.preventDefault();
+            const form = new FormData(event.currentTarget);
+            const next = new URLSearchParams(p);
+            for (const { key } of searchFields) {
+              const value = String(form.get(key) ?? '').trim();
+              if (value) next.set(key, value);
+              else next.delete(key);
+            }
+            keepList(next);
+          }}
+        >
+          {searchFields.map(
+            ({ key, apiKey, label, pattern, maxLength, hint }) => (
+              <label className="sel" key={key}>
+                <span className="lbl">{label}</span>
+                <input
+                  className="cfg-input"
+                  type="search"
+                  name={key}
+                  defaultValue={filters.get(apiKey) ?? ''}
+                  maxLength={maxLength ?? 256}
+                  pattern={pattern}
+                  title={hint}
+                />
+              </label>
+            )
+          )}
+          <button className="btn btn-tonal btn-sm" type="submit">
+            Search Books
+          </button>
+          {filters.size > 0 && (
+            <button
+              type="button"
+              className="chip"
+              onClick={() => {
+                const next = new URLSearchParams(p);
+                for (const { key } of searchFields) next.delete(key);
+                keepList(next);
+              }}
+            >
+              Clear Book Search
+            </button>
+          )}
+        </form>
+      )}
       <div className="toolbar">
         {subject && (
           <button className="chip" type="button" onClick={() => setGenres([])}>

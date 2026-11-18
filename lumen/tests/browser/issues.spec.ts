@@ -199,3 +199,166 @@ test('a reporter can edit their description and confirm removal of their own rep
   await expect(page.getByText('My reply', { exact: true })).toHaveCount(0);
   expect(writes).toEqual(['edit', 'delete']);
 });
+
+test('issue details link to exact non-video catalog titles', async ({
+  page,
+}) => {
+  const titles = [
+    {
+      mediaType: 'book',
+      provider: 'bookshelf',
+      value: 'bookshelf:2:aGM6NA',
+      label: 'Book',
+    },
+    {
+      mediaType: 'music',
+      provider: 'musicbrainz',
+      value: 'album-42',
+      label: 'Album',
+    },
+    { mediaType: 'comic', provider: 'comicvine', value: '456', label: 'Comic' },
+    {
+      mediaType: 'magazine',
+      provider: 'lazylibrarian',
+      value: 'Science Vol. 2',
+      label: 'Magazine',
+    },
+  ];
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const path = new URL(route.request().url()).pathname.slice(
+      '/api/v1'.length
+    );
+    if (path === '/auth/me')
+      return route.fulfill({ json: { id: 2, permissions: 2097152 } });
+    const id = /^\/issue\/(\d+)$/.exec(path)?.[1];
+    const title = id && titles[Number(id) - 1];
+    if (!title) return route.fulfill({ json: {} });
+    return route.fulfill({
+      json: {
+        id: Number(id),
+        status: 1,
+        issueType: 1,
+        createdAt: '2026-11-12T00:00:00Z',
+        createdBy: { id: 2 },
+        media: {
+          mediaType: title.mediaType,
+          identifiers: [{ provider: title.provider, value: title.value }],
+        },
+      },
+    });
+  });
+  for (const [index, title] of titles.entries()) {
+    await page.goto(`/issues/${index + 1}`);
+    await expect(
+      page.getByRole('link', { name: `Open ${title.label}` })
+    ).toHaveAttribute(
+      'href',
+      `/${title.mediaType}/${encodeURIComponent(title.value)}`
+    );
+  }
+});
+
+test('issue filters read from bookmarks and reset pagination when changed', async ({
+  page,
+}) => {
+  const queries: URLSearchParams[] = [];
+  const issue = {
+    id: 7,
+    status: 1,
+    issueType: 1,
+    createdBy: { id: 2 },
+    createdAt: '2026-11-12T00:00:00Z',
+  };
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname.endsWith('/auth/me'))
+      return route.fulfill({ json: { id: 2, permissions: 2097152 } });
+    if (url.pathname.endsWith('/issue')) {
+      queries.push(url.searchParams);
+      return route.fulfill({
+        json: { results: [issue], pageInfo: { page: 1, pages: 3 } },
+      });
+    }
+    if (url.pathname.endsWith('/issue/7'))
+      return route.fulfill({ json: issue });
+    return route.fulfill({ json: {} });
+  });
+  await page.goto('/issues?mediaType=book&issueType=audio&timeFrame=7d&page=2');
+  await expect(page.getByLabel('Media Type')).toHaveValue('book');
+  await expect.poll(() => queries.at(-1)?.get('skip')).toBe('10');
+  expect(queries.at(-1)?.get('issueType')).toBe('audio');
+  expect(queries.at(-1)?.get('timeFrame')).toBe('7d');
+  await page.getByRole('link', { name: 'Video #7' }).click();
+  await expect(page.getByRole('heading', { name: 'Issue #7' })).toBeVisible();
+  await page.getByRole('link', { name: 'Back to Issues' }).click();
+  await expect(page).toHaveURL(
+    /\/issues\?mediaType=book&issueType=audio&timeFrame=7d&page=2$/
+  );
+  await page.getByLabel('Issue Type').selectOption('subtitle');
+  await expect.poll(() => queries.at(-1)?.get('issueType')).toBe('subtitle');
+  expect(queries.at(-1)?.get('skip')).toBe('0');
+  expect(new URL(page.url()).searchParams.has('page')).toBe(false);
+  await page.getByLabel('Search Issues').fill('missing & audio');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect
+    .poll(() => queries.at(-1)?.get('search'))
+    .toBe('missing & audio');
+  await expect(page.getByLabel('Media Type')).toHaveValue('book');
+  await page.getByLabel('Release Year').fill('2020');
+  await page.getByLabel('Genre', { exact: true }).fill('science fiction');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect.poll(() => queries.at(-1)?.get('releaseYear')).toBe('2020');
+  expect(queries.at(-1)?.get('genre')).toBe('science fiction');
+  await page.getByLabel('Sort Issues').selectOption('modified');
+  await expect.poll(() => queries.at(-1)?.get('sort')).toBe('modified');
+  await page.getByLabel('Media Type').selectOption('all');
+  await expect(page.getByLabel('Release Year')).toHaveCount(0);
+  await expect.poll(() => queries.at(-1)?.get('releaseYear')).toBeNull();
+});
+
+test('deleting the final issue on a page preserves filters and returns to the last available page', async ({
+  page,
+}) => {
+  let deleted = false;
+  const issue = {
+    id: 7,
+    status: 1,
+    issueType: 1,
+    createdBy: { id: 2 },
+    createdAt: '2026-11-12T00:00:00Z',
+  };
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname.endsWith('/auth/me'))
+      return route.fulfill({ json: { id: 2, permissions: 1048576 } });
+    if (url.pathname.endsWith('/issue/7')) {
+      if (route.request().method() === 'DELETE') {
+        deleted = true;
+        return route.fulfill({ status: 204 });
+      }
+      return route.fulfill({ json: issue });
+    }
+    if (url.pathname.endsWith('/issue')) {
+      const first = url.searchParams.get('skip') === '0';
+      return route.fulfill({
+        json: {
+          results: first ? [{ ...issue, id: 6 }] : deleted ? [] : [issue],
+          pageInfo: { page: first ? 1 : 2, pages: deleted ? 1 : 2 },
+        },
+      });
+    }
+    return route.fulfill({ json: {} });
+  });
+  await page.goto('/issues?mediaType=movie&page=2');
+  await page.getByRole('link', { name: 'Video #7' }).click();
+  await page.getByRole('button', { name: 'Delete Issue' }).click();
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Delete Issue' })
+    .click();
+  await expect(page).toHaveURL(/\/issues\?mediaType=movie$/);
+  await expect(page.getByRole('link', { name: 'Video #6' })).toBeVisible();
+});

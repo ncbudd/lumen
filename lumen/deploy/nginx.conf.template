@@ -49,6 +49,11 @@ server {
     proxy_set_header CF-Connecting-IP "";
     proxy_set_header Forwarded "";
     proxy_set_header X-Forwarded-Proto $lumen_forwarded_proto;
+
+    location = /api/v1/integrations/discovery/mappings/packs {
+      client_max_body_size 5m;
+      proxy_pass ${SEERR_URL};
+    }
   }
   location ~ ^/(imageproxy|avatarproxy)/ {
     proxy_pass ${SEERR_URL};
@@ -156,6 +161,9 @@ server {
   location ~ ^/profile/settings/notifications/(email|telegram|discord|pushbullet|pushover|webpush)/?$ {
     return 302 "/me/account/notifications#notification-$1";
   }
+  location ~ ^/profile/settings/permissions/?$ {
+    return 302 "/me/account#account-permissions";
+  }
   location ~ ^/profile/settings/password/?$ {
     return 302 "/me/account#password";
   }
@@ -164,6 +172,15 @@ server {
   }
   location ~ ^/profile/watchlist/?$ {
     return 302 /watchlist$is_args$args;
+  }
+  location ~ "^/series/(bookshelf-series:[0-9]{1,10}:[A-Za-z0-9_-]{1,2048}(?::[0-9]{1,10})?)/?$" {
+    return 302 /book-series/$1;
+  }
+  location ~ ^/discover/book-recommendations/?$ {
+    return 302 /books/recommendations$is_args$args;
+  }
+  location ~ ^/discover/collectors/?$ {
+    return 302 /music/collectors;
   }
   location ~ ^/discover/(adult|audiobooks|books|comics|games|magazines|music|patches|providers|sports)/?$ {
     return 302 /$1$is_args$args;
@@ -195,6 +212,12 @@ server {
   location ~ "^/discover/tv/language/([a-z]{2})/?$" {
     return 302 /series?nativeFilters=1&language=$1&$args;
   }
+  location ~ ^/discover/movies/genres/?$ {
+    return 302 /movies/genres;
+  }
+  location ~ ^/discover/tv/genres/?$ {
+    return 302 /series/genres;
+  }
   location ~ ^/discover/movies(/keyword)?/?$ {
     return 302 /movies?nativeFilters=1&$args;
   }
@@ -202,10 +225,8 @@ server {
     return 302 /series?nativeFilters=1&$args;
   }
   location ~ ^/coming-soon/?$ {
+    if ($arg_media ~ ^(movie|tv)$) { return 302 /soon?media=$arg_media; }
     return 302 /soon;
-  }
-  location ~ "^/(movie|tv)/([1-9][0-9]{0,8}|1000000000)/(cast|crew)/?$" {
-    return 302 "/$1/$2#$3";
   }
   location ~ ^/discover/watchlist/?$ {
     return 302 /watchlist/discover$is_args$args;
@@ -214,7 +235,7 @@ server {
     return 302 /watchlist/user/$1$is_args$args;
   }
   location ~ "^/users/([1-9][0-9]{0,8}|1000000000)/requests/?$" {
-    return 302 /requests?requestedBy=$1&show=$arg_filter&mediaType=$arg_mediaType;
+    return 302 /requests/by-user/$1$is_args$args;
   }
 
   location ~ "^/users/([1-9][0-9]{0,8}|1000000000)/settings/notifications/(email|discord|telegram|pushbullet|pushover|webpush)/?$" {
@@ -226,18 +247,53 @@ server {
   location ~ "^/users/([1-9][0-9]{0,8}|1000000000)/settings/?$" {
     return 302 /admin/users/$1/main;
   }
+  location ~ "^/users/([1-9][0-9]{0,8}|1000000000)/?$" {
+    return 302 /household/$1;
+  }
   location ~ ^/users/?$ {
     return 302 /admin/users;
   }
-  location ~ ^/settings/(jobs|logs|about)/?$ {
+  location ~ ^/settings/notifications(/(?:email|telegram|pushbullet|pushover|gotify|ntfy|apprise|discord|slack|webhook|webpush))?/?$ {
+    return 302 /admin/notifications$1;
+  }
+  location ~ ^/settings/(jobs|logs|about|categories|network|discovery|metadata|library-migration|prowlarr)/?$ {
     return 302 /admin/$1;
   }
-  location ~ ^/settings(/main)?/?$ {
+  location ~ ^/settings/(plex|jellyfin)/?$ {
+    return 302 /admin/media-libraries;
+  }
+  location ~ ^/settings/services/?$ {
+    if ($arg_settingsSearchTarget ~ ^prowlarr(-|$)) { return 302 /admin/prowlarr; }
+    if ($arg_settingsSearchTarget ~ ^download-clients-) { return 302 /admin/download-clients; }
+    if ($arg_settingsSearchTarget ~ ^slskdn-) { return 302 /admin/soulseek; }
+    if ($arg_settingsSearchTarget ~ ^tunerr-) { return 302 /admin/tunerr; }
+    if ($arg_settingsSearchTarget ~ ^reader-) { return 302 /admin/reader-delivery; }
+    if ($arg_settingsSearchTarget ~ ^readmeabook-) { return 302 /admin/readmeabook; }
+    if ($arg_settingsSearchTarget = steamApiKey) { return 302 "/admin/software-acquisition#steam-library-import"; }
+    if ($arg_serviceCategory ~ ^(tv-movies|audiobooks-books|music|tools-other)$) {
+      return 302 /admin?serviceCategory=$arg_serviceCategory;
+    }
+    return 302 /admin;
+  }
+  location ~ ^/settings/main/?$ {
+    if ($arg_settingsSearchTarget = enable4k) { return 302 "/admin/general#enable4k"; }
+    if ($arg_settingsSearchTarget = apiKey) { return 302 "/admin/general#apiKey"; }
+    if ($arg_settingsSearchTarget = spotifyClientId) { return 302 "/admin/general#spotifyClientId"; }
+    return 302 /admin/general;
+  }
+  location ~ ^/settings/users/?$ {
+    return 302 "/admin/general#default-request-quotas";
+  }
+  location ~ ^/settings/?$ {
     return 302 /admin/general;
   }
 
+  location ~ ^/setup/?$ {
+    try_files $uri /index.html;
+  }
+
   # SeerrNG pages Lumen doesn't have (links in emails, old bookmarks): open them in full SeerrNG
-  location ~ ^/(settings|users|profile|discover|setup|swipe|recordings|book-series|author|software|collections)(/|$) {
+  location ~ ^/(settings|users|profile|discover|setup)(/|$) {
     return 302 ${SEERR_FULL_URL}$request_uri;
   }
 
