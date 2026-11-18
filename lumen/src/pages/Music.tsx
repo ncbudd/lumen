@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
+import BlocklistButton from '../components/BlocklistButton';
 import { MoreOnScroll, Section } from '../components/cards';
+import { CardTitleToggle } from '../components/CardTitleToggle';
 import { DetailTop, Facts, Pill } from '../components/detail';
 import {
   ExtraCard,
@@ -12,6 +14,9 @@ import {
   ServiceNote,
   StatPill,
 } from '../components/extra';
+import IndexerSearchLink from '../components/IndexerSearchLink';
+import ReportIssueButton from '../components/ReportIssueButton';
+import WatchlistButton from '../components/WatchlistButton';
 import {
   artistOf,
   fmtTrack,
@@ -22,11 +27,13 @@ import {
 } from '../extras';
 import { useApi, usePaged } from '../hooks';
 import { Icon } from '../icons';
+import { AssociationLink } from './Associations';
 
 const SORTS = [
   ['ranked', 'Recommended'],
   ['popular.week', 'This week'],
   ['popular.month', 'This month'],
+  ['popular.year', 'This year'],
   ['listen_count.desc', 'Most played'],
   ['release_date.desc', 'Newest'],
 ] as const;
@@ -51,6 +58,7 @@ export const AlbumCard = ({ a }: { a: Album }) => (
     img={a.posterPath}
     title={a.title}
     shape="sq"
+    titleKind="album"
     icon="music"
     stat={extraStat(a.mediaInfo)}
     meta={[artistOf(a), (a['first-release-date'] || '').slice(0, 4)]
@@ -63,7 +71,11 @@ export const AlbumCard = ({ a }: { a: Album }) => (
 export function Music() {
   const [p, setP] = useSearchParams();
   const [q, setQ] = useState(p.get('q') || '');
-  const sort = p.get('sort') || 'ranked';
+  const requestedSort = p.get('sort') || p.get('sortBy');
+  const sort =
+    SORTS.find(([value]) => value === requestedSort)?.[0] ?? 'ranked';
+  const rawGenre = p.get('genre')?.trim() ?? '';
+  const genre = rawGenre.length <= 512 ? rawGenre : '';
   const type = p.get('type') || '';
   const query = p.get('q') || '';
   // searching ignores the chart sorts, which only rank the curated feed
@@ -71,10 +83,12 @@ export function Music() {
     sortBy: query ? 'ranked' : sort,
     ...(query ? { query } : {}),
     ...(type ? { releaseType: type } : {}),
+    ...(genre ? { genre } : {}),
   });
   const list = usePaged<Album>(`/discover/music?${qs}`);
   const upd = (k: string, v: string) => {
     const n = new URLSearchParams(p);
+    if (k === 'sort') n.delete('sortBy');
     if (!v || (k === 'sort' && v === 'ranked')) n.delete(k);
     else n.set(k, v);
     setP(n, { replace: true });
@@ -99,6 +113,22 @@ export function Music() {
         />
       </ExtraHeader>
       <div className="toolbar">
+        <CardTitleToggle kinds={['album']} />
+        <Link className="btn btn-quiet btn-sm" to="/track-requests">
+          Track Requests
+        </Link>
+        <Link className="btn btn-quiet btn-sm" to="/music/playlist-import">
+          Import Playlist
+        </Link>
+        {genre && (
+          <button
+            className="chip"
+            type="button"
+            onClick={() => upd('genre', '')}
+          >
+            Clear Genre: {genre}
+          </button>
+        )}
         {!query && (
           <label className="sel">
             <span className="lbl">Sort</span>
@@ -150,7 +180,7 @@ export function Music() {
 
 export function AlbumDetail() {
   const { id } = useParams();
-  const { data: a, error } = useApi<AlbumDetails>(`/music/${id}`);
+  const { data: a, error, refresh } = useApi<AlbumDetails>(`/music/${id}`);
   if (error)
     return (
       <ExtraGate k="music">
@@ -202,6 +232,21 @@ export function AlbumDetail() {
                 {big(a.stats.totalListenCount)} plays
               </Pill>
             )}
+            <IndexerSearchLink category="music" title={a.title} />
+            <AssociationLink mediaType="album" id={id} />
+            <BlocklistButton
+              mediaType="music"
+              id={a.id}
+              requestedId={id}
+              title={a.title}
+              onChange={refresh}
+            />
+            <ReportIssueButton
+              type="music"
+              title={a.title}
+              media={a.mediaInfo}
+            />
+            <WatchlistButton mediaType="music" detail={a} requestedId={id} />
           </div>
           <div className="dacts pc">{main}</div>
           <div className="dcols">
@@ -290,6 +335,10 @@ export function Artist() {
           ]}
         />
         <div className="dbody">
+          <div className="dstatus">
+            <IndexerSearchLink category="music" title={a.artist.name} />
+            <AssociationLink mediaType="artist" id={id} />
+          </div>
           {a.wikipedia?.extract && <p className="ov">{a.wikipedia.extract}</p>}
           {groups.map(([k, t]) => {
             const list = a.releaseGroups.filter(

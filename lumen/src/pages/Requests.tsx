@@ -15,6 +15,7 @@ import {
   type RequestItem,
   type TvDetails,
 } from '../api';
+import { forget } from '../apiCache';
 import { useAuth, useMediaServerName } from '../auth';
 import { Cover, shortDate } from '../components/cards';
 import { ConfirmSheet } from '../components/ConfirmSheet';
@@ -24,12 +25,18 @@ import {
   Pill,
 } from '../components/detail';
 import { RequestEditSheet } from '../components/requestEdit';
+import RequestEpisodeQueueSheet, {
+  canEditEpisodeQueue,
+} from '../components/RequestEpisodeQueueSheet';
+import RequestHistorySheet from '../components/RequestHistorySheet';
 import { Avatar } from '../components/Shell';
+import { SoftwareRequestHistorySheet } from '../components/SoftwareRequestHistorySheet';
 import { useToast } from '../components/toast';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
 import {
   GAME_LABEL,
+  patchHref,
   useExtras,
   type AlbumDetails,
   type Comic,
@@ -38,8 +45,9 @@ import {
   type Scene,
   type SoftwareRequest,
 } from '../extras';
-import { usePullToRefresh } from '../hooks';
+import { useApi, usePullToRefresh } from '../hooks';
 import { Icon, type IconName } from '../icons';
+import { canRetryRequest, requestFailureMessage } from '../requestRetry';
 import {
   onSessionReset,
   sessionGeneration,
@@ -73,8 +81,13 @@ const EVERYONE_FILTERS = [
   ['all', 'All', 'total'],
   ['pending', 'Waiting', 'pending'],
   ['processing', 'Downloading', 'processing'],
+  ['incomplete', 'Incomplete', 'incomplete'],
+  ['attention', 'Needs attention', 'attention'],
+  ['unavailable', 'Unavailable', 'unavailable'],
   ['failed', 'Failed', 'failed'],
+  ['completed', 'Completed', 'completed'],
   ['available', 'Available', 'available'],
+  ['software', 'Software', 'software'],
 ] as const;
 const PAGE = 20;
 
@@ -116,11 +129,26 @@ async function requestList(path: string): Promise<RequestListPage> {
     authoritativeStatus: pages.every((p) => p.authoritativeStatus) || undefined,
   };
 }
+const TIMELINE_ONLY_REQUEST_FILTERS = new Set([
+  'incomplete',
+  'attention',
+  'unavailable',
+  'completed',
+]);
+
 async function requestListOnce(path: string): Promise<RequestListPage> {
-  const filter = new URLSearchParams(path.split('?')[1]).get('filter');
+  const params = new URLSearchParams(path.split('?')[1]);
+  const filter = params.get('filter');
+  const requiresTimeline =
+    TIMELINE_ONLY_REQUEST_FILTERS.has(filter ?? '') ||
+    params.has('timeFrame') ||
+    params.has('bookFormat') ||
+    params.has('search') ||
+    params.has('sortDirection');
   if (
-    statusFilterSupported &&
-    (filter === 'available' || filter === 'processing')
+    requiresTimeline ||
+    (statusFilterSupported &&
+      (filter === 'available' || filter === 'processing'))
   ) {
     try {
       // The legacy list filter follows aggregate media/coarse request flags.
@@ -128,7 +156,9 @@ async function requestListOnce(path: string): Promise<RequestListPage> {
       const stages =
         filter === 'available'
           ? ['available']
-          : ['searching', 'downloading', 'importing', 'library'];
+          : filter === 'processing'
+            ? ['searching', 'downloading', 'importing', 'library']
+            : null;
       const data = await api<{
         pageInfo: { pages: number; results: number };
         results: {
@@ -145,7 +175,8 @@ async function requestListOnce(path: string): Promise<RequestListPage> {
             !item.request ||
             !Number.isSafeInteger(item.request.id) ||
             item.request.id <= 0 ||
-            !stages.includes(item.status?.stage)
+            typeof item.status?.stage !== 'string' ||
+            (stages !== null && !stages.includes(item.status.stage))
         )
       ) {
         throw new Error('Invalid request status response');
@@ -159,7 +190,11 @@ async function requestListOnce(path: string): Promise<RequestListPage> {
         })),
       };
     } catch (error) {
-      if (!(error instanceof ApiError) || ![400, 404].includes(error.status))
+      if (
+        requiresTimeline ||
+        !(error instanceof ApiError) ||
+        ![400, 404].includes(error.status)
+      )
         throw error;
       statusFilterSupported = false;
     }
@@ -828,7 +863,12 @@ function gameRow(g: SoftwareRequest): Row {
     is4k: false,
     createdAt: q.createdAt,
     seasons: [],
-    requestedBy: { id: 0, displayName: '' },
+    requestedBy: q.requestedBy ?? { id: 0, displayName: '' },
+    currentStatus: {
+      stage: st === 'pending' ? 'requested' : st,
+      percent: q.percent,
+      message: q.error ?? undefined,
+    },
     media: {
       mediaType: 'game',
       tmdbId: 0,
@@ -841,14 +881,156 @@ function gameRow(g: SoftwareRequest): Row {
     },
   } as unknown as RequestItem;
   const id = q.catalogProvider === 'dat' ? q.catalogKey : q.catalogId;
+  const patch = q.selection?.kind === 'patch' ? q.selection : null;
+  const patchLink = patch && patchHref(patch.projectId, patch.versionId);
   return {
     r,
     title: q.title,
     art: q.coverUrl || undefined,
     cover: true,
-    href: `/game/${q.category}/${encodeURIComponent(String(id))}${q.catalogProvider === 'dat' ? '?dat=1' : ''}`,
-    sub: [GAME_LABEL[q.category], q.platform?.name].filter(Boolean).join(' · '),
+    href:
+      patchLink ||
+      (id
+        ? `/game/${q.category}/${encodeURIComponent(String(id))}${q.catalogProvider === 'dat' ? '?dat=1' : ''}`
+        : ''),
+    sub: [GAME_LABEL[q.category], q.platform?.name, patch && 'Patch']
+      .filter(Boolean)
+      .join(' · '),
   };
+}
+
+const REQUEST_SORTS = [
+  ['priority', 'Request priority', 'added', 'desc'],
+  ['newest', 'Newest first', 'added', 'desc'],
+  ['oldest', 'Oldest first', 'added', 'asc'],
+  ['updated', 'Recently updated', 'modified', 'desc'],
+  ['title-asc', 'Title A–Z', 'title', 'asc'],
+  ['title-desc', 'Title Z–A', 'title', 'desc'],
+] as const;
+
+const REQUEST_TIME_FRAMES = [
+  ['all', 'All time'],
+  ['7d', 'Last 7 days'],
+  ['14d', 'Last 14 days'],
+  ['30d', 'Last 30 days'],
+  ['6m', 'Last 6 months'],
+] as const;
+
+const REQUEST_MEDIA_TYPES = [
+  ['all', 'All media'],
+  ['movie', 'Movies'],
+  ['tv', 'Series'],
+  ['music', 'Music'],
+  ['book', 'Books and audiobooks'],
+  ['comic', 'Comics'],
+  ['magazine', 'Magazines'],
+  ['sports', 'Sports'],
+  ['adult', 'Adult'],
+] as const;
+
+const SOFTWARE_CATEGORIES = [
+  ['all', 'All categories'],
+  ['game', 'PC games'],
+  ['retro', 'Retro games'],
+  ['modern', 'Modern games'],
+] as const;
+
+const SOFTWARE_STATUSES = [
+  ['all', 'All statuses'],
+  ['active', 'Active'],
+  ['pending', 'Waiting for approval'],
+  ['approved', 'Approved'],
+  ['searching', 'Searching'],
+  ['downloading', 'Downloading'],
+  ['importing', 'Importing'],
+  ['available', 'Available'],
+  ['attention', 'Needs attention'],
+  ['failed', 'Failed'],
+  ['declined', 'Declined'],
+  ['cancelled', 'Cancelled'],
+] as const;
+
+function RequesterFilter({
+  value,
+  change,
+}: {
+  value: string;
+  change: (value: string) => void;
+}) {
+  const [page, setPage] = useState(0);
+  const { data, error, reload } = useApi<{
+    results: { id: number; displayName: string }[];
+    pageInfo: { page: number; pages: number };
+  }>(`/request/status/users?take=100&skip=${page * 100}`);
+  const users = data?.results ?? [];
+  return (
+    <div className="toolbar" role="group" aria-label="Requester filter">
+      <label className="sel">
+        <span className="lbl">Requester</span>
+        <select value={value} onChange={(event) => change(event.target.value)}>
+          <option value="all">Everyone</option>
+          {value !== 'all' && !users.some(({ id }) => String(id) === value) && (
+            <option value={value}>User #{value}</option>
+          )}
+          {users.map(({ id, displayName }) => (
+            <option key={id} value={id}>
+              {displayName}
+            </option>
+          ))}
+        </select>
+      </label>
+      {page > 0 && (
+        <button
+          className="btn btn-quiet btn-sm"
+          onClick={() => setPage(page - 1)}
+        >
+          Previous Users
+        </button>
+      )}
+      {!!data &&
+        data.pageInfo.page === page + 1 &&
+        data.pageInfo.pages > page + 1 && (
+          <button
+            className="btn btn-quiet btn-sm"
+            onClick={() => setPage(page + 1)}
+          >
+            More Users
+          </button>
+        )}
+      {error && (
+        <button className="btn btn-quiet btn-sm" onClick={reload}>
+          Retry Loading Users
+        </button>
+      )}
+    </div>
+  );
+}
+
+async function householdSoftwareRequests(
+  pages: number,
+  category: string,
+  status: string,
+  requester: string
+) {
+  const rows: Row[] = [];
+  let more = false;
+  for (let page = 0; page < pages; page++) {
+    const params = new URLSearchParams({
+      take: String(PAGE),
+      skip: String(page * PAGE),
+      filter: status,
+    });
+    if (category !== 'all') params.set('category', category);
+    if (requester !== 'all') params.set('requestedBy', requester);
+    const data = await api<{
+      results: SoftwareRequest[];
+      pageInfo: { pages: number };
+    }>(`/request/software/status?${params}`);
+    rows.push(...data.results.map(gameRow));
+    more = data.pageInfo.pages > page + 1;
+    if (!more) break;
+  }
+  return { rows, more };
 }
 
 export default function Requests() {
@@ -856,6 +1038,26 @@ export default function Requests() {
   const { user } = useAuth();
   const toast = useToast();
   const [p, setP] = useSearchParams();
+  const requestKey = p.has('softwareRequestId')
+    ? 'softwareRequestId'
+    : 'requestId';
+  const requestParam = p.get(requestKey);
+  const focusedId =
+    requestParam && /^\d+$/.test(requestParam) ? Number(requestParam) : 0;
+  const validRequestLink = Number.isSafeInteger(focusedId) && focusedId > 0;
+  const historyParams = (id: number) => {
+    const next = new URLSearchParams(p);
+    next.delete('requestId');
+    next.delete('softwareRequestId');
+    next.set(id < 0 ? 'softwareRequestId' : 'requestId', String(Math.abs(id)));
+    return next;
+  };
+  const closeHistory = () => {
+    const next = new URLSearchParams(p);
+    next.delete(requestKey);
+    setP(next, { replace: true });
+  };
+
   const viewAll = canViewAllRequests(user?.permissions);
   const defaultTab = viewAll ? 'everyone' : 'active';
   const requestedTab = p.get('tab');
@@ -884,14 +1086,94 @@ export default function Requests() {
   // Everyone: which requests (SeerrNG's own filters) and how many pages of them
   const show = (EVERYONE_FILTERS.find(([v]) => v === p.get('show')) ||
     EVERYONE_FILTERS[0])[0];
+  const softwareCategory =
+    SOFTWARE_CATEGORIES.find(([value]) => value === p.get('category'))?.[0] ??
+    'all';
+  const softwareStatus =
+    SOFTWARE_STATUSES.find(
+      ([value]) => value === p.get('softwareStatus')
+    )?.[0] ?? 'all';
+  const requesterParam = p.get('requestedBy');
+  const requester =
+    requesterParam &&
+    /^[1-9]\d*$/.test(requesterParam) &&
+    Number.isSafeInteger(Number(requesterParam))
+      ? requesterParam
+      : 'all';
+  const requesterQuery = requester === 'all' ? '' : `&requestedBy=${requester}`;
+  const permissions = user?.permissions ?? 0;
+  const canViewAdult =
+    manage ||
+    (Number.isSafeInteger(permissions) &&
+      permissions >= 0 &&
+      (BigInt(permissions) & 140737488355328n) !== 0n);
+  const mediaTypes = REQUEST_MEDIA_TYPES.filter(
+    ([type]) => type !== 'adult' || canViewAdult
+  );
+  const formatParam = p.get('bookFormat');
+  const selectedBookFormat =
+    formatParam === 'ebook' || formatParam === 'audiobook'
+      ? formatParam
+      : 'all';
+  const mediaType =
+    mediaTypes.find(([type]) => type === p.get('mediaType'))?.[0] ??
+    (selectedBookFormat === 'all' ? 'all' : 'book');
+  const bookFormat = mediaType === 'book' ? selectedBookFormat : 'all';
+  const timeFrameParam =
+    p.get('timeFrame') === '1m' ? '30d' : p.get('timeFrame');
+  const timeFrame =
+    REQUEST_TIME_FRAMES.find(([value]) => value === timeFrameParam)?.[0] ??
+    'all';
+  const search = (p.get('search') ?? '').trim().slice(0, 200);
+  const [sortMode, , sortField, sortDirection] =
+    REQUEST_SORTS.find(([value]) => value === p.get('order')) ??
+    REQUEST_SORTS[0];
+  const priorityOrder = sortMode === 'priority';
+  const requestSortQuery = priorityOrder
+    ? 'sort=added'
+    : `sort=${sortField}&sortDirection=${sortDirection}`;
+  const mediaQuery =
+    requesterQuery +
+    (mediaType === 'all' ? '' : `&mediaType=${mediaType}`) +
+    (timeFrame === 'all' ? '' : `&timeFrame=${timeFrame}`) +
+    (bookFormat === 'all' ? '' : `&bookFormat=${bookFormat}`) +
+    (search ? `&${new URLSearchParams({ search })}` : '');
+  const setRequestFilter = (key: string, value: string) => {
+    const next = new URLSearchParams(p);
+    if (key === 'mediaType' && value !== 'book') next.delete('bookFormat');
+    if (key === 'bookFormat') next.set('mediaType', 'book');
+    if (
+      !value ||
+      (key !== 'search' && value === 'all') ||
+      (key === 'order' && value === 'priority')
+    )
+      next.delete(key);
+    else next.set(key, value);
+    setPages(1);
+    setP(next, { replace: true });
+  };
   const [pages, setPages] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   useEffect(() => {
     setPages(1);
     setOthers(null);
-  }, [show, everyone]);
+  }, [
+    show,
+    everyone,
+    softwareCategory,
+    softwareStatus,
+    requester,
+    mediaType,
+    bookFormat,
+    timeFrame,
+    search,
+    sortMode,
+  ]);
+  const mutationInFlight = useRef(false);
+  const [historyRevision, setHistoryRevision] = useState(0);
   const [acting, setActing] = useState<number | null>(null);
+  const [queueEdit, setQueueEdit] = useState<Row | null>(null);
   const [editing, setEditing] = useState<Row | null>(null);
   // a decline, a cancel or a remove waits for a yes; none can be taken back
   const [confirming, setConfirming] = useState<{
@@ -935,11 +1217,12 @@ export default function Requests() {
       let total = 0;
       for (let skip = 0; skip < take; skip += 100) {
         const d = await requestList(
-          `/request?take=${Math.min(100, take - skip)}&skip=${skip}&filter=${filter}&sort=added`
+          `/request?take=${Math.min(100, take - skip)}&skip=${skip}&filter=${filter}&${requestSortQuery}${mediaQuery}`
         );
         total = d.pageInfo?.results ?? 0;
         if (
           live &&
+          !mediaQuery &&
           (filter === 'available' || filter === 'processing') &&
           d.authoritativeStatus
         ) {
@@ -953,26 +1236,41 @@ export default function Requests() {
     const take = PAGE * pages;
     // All: waiting for approval, then downloads that have started (furthest along first), then
     // the newest of the rest. Downloading: started ones first too. Others: newest first.
-    const started =
-      show === 'all' || show === 'processing'
-        ? startedDownloads()
-            .then((x) => x.sort((a, b) => progress(b) - progress(a)))
-            .catch(() => [])
-        : Promise.resolve([]);
-    const pending =
-      show === 'all'
-        ? list('pending', 50).then((x) => x.results)
-        : Promise.resolve([]);
-    loads.current++;
-    Promise.all([pending, started, list(show, take)])
-      .then(async ([waitingList, startedList, rest]) => {
-        const rows = await describeAll(
-          merge(waitingList, startedList, rest.results),
-          (early) => live && setOthers(early)
+    const load = async () => {
+      if (show === 'software')
+        return householdSoftwareRequests(
+          pages,
+          softwareCategory,
+          softwareStatus,
+          requester
         );
+      const started =
+        priorityOrder && (show === 'all' || show === 'processing')
+          ? startedDownloads(mediaQuery)
+              .then((x) => x.sort((a, b) => progress(b) - progress(a)))
+              .catch(() => [])
+          : Promise.resolve([]);
+      const pending =
+        priorityOrder && show === 'all'
+          ? list('pending', 50).then((x) => x.results)
+          : Promise.resolve([]);
+      const [waitingList, startedList, rest] = await Promise.all([
+        pending,
+        started,
+        list(show, take),
+      ]);
+      const rows = await describeAll(
+        merge(waitingList, startedList, rest.results),
+        (early) => live && setOthers(early)
+      );
+      return { rows, more: rest.more };
+    };
+    loads.current++;
+    load()
+      .then(({ rows, more }) => {
         if (!live) return;
         setOthers(rows);
-        setHasMore(rest.more);
+        setHasMore(more);
       })
       .catch(() => {
         if (!live) return;
@@ -988,7 +1286,18 @@ export default function Requests() {
     return () => {
       live = false;
     };
-  }, [everyone, show, pages, tick]);
+  }, [
+    everyone,
+    show,
+    pages,
+    tick,
+    softwareCategory,
+    softwareStatus,
+    requester,
+    mediaQuery,
+    priorityOrder,
+    requestSortQuery,
+  ]);
 
   useEffect(() => {
     if (!user || everyone) return;
@@ -1082,16 +1391,21 @@ export default function Requests() {
   useEffect(() => {
     // a full load still on its way would land over the poll's newer numbers: skip this one
     if (!poll || !user || loads.current) return;
+    if (everyone && (show === 'software' || sortMode === 'updated')) {
+      setTick((n) => n + 1);
+      return;
+    }
     let live = true;
     const current = shown || [];
     const ids = new Set(current.map((x) => x.r.id));
     // these lists always include every started download
-    const withStarted = !everyone || show === 'all' || show === 'processing';
+    const withStarted =
+      !everyone || (priorityOrder && (show === 'all' || show === 'processing'));
     const gameBusy =
       !everyone &&
       current.some((x) => x.r.id < 0 && state(x, serverName).pct != null);
     Promise.all([
-      processingRequests(everyone ? '' : `&requestedBy=${user.id}`),
+      processingRequests(everyone ? mediaQuery : `&requestedBy=${user.id}`),
       gameBusy
         ? api<{ results: SoftwareRequest[] }>(
             `/request/software/status?take=40&requestedBy=${user.id}`
@@ -1130,6 +1444,8 @@ export default function Requests() {
     id: number,
     how: 'approve' | 'decline' | 'retry' | 'remove'
   ) => {
+    if (mutationInFlight.current) return;
+    mutationInFlight.current = true;
     setActing(id);
     try {
       if (how === 'remove') await api(`/request/${id}`, { method: 'DELETE' });
@@ -1142,16 +1458,22 @@ export default function Requests() {
           remove: 'Request removed',
         }[how]
       );
+      forget(`/request/status/${id}`);
+      if (requestKey === 'requestId' && focusedId === id) {
+        if (how === 'remove') closeHistory();
+        else setHistoryRevision((value) => value + 1);
+      }
       setTick((t) => t + 1);
     } catch (e) {
       toast(friendlyError(e, 'Couldn’t update the request'));
     } finally {
+      mutationInFlight.current = false;
       setActing(null);
     }
   };
   const cancel = async (id: number) => {
-    // a second tap while the first is on its way would fail ("not found") after it worked
-    if (acting === id) return;
+    if (mutationInFlight.current) return;
+    mutationInFlight.current = true;
     setActing(id);
     try {
       // game requests (negative ids here) are withdrawn through their own endpoint
@@ -1160,15 +1482,125 @@ export default function Requests() {
           method: 'POST',
         });
       else await cancelRequest(id);
+      if (id > 0) forget(`/request/status/${id}`);
       toast('Request cancelled');
+      if (requestKey === 'requestId' && focusedId === id) closeHistory();
       // gone now, not after the list has refreshed
       setRows((list) => list && list.filter((x) => x.r.id !== id));
       setTick((t) => t + 1);
     } catch (e) {
       toast(friendlyError(e, 'Couldn’t cancel'));
     } finally {
+      mutationInFlight.current = false;
       setActing(null);
     }
+  };
+
+  const renderRequestActions = (x: Row, moderate: boolean) => {
+    const st = state(x, serverName);
+    return (
+      <>
+        {canEditEpisodeQueue(x.r, user?.permissions) && (
+          <button
+            className="btn btn-sm btn-quiet"
+            disabled={acting !== null}
+            onClick={() => setQueueEdit(x)}
+          >
+            Episode Queue
+          </button>
+        )}
+        {canRetryRequest(x.r, user, manage) && (
+          <button
+            className="btn btn-sm btn-tonal"
+            disabled={acting !== null}
+            onClick={() => decide(x.r.id, 'retry')}
+          >
+            <Icon name="refresh" size="sm" />
+            Retry
+          </button>
+        )}
+        {moderate && x.r.id > 0 ? (
+          <>
+            {x.r.status === 1 && (
+              <>
+                <button
+                  className="btn btn-sm btn-ok"
+                  disabled={acting !== null}
+                  onClick={() => decide(x.r.id, 'approve')}
+                >
+                  <Icon name="check" size="sm" />
+                  Approve
+                </button>
+                <button
+                  className="btn btn-sm btn-quiet"
+                  disabled={acting !== null}
+                  onClick={() =>
+                    setConfirming({
+                      id: x.r.id,
+                      how: 'decline',
+                      title: x.title,
+                    })
+                  }
+                >
+                  <Icon name="x" size="sm" />
+                  Decline
+                </button>
+              </>
+            )}
+            {(x.r.status === 1 || x.r.status === 4) &&
+              (x.r.type === 'movie' || x.r.type === 'tv') && (
+                <button
+                  className="btn btn-sm btn-quiet"
+                  disabled={acting !== null}
+                  onClick={() => setEditing(x)}
+                >
+                  Change
+                </button>
+              )}
+            <button
+              className="btn btn-sm btn-quiet"
+              disabled={acting !== null}
+              onClick={() =>
+                setConfirming({
+                  id: x.r.id,
+                  how: 'remove',
+                  title: x.title,
+                })
+              }
+            >
+              Remove
+            </button>
+          </>
+        ) : st.k === 'ok' &&
+          x.r.type !== 'book' &&
+          plexUrl(x.r.media, x.r.is4k) ? (
+          <a
+            className="btn btn-sm btn-ok"
+            {...mediaLink(x.r.media, x.r.is4k, x.r.type, serverName)}
+          >
+            <Icon name="play" size="sm" />
+            {x.r.type === 'music'
+              ? `Listen on ${serverName}`
+              : `Watch on ${serverName}`}
+          </a>
+        ) : (x.r.id < 0 ? !everyone : x.r.requestedBy?.id === user?.id) &&
+          x.r.status === 1 ? (
+          <button
+            className="btn btn-sm btn-quiet"
+            disabled={acting !== null}
+            onClick={() =>
+              setConfirming({
+                id: x.r.id,
+                how: 'cancel',
+                title: x.title,
+              })
+            }
+          >
+            Cancel
+          </button>
+        ) : null}
+      </>
+    );
   };
 
   return (
@@ -1182,9 +1614,13 @@ export default function Requests() {
         </div>
         <p className="sub">
           {everyone
-            ? show === 'all'
-              ? 'Everyone’s requests: waiting ones first, then downloads, then the newest.'
-              : 'Everyone’s requests, newest first.'
+            ? show === 'software'
+              ? 'Software and game requests from everyone, newest first.'
+              : !priorityOrder
+                ? 'Everyone’s requests in the selected order.'
+                : show === 'all'
+                  ? 'Everyone’s requests: waiting ones first, then downloads, then the newest.'
+                  : 'Everyone’s requests, newest first.'
             : 'Everything you’ve asked for, newest first.'}
         </p>
       </header>
@@ -1255,23 +1691,158 @@ export default function Requests() {
               key={v}
               className="chip"
               aria-pressed={show === v}
-              onClick={() =>
-                setP(
-                  v === 'all'
-                    ? { tab: 'everyone' }
-                    : { tab: 'everyone', show: v },
-                  {
-                    replace: true,
-                  }
-                )
-              }
+              onClick={() => setRequestFilter('show', v)}
             >
               {t}
-              {counts?.[key] != null && (
+              {!mediaQuery && counts?.[key] != null && (
                 <span className="n">{counts[key]}</span>
               )}
             </button>
           ))}
+        </div>
+      )}
+      {everyone && (
+        <RequesterFilter
+          value={requester}
+          change={(value) => setRequestFilter('requestedBy', value)}
+        />
+      )}
+      {everyone && show !== 'software' && (
+        <div className="toolbar">
+          <label className="sel">
+            <span className="lbl">Media Type</span>
+            <select
+              value={mediaType}
+              onChange={(event) =>
+                setRequestFilter('mediaType', event.target.value)
+              }
+            >
+              {mediaTypes.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          {mediaType === 'book' && (
+            <label className="sel">
+              <span className="lbl">Book Format</span>
+              <select
+                value={bookFormat}
+                onChange={(event) =>
+                  setRequestFilter('bookFormat', event.target.value)
+                }
+              >
+                <option value="all">All formats</option>
+                <option value="ebook">Ebook</option>
+                <option value="audiobook">Audiobook</option>
+              </select>
+            </label>
+          )}
+          <label className="sel">
+            <span className="lbl">Sort</span>
+            <select
+              value={sortMode}
+              onChange={(event) =>
+                setRequestFilter('order', event.target.value)
+              }
+            >
+              {REQUEST_SORTS.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="sel">
+            <span className="lbl">Date Added</span>
+            <select
+              value={timeFrame}
+              onChange={(event) =>
+                setRequestFilter('timeFrame', event.target.value)
+              }
+            >
+              {REQUEST_TIME_FRAMES.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+      {everyone && show !== 'software' && (
+        <form
+          className="toolbar"
+          aria-label="Search media requests"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const value = new FormData(event.currentTarget).get('search');
+            setRequestFilter(
+              'search',
+              typeof value === 'string' ? value.trim() : ''
+            );
+          }}
+        >
+          <label className="search">
+            <input
+              key={search}
+              name="search"
+              type="search"
+              aria-label="Search media requests"
+              placeholder="Search media requests"
+              maxLength={200}
+              defaultValue={search}
+            />
+          </label>
+          <button className="btn btn-tonal btn-sm">Search</button>
+          {search && (
+            <button
+              type="button"
+              className="btn btn-quiet btn-sm"
+              onClick={() => setRequestFilter('search', '')}
+            >
+              Clear Search
+            </button>
+          )}
+        </form>
+      )}
+      {everyone && show === 'software' && (
+        <div
+          className="toolbar"
+          role="group"
+          aria-label="Software request filters"
+        >
+          <label className="sel">
+            <span className="lbl">Category</span>
+            <select
+              value={softwareCategory}
+              onChange={(event) =>
+                setRequestFilter('category', event.target.value)
+              }
+            >
+              {SOFTWARE_CATEGORIES.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="sel">
+            <span className="lbl">Status</span>
+            <select
+              value={softwareStatus}
+              onChange={(event) =>
+                setRequestFilter('softwareStatus', event.target.value)
+              }
+            >
+              {SOFTWARE_STATUSES.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       )}
       {shown && !list.length && everyone && (
@@ -1295,6 +1866,7 @@ export default function Requests() {
       <div className="rqlist">
         {list.map((x) => {
           const st = state(x, serverName);
+          const detail = requestFailureMessage(x.r) ?? st.detail;
           return (
             <div className="rq" key={x.r.id}>
               <div className={`art ${x.cover ? 'cover' : ''}`}>
@@ -1328,7 +1900,9 @@ export default function Requests() {
               </div>
               <div style={{ minWidth: 0 }}>
                 <div className="tt">
-                  <Link to={x.href}>{x.title}</Link>
+                  <Link to={x.href || `?${historyParams(x.r.id)}`}>
+                    {x.title}
+                  </Link>
                 </div>
                 <div className="sub">
                   {everyone && x.r.requestedBy?.displayName
@@ -1340,98 +1914,25 @@ export default function Requests() {
                   <Pill k={st.k} icon={st.ico}>
                     {st.word}
                   </Pill>
-                  {st.detail && <span className="d">{st.detail}</span>}
+                  {x.r.watchAheadParentRequestId ? (
+                    <span className="d">Auto-Queued</span>
+                  ) : (x.r.watchAheadEpisodeCount ?? 0) > 0 ? (
+                    <span className="d">
+                      Episode Queue · {x.r.watchAheadEpisodeCount} ahead
+                    </span>
+                  ) : null}
+                  {detail && <span className="d">{detail}</span>}
                 </div>
                 <div className="rqa">
-                  {everyone && manage ? (
-                    <>
-                      {x.r.status === 1 && (
-                        <>
-                          <button
-                            className="btn btn-sm btn-ok"
-                            disabled={acting === x.r.id}
-                            onClick={() => decide(x.r.id, 'approve')}
-                          >
-                            <Icon name="check" size="sm" />
-                            Approve
-                          </button>
-                          <button
-                            className="btn btn-sm btn-quiet"
-                            disabled={acting === x.r.id}
-                            onClick={() =>
-                              setConfirming({
-                                id: x.r.id,
-                                how: 'decline',
-                                title: x.title,
-                              })
-                            }
-                          >
-                            <Icon name="x" size="sm" />
-                            Decline
-                          </button>
-                        </>
-                      )}
-                      {x.r.status === 4 && (
-                        <button
-                          className="btn btn-sm btn-tonal"
-                          disabled={acting === x.r.id}
-                          onClick={() => decide(x.r.id, 'retry')}
-                        >
-                          <Icon name="refresh" size="sm" />
-                          Retry
-                        </button>
-                      )}
-                      {(x.r.status === 1 || x.r.status === 4) &&
-                        (x.r.type === 'movie' || x.r.type === 'tv') && (
-                          <button
-                            className="btn btn-sm btn-quiet"
-                            disabled={acting === x.r.id}
-                            onClick={() => setEditing(x)}
-                          >
-                            Change
-                          </button>
-                        )}
-                      <button
-                        className="btn btn-sm btn-quiet"
-                        disabled={acting === x.r.id}
-                        onClick={() =>
-                          setConfirming({
-                            id: x.r.id,
-                            how: 'remove',
-                            title: x.title,
-                          })
-                        }
-                      >
-                        Remove
-                      </button>
-                    </>
-                  ) : st.k === 'ok' &&
-                    x.r.type !== 'book' &&
-                    plexUrl(x.r.media, x.r.is4k) ? (
-                    <a
-                      className="btn btn-sm btn-ok"
-                      {...mediaLink(x.r.media, x.r.is4k, x.r.type, serverName)}
-                    >
-                      <Icon name="play" size="sm" />
-                      {x.r.type === 'music'
-                        ? `Listen on ${serverName}`
-                        : `Watch on ${serverName}`}
-                    </a>
-                  ) : !everyone && x.r.status === 1 ? (
+                  {x.r.id !== 0 && (
                     <button
                       className="btn btn-sm btn-quiet"
-                      disabled={acting === x.r.id}
-                      onClick={() =>
-                        setConfirming({
-                          id: x.r.id,
-                          how: 'cancel',
-                          title: x.title,
-                        })
-                      }
+                      onClick={() => setP(historyParams(x.r.id))}
                     >
-                      Cancel
+                      History
                     </button>
-                  ) : null}
+                  )}
+                  {renderRequestActions(x, everyone && manage)}
                 </div>
               </div>
             </div>
@@ -1484,6 +1985,75 @@ export default function Requests() {
           }}
         />
       )}
+      {requestParam !== null && !validRequestLink && (
+        <p className="note" role="alert">
+          This request link is invalid.
+        </p>
+      )}
+      {validRequestLink && requestKey === 'softwareRequestId' && (
+        <SoftwareRequestHistorySheet
+          changed={() => setTick((value) => value + 1)}
+          key={focusedId}
+          id={focusedId}
+          close={closeHistory}
+        />
+      )}
+      {validRequestLink &&
+        requestKey === 'requestId' &&
+        !confirming &&
+        !editing &&
+        !queueEdit && (
+          <RequestHistorySheet
+            key={`${focusedId}:${historyRevision}`}
+            id={focusedId}
+            title={list.find(({ r }) => r.id === focusedId)?.title}
+            describeRequest={describe}
+            renderActions={(request, title) => (
+              <div className="rqa">
+                {renderRequestActions(
+                  {
+                    href: '',
+                    sub: '',
+                    ...list.find(({ r }) => r.id === request.id),
+                    r: request,
+                    title,
+                  },
+                  manage
+                )}
+              </div>
+            )}
+
+            close={closeHistory}
+          />
+        )}
+      {queueEdit && (
+        <RequestEpisodeQueueSheet
+          request={queueEdit.r}
+          title={queueEdit.title}
+          close={() => setQueueEdit(null)}
+          saved={({ episodeCount, usesUserDefault }) => {
+            forget(`/request/status/${queueEdit.r.id}`);
+            const patch = (previous: Row[] | null) =>
+              previous?.map((row) =>
+                row.r.id === queueEdit.r.id
+                  ? {
+                      ...row,
+                      r: {
+                        ...row.r,
+                        watchAheadEpisodeCount: episodeCount,
+                        watchAheadUsesUserDefault: usesUserDefault,
+                      },
+                    }
+                  : row
+              ) ?? null;
+            setRows(patch);
+            setOthers(patch);
+            setQueueEdit(null);
+            toast('Episode Queue saved.');
+            setTick((t) => t + 1);
+          }}
+        />
+      )}
       {editing && (
         <RequestEditSheet
           r={editing.r}
@@ -1491,6 +2061,7 @@ export default function Requests() {
           art={editing.art}
           onClose={() => setEditing(null)}
           onDone={(message) => {
+            forget(`/request/status/${editing.r.id}`);
             setEditing(null);
             toast(message);
             setTick((t) => t + 1);

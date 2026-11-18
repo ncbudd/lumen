@@ -17,6 +17,7 @@ import {
   type EditionList,
 } from '../api';
 import { useAuth } from '../auth';
+import BlocklistButton from '../components/BlocklistButton';
 import { statusOf } from '../components/cards';
 import {
   ActionBar,
@@ -27,11 +28,16 @@ import {
   Pill,
 } from '../components/detail';
 import { ServiceNote } from '../components/extra';
+import IndexerSearchLink from '../components/IndexerSearchLink';
+import ReportIssueButton from '../components/ReportIssueButton';
+import { ReaderDownloads } from '../components/RequestFiles';
 import { useToast } from '../components/toast';
+import WatchlistButton from '../components/WatchlistButton';
 import { friendlyError } from '../errors';
 import { dropBookStates, useApi } from '../hooks';
 import { Icon } from '../icons';
 import { usePrefs } from '../settings';
+import { AssociationLink } from './Associations';
 
 const english = (e: Edition) =>
   !e.language || /^(en|eng|english|und)$/i.test(e.language);
@@ -348,43 +354,48 @@ export default function BookDetail() {
   // picking another narrator makes that the main button: the copy already here stays reachable
   const alsoListen =
     audio && anotherMode && ownsAny && chosenRow ? listen : null;
-  const main = pendingRequest ? (
-    <button className="btn btn-ok" disabled={busy} onClick={approve}>
-      <Icon name="check" />
-      {busy ? 'Approving…' : 'Approve request'}
-    </button>
-  ) : audio && showNarr && anotherMode ? (
-    chosenRow ? (
-      <button
-        className="btn btn-primary"
-        disabled={busy}
-        onClick={requestAnother}
-      >
-        <Icon name="plus" />
-        Request another narrator · {who(chosenRow)}
-      </button>
-    ) : ownsAny ? (
-      listen
-    ) : (
+  const main =
+    b.mediaInfo?.status === MediaStatus.BLOCKLISTED ? (
       <button className="btn btn-tonal" disabled>
-        <Icon name="clock" />
-        Requested
+        Blocklisted
       </button>
-    )
-  ) : available ? (
-    // owned: another narrator is only offered once the narration list has loaded (above)
-    inAbs(audio)
-  ) : s && s.k !== 'ok' ? (
-    <button className="btn btn-tonal" disabled>
-      <Icon name={s.ico} />
-      {s.word}
-    </button>
-  ) : (
-    <button className="btn btn-primary" disabled={busy} onClick={request}>
-      <Icon name="plus" />
-      {label}
-    </button>
-  );
+    ) : pendingRequest ? (
+      <button className="btn btn-ok" disabled={busy} onClick={approve}>
+        <Icon name="check" />
+        {busy ? 'Approving…' : 'Approve request'}
+      </button>
+    ) : audio && showNarr && anotherMode ? (
+      chosenRow ? (
+        <button
+          className="btn btn-primary"
+          disabled={busy}
+          onClick={requestAnother}
+        >
+          <Icon name="plus" />
+          Request another narrator · {who(chosenRow)}
+        </button>
+      ) : ownsAny ? (
+        listen
+      ) : (
+        <button className="btn btn-tonal" disabled>
+          <Icon name="clock" />
+          Requested
+        </button>
+      )
+    ) : available ? (
+      // owned: another narrator is only offered once the narration list has loaded (above)
+      inAbs(audio)
+    ) : s && s.k !== 'ok' ? (
+      <button className="btn btn-tonal" disabled>
+        <Icon name={s.ico} />
+        {s.word}
+      </button>
+    ) : (
+      <button className="btn btn-primary" disabled={busy} onClick={request}>
+        <Icon name="plus" />
+        {label}
+      </button>
+    );
 
   return (
     <article className="detail">
@@ -439,6 +450,21 @@ export default function BookDetail() {
               {s.word}
             </Pill>
           )}
+          <IndexerSearchLink
+            category={audio ? 'audiobook' : 'ebook'}
+            title={b.title}
+          />
+          <AssociationLink mediaType="book" id={b.id} audio={audio} />
+          <BlocklistButton
+            mediaType="book"
+            id={b.id}
+            requestedId={plainId}
+            title={b.title}
+            onChange={first.refresh}
+          />
+          <ReaderDownloads mediaId={b.mediaInfo?.id} type="book" format={f} />
+          <ReportIssueButton type="book" title={b.title} media={b.mediaInfo} />
+          <WatchlistButton mediaType="book" detail={b} requestedId={plainId} />
         </div>
         {/* phones: the action bar holds only the request, so the owned copy's link goes here */}
         {alsoListen && <div className="dacts ph">{alsoListen}</div>}

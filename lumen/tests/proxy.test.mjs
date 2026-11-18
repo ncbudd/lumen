@@ -131,6 +131,73 @@ async function check(settings, clientIp, scheme, headers = {}) {
       full.headers.get('location'),
       'https://seerr.example.test/?interface=classic'
     );
+    for (const [path, target] of [
+      ['/profile/', '/me'],
+      ['/profile/settings/', '/me/account'],
+      ['/profile/settings/password/', '/me/account#password'],
+      [
+        '/profile/settings/episode-queue/',
+        '/me/account/tv-requests#episode-queue',
+      ],
+      [
+        '/profile/settings/notifications/webpush',
+        '/me/account/notifications#notification-webpush',
+      ],
+      ['/profile/watchlist/?page=2', '/watchlist?page=2'],
+      ['/users/19/watchlist/?page=2', '/watchlist/user/19?page=2'],
+      [
+        '/users/19/requests/?requestedBy=11&filter=pending&mediaType=movie',
+        '/requests?requestedBy=19&show=pending&mediaType=movie',
+      ],
+      ['/discover/comics?q=Example', '/comics?q=Example'],
+      ['/discover/watchlist/?page=3', '/watchlist/discover?page=3'],
+      [
+        '/discover/movies/studio/42?sortBy=vote_average.desc',
+        '/movies?nativeFilters=1&studio=42&sortBy=vote_average.desc',
+      ],
+      [
+        '/discover/tv/network/213?availability=4k',
+        '/series?nativeFilters=1&network=213&availability=4k',
+      ],
+      [
+        '/discover/tv/language/fr?genre=18%7C35',
+        '/series?nativeFilters=1&language=fr&genre=18%7C35',
+      ],
+      [
+        '/discover/movies/keyword?keywords=17',
+        '/movies?nativeFilters=1&keywords=17',
+      ],
+      ['/coming-soon/', '/soon'],
+      ['/discover/movies/upcoming/', '/soon?media=movie'],
+      ['/discover/tv/upcoming', '/soon?media=tv'],
+      ['/movie/12/cast', '/movie/12#cast'],
+      ['/tv/1000000000/crew/', '/tv/1000000000#crew'],
+      ['/discover/trending?mediaType=audiobook', '/audiobooks'],
+      ['/discover/list/12345/?page=2', '/list/12345?page=2'],
+      ['/discover/trending?mediaType=tv', '/trending?mediaType=tv'],
+      ['/discover/patches?kind=hack', '/patches?kind=hack'],
+      ['/discover/providers', '/providers'],
+      ['/settings/jobs/', '/admin/jobs'],
+      ['/users/', '/admin/users'],
+      ['/users/19/settings', '/admin/users/19/main'],
+      ['/users/19/settings/maturity', '/admin/users/19/maturity'],
+      ['/users/19/settings/linked-accounts', '/admin/users/19/linked-accounts'],
+      [
+        '/users/19/settings/notifications/email',
+        '/admin/users/19/notifications#notification-email',
+      ],
+      ['/users/19/settings/notifications/', '/admin/users/19/notifications'],
+      ['/settings/logs', '/admin/logs'],
+      ['/settings/main', '/admin/general'],
+    ]) {
+      const response = await fetch(base + path, { redirect: 'manual' });
+      assert.equal(response.status, 302, path);
+      assert.equal(
+        new URL(response.headers.get('location'), base).href,
+        new URL(target, base).href,
+        path
+      );
+    }
     const frontend = await fetch(base + '/');
     assert.equal(frontend.status, 200);
     assert.match(await frontend.text(), /<div id="root"><\/div>/);

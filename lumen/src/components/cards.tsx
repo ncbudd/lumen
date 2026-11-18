@@ -1,5 +1,11 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   bookArt,
   englishAudioEdition,
@@ -14,10 +20,13 @@ import {
   tmdbImg,
   yearOf,
   type BookResult,
+  type CardTitleKind,
+  type CollectionResult,
   type MediaInfo,
   type TitleResult,
 } from '../api';
-import { useMediaServerName } from '../auth';
+import { useAuth, useMediaServerName } from '../auth';
+import { cardTitleModes } from '../cardTitleModes';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
 import {
@@ -28,6 +37,8 @@ import {
 } from '../hooks';
 import { Icon, type IconName } from '../icons';
 import { scrollBehavior } from '../motion';
+import { seriesRequestSummary } from '../seriesRequestSummary';
+import { onSessionReset, sessionGeneration } from '../sessionState';
 import { usePrefs } from '../settings';
 import { useQuickRequest } from './requestSheet';
 import { useToast } from './toast';
@@ -89,6 +100,8 @@ export function statusOf(
   book = false,
   serverName = 'Plex'
 ): Stat {
+  if (mi?.status === MediaStatus.BLOCKLISTED)
+    return { k: 'wait', word: 'Blocklisted', ico: 'lock' };
   // SeerrNG's own cards count the 4K copy too: a title that's only in the 4K library
   // (or only requested in 4K) still gets its glyph
   const shown = (x?: number) =>
@@ -223,11 +236,40 @@ function useRequested(initial: Stat) {
   ] as const;
 }
 
+export function useCardTitleMode(kind?: CardTitleKind) {
+  const { user } = useAuth();
+  return kind ? cardTitleModes(user?.settings)[kind] : undefined;
+}
+
+export function CollectionCard({
+  collection,
+}: {
+  collection: CollectionResult;
+}) {
+  const href = `/collection/${collection.id}`;
+  return (
+    <div className="poster">
+      <div className="art">
+        <Cover
+          src={tmdbImg(collection.posterPath)}
+          title={collection.title}
+          icon="film"
+        />
+        <Link className="hit" to={href} aria-label={collection.title} />
+      </div>
+      <Link className="t" to={href} tabIndex={-1} aria-hidden="true">
+        {collection.title}
+      </Link>
+    </div>
+  );
+}
+
 export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
   const serverName = useMediaServerName();
   const toast = useToast();
   const { prefs } = usePrefs();
   const tv = it.mediaType === 'tv';
+  const titleMode = useCardTitleMode(tv ? 'tv' : 'movie');
   // the glyph still shows a 4K-only request; the request buttons follow HD alone
   const shown = statusOf(it.mediaInfo, false, serverName);
   const [s, markRequested] = useRequested(
@@ -249,17 +291,22 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
     .join(' · ');
   const go = async () => {
     try {
-      await (tv ? requestSeries(it.id) : requestMovie(it.id));
+      let message = `Requested ${titleOf(it)}`;
+      if (tv)
+        message = seriesRequestSummary(titleOf(it), await requestSeries(it.id));
+      else await requestMovie(it.id);
       markRequested();
-      toast(`Requested ${titleOf(it)}${tv ? ' · entire series' : ''}`);
+      toast(message);
     } catch (e) {
       toast(friendlyError(e, 'Request failed'));
     }
   };
-  const quick = useQuickRequest(it, go, (is4k) => {
+  const quick = useQuickRequest(it, go, (is4k, series) => {
     markRequested(is4k ? '4K Requested' : 'Requested');
     toast(
-      `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}${tv ? ' · entire series' : ''}`
+      tv
+        ? seriesRequestSummary(titleOf(it), series, is4k)
+        : `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}`
     );
   });
   const [request, busy] = useBusy(quick.request);
@@ -331,7 +378,10 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
       </>
     );
   return (
-    <div className={hold ? 'poster hold' : 'poster'}>
+    <div
+      className={hold ? 'poster hold' : 'poster'}
+      data-title-mode={it.posterPath ? titleMode : undefined}
+    >
       <div className="art">
         <Cover
           src={it.posterPath ? tmdbImg(it.posterPath) : null}
@@ -366,6 +416,7 @@ export function TitleCard({ it, meta }: { it: TitleResult; meta?: string }) {
 }
 
 export function BookCard({ b }: { b: BookResult }) {
+  const titleMode = useCardTitleMode('book');
   const audio = b.bookFormat === 'audiobook';
   const { prefs } = usePrefs();
   const toast = useToast();
@@ -425,7 +476,10 @@ export function BookCard({ b }: { b: BookResult }) {
   const href = `/book/${encodeURIComponent(b.id)}${audio ? '?f=audio' : ''}`;
   const series = b.series?.[0];
   return (
-    <div className={`poster ${audio ? 'sq' : 'book'}`}>
+    <div
+      className={`poster ${audio ? 'sq' : 'book'}`}
+      data-title-mode={b.posterPath ? titleMode : undefined}
+    >
       <div className="art">
         <Cover
           src={bookArt(b.posterPath)}
@@ -547,17 +601,22 @@ export function FeatCard({
     .join(' · ');
   const go = async () => {
     try {
-      await (tv ? requestSeries(it.id) : requestMovie(it.id));
+      let message = `Requested ${titleOf(it)}`;
+      if (tv)
+        message = seriesRequestSummary(titleOf(it), await requestSeries(it.id));
+      else await requestMovie(it.id);
       setDone('Requested');
-      toast(`Requested ${titleOf(it)}${tv ? ' · entire series' : ''}`);
+      toast(message);
     } catch (e) {
       toast(friendlyError(e, 'Request failed'));
     }
   };
-  const quick = useQuickRequest(it, go, (is4k) => {
+  const quick = useQuickRequest(it, go, (is4k, series) => {
     setDone(is4k ? '4K Requested' : 'Requested');
     toast(
-      `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}${tv ? ' · entire series' : ''}`
+      tv
+        ? seriesRequestSummary(titleOf(it), series, is4k)
+        : `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}`
     );
   });
   const [request, busy] = useBusy(quick.request);
@@ -617,33 +676,58 @@ export function FeatCard({
   );
 }
 
+const railPositions = new Map<string, number>();
+onSessionReset(() => railPositions.clear());
+
 // a horizontal row with arrow buttons for mouse users (same behaviour as the mockup)
 export function Rail({
   children,
   className = '',
+  restoreId,
 }: {
   children: ReactNode;
   className?: string;
+  restoreId?: string;
 }) {
+  const location = useLocation();
+  const storageKey = restoreId
+    ? JSON.stringify([location.key, restoreId])
+    : undefined;
   const ref = useRef<HTMLDivElement>(null);
   const [edge, setEdge] = useState({ start: true, end: false });
-  useEffect(() => {
+  useLayoutEffect(() => {
     const r = ref.current;
     if (!r) return;
+    const generation = sessionGeneration();
+    if (storageKey) r.scrollLeft = railPositions.get(storageKey) ?? 0;
+    const save = () => {
+      if (!storageKey || generation !== sessionGeneration()) return;
+      railPositions.delete(storageKey);
+      railPositions.set(storageKey, r.scrollLeft);
+      if (railPositions.size > 200) {
+        const oldest = railPositions.keys().next().value;
+        if (oldest !== undefined) railPositions.delete(oldest);
+      }
+    };
     const upd = () =>
       setEdge({
         start: r.scrollLeft < 8,
         end: r.scrollLeft + r.clientWidth > r.scrollWidth - 8,
       });
     upd();
-    r.addEventListener('scroll', upd, { passive: true });
+    const onScroll = () => {
+      upd();
+      save();
+    };
+    r.addEventListener('scroll', onScroll, { passive: true });
     const ro = new ResizeObserver(upd);
     ro.observe(r);
     return () => {
-      r.removeEventListener('scroll', upd);
+      save();
+      r.removeEventListener('scroll', onScroll);
       ro.disconnect();
     };
-  }, []);
+  }, [storageKey]);
   const by = (d: number) =>
     ref.current?.scrollBy({
       left: d * ref.current.clientWidth * 0.85,
@@ -676,17 +760,19 @@ export function Rail({
 
 export function Section({
   title,
+  id,
   link,
   action,
   children,
 }: {
   title: string;
+  id?: string;
   link?: [string, string];
   action?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <section>
+    <section id={id}>
       <div className="sec-head">
         <h2>{title}</h2>
         {link && <Link to={link[1]}>{link[0]}</Link>}

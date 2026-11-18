@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   mediaLink,
   MediaStatus,
@@ -11,6 +11,7 @@ import {
   type TitleResult,
 } from '../api';
 import { useAuth, useMediaServerName } from '../auth';
+import BlocklistButton from '../components/BlocklistButton';
 import {
   Rail,
   Section,
@@ -22,18 +23,24 @@ import {
   ActionBar,
   AdvancedOptions,
   canRequest4k,
+  CreditsDisclosure,
   DetailTop,
   Facts,
   fmtRun,
-  People,
   Pill,
+  productionCountryLinks,
+  SubjectTagsDisclosure,
 } from '../components/detail';
 import { ServiceNote } from '../components/extra';
+import IndexerSearchLink from '../components/IndexerSearchLink';
+import ReportIssueButton from '../components/ReportIssueButton';
 import { useToast } from '../components/toast';
+import WatchlistButton from '../components/WatchlistButton';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
 import { useApi, usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
+import { AssociationLink } from './Associations';
 
 const cert = (m: MovieDetails) =>
   m.releases?.results
@@ -72,6 +79,7 @@ export default function MovieDetail() {
     false,
     serverName
   );
+  const blocklisted = m.mediaInfo?.status === MediaStatus.BLOCKLISTED;
   const s4k = m.mediaInfo?.status4k;
   const date = m.releaseDate || '';
   const unreleased = date > localToday();
@@ -133,7 +141,7 @@ export default function MovieDetail() {
     );
   // offered whether or not the HD copy is here or requested: they're separate files
   const fourK =
-    pub?.movie4kEnabled && can4k && !has4k ? (
+    !blocklisted && pub?.movie4kEnabled && can4k && !has4k ? (
       <button
         className="btn btn-quiet"
         disabled={busy}
@@ -195,6 +203,21 @@ export default function MovieDetail() {
               {m.voteAverage.toFixed(1)} / 10
             </Pill>
           )}
+          <IndexerSearchLink category="movie" title={m.title} />
+          <BlocklistButton
+            mediaType="movie"
+            id={m.id}
+            requestedId={id}
+            title={m.title}
+            onChange={refresh}
+          />
+          <ReportIssueButton
+            type="movie"
+            title={m.title}
+            media={m.mediaInfo}
+            allow4k={!!pub?.movie4kEnabled && can4k}
+          />
+          <WatchlistButton key={m.id} mediaType="movie" detail={m} />
         </div>
         <div className="dacts pc">
           {main}
@@ -214,12 +237,23 @@ export default function MovieDetail() {
           <div style={{ display: 'grid', gap: 22 }}>
             {m.tagline && <p className="tagline">{m.tagline}</p>}
             <p className="ov">{m.overview}</p>
-            {!!m.credits?.cast.length && (
-              <div>
-                <div className="h2">Starring</div>
-                <People list={m.credits.cast.slice(0, 10)} />
-              </div>
-            )}
+            <CreditsDisclosure
+              key={`cast-${m.id}`}
+              media="movie"
+              credit="cast"
+              people={m.credits?.cast}
+            />
+            <CreditsDisclosure
+              key={`crew-${m.id}`}
+              media="movie"
+              credit="crew"
+              people={m.credits?.crew}
+            />
+            <SubjectTagsDisclosure
+              key={`tags-${m.id}`}
+              media="movie"
+              tags={m.keywords}
+            />
             {(fourK || trailerBtn) && (
               <div className="ph-only-row">
                 {fourK}
@@ -230,6 +264,27 @@ export default function MovieDetail() {
           <aside>
             <Facts
               rows={[
+                [
+                  'Production Countries',
+                  productionCountryLinks(m.productionCountries, '/movies'),
+                ],
+                [
+                  'Production Studios',
+                  m.productionCompanies?.length
+                    ? m.productionCompanies.map(({ id, name }, index) => (
+                        <span key={`${id}:${index}`}>
+                          {index > 0 && ', '}
+                          {Number.isSafeInteger(id) &&
+                          id > 0 &&
+                          id <= 1_000_000_000 ? (
+                            <Link to={`/movies?studio=${id}`}>{name}</Link>
+                          ) : (
+                            name
+                          )}
+                        </span>
+                      ))
+                    : null,
+                ],
                 ['Runtime', fmtRun(m.runtime)],
                 [
                   'Released',
@@ -237,7 +292,14 @@ export default function MovieDetail() {
                 ],
                 ['Director', director],
                 ['Rated', cert(m)],
-                ['Collection', m.collection?.name],
+                [
+                  'Collection',
+                  m.collection && (
+                    <Link to={`/collection/${m.collection.id}`}>
+                      {m.collection.name}
+                    </Link>
+                  ),
+                ],
                 [
                   '4K',
                   pub?.movie4kEnabled
@@ -252,15 +314,22 @@ export default function MovieDetail() {
             />
           </aside>
         </div>
-        {!!like?.results.length && (
-          <Section title="More like this">
+        <Section
+          title="Related Titles"
+          link={['Recommendations', `/movie/${id}/recommendations`]}
+          action={<Link to={`/movie/${id}/similar`}>Similar Movies</Link>}
+        >
+          <div className="toolbar">
+            <AssociationLink mediaType="movie" id={id} />
+          </div>
+          {!!like?.results.length && (
             <Rail>
               {like.results.map((x) => (
                 <TitleCard key={x.id} it={{ ...x, mediaType: 'movie' }} />
               ))}
             </Rail>
-          </Section>
-        )}
+          )}
+        </Section>
       </div>
       <ActionBar
         title={m.title || ''}

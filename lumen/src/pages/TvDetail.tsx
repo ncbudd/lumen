@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import {
+  ApiError,
   mediaLink,
   MediaStatus,
   requestSeries,
@@ -10,7 +11,8 @@ import {
   type TitleResult,
   type TvDetails,
 } from '../api';
-import { useMediaServerName } from '../auth';
+import { useAuth, useMediaServerName } from '../auth';
+import BlocklistButton from '../components/BlocklistButton';
 import {
   Rail,
   Section,
@@ -21,21 +23,29 @@ import {
 import {
   ActionBar,
   AdvancedOptions,
+  CreditsDisclosure,
   DetailTop,
   Facts,
   fmtRun,
-  People,
   Pill,
+  productionCountryLinks,
+  SubjectTagsDisclosure,
 } from '../components/detail';
+import { EpisodeAvailabilityPanel } from '../components/EpisodeAvailabilityPanel';
 import { ServiceNote } from '../components/extra';
+import IndexerSearchLink from '../components/IndexerSearchLink';
+import ReportIssueButton from '../components/ReportIssueButton';
 import { useOffers4k } from '../components/requestSheet';
 import { useToast } from '../components/toast';
+import WatchlistButton from '../components/WatchlistButton';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
 import { useApi, usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
 import { scrollBehavior } from '../motion';
+import { seasonList, seriesRequestSummary } from '../seriesRequestSummary';
 import { usePrefs } from '../settings';
+import { AssociationLink } from './Associations';
 
 type SeasonState = 'have' | 'part' | 'asked' | 'none';
 const stateOf = (status?: number): SeasonState =>
@@ -50,20 +60,9 @@ const stateOf = (status?: number): SeasonState =>
 // request status: 1 waiting for approval, 2 approved (3 declined, 4 failed, 5 completed)
 const live = (status?: number) => status === 1 || status === 2;
 
-const seasonList = (n: number[]) => {
-  const a = [...n].sort((x, y) => x - y);
-  const runs: string[] = [];
-  for (let i = 0; i < a.length;) {
-    let j = i;
-    while (j + 1 < a.length && a[j + 1] === a[j] + 1) j++;
-    runs.push(j > i ? `${a[i]}–${a[j]}` : `${a[i]}`);
-    i = j + 1;
-  }
-  return (a.length === 1 ? 'Season ' : 'Seasons ') + runs.join(', ');
-};
-
 export default function TvDetail() {
   const serverName = useMediaServerName();
+  const { user } = useAuth();
   const { id } = useParams();
   const loc = useLocation();
   const { data: t, error, reload, refresh } = useApi<TvDetails>(`/tv/${id}`);
@@ -74,15 +73,24 @@ export default function TvDetail() {
   const [sel, setSel] = useState<Set<number>>(new Set());
   const [opts, setOpts] = useState<RequestOptions>({});
   const [busy, setBusy] = useState(false);
+  const [watchFailure, setWatchFailure] = useState<{
+    selection: string;
+    message: string;
+    needsAccount: boolean;
+  }>();
   const onOpts = useCallback((o: RequestOptions) => setOpts(o), []);
   // people who may request 4K series pick 1080p or 4K here, admins or not
   const offers4k = useOffers4k('tv');
   const [fourK, setFourK] = useState(false);
   const is4k = offers4k && fourK;
 
+  const specials = pub?.enableSpecialEpisodes === true;
   const seasons = useMemo(
-    () => (t?.seasons || []).filter((s) => s.seasonNumber > 0),
-    [t]
+    () =>
+      (t?.seasons || []).filter(
+        (s) => s.seasonNumber > 0 || (specials && s.seasonNumber === 0)
+      ),
+    [t, specials]
   );
   const stat = useMemo(() => {
     const m = new Map<number, SeasonState>();
@@ -139,7 +147,7 @@ export default function TvDetail() {
   useEffect(() => {
     setSel(new Set(prefs.wholeSeriesDefault || !partialOk ? missing : []));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showId, prefs.wholeSeriesDefault, partialOk, is4k]);
+  }, [showId, prefs.wholeSeriesDefault, partialOk, is4k, specials]);
   // seasons that were just requested (or arrived) can no longer be ticked
   const missingKey = missing.join(',');
   useEffect(() => {
@@ -161,6 +169,18 @@ export default function TvDetail() {
   if (!t) return <div className="detail-loading" aria-busy="true" />;
 
   const n = sel.size;
+  const selectedSeasons = [...sel].sort((a, b) => a - b);
+  const selectionKey = JSON.stringify([
+    t.id,
+    is4k,
+    opts.userId,
+    selectedSeasons,
+  ]);
+  const gateFailure =
+    watchFailure?.selection === selectionKey ? watchFailure : undefined;
+  const watchRule =
+    pub?.tvSeasonWatchGateEnabled === true ||
+    user?.tvSeasonWatchGateStatus === 'enabled';
   const label = !n
     ? 'Pick seasons'
     : n === missing.length && n > 1
@@ -177,22 +197,36 @@ export default function TvDetail() {
       return y;
     });
   };
+  const blocklisted = t.mediaInfo?.status === MediaStatus.BLOCKLISTED;
   const request = async () => {
-    if (!n) return;
+    if (!n || blocklisted || busy) return;
+    setWatchFailure(undefined);
     setBusy(true);
     try {
-      const whole = n === seasons.length;
-      await requestSeries(
+      const whole = !partialOk || n === seasons.length;
+      const result = await requestSeries(
         t.id,
-        whole ? 'all' : [...sel].sort((a, b) => a - b),
+        whole ? 'all' : selectedSeasons,
         is4k ? { ...opts, is4k: true } : opts
       );
-      toast(
-        `Requested ${t.name} · ${whole ? 'entire series' : n === 1 ? 'Season ' + [...sel][0] : n + ' seasons'}`
-      );
+      toast(seriesRequestSummary(t.name || 'this series', result, is4k));
       refresh();
     } catch (e) {
-      toast(friendlyError(e, 'Request failed'));
+      if (e instanceof ApiError && e.code === 'TV_SEASON_WATCH_GATE') {
+        setWatchFailure({
+          selection: selectionKey,
+          message: friendlyError(
+            e,
+            'Could not verify the previous season. Try again.'
+          ),
+          needsAccount: e.reason === 'account-required',
+        });
+        document
+          .getElementById('seasons')
+          ?.scrollIntoView({ behavior: scrollBehavior() });
+      } else {
+        toast(friendlyError(e, 'Request failed'));
+      }
     } finally {
       setBusy(false);
     }
@@ -229,7 +263,11 @@ export default function TvDetail() {
   const asks = (t.mediaInfo?.requests || []).filter(
     (r) => !!r.is4k === !!is4k && live(r.status)
   );
-  const main = missing.length ? (
+  const main = blocklisted ? (
+    <button className="btn btn-tonal" disabled>
+      Blocklisted
+    </button>
+  ) : missing.length ? (
     <button className="btn btn-primary" disabled={!n || busy} onClick={request}>
       <Icon name="plus" />
       {label}
@@ -298,6 +336,22 @@ export default function TvDetail() {
               {t.voteAverage.toFixed(1)} / 10
             </Pill>
           )}
+          <IndexerSearchLink category="tv" title={t.name} />
+          <BlocklistButton
+            mediaType="tv"
+            id={t.id}
+            requestedId={id}
+            title={t.name}
+            onChange={refresh}
+          />
+          <ReportIssueButton
+            type="tv"
+            title={t.name}
+            media={t.mediaInfo}
+            allow4k={offers4k}
+            tvId={t.id}
+          />
+          <WatchlistButton key={t.id} mediaType="tv" detail={t} />
         </div>
         <div className="dacts pc">
           {main}
@@ -378,6 +432,25 @@ export default function TvDetail() {
               <div className="sec-head">
                 <h2>Seasons</h2>
               </div>
+              {watchRule && (
+                <p className="note">
+                  Later seasons may require finishing the previous regular
+                  season on your linked media server.
+                </p>
+              )}
+              {gateFailure && (
+                <div className="note" role="alert">
+                  <p>{gateFailure.message}</p>
+                  {gateFailure.needsAccount && (
+                    <Link
+                      className="btn btn-tonal btn-sm"
+                      to="/me/account/linked-accounts"
+                    >
+                      Link Playback Account
+                    </Link>
+                  )}
+                </div>
+              )}
               {missing.length > 1 && (
                 <p className="note" style={{ margin: '-4px 0 12px' }}>
                   {!partialOk
@@ -443,7 +516,12 @@ export default function TvDetail() {
                         <Icon name="check" />
                       </span>
                       <span>
-                        <b>{s.name || `Season ${s.seasonNumber}`}</b>
+                        <b>
+                          {s.name ||
+                            (s.seasonNumber === 0
+                              ? 'Specials'
+                              : `Season ${s.seasonNumber}`)}
+                        </b>
                         <small>
                           {s.episodeCount} episode
                           {s.episodeCount === 1 ? '' : 's'} · {yr}
@@ -474,17 +552,56 @@ export default function TvDetail() {
                 })}
               </div>
             </div>
-            {!!t.credits?.cast.length && (
-              <div>
-                <div className="h2">Starring</div>
-                <People list={t.credits.cast.slice(0, 10)} />
-              </div>
+            {pub?.trackEpisodeAvailability === true && seasons.length > 0 && (
+              <EpisodeAvailabilityPanel
+                key={t.id}
+                tvId={t.id}
+                seasons={seasons}
+              />
             )}
+            <CreditsDisclosure
+              key={`cast-${t.id}`}
+              media="tv"
+              credit="cast"
+              people={t.credits?.cast}
+            />
+            <CreditsDisclosure
+              key={`crew-${t.id}`}
+              media="tv"
+              credit="crew"
+              people={t.credits?.crew}
+            />
+            <SubjectTagsDisclosure
+              key={`tags-${t.id}`}
+              media="tv"
+              tags={t.keywords}
+            />
           </div>
           <aside>
             <Facts
               rows={[
-                ['Network', t.networks?.map((x) => x.name).join(', ')],
+                [
+                  'Production Countries',
+                  productionCountryLinks(t.productionCountries, '/series'),
+                ],
+                [
+                  'Network',
+                  t.networks?.length
+                    ? t.networks.map(({ id, name }, index) => (
+                        <span key={`${id ?? name}:${index}`}>
+                          {index > 0 && ', '}
+                          {id &&
+                          Number.isSafeInteger(id) &&
+                          id > 0 &&
+                          id <= 1_000_000_000 ? (
+                            <Link to={`/series?network=${id}`}>{name}</Link>
+                          ) : (
+                            name
+                          )}
+                        </span>
+                      ))
+                    : null,
+                ],
                 [
                   'Status',
                   t.status === 'Returning Series' ? 'Still airing' : t.status,
@@ -507,15 +624,25 @@ export default function TvDetail() {
             />
           </aside>
         </div>
-        {!!like?.results.length && (
-          <Section title="More like this">
+        <Section
+          title="Related Titles"
+          link={['Recommendations', `/tv/${id}/recommendations`]}
+          action={<Link to={`/tv/${id}/similar`}>Similar Series</Link>}
+        >
+          <div className="toolbar">
+            <AssociationLink mediaType="tv" id={id} />
+            <Link className="chip" to={`/franchise/tv/${id}`}>
+              Franchise
+            </Link>
+          </div>
+          {!!like?.results.length && (
             <Rail>
               {like.results.map((x) => (
                 <TitleCard key={x.id} it={{ ...x, mediaType: 'tv' }} />
               ))}
             </Rail>
-          </Section>
-        )}
+          )}
+        </Section>
       </div>
       <ActionBar
         title={t.name || ''}

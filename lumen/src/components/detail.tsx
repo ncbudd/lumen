@@ -1,9 +1,20 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { api, type Person, type RequestOptions } from '../api';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  api,
+  tmdbImg,
+  type Person,
+  type ProductionCountry,
+  type RequestOptions,
+  type SubjectTag,
+  type VideoDetailPins,
+} from '../api';
 import { useAuth } from '../auth';
 import { friendlyError } from '../errors';
 import { Icon, type IconName } from '../icons';
+import { sessionGeneration } from '../sessionState';
 import { Glyph, type Stat } from './cards';
+import { useToast } from './toast';
 
 const hue = (s: string) =>
   [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 0);
@@ -41,31 +52,256 @@ export function Pill({
   );
 }
 
-export function People({ list }: { list: Person[] }) {
+function People({ list }: { list: Person[] }) {
+  const listId = useId();
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? list : list.slice(0, 10);
   return (
-    <div className="people">
-      {list.map((p) => (
-        <span
-          className="person"
-          key={p.id + (p.character || p.job || '')}
-          title={p.character || p.job}
-        >
-          <i style={{ background: `hsl(${hue(p.name)} 40% 40%)` }}>
-            {p.profilePath ? (
-              <img
-                src={`/imageproxy/tmdb/t/p/w185${p.profilePath}`}
-                alt=""
-                loading="lazy"
-              />
-            ) : (
-              initials(p.name)
-            )}
-          </i>
-          {p.name}
-        </span>
-      ))}
-    </div>
+    <>
+      <div id={listId} className="people">
+        {visible.map((person, index) => {
+          const role = person.character || person.job;
+          const portrait = tmdbImg(person.profilePath, 'w185');
+          const content = (
+            <>
+              <i
+                aria-hidden="true"
+                style={{ background: `hsl(${hue(person.name)} 40% 40%)` }}
+              >
+                {portrait ? (
+                  <img src={portrait} alt="" loading="lazy" />
+                ) : (
+                  initials(person.name)
+                )}
+              </i>
+              <span>
+                {person.name}
+                {role && <small>{role}</small>}
+              </span>
+            </>
+          );
+          const key = `${person.id}:${role ?? ''}:${index}`;
+          return Number.isSafeInteger(person.id) &&
+            person.id > 0 &&
+            person.id <= 1_000_000_000 ? (
+            <Link className="person" key={key} to={`/person/${person.id}`}>
+              {content}
+            </Link>
+          ) : (
+            <span className="person" key={key}>
+              {content}
+            </span>
+          );
+        })}
+      </div>
+      {list.length > 10 && (
+        <div className="toolbar">
+          <button
+            className="chip"
+            type="button"
+            aria-controls={listId}
+            aria-expanded={expanded}
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded
+              ? 'Show Fewer Credits'
+              : `Show All ${list.length} Credits`}
+          </button>
+        </div>
+      )}
+    </>
   );
+}
+
+export function CreditsDisclosure({
+  media,
+  credit,
+  people,
+}: {
+  media: 'movie' | 'tv';
+  credit: 'cast' | 'crew';
+  people?: Person[];
+}) {
+  const { hash } = useLocation();
+  if (!people?.length && hash !== `#${credit}`) return null;
+
+  return (
+    <VideoDisclosure
+      media={media}
+      panel={credit}
+      label={credit === 'cast' ? 'Starring' : 'Crew'}
+    >
+      {people?.length ? <People list={people} /> : <p>No credits available.</p>}
+    </VideoDisclosure>
+  );
+}
+
+export function SubjectTagsDisclosure({
+  media,
+  tags,
+}: {
+  media: 'movie' | 'tv';
+  tags?: SubjectTag[];
+}) {
+  const { user } = useAuth();
+  const contentId = useId();
+  const storageKey = `seerr.subjectTagVisibility:${user?.id ?? 'anonymous'}`;
+  const [visible, setVisible] = useState(() => {
+    try {
+      return localStorage.getItem(storageKey) !== 'hidden';
+    } catch {
+      return true;
+    }
+  });
+  const browse = media === 'movie' ? '/movies' : '/series';
+
+  function toggleVisibility() {
+    setVisible(!visible);
+    try {
+      localStorage.setItem(storageKey, visible ? 'hidden' : 'visible');
+    } catch {
+      // The current panel still works when storage is unavailable.
+    }
+  }
+
+  return (
+    <VideoDisclosure media={media} panel="subjectTags" label="Subject Tags">
+      {tags?.length ? (
+        <>
+          <div className="toolbar">
+            <button
+              type="button"
+              className="chip"
+              aria-pressed={visible}
+              aria-controls={contentId}
+              onClick={toggleVisibility}
+            >
+              Show Subject Tags
+            </button>
+          </div>
+          <div id={contentId} hidden={!visible}>
+            <div className="toolbar">
+              {tags.map((tag) => (
+                <Link
+                  className="chip"
+                  key={tag.id}
+                  to={`${browse}?keywords=${tag.id}`}
+                >
+                  {tag.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <p className="note">No subject tags.</p>
+      )}
+    </VideoDisclosure>
+  );
+}
+
+function VideoDisclosure({
+  media,
+  panel,
+  label,
+  children,
+}: {
+  media: 'movie' | 'tv';
+  panel: keyof VideoDetailPins;
+  label: string;
+  children: ReactNode;
+}) {
+  const { user, refresh } = useAuth();
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  const disclosure = useRef<HTMLDetailsElement>(null);
+  const { hash, key } = useLocation();
+  const anchor = panel === 'subjectTags' ? undefined : panel;
+
+  useEffect(() => {
+    const element = disclosure.current;
+    if (element && anchor && hash === `#${anchor}`) {
+      element.open = true;
+      element.scrollIntoView();
+    }
+  }, [anchor, hash, key]);
+
+  const pending = useRef(false);
+  const legacy = {
+    cast: user?.settings?.detailDisclosureCastPinned,
+    crew: user?.settings?.detailDisclosureCrewPinned,
+    subjectTags: user?.settings?.detailDisclosureSubjectTagsPinned,
+  };
+  const pinned =
+    user?.settings?.detailDisclosurePins?.[media]?.[panel] ??
+    (media === 'movie' && legacy[panel] === true);
+  const preference = panel === 'subjectTags' ? 'subject tag' : 'credit';
+
+  async function togglePin() {
+    if (!user || pending.current) return;
+    const generation = sessionGeneration();
+    pending.current = true;
+    setBusy(true);
+    try {
+      const result = await api<VideoDetailPins>(
+        `/user/${user.id}/settings/detail-disclosures/${media}`,
+        { method: 'POST', body: JSON.stringify({ [panel]: !pinned }) }
+      );
+      if (generation !== sessionGeneration()) return;
+      if (result[panel] !== !pinned) {
+        toast(`Could not confirm the saved ${preference} preference.`);
+        return;
+      }
+      await refresh();
+    } catch {
+      if (generation === sessionGeneration())
+        toast(`Could not save the ${preference} preference. Try again.`);
+    } finally {
+      pending.current = false;
+      setBusy(false);
+    }
+  }
+
+  return (
+    <details ref={disclosure} id={anchor} className="adv" open={pinned}>
+      <summary>
+        <Icon name="chev" size="sm" />
+        {label}
+      </summary>
+      {children}
+      {user && (
+        <div className="toolbar">
+          <button
+            className="chip"
+            type="button"
+            aria-pressed={pinned}
+            disabled={busy}
+            onClick={() => void togglePin()}
+          >
+            Keep {label} Open
+          </button>
+        </div>
+      )}
+    </details>
+  );
+}
+
+export function productionCountryLinks(
+  countries: ProductionCountry[] | undefined,
+  browse: '/movies' | '/series'
+) {
+  const unique = new Map<string, string>();
+  for (const { iso_3166_1: code, name } of countries ?? []) {
+    if (/^[A-Z]{2}$/.test(code) && !unique.has(code))
+      unique.set(code, name || code);
+  }
+  if (!unique.size) return null;
+  return [...unique].map(([code, name], index) => (
+    <span key={code}>
+      {index > 0 && ', '}
+      <Link to={`${browse}?country=${code}`}>{name}</Link>
+    </span>
+  ));
 }
 
 export function Facts({ rows }: { rows: [string, ReactNode][] }) {
@@ -182,6 +418,8 @@ export const canChooseRequestOptions = (permissions?: number) =>
   (permissionBits(permissions) & MANAGE) !== 0;
 export const canViewAllRequests = (permissions?: number) =>
   (permissionBits(permissions) & (MANAGE | REQUEST_VIEW)) !== 0;
+export const canRequestMovies = (permissions?: number) =>
+  (permissionBits(permissions) & (2 | 32 | 262144)) !== 0;
 // who may request in 4K: Admin, Request 4K, or Request 4K Movies / Request 4K Series
 export const canRequest4k = (
   permissions: number | undefined,

@@ -18,13 +18,21 @@ export function csrfHeaders(): Record<string, string> {
 export class ApiError extends Error {
   constructor(
     public status: number,
-    message: string
+    message: string,
+    public confirmationRequired?: string,
+    public code?: string,
+    public reason?: string,
+    public retryAt?: number
   ) {
     super(message);
   }
 }
 
-export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
+export async function api<T>(
+  path: string,
+  init: RequestInit = {},
+  response: 'json' | 'empty' = 'json'
+): Promise<T> {
   const res = await fetch('/api/v1' + path, {
     credentials: 'same-origin',
     // SeerrNG marks detail responses cacheable for 5 minutes (stale for 30), which would hide
@@ -39,17 +47,47 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   });
   if (!res.ok) {
     let msg = res.statusText;
+    let confirmationRequired: string | undefined;
+    let code: string | undefined;
+    let reason: string | undefined;
     try {
       const b = await res.json();
       msg = b.message || b.error || msg;
+      if (typeof b.code === 'string') code = b.code;
+      if (typeof b.reason === 'string') reason = b.reason;
+      if (typeof b.confirmationRequired === 'string')
+        confirmationRequired = b.confirmationRequired;
     } catch {
       // body wasn't JSON
     }
-    throw new ApiError(res.status, msg);
+    const retryAfter =
+      res.status === 429 ? res.headers.get('Retry-After') : null;
+    const now = Date.now();
+    const target =
+      retryAfter && /^\d+$/.test(retryAfter)
+        ? now + Number(retryAfter) * 1000
+        : retryAfter
+          ? Date.parse(retryAfter)
+          : NaN;
+    const retryAt = Number.isFinite(target)
+      ? Math.max(now, Math.min(target, now + 3_600_000))
+      : code === 'PROVIDER_RATE_LIMITED' && res.status === 429
+        ? now + 60_000
+        : undefined;
+    throw new ApiError(
+      res.status,
+      msg,
+      confirmationRequired,
+      code,
+      reason,
+      retryAt
+    );
   }
   // a request or other change: saved answers may now be out of date
   if (init.method && init.method !== 'GET') markAllStale();
-  return res.status === 204 ? (undefined as T) : res.json();
+  return response === 'empty' || res.status === 204
+    ? (undefined as T)
+    : res.json();
 }
 
 // ---- shapes we use (subset of SeerrNG's) ----
@@ -59,9 +97,12 @@ export const MediaStatus = {
   PROCESSING: 3,
   PARTIAL: 4,
   AVAILABLE: 5,
+  BLOCKLISTED: 6,
 } as const;
 
 export interface MediaInfo {
+  viewerRequestCoverage?: { standard?: boolean; fourK?: boolean };
+  id?: number;
   requests?: {
     id: number;
     status: number;
@@ -108,6 +149,16 @@ export interface TitleResult {
   genreIds?: number[];
   mediaInfo?: MediaInfo;
 }
+export interface CollectionResult {
+  id: number;
+  mediaType: 'collection';
+  title: string;
+  posterPath?: string;
+  backdropPath?: string;
+}
+
+export type VideoSearchResult = TitleResult | CollectionResult;
+
 export interface BookResult {
   id: string;
   mediaType: 'book';
@@ -136,12 +187,40 @@ export interface MediaRow {
   releaseDate?: string;
   mediaAddedAt?: string;
 }
+export type CardTitleMode = 'hover' | 'always';
+export type CardTitleKind = 'movie' | 'tv' | 'album' | 'book';
+export type CardTitleSettings = Partial<Record<CardTitleKind, CardTitleMode>>;
+export const defaultCardTitleModes = {
+  movie: 'hover',
+  tv: 'hover',
+  album: 'always',
+  book: 'always',
+} satisfies Record<CardTitleKind, CardTitleMode>;
+
+export type VideoDetailPins = Partial<
+  Record<'cast' | 'crew' | 'subjectTags', boolean>
+>;
+
 export interface User {
+  plexUsername?: string | null;
+  jellyfinUsername?: string | null;
   id: number;
   displayName: string;
   avatar?: string;
   permissions: number;
+  userType?: 1 | 2 | 3 | 4;
   warnings?: string[];
+  tvSeasonWatchGateStatus?: string;
+  settings?: {
+    detailDisclosureCastPinned?: boolean;
+    detailDisclosureCrewPinned?: boolean;
+    detailDisclosureSubjectTagsPinned?: boolean;
+    detailDisclosurePins?: Partial<Record<'movie' | 'tv', VideoDetailPins>>;
+    cardTextVisibilityMovie?: CardTitleMode;
+    cardTextVisibilityTv?: CardTitleMode;
+    cardTextVisibilityAlbum?: CardTitleMode;
+    cardTextVisibilityBook?: CardTitleMode;
+  };
 }
 export interface Genre {
   id: number;
@@ -152,8 +231,10 @@ export interface Genre {
 // TMDB artwork goes through SeerrNG's image proxy, the same as SeerrNG's own UI.
 // Treat provider paths as untrusted input: accepting an arbitrary absolute URL here
 // would turn metadata into a browser-side tracking/request primitive.
-const TMDB_IMAGE_SIZES = new Set(['w342', 'w500', 'w780', 'w1280']);
+const TMDB_IMAGE_SIZES = new Set(['w185', 'w342', 'w500', 'w780', 'w1280']);
 const THEAUDIODB_IMAGE_HOST = 'theaudiodb.com';
+// eslint-disable-next-line no-control-regex -- Reject control characters in provider URL paths.
+const UNSAFE_IMAGE_PATH_CHARACTERS = /[\u0000-\u001f\u007f?#]/;
 const isSafeImagePath = (path: string) => {
   if (
     path.length > 2048 ||
@@ -161,7 +242,7 @@ const isSafeImagePath = (path: string) => {
     path.startsWith('//') ||
     path.includes('//') ||
     path.includes('\\') ||
-    /[\u0000-\u001f\u007f?#]/.test(path)
+    UNSAFE_IMAGE_PATH_CHARACTERS.test(path)
   ) {
     return false;
   }
@@ -186,7 +267,7 @@ const isSafeImagePath = (path: string) => {
           decoded === '..' ||
           decoded.includes('/') ||
           decoded.includes('\\') ||
-          /[\u0000-\u001f\u007f?#]/.test(decoded)
+          UNSAFE_IMAGE_PATH_CHARACTERS.test(decoded)
         ) {
           return false;
         }
@@ -309,8 +390,8 @@ export interface RequestOptions {
   rootFolder?: string;
   userId?: number; // request on someone else's behalf (admins)
 }
-const post = (body: object) =>
-  api<{ id: number }>('/request', {
+const post = <T = { id: number }>(body: object) =>
+  api<T>('/request', {
     method: 'POST',
     body: JSON.stringify(body),
   });
@@ -322,7 +403,13 @@ export const requestSeries = (
   id: number,
   seasons: number[] | 'all' = 'all',
   o: RequestOptions = {}
-) => post({ mediaType: 'tv', mediaId: id, seasons, ...o });
+) =>
+  post<{ id: number; seasons?: { seasonNumber: number }[] }>({
+    mediaType: 'tv',
+    mediaId: id,
+    seasons,
+    ...o,
+  });
 // books: the format decides which ChaptarrNG server; an edition pins one narration
 // policy 'only' = exactly that narration; 'either' = that edition is the target, other copies OK;
 // 'alongside' = add that narration as a separate copy next to the one already in the library
@@ -475,7 +562,7 @@ export const bookMediaForFormat = (
   media: MediaInfo | undefined,
   format: 'ebook' | 'audiobook'
 ): MediaInfo | undefined => {
-  if (!media) return media;
+  if (!media || media.status === MediaStatus.BLOCKLISTED) return media;
   const hasRequests = Array.isArray((media as { requests?: unknown }).requests);
   if (
     media.status !== MediaStatus.AVAILABLE &&
@@ -552,12 +639,26 @@ export interface Credits {
   cast: Person[];
   crew: Person[];
 }
+export interface SubjectTag {
+  id: number;
+  name: string;
+}
+
+export interface ProductionCountry {
+  iso_3166_1: string;
+  name: string;
+}
+
 export interface MovieDetails extends TitleResult {
+  onUserWatchlist?: boolean;
   runtime?: number;
   tagline?: string;
   overview?: string;
   genres: { id: number; name: string }[];
   credits?: Credits;
+  keywords?: SubjectTag[];
+  productionCompanies?: { id: number; name: string }[];
+  productionCountries?: ProductionCountry[];
   relatedVideos?: { site: string; key: string; type: string; url: string }[];
   releases?: {
     results: {
@@ -574,14 +675,17 @@ export interface Season {
   name: string;
 }
 export interface TvDetails extends TitleResult {
+  onUserWatchlist?: boolean;
   overview?: string;
   genres: { id: number; name: string }[];
   seasons: Season[];
   numberOfSeasons: number;
   episodeRunTime?: number[];
-  networks?: { name: string }[];
+  networks?: { id?: number; name: string }[];
   status?: string;
   credits?: Credits;
+  keywords?: SubjectTag[];
+  productionCountries?: ProductionCountry[];
   createdBy?: { name: string }[];
   contentRatings?: { results: { iso_3166_1: string; rating: string }[] };
   lastEpisodeToAir?: {
@@ -599,6 +703,7 @@ export interface TvDetails extends TitleResult {
   };
 }
 export interface BookDetails extends BookResult {
+  onUserWatchlist?: boolean;
   description?: string;
   subjects?: string[];
   isbnCandidates?: string[];
@@ -631,7 +736,13 @@ export interface DownloadItem {
   status?: string;
 }
 export interface RequestItem {
+  isAutoRequest?: boolean;
+  watchAheadParentRequestId?: number | null;
+  watchAheadEpisodeCount?: number;
+  watchAheadUsesUserDefault?: boolean;
+  failureReason?: string | null;
   currentStatus?: {
+    retryable?: boolean;
     stage: string;
     percent: number | null;
     message?: string;
@@ -643,7 +754,11 @@ export interface RequestItem {
   createdAt: string;
   bookFormat?: string;
   preferredEditionId?: string | null;
-  seasons: { seasonNumber: number }[];
+  seasons: {
+    seasonNumber: number;
+    status?: number;
+    episodeNumbers?: number[] | null;
+  }[];
   requestedBy: { id: number; displayName: string };
   media: MediaInfo & {
     mediaType: string;

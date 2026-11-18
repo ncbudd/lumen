@@ -28,6 +28,8 @@ server {
   listen 80;
   root /usr/share/nginx/html;
   server_tokens off;
+  # Keep local redirects on the browser-facing origin behind TLS or mapped ports.
+  absolute_redirect off;
   set $lumen_runtime_uid "${LUMEN_RUNTIME_UID}";
   set $lumen_runtime_gid "${LUMEN_RUNTIME_GID}";
 
@@ -136,8 +138,106 @@ server {
     return 302 ${SEERR_FULL_URL}/?interface=classic;
   }
 
+  location ~ ^/profile/?$ {
+    return 302 /me;
+  }
+  location ~ ^/profile/settings/tv-request-access/?$ {
+    return 302 /me/account/tv-requests;
+  }
+  location ~ ^/profile/settings/episode-queue/?$ {
+    return 302 "/me/account/tv-requests#episode-queue";
+  }
+  location ~ ^/profile/settings/linked-accounts/?$ {
+    return 302 /me/account/linked-accounts;
+  }
+  location ~ ^/profile/settings/client-tokens/?$ {
+    return 302 /me/account/client-tokens;
+  }
+  location ~ ^/profile/settings/notifications/(email|telegram|discord|pushbullet|pushover|webpush)/?$ {
+    return 302 "/me/account/notifications#notification-$1";
+  }
+  location ~ ^/profile/settings/password/?$ {
+    return 302 "/me/account#password";
+  }
+  location ~ ^/profile/settings(/main)?/?$ {
+    return 302 /me/account;
+  }
+  location ~ ^/profile/watchlist/?$ {
+    return 302 /watchlist$is_args$args;
+  }
+  location ~ ^/discover/(adult|audiobooks|books|comics|games|magazines|music|patches|providers|sports)/?$ {
+    return 302 /$1$is_args$args;
+  }
+  location ~ "^/discover/list/([1-9][0-9]{0,9})/?$" {
+    return 302 /list/$1$is_args$args;
+  }
+  location ~ ^/discover/trending/?$ {
+    if ($arg_mediaType = music) { return 302 /music; }
+    if ($arg_mediaType = book) { return 302 /books; }
+    if ($arg_mediaType = audiobook) { return 302 /audiobooks; }
+    return 302 /trending$is_args$args;
+  }
+  location ~ ^/discover/movies/upcoming/?$ {
+    return 302 /soon?media=movie;
+  }
+  location ~ ^/discover/tv/upcoming/?$ {
+    return 302 /soon?media=tv;
+  }
+  location ~ "^/discover/movies/(genre|studio)/([1-9][0-9]{0,8}|1000000000)/?$" {
+    return 302 /movies?nativeFilters=1&$1=$2&$args;
+  }
+  location ~ "^/discover/tv/(genre|network)/([1-9][0-9]{0,8}|1000000000)/?$" {
+    return 302 /series?nativeFilters=1&$1=$2&$args;
+  }
+  location ~ "^/discover/movies/language/([a-z]{2})/?$" {
+    return 302 /movies?nativeFilters=1&language=$1&$args;
+  }
+  location ~ "^/discover/tv/language/([a-z]{2})/?$" {
+    return 302 /series?nativeFilters=1&language=$1&$args;
+  }
+  location ~ ^/discover/movies(/keyword)?/?$ {
+    return 302 /movies?nativeFilters=1&$args;
+  }
+  location ~ ^/discover/tv(/keyword)?/?$ {
+    return 302 /series?nativeFilters=1&$args;
+  }
+  location ~ ^/coming-soon/?$ {
+    return 302 /soon;
+  }
+  location ~ "^/(movie|tv)/([1-9][0-9]{0,8}|1000000000)/(cast|crew)/?$" {
+    return 302 "/$1/$2#$3";
+  }
+  location ~ ^/discover/watchlist/?$ {
+    return 302 /watchlist/discover$is_args$args;
+  }
+  location ~ "^/users/([1-9][0-9]{0,8}|1000000000)/watchlist/?$" {
+    return 302 /watchlist/user/$1$is_args$args;
+  }
+  location ~ "^/users/([1-9][0-9]{0,8}|1000000000)/requests/?$" {
+    return 302 /requests?requestedBy=$1&show=$arg_filter&mediaType=$arg_mediaType;
+  }
+
+  location ~ "^/users/([1-9][0-9]{0,8}|1000000000)/settings/notifications/(email|discord|telegram|pushbullet|pushover|webpush)/?$" {
+    return 302 "/admin/users/$1/notifications#notification-$2";
+  }
+  location ~ "^/users/([1-9][0-9]{0,8}|1000000000)/settings/(main|episode-queue|maturity|permissions|password|tv-request-access|linked-accounts|notifications)/?$" {
+    return 302 /admin/users/$1/$2;
+  }
+  location ~ "^/users/([1-9][0-9]{0,8}|1000000000)/settings/?$" {
+    return 302 /admin/users/$1/main;
+  }
+  location ~ ^/users/?$ {
+    return 302 /admin/users;
+  }
+  location ~ ^/settings/(jobs|logs|about)/?$ {
+    return 302 /admin/$1;
+  }
+  location ~ ^/settings(/main)?/?$ {
+    return 302 /admin/general;
+  }
+
   # SeerrNG pages Lumen doesn't have (links in emails, old bookmarks): open them in full SeerrNG
-  location ~ ^/(issues|settings|users|profile|collection|discover|calendar|blocklist|setup|swipe|following|library|downloads|recordings|share|identify|indexer-search|track-requests|book-series|author|software|franchise|collections|associations|resetpassword)(/|$) {
+  location ~ ^/(settings|users|profile|discover|setup|swipe|recordings|book-series|author|software|collections)(/|$) {
     return 302 ${SEERR_FULL_URL}$request_uri;
   }
 
@@ -149,6 +249,9 @@ server {
     add_header X-Content-Type-Options nosniff always;
     add_header Referrer-Policy same-origin always;
     try_files $uri =404;
+  }
+  location = /share-target {
+    return 303 "/share#share=unavailable";
   }
   location = /manifest.webmanifest {
     default_type application/manifest+json;

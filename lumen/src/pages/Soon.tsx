@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   requestMovie,
   requestSeries,
@@ -21,6 +21,7 @@ import { useToast } from '../components/toast';
 import { friendlyError } from '../errors';
 import { useApi } from '../hooks';
 import { Icon } from '../icons';
+import { seriesRequestSummary } from '../seriesRequestSummary';
 
 const MONTHS = [
   'January',
@@ -40,12 +41,22 @@ const MONTHS = [
 // upcoming movies and series, grouped by month, requestable ahead of release
 export default function Soon() {
   const serverName = useMediaServerName();
-  const movieList = useApi<Paged<TitleResult>>('/discover/movies/upcoming');
-  const tvList = useApi<Paged<TitleResult>>('/discover/tv/upcoming');
-  const movies = movieList.data;
-  const tv = tvList.data;
-  // both lists failed: say so (with Retry) instead of "Loading…" for good
-  const failed = !movies && !tv && !!movieList.error && !!tvList.error;
+  const [params] = useSearchParams();
+  const scope = params.get('media');
+  const showMovies = scope !== 'tv';
+  const showTv = scope !== 'movie';
+  const movieList = useApi<Paged<TitleResult>>(
+    showMovies ? '/discover/movies/upcoming' : null
+  );
+  const tvList = useApi<Paged<TitleResult>>(
+    showTv ? '/discover/tv/upcoming' : null
+  );
+  const movies = showMovies ? movieList.data : null;
+  const tv = showTv ? tvList.data : null;
+  const loading =
+    (showMovies && !movies && !movieList.error) ||
+    (showTv && !tv && !tvList.error);
+  const allSelectedListsLoaded = (!showMovies || !!movies) && (!showTv || !!tv);
   const toast = useToast();
   const [asked, setAsked] = useState<Set<string>>(new Set());
   const asks = useAsksRequestOptions();
@@ -82,10 +93,13 @@ export default function Soon() {
       });
     setAsked((a) => new Set(a).add(key));
     try {
-      await (it.mediaType === 'tv'
-        ? requestSeries(it.id)
-        : requestMovie(it.id));
-      toast(`Requested ${it.title || it.name}. It downloads when it’s out.`);
+      const title = it.title || it.name || 'this title';
+      if (it.mediaType === 'tv') {
+        toast(seriesRequestSummary(title, await requestSeries(it.id)));
+      } else {
+        await requestMovie(it.id);
+        toast(`Requested ${title}. It downloads when it’s out.`);
+      }
     } catch (e) {
       unask();
       toast(friendlyError(e, 'Request failed'));
@@ -102,24 +116,62 @@ export default function Soon() {
           <Avatar className="avatar ph-only-avatar" />
         </div>
         <p className="sub">Request ahead and it downloads the day it’s out.</p>
+        <nav className="toolbar" aria-label="Upcoming Media">
+          <Link
+            className="chip"
+            aria-current={showMovies && showTv ? 'page' : undefined}
+            to="/soon"
+          >
+            All
+          </Link>
+          <Link
+            className="chip"
+            aria-current={!showTv ? 'page' : undefined}
+            to="/soon?media=movie"
+          >
+            Movies
+          </Link>
+          <Link
+            className="chip"
+            aria-current={!showMovies ? 'page' : undefined}
+            to="/soon?media=tv"
+          >
+            Series
+          </Link>
+        </nav>
       </header>
-      {!movies && !tv && !failed && <p className="note">Loading…</p>}
+      {loading && (
+        <p className="note" role="status">
+          Loading upcoming titles…
+        </p>
+      )}
       <ServiceNote
-        error={failed ? movieList.error : null}
-        what="upcoming titles"
-        retry={() => {
-          movieList.reload();
-          tvList.reload();
-        }}
+        error={showMovies ? movieList.error : null}
+        what="upcoming movies"
+        retry={movieList.reload}
       />
+      <ServiceNote
+        error={showTv ? tvList.error : null}
+        what="upcoming series"
+        retry={tvList.reload}
+      />
+      {allSelectedListsLoaded && !months.size && (
+        <p className="note">No upcoming titles found.</p>
+      )}
       {choosing && (
         <RequestSheet
           it={choosing}
           onClose={() => setChoosing(null)}
-          onDone={() => {
+          onDone={(is4k, series) => {
             setAsked((a) => new Set(a).add(choosing.mediaType + choosing.id));
             toast(
-              `Requested ${choosing.title || choosing.name}. It downloads when it’s out.`
+              choosing.mediaType === 'tv'
+                ? seriesRequestSummary(
+                    choosing.name || 'this series',
+                    series,
+                    is4k
+                  )
+                : `Requested ${choosing.title || choosing.name}. It downloads when it’s out.`
             );
             setChoosing(null);
           }}

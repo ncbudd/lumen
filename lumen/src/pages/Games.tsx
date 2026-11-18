@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { GridSkeleton, MoreOnScroll, type Stat } from '../components/cards';
 import { DetailTop, Facts, fmtHrs, Pill } from '../components/detail';
@@ -11,6 +11,7 @@ import {
   ServiceNote,
   StatPill,
 } from '../components/extra';
+import IndexerSearchLink from '../components/IndexerSearchLink';
 import { useToast } from '../components/toast';
 import {
   GAME_LABEL,
@@ -140,6 +141,14 @@ export function Games() {
             : 'Pick the console when you request; it arrives ready for your emulator.'
         }
       >
+        <div className="toolbar">
+          <Link className="chip" to="/patches">
+            Translations and Hacks
+          </Link>
+          <Link className="chip" to="/game-library">
+            My Games
+          </Link>
+        </div>
         {x.games.length > 1 && (
           <div className="seg wide" role="group" aria-label="Platform">
             {x.games.map((c) => (
@@ -295,6 +304,7 @@ export function GameDetail() {
         <div className="dbody">
           <div className="dstatus">
             <StatPill s={s} />
+            <IndexerSearchLink category={cat} title={g.title} />
             {g.rating != null && (
               <Pill k="neutral" icon="star">
                 {Math.round(g.rating)} / 100

@@ -467,6 +467,11 @@ h3 {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+@media (hover: hover) and (pointer: fine) {
+  .poster[data-title-mode='hover']:not(:hover):not(:focus-within) > .t {
+    visibility: hidden;
+  }
+}
 .poster .m {
   margin-top: 2px;
   font-size: 12px;
@@ -500,6 +505,9 @@ h3 {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
+}
+.sec-head:has(> .chip) {
+  flex-wrap: wrap;
 }
 .sec-head h2 {
   font-size: 20px;

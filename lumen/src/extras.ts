@@ -248,6 +248,7 @@ export interface Album {
   mediaInfo?: MediaInfo;
 }
 export interface AlbumDetails {
+  onUserWatchlist?: boolean;
   id: string;
   title: string;
   type?: string;
@@ -292,6 +293,7 @@ export const fmtTrack = (ms?: number) =>
 
 // ---- comics (ComicVine volumes) and magazines (LazyLibrarian or Google Books) ----
 export interface Comic {
+  onUserWatchlist?: boolean;
   id: string;
   mediaType: 'comic';
   title: string;
@@ -379,6 +381,7 @@ export interface ComicIssue {
   coverUrl?: string;
 }
 export interface Magazine {
+  onUserWatchlist?: boolean;
   id: string;
   mediaType: 'magazine';
   provider: 'lazylibrarian' | 'googlebooks';
@@ -455,15 +458,36 @@ export const PC_ARCH = [
   ['x86', '32-bit (x86)'],
   ['universal', 'Universal'],
 ] as const;
+export const PATCH_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/;
+
+export function patchHref(id: string, version?: string) {
+  if (!PATCH_ID.test(id) || (version && !PATCH_ID.test(version))) return;
+  const query = version ? `?${new URLSearchParams({ version })}` : '';
+  return `/patches/${encodeURIComponent(id)}${query}`;
+}
+
+export type PatchSelection = {
+  kind: 'patch';
+  projectId: string;
+  versionId?: string;
+  keepOriginal: boolean;
+};
+
 export const requestGame = (
   category: GameCategory,
   g: Game,
-  pick: { os?: string; arch?: string; system?: string }
+  pick: {
+    os?: string;
+    arch?: string;
+    system?: string;
+    selection?: PatchSelection;
+  }
 ) =>
-  api<{ request: { status: string } }>('/request/software', {
+  api<{ request: { status: string; id?: number } }>('/request/software', {
     method: 'POST',
     body: JSON.stringify({
       category,
+      selection: pick.selection,
       catalogProvider: g.catalogProvider,
       ...(g.catalogProvider === 'dat'
         ? { catalogKey: g.catalogId }
@@ -486,6 +510,7 @@ export const gameState = (g: Game) =>
 export interface SoftwareRequest {
   request: {
     id: number;
+    requestedBy?: { id: number; displayName: string } | null;
     category: GameCategory;
     status: string;
     title: string;
@@ -493,6 +518,15 @@ export interface SoftwareRequest {
     catalogId: number | null;
     catalogKey: string | null;
     catalogProvider: 'igdb' | 'dat';
+    selection?:
+      | PatchSelection
+      | {
+          kind: 'game-content';
+          mode: 'edition' | 'missing-selected';
+          editionId?: number;
+          addonIds?: number[];
+        }
+      | null;
     platform: { name: string } | null;
     percent: number | null;
     error: string | null;

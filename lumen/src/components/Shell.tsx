@@ -8,10 +8,16 @@ import {
 } from 'react-router-dom';
 import { api } from '../api';
 import { isAdministrator, useAuth } from '../auth';
+import { useBlocklistNavigation } from '../blocklist';
+import { canManageDownloads } from '../downloadPermissions';
 import { useExtras } from '../extras';
+import { canViewFollowing } from '../followPermissions';
 import { useBack, usePublicSettings } from '../hooks';
 import { Icon, type IconName } from '../icons';
+import { canSearchIndexers } from '../indexerPermissions';
+import { canReadIssues } from '../issuePermissions';
 import { scrollBehavior } from '../motion';
+import { normalizeSearchParams } from '../searchParams';
 import { usePrefs } from '../settings';
 import { BrandMark, brandName } from './brand';
 import { canChooseRequestOptions } from './detail';
@@ -78,6 +84,7 @@ export default function Shell({ children }: { children: ReactNode }) {
   const extras = useExtras();
   const isBook = (h: string) => h === '/books' || h === '/audiobooks';
   const loc = useLocation();
+  const showBlocklist = useBlocklistNavigation();
   const canManageRequests = canChooseRequestOptions(user?.permissions);
   const [pendingRequests, setPendingRequests] = useState(0);
   useEffect(() => {
@@ -101,11 +108,13 @@ export default function Shell({ children }: { children: ReactNode }) {
   const nav = useNavigate();
   const q = useRef<HTMLInputElement>(null);
   const detail =
-    /^\/(movie|tv|book|music|artist|comic|magazine|game|sportarr|adult)\/./.test(
+    /^\/(movie|tv|book|music|artist|comic|magazine|game|sportarr|adult|collection)\/./.test(
       loc.pathname
     );
   // the top search stays in the section you're in (Audiobooks searches audiobooks), like the phone pages
-  const params = new URLSearchParams(loc.search);
+  const query = new URLSearchParams(loc.search);
+  const params =
+    loc.pathname === '/search' ? normalizeSearchParams(query) : query;
   const path = loc.pathname;
   const scope =
     path === '/search'
@@ -294,6 +303,48 @@ export default function Shell({ children }: { children: ReactNode }) {
                 {pendingRequests}
               </span>
             )}
+          </NavLink>
+          {canViewFollowing(user?.permissions) && (
+            <NavLink to="/following">
+              <Icon name="list" />
+              Following
+            </NavLink>
+          )}
+          {canManageDownloads(user?.permissions) && (
+            <NavLink to="/downloads">
+              <Icon name="down" />
+              Download Inbox
+            </NavLink>
+          )}
+          {canSearchIndexers(user?.permissions) && (
+            <NavLink to="/indexer-search">
+              <Icon name="search" />
+              Indexer Search
+            </NavLink>
+          )}
+          {canReadIssues(user?.permissions) && (
+            <NavLink to="/issues">
+              <Icon name="list" />
+              Issues
+            </NavLink>
+          )}
+          {showBlocklist && (
+            <NavLink to="/blocklist">
+              <Icon name="list" />
+              Blocklist
+            </NavLink>
+          )}
+          <NavLink to="/watchlist">
+            <Icon name="star" />
+            Watchlist
+          </NavLink>
+          <NavLink to="/library">
+            <Icon name="book" />
+            My Media
+          </NavLink>
+          <NavLink to="/calendar">
+            <Icon name="cal" />
+            Release Calendar
           </NavLink>
           <NavLink to="/soon">
             <Icon name="cal" />

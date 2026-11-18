@@ -28,22 +28,29 @@ import { onSessionReset, sessionGeneration } from './sessionState';
 const PUBLIC_PATH = '/settings/public';
 
 // A saved answer shows at once; a fresh one isn't asked for again (see apiCache.ts).
-export function useApi<T>(path: string | null) {
+export function useApi<T>(
+  path: string | null,
+  { currentPathOnly = false, keepDuringRefresh = false } = {}
+) {
+  const [responsePath, setResponsePath] = useState(path);
+  const lastRequestedPath = useRef<string | null>(null);
   const [data, setData] = useState<T | null>(
     path ? (cached<T>(path) ?? null) : null
   );
   const [error, setError] = useState<string | null>(null);
-  // the HTTP status of that error (0 when the server wasn't reached)
-  const [errorStatus, setErrorStatus] = useState(0);
+  const [apiError, setApiError] = useState<ApiError>();
   const [tick, setTick] = useState(0);
   useEffect(() => {
     if (!path) return;
     let live = true;
     const generation = sessionGeneration();
+    const keep = keepDuringRefresh && lastRequestedPath.current === path;
+    lastRequestedPath.current = path;
+    setResponsePath(path);
     setError(null);
-    setErrorStatus(0);
+    setApiError(undefined);
     const saved = cached<T>(path);
-    setData(saved ?? null);
+    if (!keep || saved !== undefined) setData(saved ?? null);
     if (saved !== undefined && isFresh(path)) return;
     fetchShared<T>(path)
       .then((d) => {
@@ -52,15 +59,17 @@ export function useApi<T>(path: string | null) {
       })
       .catch((e) => {
         // a saved answer stays up if refreshing it fails
-        if (live && saved === undefined) {
+        if (live && generation === sessionGeneration() && saved === undefined) {
+          if (e instanceof ApiError && (e.status === 401 || e.status === 403))
+            setData(null);
           setError(friendlyError(e, 'Failed to load'));
-          setErrorStatus(e instanceof ApiError ? e.status : 0);
+          setApiError(e instanceof ApiError ? e : undefined);
         }
       });
     return () => {
       live = false;
     };
-  }, [path, tick]);
+  }, [path, tick, keepDuringRefresh]);
   const reload = useCallback(() => {
     if (path) forget(path);
     setTick((t) => t + 1);
@@ -68,7 +77,15 @@ export function useApi<T>(path: string | null) {
   // ask again but keep what is on screen meanwhile (after a request the saved copy is already
   // marked stale, so the page updates in place instead of blanking)
   const refresh = useCallback(() => setTick((t) => t + 1), []);
-  return { data, error, errorStatus, reload, refresh };
+  const current = !currentPathOnly || responsePath === path;
+  return {
+    data: current ? data : null,
+    error: current ? error : null,
+    errorStatus: current ? (apiError?.status ?? 0) : 0,
+    apiError: current ? apiError : undefined,
+    reload,
+    refresh,
+  };
 }
 
 // one call for everyone asking for the same path at once; the answer is saved
@@ -93,11 +110,23 @@ export async function cachedApi<T>(path: string): Promise<T> {
 }
 
 export interface PublicSettings {
+  versionCheck?: boolean;
+  openIdProviders?: { slug: string; name: string }[];
+  mediaServerType?: number;
+  jellyfinQuickConnectOnly?: boolean;
+  otherUsersAvailability?: 'show' | 'distinguish' | 'hide';
   lockLumenForNonAdmins?: boolean;
   softwareEnabled?: boolean;
   romarrEnabled?: boolean;
+  emailEnabled?: boolean;
+  streamingRegion?: string;
   applicationTitle: string;
   movie4kEnabled: boolean;
+  personMovieBulkRequestsEnabled?: boolean;
+  enable4k?: boolean;
+  enableSpecialEpisodes?: boolean;
+  trackEpisodeAvailability?: boolean;
+  tvSeasonWatchGateEnabled?: boolean;
   series4kEnabled: boolean;
   partialRequestsEnabled: boolean;
   booksEnabled: boolean;
@@ -115,7 +144,12 @@ const pagedSnap = new Map<
   string,
   { items: unknown[]; page: number; total: number; gen: number }
 >();
-export function usePaged<T>(base: string) {
+const pageItemId = (item: unknown) => String((item as { id?: unknown }).id);
+
+export function usePaged<T>(
+  base: string,
+  idOf: (item: T) => string = pageItemId
+) {
   const entry = useLocation().key;
   const snapKey = `${entry}|${base}`;
   const snap = pagedSnap.get(snapKey);
@@ -157,7 +191,6 @@ export function usePaged<T>(base: string) {
     let live = true;
     const gen = cacheGeneration();
     const sep = base.includes('?') ? '&' : '?';
-    const idOf = (x: T) => String((x as { id?: unknown }).id);
     const head = Math.min(2, s.page);
     const tail = [s.page - 1, s.page].filter((p) => p > head);
     (async () => {
@@ -202,7 +235,7 @@ export function usePaged<T>(base: string) {
     return () => {
       live = false;
     };
-  }, [snapKey, base]);
+  }, [snapKey, base, idOf]);
   useEffect(() => {
     if (loadedBase === base && page > 0)
       pagedSnap.set(snapKey, { items, page, total, gen: rowsGen.current });
@@ -210,49 +243,56 @@ export function usePaged<T>(base: string) {
     if (pagedSnap.size > 30)
       pagedSnap.delete(pagedSnap.keys().next().value as string);
   }, [base, loadedBase, snapKey, items, page, total]);
-  const more = useCallback(async () => {
-    // after a failure only Retry asks again: retrying by itself would hammer the rate limit
-    if (loadedBase !== base || loading || page >= total || error) return;
-    const key = `${base}#${page + 1}`;
-    if (inFlight.current === key) return;
-    inFlight.current = key;
-    if (page === 0) rowsGen.current = cacheGeneration();
-    const requestGeneration = generation.current;
-    const ownsRequest = () =>
-      generation.current === requestGeneration && inFlight.current === key;
-    setLoading(true);
-    try {
-      const sep = base.includes('?') ? '&' : '?';
-      const d = await cachedApi<{
-        page: number;
-        totalPages: number;
-        results: T[];
-      }>(`${base}${sep}page=${page + 1}`);
-      if (!ownsRequest()) return; // an old filter must not replace the current list
-      // popular lists shift between pages, so a title can come back; show it once
-      const idOf = (x: T) => String((x as { id?: unknown }).id);
-      setItems((x) => {
-        const seen = new Set(x.map(idOf));
-        return x.concat(d.results.filter((r) => !seen.has(idOf(r))));
-      });
-      setPage(d.page);
-      setTotal(d.totalPages || 1);
-    } catch (e) {
-      if (ownsRequest()) setError(friendlyError(e, 'Failed to load'));
-    } finally {
-      if (ownsRequest()) {
-        inFlight.current = null;
-        setLoading(false);
+  const loadNext = useCallback(
+    async (retrying: boolean) => {
+      // after a failure only Retry asks again: retrying by itself would hammer the rate limit
+      if (
+        loadedBase !== base ||
+        loading ||
+        page >= total ||
+        (error && !retrying)
+      )
+        return;
+      const key = `${base}#${page + 1}`;
+      if (inFlight.current === key) return;
+      inFlight.current = key;
+      if (page === 0) rowsGen.current = cacheGeneration();
+      const requestGeneration = generation.current;
+      const ownsRequest = () =>
+        generation.current === requestGeneration && inFlight.current === key;
+      setError(null);
+      setLoading(true);
+      try {
+        const sep = base.includes('?') ? '&' : '?';
+        const d = await cachedApi<{
+          page: number;
+          totalPages: number;
+          results: T[];
+        }>(`${base}${sep}page=${page + 1}`);
+        if (!ownsRequest()) return; // an old filter must not replace the current list
+        // popular lists shift between pages, so a title can come back; show it once
+        setItems((x) => {
+          const seen = new Set(x.map(idOf));
+          return x.concat(d.results.filter((r) => !seen.has(idOf(r))));
+        });
+        setPage(d.page);
+        setTotal(d.totalPages || 1);
+      } catch (e) {
+        if (ownsRequest()) setError(friendlyError(e, 'Failed to load'));
+      } finally {
+        if (ownsRequest()) {
+          inFlight.current = null;
+          setLoading(false);
+        }
       }
-    }
-  }, [base, loadedBase, page, total, loading, error]);
+    },
+    [base, loadedBase, page, total, loading, error, idOf]
+  );
+  const more = useCallback(() => loadNext(false), [loadNext]);
+  const retry = useCallback(() => loadNext(true), [loadNext]);
   useEffect(() => {
     if (page === 0 && !loading && !error) void more();
   }, [base, page, loading, error, more]);
-  const retry = useCallback(() => {
-    inFlight.current = null;
-    setError(null);
-  }, []);
   return {
     items,
     more,

@@ -7,6 +7,7 @@ import {
   type MediaRow,
   type Paged,
   type TitleResult,
+  type VideoSearchResult,
 } from '../api';
 import { cached, isFresh, remember } from '../apiCache';
 import { useAuth, useMediaServerName } from '../auth';
@@ -19,6 +20,8 @@ import {
   shortDate,
   TitleCard,
 } from '../components/cards';
+import { CardTitleToggle } from '../components/CardTitleToggle';
+import { ConfiguredDiscoverShelves } from '../components/ConfiguredDiscoverShelves';
 import { Avatar } from '../components/Shell';
 import { useExtras } from '../extras';
 import { cachedApi, useApi } from '../hooks';
@@ -99,6 +102,8 @@ const CHIPS: [IconName, string, string][] = [
   ['book', 'Books', '/books'],
   ['headphones', 'Audiobooks', '/audiobooks'],
   ['cal', 'Coming soon', '/soon'],
+  ['list', 'Provider Discovery', '/providers'],
+  ['list', 'Share', '/share'],
 ];
 
 export default function Discover() {
@@ -106,7 +111,7 @@ export default function Discover() {
   const { prefs } = usePrefs();
   const on = prefs.rows;
   const books_ = prefs.showBooks;
-  const trending = useApi<Paged<TitleResult>>(
+  const trending = useApi<Paged<VideoSearchResult>>(
     on.hero ? '/discover/trending' : null
   );
   const movies = useApi<Paged<TitleResult>>(
@@ -133,7 +138,11 @@ export default function Discover() {
   const extras = useExtras();
 
   const hero = (trending.data?.results || [])
-    .filter((r) => r.backdropPath && r.mediaType !== 'person')
+    .filter(
+      (r): r is TitleResult =>
+        Boolean(r.backdropPath) &&
+        (r.mediaType === 'movie' || r.mediaType === 'tv')
+    )
     .slice(0, 6);
   const today = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
@@ -183,9 +192,9 @@ export default function Discover() {
       </header>
 
       {on.hero && (
-        <Section title="Popular right now">
+        <Section title="Popular right now" link={['See all', '/trending']}>
           {hero.length ? (
-            <Rail className="feat-rail">
+            <Rail className="feat-rail" restoreId="featured">
               {hero.map((it, i) => (
                 <FeatCard
                   key={it.mediaType + it.id}
@@ -223,9 +232,24 @@ export default function Discover() {
         <Section
           title={`New on ${serverName}`}
           link={['See all', '/movies?show=plex']}
+          action={
+            fresh?.length ? (
+              <CardTitleToggle
+                kinds={[
+                  ...new Set(
+                    fresh.map((item) =>
+                      item.mediaType === 'tv'
+                        ? ('tv' as const)
+                        : ('movie' as const)
+                    )
+                  ),
+                ]}
+              />
+            ) : undefined
+          }
         >
           {fresh ? (
-            <Rail>
+            <Rail restoreId="recent">
               {fresh.map((m) => (
                 <TitleCard
                   key={m.mediaType + m.id}
@@ -245,9 +269,13 @@ export default function Discover() {
       )}
 
       {on.trendingMovies && !empty(movies.data?.results) && (
-        <Section title="Trending movies" link={['See all', '/movies']}>
+        <Section
+          title="Trending movies"
+          action={<CardTitleToggle kinds={['movie']} />}
+          link={['See all', '/movies']}
+        >
           {movies.data ? (
-            <Rail>
+            <Rail restoreId="movies">
               {movies.data.results.map((m) => (
                 <TitleCard key={m.id} it={{ ...m, mediaType: 'movie' }} />
               ))}
@@ -261,9 +289,13 @@ export default function Discover() {
       )}
 
       {on.popularSeries && !empty(series.data?.results) && (
-        <Section title="Popular series" link={['See all', '/series']}>
+        <Section
+          title="Popular series"
+          action={<CardTitleToggle kinds={['tv']} />}
+          link={['See all', '/series']}
+        >
           {series.data ? (
-            <Rail>
+            <Rail restoreId="series">
               {series.data.results.map((t) => (
                 <TitleCard key={t.id} it={{ ...t, mediaType: 'tv' }} />
               ))}
@@ -279,9 +311,13 @@ export default function Discover() {
       {books_ &&
         on.audiobooks &&
         !empty(audio.data ? withCovers(audio.data) : undefined) && (
-          <Section title="Popular audiobooks" link={['See all', '/audiobooks']}>
+          <Section
+            title="Popular audiobooks"
+            action={<CardTitleToggle kinds={['book']} />}
+            link={['See all', '/audiobooks']}
+          >
             {audio.data ? (
-              <Rail>
+              <Rail restoreId="audiobooks">
                 {withCovers(audio.data).map((b) => (
                   <BookCard key={b.id} b={{ ...b, bookFormat: 'audiobook' }} />
                 ))}
@@ -295,9 +331,13 @@ export default function Discover() {
         )}
 
       {books_ && on.books && !empty(books.data ? ebookCards : undefined) && (
-        <Section title="Popular books" link={['See all', '/books']}>
+        <Section
+          title="Popular books"
+          action={<CardTitleToggle kinds={['book']} />}
+          link={['See all', '/books']}
+        >
           {books.data ? (
-            <Rail>
+            <Rail restoreId="books">
               {ebookCards.map((b) => (
                 <BookCard
                   key={b.id}
@@ -314,9 +354,13 @@ export default function Discover() {
       )}
 
       {on.comingSoon && !empty(soon.data?.results) && (
-        <Section title="Coming soon" link={['See all', '/soon']}>
+        <Section
+          title="Coming soon"
+          action={<CardTitleToggle kinds={['movie']} />}
+          link={['See all', '/soon']}
+        >
           {soon.data ? (
-            <Rail>
+            <Rail restoreId="coming-soon">
               {soon.data.results.map((m) => (
                 <TitleCard
                   key={m.id}
@@ -332,6 +376,11 @@ export default function Discover() {
           )}
         </Section>
       )}
+
+      <ConfiguredDiscoverShelves
+        showBooks={books_}
+        showMusic={extras.list.some((entry) => entry.key === 'music')}
+      />
 
       {on.genres && genres.data && (
         <Section title="Browse by genre">

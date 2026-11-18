@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { isAdministrator, useAuth } from '../auth';
+import { useBlocklistNavigation } from '../blocklist';
 import { Section } from '../components/cards';
 import { ConfirmSheet } from '../components/ConfirmSheet';
 import { canChooseRequestOptions } from '../components/detail';
 import { fullSeerrUrl, initials } from '../components/Shell';
 import { useToast } from '../components/toast';
+import { canManageDownloads } from '../downloadPermissions';
+import { canViewFollowing } from '../followPermissions';
 import { CAN_HOVER, useApi, usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
+import { canReadIssues } from '../issuePermissions';
 import { mediaServer, services } from '../mediaServer';
 import {
   DISCOVER_ROWS,
@@ -61,6 +65,7 @@ function Toggle({
 
 export default function Me() {
   const { user, signOut } = useAuth();
+  const showBlocklist = useBlocklistNavigation();
   const toast = useToast();
   const { prefs, set, reset, locked, seerrPublicUrl } = usePrefs();
   const [askReset, setAskReset] = useState(false);
@@ -113,9 +118,32 @@ export default function Me() {
         </div>
       </div>
 
+      {((user?.permissions ?? 0) & (2 | 8)) !== 0 && (
+        <Section title="User Management">
+          <div className="setlist">
+            <div className="set">
+              <b>Users</b>
+              <Link className="go" to="/admin/users" aria-label="Open Users">
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+          </div>
+        </Section>
+      )}
+
       {isAdmin && (
         <Section title="Administration">
           <div className="setlist">
+            <div className="set">
+              <b>General Settings</b>
+              <Link
+                className="go"
+                to="/admin/general"
+                aria-label="Open General Settings"
+              >
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
             <div className="set">
               <span>
                 <b>Lumen Settings</b>
@@ -127,6 +155,36 @@ export default function Me() {
                 className="go"
                 to="/me/lumen"
                 aria-label="Open Lumen Settings"
+              >
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+            <div className="set">
+              <b>Scheduled Jobs</b>
+              <Link
+                className="go"
+                to="/admin/jobs"
+                aria-label="Open Scheduled Jobs"
+              >
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+            <div className="set">
+              <b>About SeerrNG</b>
+              <Link
+                className="go"
+                to="/admin/about"
+                aria-label="Open About SeerrNG"
+              >
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+            <div className="set">
+              <b>System Logs</b>
+              <Link
+                className="go"
+                to="/admin/logs"
+                aria-label="Open System Logs"
               >
                 Open <Icon name="chev" size="sm" />
               </Link>
@@ -150,6 +208,105 @@ export default function Me() {
         </Section>
       )}
 
+      <Section title="Library">
+        <div className="setlist">
+          <div className="set">
+            <b>My Media</b>
+            <Link className="go" to="/library" aria-label="Open My Media">
+              Open <Icon name="chev" size="sm" />
+            </Link>
+          </div>
+          <div className="set">
+            <b>Release Calendar</b>
+            <Link
+              className="go"
+              to="/calendar"
+              aria-label="Open Release Calendar"
+            >
+              Open <Icon name="chev" size="sm" />
+            </Link>
+          </div>
+          <div className="set">
+            <b>Watchlist</b>
+            <Link className="go" to="/watchlist" aria-label="Open Watchlist">
+              Open <Icon name="chev" size="sm" />
+            </Link>
+          </div>
+          <div className="set">
+            <b>My Games</b>
+            <Link className="go" to="/game-library" aria-label="Open My Games">
+              Open <Icon name="chev" size="sm" />
+            </Link>
+          </div>
+          {canViewFollowing(user?.permissions) && (
+            <div className="set">
+              <b>Following</b>
+              <Link className="go" to="/following" aria-label="Open Following">
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+          )}
+        </div>
+      </Section>
+
+      {canManageDownloads(user?.permissions) && (
+        <Section title="Acquisition">
+          <div className="setlist">
+            <div className="set">
+              <b>Download Inbox</b>
+              <Link
+                className="go"
+                to="/downloads"
+                aria-label="Open Download Inbox"
+              >
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+          </div>
+        </Section>
+      )}
+
+      {(showBlocklist || canReadIssues(user?.permissions)) && (
+        <Section title="Support">
+          <div className="setlist">
+            {showBlocklist && (
+              <div className="set">
+                <b>Blocklist</b>
+                <Link
+                  className="go"
+                  to="/blocklist"
+                  aria-label="Open Blocklist"
+                >
+                  Open <Icon name="chev" size="sm" />
+                </Link>
+              </div>
+            )}
+            {canReadIssues(user?.permissions) && (
+              <div className="set">
+                <b>Issues</b>
+                <Link className="go" to="/issues" aria-label="Open Issues">
+                  Open <Icon name="chev" size="sm" />
+                </Link>
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
+
+      <Section title="Account">
+        <div className="setlist">
+          <div className="set">
+            <b>Profile and Password</b>
+            <Link
+              className="go"
+              to="/me/account"
+              aria-label="Open Account Settings"
+            >
+              Open <Icon name="chev" size="sm" />
+            </Link>
+          </div>
+        </div>
+      </Section>
       <Section title="Request limits">
         <div className="quota">
           {q('movie', 'Movies')}

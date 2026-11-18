@@ -1,0 +1,229 @@
+import { expect, test } from '@playwright/test';
+
+test('Patch discovery filters, follows the exact project and pages through results', async ({
+  page,
+}) => {
+  const key = `dat-${'a'.repeat(64)}`;
+  let followed = false;
+  const searches: Record<string, string>[] = [];
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    switch (url.pathname.slice('/api/v1'.length)) {
+      case '/auth/me':
+        return route.fulfill({
+          json: { id: 1, displayName: 'Player', permissions: 32 },
+        });
+      case '/patches/search':
+        searches.push(Object.fromEntries(url.searchParams));
+        return route.fulfill({
+          json: {
+            available: true,
+            nextCursor: url.searchParams.has('cursor')
+              ? null
+              : 'fixture-cursor',
+            results: url.searchParams.has('cursor')
+              ? []
+              : [
+                  {
+                    id: 'patch-1',
+                    name: 'Fixture Translation',
+                    kind: 'translation',
+                    language: 'en',
+                    status: 'complete',
+                    game: { catalogKey: key, title: 'Fixture Game' },
+                    versions: [{ id: 'v2', version: '2.0' }],
+                    latestVersionId: 'v2',
+                  },
+                ],
+          },
+        });
+      case '/follow':
+        if (request.method() === 'POST') {
+          const subject = request.postDataJSON();
+          expect(subject).toMatchObject({
+            kind: 'patch-project',
+            subjectKey: 'patch:patch-1',
+            conditions: { ref: { projectId: 'patch-1' } },
+          });
+          followed = true;
+          return route.fulfill({ status: 201, json: { id: 1, ...subject } });
+        }
+        return route.fulfill({ json: { results: [] } });
+      default:
+        return route.fulfill({ json: {} });
+    }
+  });
+  await page.goto('/patches');
+  await expect(page.getByText('Fixture Translation')).toBeVisible();
+  expect(searches[0]).toEqual({ language: 'en', completeOnly: 'true' });
+  await expect(page.getByRole('link', { name: 'Open Game' })).toHaveAttribute(
+    'href',
+    `/game/retro/${key}?dat=1`
+  );
+  const follow = page.getByRole('button', { name: 'Follow', exact: true });
+  await follow.click();
+  await expect(page.getByRole('button', { name: 'Following' })).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  );
+  expect(followed).toBe(true);
+  await page.getByLabel('Search Titles').fill('Fixture');
+  await page.getByLabel('Kind', { exact: true }).selectOption('translation');
+  await page.getByRole('button', { name: 'Apply Filters' }).click();
+  await expect
+    .poll(() => searches.at(-1))
+    .toMatchObject({ q: 'Fixture', kind: 'translation' });
+  await page.getByRole('button', { name: 'Next Page' }).click();
+  await expect(page.getByText('No projects matched.')).toBeVisible();
+  expect(searches.at(-1)?.cursor).toBe('fixture-cursor');
+  await page.getByRole('button', { name: 'First Page' }).click();
+  await expect(page.getByText('Fixture Translation')).toBeVisible();
+});
+
+test('a Following update opens its exact patch version and submits only with a compatible base', async ({
+  page,
+}) => {
+  const key = `dat-${'b'.repeat(64)}`;
+  let submissions = 0;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const req = route.request();
+    const url = new URL(req.url());
+    switch (url.pathname.slice('/api/v1'.length)) {
+      case '/auth/me':
+        return route.fulfill({
+          json: { id: 1, displayName: 'Player', permissions: 32 },
+        });
+      case '/follow/events':
+        return route.fulfill({
+          json: {
+            total: 1,
+            results: [
+              {
+                id: 1,
+                title: 'Patch v1',
+                seen: true,
+                follow: { subjectLabel: 'Patch Fixture' },
+                target: {
+                  mediaType: 'patch',
+                  id: 'patch:fixture',
+                  variantKey: 'v1',
+                },
+              },
+            ],
+          },
+        });
+      case '/follow':
+        return route.fulfill({ json: { results: [] } });
+      case '/patches/projects/patch%3Afixture':
+        return route.fulfill({
+          json: {
+            id: 'patch:fixture',
+            name: 'Patch Fixture',
+            game: {
+              catalogKey: key,
+              title: 'Fixture Game',
+              platformSlug: 'snes',
+            },
+            latestVersionId: 'v2',
+            versions: [
+              { id: 'v1', version: '1.0', base: { available: false } },
+              { id: 'v2', version: '2.0', base: { available: true } },
+            ],
+          },
+        });
+      case `/request/software/catalog/games/${key}`:
+        return route.fulfill({
+          json: {
+            catalogProvider: 'dat',
+            catalogId: key,
+            emulationSystems: [
+              { group: 'retro', slug: 'snes', name: 'SNES' },
+              { group: 'retro', slug: 'other', name: 'Other System' },
+            ],
+          },
+        });
+      case '/request/software':
+        expect(req.method()).toBe('POST');
+        expect(req.postDataJSON()).toEqual({
+          category: 'retro',
+          catalogProvider: 'dat',
+          catalogKey: key,
+          platformSlug: 'snes',
+          selection: {
+            kind: 'patch',
+            projectId: 'patch:fixture',
+            versionId: 'v2',
+            keepOriginal: true,
+          },
+        });
+        submissions++;
+        return route.fulfill({
+          status: 201,
+          json: { request: { id: 71, status: 'pending' } },
+        });
+      case '/request/software/status/71':
+        return route.fulfill({
+          json: {
+            status: 'pending',
+            request: {
+              id: 71,
+              title: 'Fixture Game',
+              category: 'retro',
+              status: 'pending',
+              selection: {
+                kind: 'patch',
+                projectId: 'patch:fixture',
+                versionId: 'v2',
+                keepOriginal: true,
+              },
+            },
+            assets: [],
+            history: [],
+          },
+        });
+      default:
+        return route.fulfill({ json: {} });
+    }
+  });
+  await page.goto('/following');
+  const link = page.getByRole('link', { name: 'Patch v1' });
+  await expect(link).toHaveAttribute(
+    'href',
+    '/patches/patch%3Afixture?version=v1'
+  );
+  await link.click();
+  await expect(page.getByLabel('Patch Version')).toHaveValue('v1');
+  const submit = page.getByRole('button', { name: 'Request Patch' });
+  await expect(submit).toBeDisabled();
+  await expect(
+    page.getByText('The required base revision is unavailable.')
+  ).toBeVisible();
+  expect(submissions).toBe(0);
+  await page.getByLabel('Patch Version').selectOption('v2');
+  await expect(page.getByLabel('System', { exact: true })).toHaveValue('snes');
+  await submit.click();
+  await expect(page.getByText('Waiting for approval')).toBeVisible();
+  await expect(submit).toBeDisabled();
+  expect(submissions).toBe(1);
+  await page
+    .getByRole('link', { name: 'Request History', exact: true })
+    .click();
+  const history = page.getByRole('dialog', {
+    name: 'Software request history',
+  });
+  await expect(
+    history.getByText('Keep original', { exact: true })
+  ).toBeVisible();
+  const requestedVersion = history.getByRole('link', {
+    name: 'Open Requested Patch Version',
+  });
+  await expect(requestedVersion).toHaveAttribute(
+    'href',
+    '/patches/patch%3Afixture?version=v2'
+  );
+  await requestedVersion.click();
+  await expect(page.getByLabel('Patch Version')).toHaveValue('v2');
+});

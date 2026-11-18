@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Link,
   useLocation,
@@ -11,8 +11,15 @@ import {
   type BookResult,
   type Paged,
   type TitleResult,
+  type VideoSearchResult,
 } from '../api';
-import { BookCard, Section, TitleCard } from '../components/cards';
+import {
+  BookCard,
+  CollectionCard,
+  Section,
+  TitleCard,
+} from '../components/cards';
+import { CardTitleToggle } from '../components/CardTitleToggle';
 import { ComicCard } from '../components/comics';
 import { ServiceNote } from '../components/extra';
 import { friendlyError } from '../errors';
@@ -24,6 +31,7 @@ import {
   readRecentSearches,
   saveRecentSearches,
 } from '../recentSearches';
+import { normalizeSearchParams } from '../searchParams';
 import { usePrefs } from '../settings';
 import { PersonCard } from './People';
 
@@ -36,14 +44,17 @@ const SCOPES = {
   comic: 'Comics/Manga',
 } as const;
 type Scope = keyof typeof SCOPES;
-
 // Search stays in the section you came from (?f=movie|tv|ebook|audio|comic); "All" widens it
 export default function Search() {
-  const [p, setP] = useSearchParams();
+  const [params, setP] = useSearchParams();
+  const p = useMemo(() => normalizeSearchParams(params), [params]);
   const { prefs } = usePrefs();
   const [q, setQ] = useState(p.get('q') || '');
-  const f = ((p.get('f') as Scope) in SCOPES ? p.get('f') : 'all') as Scope;
-  const [titles, setTitles] = useState<TitleResult[] | null>(null);
+  const requestedScope = p.get('f') ?? '';
+  const f = Object.hasOwn(SCOPES, requestedScope)
+    ? (requestedScope as Scope)
+    : 'all';
+  const [titles, setTitles] = useState<VideoSearchResult[] | null>(null);
   const [books, setBooks] = useState<BookResult[] | null>(null);
   const [comics, setComics] = useState<ComicWork[] | null>(null);
   const [recent, setRecent] = useState<string[]>(readRecentSearches);
@@ -59,7 +70,7 @@ export default function Search() {
   const comicsOn = extras.list.some((e) => e.key === 'comic');
   const term0 = (p.get('q') || '').trim();
   // nothing typed yet: something to tap instead of an empty screen
-  const trending = useApi<Paged<TitleResult>>(
+  const trending = useApi<Paged<VideoSearchResult>>(
     term0 ? null : '/discover/trending'
   ).data;
   // a search is remembered when it's finished (Enter, or a result opened), not on every keystroke,
@@ -133,7 +144,7 @@ export default function Search() {
         : null;
       const [tr, ...brs] = await Promise.all([
         wantTitles
-          ? api<Paged<TitleResult>>(
+          ? api<Paged<VideoSearchResult>>(
               `/search?query=${encodeURIComponent(term)}&page=1`
             ).catch(failure)
           : null,
@@ -155,12 +166,13 @@ export default function Search() {
       const foundComics = cr?.results || [];
       const foundTitles = (tr?.results || []).filter((r) =>
         f === 'movie'
-          ? r.mediaType === 'movie'
+          ? r.mediaType === 'movie' || r.mediaType === 'collection'
           : f === 'tv'
             ? r.mediaType === 'tv'
             : r.mediaType === 'movie' ||
               r.mediaType === 'tv' ||
-              r.mediaType === 'person'
+              r.mediaType === 'person' ||
+              r.mediaType === 'collection'
       );
       let foundBooks = brs.flatMap((r, i) =>
         (r?.results || [])
@@ -223,9 +235,18 @@ export default function Search() {
         ? 'Search comics and manga…'
         : `Search ${SCOPES[f].toLowerCase()}…`;
   const people =
-    f === 'all' ? (titles || []).filter((t) => t.mediaType === 'person') : [];
-  const movies = (titles || []).filter((t) => t.mediaType === 'movie');
-  const shows = (titles || []).filter((t) => t.mediaType === 'tv');
+    f === 'all'
+      ? (titles || []).filter((t): t is TitleResult => t.mediaType === 'person')
+      : [];
+  const collections = (titles || []).filter(
+    (t) => t.mediaType === 'collection'
+  );
+  const movies = (titles || []).filter(
+    (t): t is TitleResult => t.mediaType === 'movie'
+  );
+  const shows = (titles || []).filter(
+    (t): t is TitleResult => t.mediaType === 'tv'
+  );
   const bookCards = books || [];
   const comicCards = comics || [];
   const nothing =
@@ -233,6 +254,7 @@ export default function Search() {
     books !== null &&
     comics !== null &&
     !movies.length &&
+    !collections.length &&
     !shows.length &&
     !people.length &&
     !bookCards.length &&
@@ -288,6 +310,16 @@ export default function Search() {
             </button>
           ))}
         </div>
+        {p.get('q') &&
+          (f === 'all' ||
+            f === 'movie' ||
+            f === 'tv' ||
+            f === 'ebook' ||
+            f === 'audio') && (
+            <div className="toolbar">
+              <CardTitleToggle kinds={['movie', 'tv', 'album', 'book']} />
+            </div>
+          )}
       </header>
       {!p.get('q') && !!recent.length && (
         <Section
@@ -345,7 +377,10 @@ export default function Search() {
         <Section title="Trending this week">
           <div className="grid">
             {trending.results
-              .filter((r) => r.mediaType === 'movie' || r.mediaType === 'tv')
+              .filter(
+                (r): r is TitleResult =>
+                  r.mediaType === 'movie' || r.mediaType === 'tv'
+              )
               .slice(0, 12)
               .map((m) => (
                 <TitleCard key={m.mediaType + m.id} it={m} />
@@ -395,6 +430,15 @@ export default function Search() {
             <div className="grid">
               {movies.map((m) => (
                 <TitleCard key={m.id} it={m} />
+              ))}
+            </div>
+          </Section>
+        )}
+        {!!collections.length && (
+          <Section title="Collections">
+            <div className="grid">
+              {collections.map((collection) => (
+                <CollectionCard key={collection.id} collection={collection} />
               ))}
             </div>
           </Section>
