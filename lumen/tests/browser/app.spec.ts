@@ -1,5 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 
+const testAppPath = (path: string) =>
+  `${process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : ''}${path}`;
+
 // These fixtures exercise the built frontend's API boundary, not provider credentials.
 const movie = {
   posterPath: '/qa-poster.png',
@@ -740,6 +743,72 @@ test('a double click on a poster’s Request sends one request', async ({
   expect(posts).toHaveLength(1);
   expect(fixture.errors).toEqual([]);
 });
+
+for (const item of [
+  {
+    path: '/movies',
+    endpoint: '**/api/v1/discover/movies*',
+    permissions: [0, 262144],
+    title: 'The Test Film',
+    result: movie,
+  },
+  {
+    path: '/series',
+    endpoint: '**/api/v1/discover/tv*',
+    permissions: [0, 524288],
+    title: 'The Test Series',
+    result: {
+      ...movie,
+      id: 202,
+      title: undefined,
+      name: 'The Test Series',
+      mediaType: 'tv',
+      firstAirDate: '2020-01-01',
+    },
+  },
+]) {
+  for (const permissions of item.permissions) {
+    test(`${item.path} poster request follows media permission (${permissions})`, async ({
+      page,
+    }) => {
+      await fixtures(page);
+      await page.route('**/api/v1/auth/me', (route) =>
+        route.fulfill({
+          json: { id: 1, displayName: 'Viewer', permissions },
+        })
+      );
+      await page.route('**/api/v1/languages', (route) =>
+        route.fulfill({
+          json: [{ iso_639_1: 'en', english_name: 'English' }],
+        })
+      );
+      await page.route('**/api/v1/watchproviders/regions', (route) =>
+        route.fulfill({
+          json: [{ iso_3166_1: 'US', english_name: 'United States' }],
+        })
+      );
+      await page.route(item.endpoint, (route) =>
+        route.fulfill({ json: paged([item.result]) })
+      );
+      await page.goto(item.path);
+      const poster = page.locator('.poster', {
+        has: page.getByRole('link', { name: item.title, exact: true }),
+      });
+      await expect(poster).toBeVisible();
+      await poster.hover();
+      await expect(
+        poster.getByRole('button', { name: /request/i })
+      ).toHaveCount(permissions === 0 ? 0 : 1);
+      await page.screenshot({
+        path: test
+          .info()
+          .outputPath(`${item.path.slice(1)}-permission-${permissions}.png`),
+        fullPage: true,
+        animations: 'disabled',
+      });
+    });
+  }
+}
 
 test('movie posters distinguish or hide shared copies without offering duplicate requests', async ({
   page,
@@ -4705,7 +4774,7 @@ test('TV access review confirms a decision and respects manager permissions', as
     .getByRole('button', { name: 'Approve' })
     .click();
   const dialog = page.getByRole('alertdialog', {
-    name: 'Approve access for Household Member?',
+    name: 'Approve TV season access?',
   });
   await expect(dialog).toBeVisible();
   expect(decision).toBeUndefined();
@@ -4719,7 +4788,7 @@ test('TV access review confirms a decision and respects manager permissions', as
     .getByRole('button', { name: 'Decline' });
   await decline.click();
   const declineDialog = page.getByRole('alertdialog', {
-    name: 'Decline access for Another Member?',
+    name: 'Decline TV season access?',
   });
   await declineDialog.getByRole('button', { name: 'Cancel' }).click();
   expect(declined).toBeUndefined();
@@ -5353,7 +5422,7 @@ test('System Logs restores display preferences without retaining search text', a
       },
     });
   });
-  await page.goto('/admin/logs');
+  await page.goto(testAppPath('/admin/logs'));
   await page.getByRole('combobox', { name: 'Severity' }).selectOption('error');
   await page.getByRole('combobox', { name: 'Page Size' }).selectOption('10');
   await page.getByLabel('Search Logs').fill('temporary search');
@@ -5375,7 +5444,7 @@ test('System Logs restores display preferences without retaining search text', a
   expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain(
     'temporary search'
   );
-  await page.goto('/admin/logs?page=10001');
+  await page.goto(testAppPath('/admin/logs?page=10001'));
   await expect(page.getByText('Page 10001', { exact: true })).toBeVisible();
   await expect.poll(() => queries.at(-1)?.get('skip')).toBe('100000');
   await expect(page.getByRole('button', { name: 'Next Page' })).toBeDisabled();
@@ -5384,7 +5453,7 @@ test('System Logs restores display preferences without retaining search text', a
       json: { id: 12, displayName: 'Another Admin', permissions: 2 },
     })
   );
-  await page.goto('/admin/logs');
+  await page.goto(testAppPath('/admin/logs'));
   await expect(page.getByRole('combobox', { name: 'Severity' })).toHaveValue(
     'info'
   );
@@ -5414,7 +5483,7 @@ test('System Logs keeps the same entry expanded when a newer log arrives', async
       },
     })
   );
-  await page.goto('/admin/logs');
+  await page.goto(testAppPath('/admin/logs'));
   const row = page.getByRole('listitem').filter({ hasText: 'Original entry' });
   await row.getByText('Details', { exact: true }).click();
   await expect(row.getByText('{"value":1}', { exact: true })).toBeVisible();
@@ -5454,7 +5523,7 @@ test('System Logs filters server entries and excludes non-admins', async ({
       },
     });
   });
-  await page.goto('/me');
+  await page.goto(testAppPath('/me'));
   await page.getByRole('link', { name: 'Open System Logs' }).click();
   await expect(page.getByText('Initial result')).toBeVisible();
   await page.getByRole('button', { name: 'Next Page' }).click();
@@ -5491,7 +5560,7 @@ test('System Logs filters server entries and excludes non-admins', async ({
   await page.route('**/api/v1/auth/me', (route) =>
     route.fulfill({ json: { id: 1, displayName: 'Member', permissions: 32 } })
   );
-  await page.goto('/admin/logs');
+  await page.goto(testAppPath('/admin/logs'));
   await expect(page).toHaveURL(/\/me$/);
   await expect(
     page.getByRole('link', { name: 'Open System Logs' })
@@ -5518,7 +5587,7 @@ test('Media Categories saves only changed instance switches and excludes non-adm
     } else reads++;
     return route.fulfill({ json: { enabledMediaCategories: categories } });
   });
-  await page.goto('/me');
+  await page.goto(testAppPath('/me'));
   await page.getByRole('link', { name: 'Open Media Categories' }).click();
   await page.getByRole('checkbox', { name: 'Movies', exact: true }).uncheck();
   await page.getByRole('button', { name: 'Save Categories' }).click();
@@ -5680,7 +5749,7 @@ test('General Settings retains application edits after failure and saves only ch
     }
     return route.fulfill({ json: saved });
   });
-  await page.goto('/me');
+  await page.goto(testAppPath('/me'));
   await page.getByRole('link', { name: 'Open General Settings' }).click();
   const title = page.getByLabel('Application Title');
   const save = page.getByRole('button', { name: 'Save Application Settings' });
@@ -5961,7 +6030,17 @@ test('book recommendations open a newly created feed', async ({ page }) => {
   await page.getByLabel('Genres to Include').fill('Fantasy, History');
   await page.getByLabel('Genres to Avoid').fill('Horror');
   await page.getByLabel('Series Position').selectOption('standalone');
-  await page.getByLabel('Prefer Less Popular Books').check();
+  const lessPopular = page.getByLabel('Prefer Less Popular Books');
+  await lessPopular.scrollIntoViewIfNeeded();
+  const controlBox = await lessPopular.boundingBox();
+  const tabbarBox = await page.locator('.tabbar').boundingBox();
+  if (tabbarBox && controlBox) {
+    expect(
+      controlBox.y + controlBox.height <= tabbarBox.y ||
+        controlBox.y >= tabbarBox.y + tabbarBox.height
+    ).toBe(true);
+  }
+  await lessPopular.check();
   await create.click();
   await expect(page.getByRole('alert')).toHaveText(
     'Hardcover rejected your API token.'
@@ -6128,7 +6207,7 @@ test('account permissions bookmarks show the signed-in users assigned permission
   await page.route('**/api/v1/user/1/settings/password', (route) =>
     route.fulfill({ json: { hasPassword: true } })
   );
-  await page.goto('/me/account#account-permissions');
+  await page.goto(testAppPath('/me/account#account-permissions'));
   const section = page.locator('#account-permissions');
   await expect(section.getByRole('heading')).toBeInViewport();
   await expect(
@@ -6268,7 +6347,7 @@ test('override rules save multiple language and country selections', async ({
   await page.route('**/api/v1/overrideRule', (route) =>
     route.fulfill({ json: route.request().method() === 'GET' ? [] : { id: 1 } })
   );
-  await page.goto('/admin/override-rules');
+  await page.goto(testAppPath('/admin/override-rules'));
   await page.getByRole('button', { name: 'New Override Rule' }).click();
   const choice = (name: string) =>
     page.getByRole('combobox', { name, exact: true });
@@ -6484,7 +6563,7 @@ test('Scheduled Jobs confirms a run and saves an edited schedule', async ({
     job.cronSchedule = schedule;
     return route.fulfill({ json: job });
   });
-  await page.goto('/me');
+  await page.goto(testAppPath('/me'));
   await page.getByRole('link', { name: 'Open Scheduled Jobs' }).click();
   await expect(
     page.getByRole('button', { name: 'Cancellation Unavailable' })
@@ -6530,7 +6609,7 @@ test('Scheduled Jobs describes calendar presets and preserves existing custom sc
       })),
     })
   );
-  await page.goto('/admin/jobs');
+  await page.goto(testAppPath('/admin/jobs'));
   for (const [name, label, schedule] of [
     ['Seconds Job', 'At Seconds 0 and 45 Each Minute', '*/45 * * * * *'],
     ['Hours Job', 'Custom Schedule', '0 0 */48 * * *'],
@@ -6593,7 +6672,7 @@ test('System Caches confirms and refreshes a DNS flush', async ({ page }) => {
       return route.fulfill({ status: 204 });
     }
   );
-  await page.goto('/admin/caches');
+  await page.goto(testAppPath('/admin/caches'));
   await expect(page.getByText('cache.example', { exact: true })).toBeVisible();
   await expect(page.getByText('/data/fixture/cache/images')).toBeVisible();
   await page.getByRole('button', { name: 'Flush DNS Entry' }).click();
@@ -6642,7 +6721,7 @@ test('About SeerrNG shows installed version and respects disabled update checks'
       },
     })
   );
-  await page.goto('/me');
+  await page.goto(testAppPath('/me'));
   await page.getByRole('link', { name: 'Open About SeerrNG' }).click();
   await expect(page.getByText('v3.72.38', { exact: true })).toBeVisible();
   await expect(
@@ -6689,7 +6768,7 @@ test('Users lets delegated managers search without exposing the directory to mem
       },
     });
   });
-  await page.goto('/me');
+  await page.goto(testAppPath('/me'));
   await page.getByRole('link', { name: 'Open Users', exact: true }).click();
   await expect(page.getByText('Owner Initial')).toBeVisible();
   await page.getByLabel('Search Users').fill('Owner & admin');
@@ -6697,7 +6776,7 @@ test('Users lets delegated managers search without exposing the directory to mem
   await expect(page.getByText('Owner Match')).toBeVisible();
   expect(reads).toBe(2);
   permissions = 32;
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await expect(page).toHaveURL(/\/me$/);
   await expect(
     page.getByRole('link', { name: 'Open Users', exact: true })
@@ -6737,7 +6816,7 @@ test('Users creates a local account with a password setup link', async ({
       });
     return route.fulfill({ status: 201, json: account });
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await page.getByRole('button', { name: 'Create Local User' }).click();
   await page.getByLabel('Username', { exact: true }).fill('New Member');
   await page.getByLabel('Email', { exact: true }).fill('member@example.test');
@@ -6779,7 +6858,7 @@ test('Users sets an Episode Queue default for the selected account', async ({
     }
     return route.fulfill({ json: { defaultEpisodeCount: count } });
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await page
     .getByRole('button', { name: 'Episode Queue', exact: true })
     .click();
@@ -6823,7 +6902,7 @@ test('Users saves and resets a selected media quota', async ({ page }) => {
     }
     return route.fulfill({ json: quotas });
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await page.getByRole('button', { name: 'Request Quotas' }).click();
   await expect(
     page.getByText('Server default unlimited requests')
@@ -6884,7 +6963,7 @@ test('Users changes media categories and indexer visibility independently', asyn
       },
     });
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await page
     .getByRole('button', { name: 'Media Categories', exact: true })
     .click();
@@ -6942,7 +7021,7 @@ test('Users clears one maturity limit and preserves the other', async ({
     }
     return route.fulfill({ json: policy });
   });
-  await page.goto('/admin/users/19/maturity');
+  await page.goto(testAppPath('/admin/users/19/maturity'));
   await expect(page.getByLabel('Movie Rating Limit')).toHaveValue('PG');
   await page.getByLabel('Movie Rating Limit').selectOption('');
   await page.getByRole('button', { name: 'Save Maturity Limits' }).click();
@@ -7011,7 +7090,7 @@ test('Users delegates only held permissions and preserves high permission bits',
     }
     return route.fulfill({ json: target });
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await page.getByRole('button', { name: 'Permissions', exact: true }).click();
   await expect(
     page.getByRole('checkbox', { name: 'Manage Settings', exact: true })
@@ -7078,7 +7157,7 @@ test('Users protects administrators and confirms deletion of the selected member
     deleted = true;
     return route.fulfill({ status: 200, json: people[2] });
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await expect(page.getByText('Second Admin')).toBeVisible();
   const remove = page.getByRole('button', { name: 'Delete User', exact: true });
   await expect(remove).toHaveCount(1);
@@ -7120,7 +7199,7 @@ test('Users imports and syncs selected Emby accounts', async ({ page }) => {
     writes++;
     return route.fulfill({ json: { createdUsers: [{}], refreshedUsers: 1 } });
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await page.getByRole('button', { name: 'Import Emby Users' }).click();
   await page.getByRole('checkbox', { name: 'New Viewer' }).check();
   await expect(page.getByText('Existing Viewer')).toHaveCount(0);
@@ -7168,7 +7247,7 @@ test('Users sends exact Plex selections and confirms the all-account sync', asyn
           : { createdUsers: [], refreshedUsers: 1 },
     });
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await page.getByRole('button', { name: 'Import Plex Users' }).click();
   await page.getByRole('checkbox', { name: 'Plex Friend' }).check();
   await page
@@ -7212,7 +7291,7 @@ test('Users edits a username without writing other profile settings', async ({
     }
     return route.fulfill({ json: { username } });
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await page.getByRole('button', { name: 'Edit Profile' }).click();
   await expect(page.getByLabel('Username')).toHaveValue('Existing Viewer');
   await page.getByLabel('Username').fill(' Renamed Viewer ');
@@ -7264,7 +7343,7 @@ test('Users edits local email and keeps Plex email provider-managed', async ({
       json: { username: 'Plex Viewer', email: 'plex@example.test' },
     })
   );
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   const plex = page.getByRole('listitem').filter({ hasText: 'Plex Viewer' });
   await plex.getByRole('button', { name: 'Edit Profile' }).click();
   await expect(plex.getByLabel('Username')).toHaveValue('Plex Viewer');
@@ -7307,7 +7386,7 @@ test('Users confirms a managed local password and clears the form after saving',
     name: 'Set Local Password',
     exact: true,
   });
-  await page.goto('/admin/users');
+  await page.goto(testAppPath('/admin/users'));
   await expect(action).toHaveCount(1);
   await action.click();
   const password = page.getByLabel('New Local Password', { exact: true });

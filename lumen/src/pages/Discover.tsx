@@ -21,6 +21,7 @@ import {
 } from '../components/cards';
 import { CardTitleToggle } from '../components/CardTitleToggle';
 import { ConfiguredDiscoverShelves } from '../components/ConfiguredDiscoverShelves';
+import { canUseShare } from '../components/detail';
 import GenreTiles from '../components/GenreTiles';
 import { Avatar } from '../components/Shell';
 import {
@@ -29,6 +30,7 @@ import {
 } from '../discoveryVisibility';
 import { useExtras } from '../extras';
 import { cachedApi, useApi, usePublicSettings } from '../hooks';
+import { useLumenLocale } from '../i18n';
 import { Icon, type IconName } from '../icons';
 import {
   enrichRecentMediaTitles,
@@ -101,6 +103,7 @@ const CHIPS: [IconName, string, string][] = [
 ];
 
 export default function Discover() {
+  const { t } = useLumenLocale();
   const serverName = useMediaServerName();
   const { prefs, adminConfigState } = usePrefs();
   // Admin defaults arrive asynchronously. Do not mount optional shelves or
@@ -184,7 +187,9 @@ export default function Discover() {
         {preferencesReady && (
           <div className="chips navchips">
             {CHIPS.filter(
-              ([, , h]) => books_ || (h !== '/books' && h !== '/audiobooks')
+              ([, , h]) =>
+                (books_ || (h !== '/books' && h !== '/audiobooks')) &&
+                (h !== '/share' || canUseShare(user?.permissions))
             ).map(([i, t, h]) => (
               <Link key={h} className="chip" to={h}>
                 <Icon name={i} />
@@ -194,7 +199,7 @@ export default function Discover() {
             {extras.list.map((e) => (
               <Link key={e.path} className="chip" to={e.path}>
                 <Icon name={e.icon} />
-                {e.label}
+                {t(e.message, e.label)}
               </Link>
             ))}
           </div>

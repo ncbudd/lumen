@@ -8,14 +8,15 @@ import { CardTitlePreferences } from '../components/CardTitlePreferences';
 import { ServiceNote } from '../components/extra';
 import { StreamingSubscriptions } from '../components/StreamingSubscriptions';
 import { useApi, usePublicSettings } from '../hooks';
+import { lumenLocales, useLumenLocale } from '../i18n';
 import { permissionOptions } from '../permissionOptions';
 import { sessionGeneration } from '../sessionState';
 
 const accountTypes: Readonly<Record<number, string>> = {
-  1: 'Plex User',
-  2: 'Local User',
-  3: 'Jellyfin User',
-  4: 'Emby User',
+  1: 'components.UserProfile.UserSettings.UserGeneralSettings.plexuser',
+  2: 'components.UserProfile.UserSettings.UserGeneralSettings.localuser',
+  3: 'components.UserProfile.UserSettings.UserGeneralSettings.mediaServerUser',
+  4: 'components.UserProfile.UserSettings.UserGeneralSettings.mediaServerUser',
 };
 
 const watchlistFields = [
@@ -25,6 +26,9 @@ const watchlistFields = [
     source: 'Plex Watchlist',
     plex: true,
     permission: 16777216n,
+    helpKey: '',
+    labelKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.plexwatchlistsyncmovies',
   },
   {
     key: 'watchlistSyncTv',
@@ -32,41 +36,60 @@ const watchlistFields = [
     source: 'Plex Watchlist',
     plex: true,
     permission: 33554432n,
+    helpKey: '',
+    labelKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.plexwatchlistsyncseries',
   },
   {
     key: 'watchlistSyncMusic',
     label: 'Auto-Request Music',
     source: 'SeerrNG music watchlists',
     permission: 8589934592n,
+    labelKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.musicwatchlistsync',
+    helpKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.musicwatchlistsynctip',
   },
   {
     key: 'watchlistSyncBooks',
     label: 'Auto-Request Books',
     source: 'SeerrNG book watchlists',
     permission: 68719476736n,
+    labelKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.bookwatchlistsync',
+    helpKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.bookwatchlistsynctip',
   },
   {
     key: 'watchlistSyncComics',
     label: 'Auto-Request Comics',
     source: 'your SeerrNG comic watchlist',
     permission: 549755813888n,
+    labelKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.comicwatchlistsync',
+    helpKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.comicwatchlistsynctip',
   },
   {
     key: 'watchlistSyncMagazines',
     label: 'Auto-Request Magazines',
     source: 'your SeerrNG magazine watchlist',
     permission: 4398046511104n,
+    labelKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.magazinewatchlistsync',
+    helpKey:
+      'components.UserProfile.UserSettings.UserGeneralSettings.magazinewatchlistsynctip',
   },
 ] as const;
 
 type WatchlistField = (typeof watchlistFields)[number]['key'];
 
 const preferredLanguageFields = [
-  ['all', 'Preferred Language for All Media'],
-  ['movie', 'Movie Language Override'],
-  ['tv', 'Series Language Override'],
-  ['music', 'Music Language Override'],
-  ['book', 'Book Language Override'],
+  ['all', 'Preferred Language for All Media', 'preferredLanguageAll'],
+  ['movie', 'Movie Language Override', 'preferredLanguageMovie'],
+  ['tv', 'Series Language Override', 'preferredLanguageTv'],
+  ['music', 'Music Language Override', 'preferredLanguageMusic'],
+  ['book', 'Book Language Override', 'preferredLanguageBook'],
 ] as const;
 
 type PreferredLanguage = (typeof preferredLanguageFields)[number][0];
@@ -85,6 +108,7 @@ function languageDraft(preferences?: PreferredLanguages | null) {
 interface Profile extends Partial<Record<WatchlistField, boolean | null>> {
   username?: string | null;
   email?: string | null;
+  locale?: string | null;
   metadataLocale?: string | null;
   preferredLanguages?: PreferredLanguages | null;
   formatRegion?: string | null;
@@ -104,6 +128,7 @@ function profileDraft(profile: Profile) {
     watchlistSyncMagazines: profile.watchlistSyncMagazines ?? false,
     username: profile.username ?? '',
     email: profile.email ?? '',
+    locale: profile.locale ?? '',
     metadataLocale: profile.metadataLocale ?? '',
     preferredLanguages: languageDraft(profile.preferredLanguages),
     formatRegion: profile.formatRegion ?? '',
@@ -130,6 +155,7 @@ function ProfileForm({
   onSaved: () => void;
 }) {
   const { refresh, user } = useAuth();
+  const { setLocale: setLumenLocale, t } = useLumenLocale();
   const languages =
     useApi<{ iso_639_1: string; english_name: string }[]>('/languages');
   const languageOptions = (Array.isArray(languages.data) ? languages.data : [])
@@ -141,37 +167,58 @@ function ProfileForm({
   const [notice, setNotice] = useState('');
   const [failure, setFailure] = useState('');
   const working = useRef(false);
+  const generalKey = 'components.UserProfile.UserSettings.UserGeneralSettings.';
   const fields = [
-    { key: 'username', label: 'Display Name', max: 100 },
-    { key: 'email', label: 'Email', max: 254 },
+    {
+      key: 'username',
+      label: 'Display Name',
+      labelKey: generalKey + 'displayName',
+      max: 100,
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      labelKey: generalKey + 'email',
+      max: 254,
+    },
     {
       key: 'metadataLocale',
       label: 'Metadata Language Code',
       help: 'Leave empty to use the server default.',
+      labelKey: generalKey + 'metadataLanguage',
+      helpKey: generalKey + 'metadataLanguageTip',
       max: 35,
     },
     {
       key: 'formatRegion',
       label: 'Regional Format Code',
       help: 'Use a two-letter region such as CA, or leave empty for the default.',
+      labelKey: generalKey + 'formatRegion',
+      helpKey: generalKey + 'formatRegionTip',
       max: 2,
     },
     {
       key: 'discoverRegion',
       label: 'Discover Region',
       help: 'Enter a two-letter region code, all, or leave empty for the server default.',
+      labelKey: generalKey + 'discoverRegion',
+      helpKey: generalKey + 'discoverRegionTip',
       max: 16,
     },
     {
       key: 'streamingRegion',
       label: 'Streaming Region',
       help: 'Enter a two-letter region code or leave empty for the server default.',
+      labelKey: generalKey + 'streamingRegion',
+      helpKey: generalKey + 'streamingRegionTip',
       max: 16,
     },
     {
       key: 'originalLanguage',
-      label: 'Original Language',
+      label: 'Discover Language',
       help: 'Enter a two-letter language code, all, or leave empty for the server default.',
+      labelKey: generalKey + 'originallanguage',
+      helpKey: generalKey + 'originallanguageTip',
       max: 16,
     },
   ] as const;
@@ -190,12 +237,18 @@ function ProfileForm({
   );
   const editable = [
     ...fields.filter(({ key }) => key !== 'email' || !plex),
+    {
+      key: 'locale',
+      label: 'Display Language',
+      labelKey: generalKey + 'applanguage',
+    } as const,
     ...visibleWatchlists,
   ];
   const normalized = {
     ...draft,
     username: draft.username.trim(),
     email: draft.email.trim(),
+    locale: draft.locale.trim(),
     metadataLocale: draft.metadataLocale.trim(),
     formatRegion: draft.formatRegion.trim().toUpperCase(),
     discoverRegion: normalizeRegion(draft.discoverRegion),
@@ -241,6 +294,7 @@ function ProfileForm({
         if (generation !== sessionGeneration()) return;
         setSaved(confirmed);
         setDraft(confirmed);
+        setLumenLocale(confirmed.locale || null);
         onSaved();
         if (
           changes.every(({ key }) => confirmed[key] === normalized[key]) &&
@@ -251,7 +305,7 @@ function ProfileForm({
                 draft.preferredLanguages[key]
             ))
         ) {
-          setNotice('Profile saved.');
+          setNotice('profile-saved');
         } else {
           setFailure(
             'SeerrNG saved different values. Review the updated profile.'
@@ -285,18 +339,60 @@ function ProfileForm({
       }}
     >
       <div className="setlist">
-        {fields.map(({ key, label, max, ...field }) => (
+        <label className="set cfg-row">
+          <span>
+            <b>
+              {t(
+                'components.UserProfile.UserSettings.UserGeneralSettings.applanguage',
+                'Display Language'
+              )}
+            </b>
+            <small>
+              {t(
+                'components.UserProfile.UserSettings.UserGeneralSettings.languageBrowserDefault',
+                'Use Browser Language ({language})',
+                { language: navigator.language }
+              )}
+            </small>
+          </span>
+          <select
+            className="cfg-input"
+            aria-label={t(
+              'components.UserProfile.UserSettings.UserGeneralSettings.applanguage',
+              'Display Language'
+            )}
+            value={draft.locale}
+            disabled={busy}
+            onChange={(event) =>
+              setDraft({ ...draft, locale: event.target.value })
+            }
+          >
+            <option value="">
+              {t(
+                'components.UserProfile.UserSettings.UserGeneralSettings.languageBrowserDefault',
+                'Use Browser Language ({language})',
+                { language: navigator.language }
+              )}
+            </option>
+            {lumenLocales.map(({ tag, nativeName }) => (
+              <option key={tag} value={tag}>
+                {nativeName}
+              </option>
+            ))}
+          </select>
+        </label>
+        {fields.map(({ key, label, labelKey, max, ...field }) => (
           <label className="set cfg-row" key={key}>
             <span>
-              <b>{label}</b>
-              {'help' in field && <small>{field.help}</small>}
+              <b>{t(labelKey, label)}</b>
+              {'help' in field && <small>{t(field.helpKey, field.help)}</small>}
               {plex && key === 'email' && <small>Managed by Plex.</small>}
             </span>
             <input
               className="cfg-input"
               type={key === 'email' ? 'email' : 'text'}
               maxLength={max}
-              aria-label={label}
+              aria-label={t(labelKey, label)}
               value={draft[key]}
               disabled={busy || (plex && key === 'email')}
               onChange={(event) =>
@@ -310,11 +406,16 @@ function ProfileForm({
           what="media languages"
           retry={languages.reload}
         />
-        {preferredLanguageFields.map(([key, label]) => {
+        {preferredLanguageFields.map(([key, label, messageKey]) => {
           const value = draft.preferredLanguages[key];
           return (
             <label className="set cfg-row" key={key}>
-              <b>{label}</b>
+              <b>
+                {t(
+                  `components.UserProfile.UserSettings.UserGeneralSettings.${messageKey}`,
+                  label
+                )}
+              </b>
               <select
                 className="cfg-input"
                 value={value}
@@ -331,9 +432,19 @@ function ProfileForm({
                 }}
               >
                 {key !== 'all' && (
-                  <option value="inherit">Use All-Media Preference</option>
+                  <option value="inherit">
+                    {t(
+                      'components.UserProfile.UserSettings.UserGeneralSettings.preferredLanguageInherit',
+                      'Use all-media preference'
+                    )}
+                  </option>
                 )}
-                <option value="">Any Language</option>
+                <option value="">
+                  {t(
+                    'components.UserProfile.UserSettings.UserGeneralSettings.preferredLanguageAny',
+                    'Any language'
+                  )}
+                </option>
                 {value &&
                   value !== 'inherit' &&
                   !languageOptions.some(
@@ -348,15 +459,22 @@ function ProfileForm({
             </label>
           );
         })}
-        {visibleWatchlists.map(({ key, label, source }) => (
+        {visibleWatchlists.map(({ key, label, labelKey, helpKey, source }) => (
           <label className="set cfg-row" key={key}>
             <span>
-              <b>{label}</b>
-              <small>Automatically request titles added to {source}.</small>
+              <b>{t(labelKey, label)}</b>
+              <small>
+                {helpKey
+                  ? t(
+                      helpKey,
+                      `Automatically request titles added to ${source}.`
+                    )
+                  : `Automatically request titles added to ${source}.`}
+              </small>
             </span>
             <input
               type="checkbox"
-              aria-label={label}
+              aria-label={t(labelKey, label)}
               checked={draft[key]}
               disabled={busy}
               onChange={(event) =>
@@ -368,7 +486,12 @@ function ProfileForm({
       </div>
       {notice && (
         <p className="note" role="status">
-          {notice}
+          {notice === 'profile-saved'
+            ? t(
+                'components.UserProfile.UserSettings.UserGeneralSettings.toastSettingsSuccess',
+                'Settings saved successfully!'
+              )
+            : notice}
         </p>
       )}
       {failure && (
@@ -381,7 +504,10 @@ function ProfileForm({
           className="btn btn-primary btn-sm"
           disabled={busy || (!changes.length && !languageChanged) || invalid}
         >
-          Save Profile
+          {t(
+            'components.UserProfile.UserSettings.UserGeneralSettings.save',
+            'Save Changes'
+          )}
         </button>
       </div>
     </form>
@@ -395,6 +521,7 @@ function PasswordForm({
   path: string;
   initialHasPassword: boolean;
 }) {
+  const { t } = useLumenLocale();
   const [hasPassword, setHasPassword] = useState(initialHasPassword);
   const [current, setCurrent] = useState('');
   const [password, setPassword] = useState('');
@@ -425,7 +552,12 @@ function PasswordForm({
       });
       if (generation !== sessionGeneration()) return;
       setHasPassword(true);
-      setNotice('Password saved. Sign in again if prompted.');
+      setNotice(
+        t(
+          'components.UserProfile.UserSettings.UserPasswordChange.toastSettingsSuccess',
+          'Password saved successfully!'
+        )
+      );
     } catch (error) {
       if (generation !== sessionGeneration()) return;
       setFailure(
@@ -455,7 +587,12 @@ function PasswordForm({
       <div className="setlist">
         {hasPassword && (
           <label className="set cfg-row">
-            <b>Current Password</b>
+            <b>
+              {t(
+                'components.UserProfile.UserSettings.UserPasswordChange.currentpassword',
+                'Current Password'
+              )}
+            </b>
             <input
               className="cfg-input"
               type="password"
@@ -469,13 +606,26 @@ function PasswordForm({
         )}
         <label className="set cfg-row">
           <span>
-            <b>New Password</b>
-            <small>Use at least eight characters.</small>
+            <b>
+              {t(
+                'components.UserProfile.UserSettings.UserPasswordChange.newpassword',
+                'New Password'
+              )}
+            </b>
+            <small>
+              {t(
+                'components.UserProfile.UserSettings.UserPasswordChange.validationNewPasswordLength',
+                'Use at least eight characters.'
+              )}
+            </small>
           </span>
           <input
             className="cfg-input"
             type="password"
-            aria-label="New Password"
+            aria-label={t(
+              'components.UserProfile.UserSettings.UserPasswordChange.newpassword',
+              'New Password'
+            )}
             autoComplete="new-password"
             maxLength={1024}
             value={password}
@@ -484,7 +634,12 @@ function PasswordForm({
           />
         </label>
         <label className="set cfg-row">
-          <b>Confirm Password</b>
+          <b>
+            {t(
+              'components.UserProfile.UserSettings.UserPasswordChange.confirmpassword',
+              'Confirm Password'
+            )}
+          </b>
           <input
             className="cfg-input"
             type="password"
@@ -517,13 +672,22 @@ function PasswordForm({
 
 function Settings({ id, plex }: { id: number; plex: boolean }) {
   const { user } = useAuth();
+  const { t } = useLumenLocale();
   const accountType = user?.userType ? accountTypes[user.userType] : undefined;
+  const mediaServerName =
+    user?.userType === 3 ? 'Jellyfin' : user?.userType === 4 ? 'Emby' : '';
   const role =
     user?.id === 1
       ? 'Owner'
       : isAdministrator(user?.permissions)
         ? 'Admin'
         : 'User';
+  const roleKey =
+    user?.id === 1
+      ? 'components.UserProfile.UserSettings.UserGeneralSettings.owner'
+      : isAdministrator(user?.permissions)
+        ? 'components.UserProfile.UserSettings.UserGeneralSettings.admin'
+        : 'components.UserProfile.UserSettings.UserGeneralSettings.user';
   const mask = user?.permissions ?? 0;
   const permissionBits =
     Number.isSafeInteger(mask) && mask >= 0 ? BigInt(mask) : 0n;
@@ -552,24 +716,41 @@ function Settings({ id, plex }: { id: number; plex: boolean }) {
   }, [hash, loaded]);
   return (
     <>
-      <Section title="Profile">
+      <Section
+        title={t(
+          'components.UserProfile.UserSettings.UserGeneralSettings.generalsettings',
+          'General Settings'
+        )}
+      >
         <dl className="setlist">
           {accountType && (
             <div className="set">
               <dt>
-                <b>Account Type</b>
+                <b>
+                  {t(
+                    'components.UserProfile.UserSettings.UserGeneralSettings.accounttype',
+                    'Account Type'
+                  )}
+                </b>
               </dt>
               <dd>
-                <small>{accountType}</small>
+                <small>
+                  {t(accountType, accountType, { mediaServerName })}
+                </small>
               </dd>
             </div>
           )}
           <div className="set">
             <dt>
-              <b>Role</b>
+              <b>
+                {t(
+                  'components.UserProfile.UserSettings.UserGeneralSettings.role',
+                  'Role'
+                )}
+              </b>
             </dt>
             <dd>
-              <small>{role}</small>
+              <small>{t(roleKey, role)}</small>
             </dd>
           </div>
         </dl>
@@ -601,7 +782,13 @@ function Settings({ id, plex }: { id: number; plex: boolean }) {
         />
       )}
       <CardTitlePreferences path={base + '/card-text'} />
-      <Section title="Password" id="password">
+      <Section
+        title={t(
+          'components.UserProfile.UserSettings.menuChangePass',
+          'Password'
+        )}
+        id="password"
+      >
         <ServiceNote
           error={password.error}
           what="password settings"
@@ -620,7 +807,13 @@ function Settings({ id, plex }: { id: number; plex: boolean }) {
           )
         )}
       </Section>
-      <Section title="Account Permissions" id="account-permissions">
+      <Section
+        title={t(
+          'components.UserProfile.UserSettings.menuPermissions',
+          'Permissions'
+        )}
+        id="account-permissions"
+      >
         {isAdministrator(mask) ? (
           <p className="note">This account has administrator access.</p>
         ) : grants.length ? (
@@ -643,32 +836,48 @@ function Settings({ id, plex }: { id: number; plex: boolean }) {
 
 export default function AccountSettings() {
   const { user } = useAuth();
+  const { t } = useLumenLocale();
   return (
     <>
       <header className="ph">
-        <h1>Account Settings</h1>
+        <h1>{t('i18n.usersettings', 'User Settings')}</h1>
       </header>
       <div className="toolbar">
         <Link className="btn btn-quiet btn-sm" to="#advanced-theme">
-          Theme Colors
+          {t(
+            'components.UserProfile.UserSettings.menuAdvancedTheme',
+            'Advanced Theme'
+          )}
         </Link>
         <Link className="btn btn-quiet btn-sm" to="#account-permissions">
-          Account Permissions
+          {t(
+            'components.UserProfile.UserSettings.menuPermissions',
+            'Permissions'
+          )}
         </Link>
         <Link className="btn btn-quiet btn-sm" to="/me/account/tv-requests">
-          TV Request Settings
+          {t('lumen.account.tvRequestSettings', 'TV Request Settings')}
         </Link>
         <Link className="btn btn-quiet btn-sm" to="/me/account/linked-accounts">
-          Linked Accounts
+          {t(
+            'components.UserProfile.UserSettings.menuLinkedAccounts',
+            'Linked Accounts'
+          )}
         </Link>
         <Link className="btn btn-quiet btn-sm" to="/me/account/client-tokens">
-          Client Tokens
+          {t(
+            'components.UserProfile.UserSettings.menuClientTokens',
+            'Client Tokens'
+          )}
         </Link>
         <Link className="btn btn-quiet btn-sm" to="/me/account/notifications">
-          Notification Settings
+          {t(
+            'components.UserProfile.UserSettings.menuNotifications',
+            'Notifications'
+          )}
         </Link>
         <Link className="btn btn-quiet btn-sm" to="/me">
-          Back to You
+          {t('lumen.account.backToYou', 'Back to You')}
         </Link>
       </div>
       {user && (

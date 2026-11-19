@@ -4,7 +4,13 @@ import { isAdministrator, useAuth } from '../auth';
 import BlocklistButton from '../components/BlocklistButton';
 import { MoreOnScroll, Section } from '../components/cards';
 import { CardTitleToggle } from '../components/CardTitleToggle';
-import { DetailTop, Facts, Pill } from '../components/detail';
+import {
+  canRequestMusic,
+  canUseRequestAccess,
+  DetailTop,
+  Facts,
+  Pill,
+} from '../components/detail';
 import {
   ExtraCard,
   ExtraGate,
@@ -274,9 +280,11 @@ export function Music() {
         <Link className="btn btn-quiet btn-sm" to="/music/playlist-import">
           Import Playlist
         </Link>
-        <Link className="btn btn-quiet btn-sm" to="/music/collectors">
-          Collector Picks
-        </Link>
+        {canUseRequestAccess(user?.permissions) && (
+          <Link className="btn btn-quiet btn-sm" to="/music/collectors">
+            Collector Picks
+          </Link>
+        )}
         <label className="sel">
           <span className="lbl">Sort</span>
           <select value={sort} onChange={(e) => upd('sort', e.target.value)}>
@@ -442,13 +450,13 @@ export function AlbumDetail() {
     .slice(0, 4)
     .map((t) => t.tag);
   const total = (a.tracks || []).reduce((n, t) => n + (t.length || 0), 0);
-  const main = (
+  const main = canRequestMusic(user?.permissions) ? (
     <RequestButton
       stat={s}
       label="Request album"
       request={() => requestExtra('music', a.id)}
     />
-  );
+  ) : null;
   return (
     <ExtraGate k="music">
       <article className="detail">

@@ -1,15 +1,30 @@
 import { expect, test, type Page } from '@playwright/test';
 
-async function session(page: Page, permissions: unknown, configured?: string) {
+const testMount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
+const testAppPath = (path: string) => `${testMount}${path}`;
+const testApiPath = (url: string) =>
+  new URL(url).pathname.replace(/^\/lumen(?=\/)/, '').replace(/^\/api\/v1/, '');
+
+async function session(
+  page: Page,
+  permissions: unknown,
+  configured?: string,
+  warnings?: string[]
+) {
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/lumen-config.json', (route) =>
     route.fulfill({ json: { seerrPublicUrl: configured } })
   );
   await page.route('**/api/v1/**', (route) => {
-    const path = new URL(route.request().url()).pathname.slice(7);
+    const path = testApiPath(route.request().url());
     const json =
       path === '/auth/me'
-        ? { id: 1, displayName: 'Household', permissions }
+        ? {
+            id: 1,
+            displayName: 'Household',
+            permissions,
+            ...(warnings ? { warnings } : {}),
+          }
         : path === '/settings/public'
           ? {
               mediaServerType: 1,
@@ -31,16 +46,36 @@ async function session(page: Page, permissions: unknown, configured?: string) {
   });
 }
 
+test('Coming soon is reachable from You on every screen size', async ({
+  page,
+}) => {
+  await session(page, 32);
+  await page.goto(testAppPath('/me'));
+  const link = page.getByRole('link', {
+    name: 'Open Coming soon',
+    exact: true,
+  });
+  await expect(link).toBeVisible();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth)
+  ).toBeLessThanOrEqual(page.viewportSize()!.width);
+  await link.click();
+  await expect(page).toHaveURL(/\/soon$/);
+  await expect(
+    page.getByRole('heading', { name: 'Coming soon', exact: true })
+  ).toBeVisible();
+});
+
 test('administration is visible in navigation and at the start of You', async ({
   page,
 }, info) => {
   await session(page, 2);
-  await page.goto('/me');
+  await page.goto(testAppPath('/me'));
   await expect(
     page.getByRole('heading', { name: 'Administration', exact: true })
   ).toBeVisible();
   await page.screenshot({ path: info.outputPath('you.png') });
-  await page.goto('/');
+  await page.goto(testAppPath('/'));
   const nav = page.getByRole('navigation', { name: 'Main', exact: true });
   const desktop = (page.viewportSize()?.width ?? 0) >= 1040;
   await page.screenshot({ path: info.outputPath('discover.png') });
@@ -54,7 +89,7 @@ test('administration is visible in navigation and at the start of You', async ({
   } else {
     await page
       .getByRole('navigation', { name: 'Tabs', exact: true })
-      .getByRole('link', { name: 'You', exact: true })
+      .getByRole('link', { name: 'Profile', exact: true })
       .click();
     await expect(
       page.getByRole('heading', { name: 'Administration', exact: true })
@@ -69,7 +104,7 @@ test('administration is visible in navigation and at the start of You', async ({
   ).toBeVisible();
   await expect(
     page.getByRole('link', { name: 'Open System Caches' })
-  ).toHaveAttribute('href', '/admin/caches');
+  ).toHaveAttribute('href', testAppPath('/admin/caches'));
   await page.screenshot({ path: info.outputPath('administration.png') });
   await page
     .getByRole('link', { name: 'Open Lumen Settings', exact: true })
@@ -85,12 +120,174 @@ test('administration is visible in navigation and at the start of You', async ({
   ).toBeLessThanOrEqual(page.viewportSize()!.width);
 });
 
+for (const locale of [
+  {
+    tag: 'fr',
+    administration: 'Administration',
+    settings: 'Paramètres généraux',
+    open: 'Ouvrir Paramètres généraux',
+    search: 'Rechercher des paramètres',
+    all: 'Tous les paramètres et outils',
+    group: 'Télévision et films',
+    groupHeading: 'Télévision et films',
+    homeSearch: 'Rechercher des films, séries, livres et mangas…',
+    back: 'Retour',
+    profile: 'Profil',
+    missingHeading: 'Page introuvable',
+    missingPage: 'Cette page n’existe pas dans Lumen.',
+    backToDiscover: 'Retour à Découvrir',
+    fullSeerr: 'ouvrir SeerrNG en entier',
+    serverWarning:
+      'Déconnectez-vous depuis Vous, puis reconnectez-vous avec votre compte Jellyfin ou Emby pour rétablir la disponibilité et la lecture de votre bibliothèque.',
+    openYou: 'Ouvrir Vous',
+  },
+  {
+    tag: 'ar',
+    administration: 'الإدارة',
+    settings: 'إعدادات الشبكة',
+    open: 'فتح إعدادات الشبكة',
+    search: 'البحث في الإعدادات',
+    all: 'كل الإعدادات والأدوات',
+    group: 'التلفزيون والأفلام',
+    groupHeading: 'التلفزيون والأفلام',
+    homeSearch: 'ابحث عن الأفلام والمسلسلات والكتب والمانغا…',
+    back: 'عودة',
+    profile: 'ملف التعريف',
+    missingHeading: 'الصفحة غير موجودة',
+    missingPage: 'هذه الصفحة غير موجودة في Lumen.',
+    backToDiscover: 'العودة إلى الاستكشاف',
+    fullSeerr: 'فتح واجهة SeerrNG كاملة',
+    serverWarning:
+      'سجّل الخروج من صفحة «أنت»، ثم سجّل الدخول مجددًا باستخدام حساب Jellyfin أو Emby لاستعادة مكتبتك وإمكانية التشغيل.',
+    openYou: 'فتح صفحة «أنت»',
+  },
+]) {
+  test(`administrator directory uses ${locale.tag} messages on You and Administration`, async ({
+    page,
+  }, info) => {
+    await session(page, 2);
+    await page.route('**/api/v1/user/1/settings/main', (route) =>
+      route.fulfill({ json: { locale: locale.tag } })
+    );
+    await page.goto(testAppPath('/me'));
+    await expect(
+      page.getByRole('heading', { name: locale.administration, exact: true })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: locale.open, exact: true })
+    ).toHaveAttribute(
+      'href',
+      testAppPath(locale.tag === 'fr' ? '/admin/general' : '/admin/network')
+    );
+    await expect(
+      page.getByText(locale.settings, { exact: true })
+    ).toBeVisible();
+    await expect(page.locator('#tq')).toHaveAttribute(
+      'placeholder',
+      locale.homeSearch
+    );
+    await page.screenshot({
+      path: info.outputPath(`shell-search-${locale.tag}.png`),
+    });
+    await expect(page.locator('#tq')).toHaveAttribute(
+      'placeholder',
+      locale.homeSearch
+    );
+    await expect(page.locator('.tb-back')).toHaveAttribute(
+      'aria-label',
+      locale.back
+    );
+    await page.goto(testAppPath('/no-such-lumen-page'));
+    await expect(
+      page.getByRole('heading', { name: locale.missingHeading, exact: true })
+    ).toBeVisible();
+    await expect(page.locator('.ph-only-avatar')).toHaveAttribute(
+      'aria-label',
+      locale.profile
+    );
+    await expect(page.getByText(locale.missingPage)).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: locale.backToDiscover, exact: true })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: locale.fullSeerr, exact: true })
+    ).toBeVisible();
+    await page.screenshot({
+      path: info.outputPath(`missing-page-${locale.tag}.png`),
+    });
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth)
+    ).toBeLessThanOrEqual(page.viewportSize()!.width);
+
+    await page.goto(testAppPath('/admin'));
+    await expect(page.getByLabel(locale.search, { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: locale.all, exact: true })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: locale.open, exact: true })
+    ).toBeVisible();
+    await page.getByLabel(locale.search, { exact: true }).fill(locale.settings);
+    await expect(
+      page.getByRole('link', { name: locale.open, exact: true })
+    ).toBeVisible();
+    await page.getByLabel(locale.search, { exact: true }).fill('');
+    await expect(page.locator('html')).toHaveAttribute(
+      'dir',
+      locale.tag === 'ar' ? 'rtl' : 'ltr'
+    );
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth)
+    ).toBeLessThanOrEqual(page.viewportSize()!.width);
+    await page.screenshot({ path: info.outputPath(`admin-${locale.tag}.png`) });
+
+    await page.getByRole('link', { name: locale.group, exact: true }).click();
+    await expect(
+      page.getByRole('heading', { name: locale.groupHeading, exact: true })
+    ).toBeVisible();
+    await page
+      .getByLabel(locale.search, { exact: true })
+      .fill('no-such-setting');
+    await expect(
+      page.getByText(
+        locale.tag === 'fr'
+          ? 'Aucun paramètre ne correspond à cette recherche.'
+          : 'لا توجد إعدادات تطابق هذا البحث.',
+        { exact: true }
+      )
+    ).toBeVisible();
+  });
+
+  test(`media-server sign-in notice uses ${locale.tag} messages`, async ({
+    page,
+  }, info) => {
+    await session(page, 2, undefined, ['mediaServerSignInRequired']);
+    await page.route('**/api/v1/user/1/settings/main', (route) =>
+      route.fulfill({ json: { locale: locale.tag } })
+    );
+    await page.goto(testAppPath('/me'));
+    const notice = page
+      .locator('p[role="status"]')
+      .filter({ hasText: locale.serverWarning });
+    await expect(notice).toContainText(locale.serverWarning);
+    await expect(
+      notice.getByRole('link', { name: locale.openYou, exact: true })
+    ).toHaveAttribute('href', testAppPath('/me'));
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth)
+    ).toBeLessThanOrEqual(page.viewportSize()!.width);
+    await page.screenshot({
+      path: info.outputPath(`server-warning-${locale.tag}.png`),
+    });
+  });
+}
+
 for (const permissions of [32, 4, '2', [2], -2, 2.5]) {
   test(`non-admin or invalid mask ${JSON.stringify(permissions)} has no admin navigation`, async ({
     page,
   }) => {
     await session(page, permissions);
-    await page.goto('/me');
+    await page.goto(testAppPath('/me'));
     await expect(
       page.getByRole('heading', { name: 'You', exact: true })
     ).toBeVisible();
@@ -104,9 +301,9 @@ for (const permissions of [32, 4, '2', [2], -2, 2.5]) {
       page.getByRole('heading', { name: 'Administration', exact: true })
     ).toHaveCount(0);
     await expect(page.getByText('Full SeerrNG', { exact: true })).toBeVisible();
-    await page.goto('/admin');
+    await page.goto(testAppPath('/admin'));
     await expect(page).toHaveURL(/\/me$/);
-    await page.goto('/me/lumen');
+    await page.goto(testAppPath('/me/lumen'));
     await expect(page.getByText('Admins only', { exact: true })).toBeVisible();
   });
 }
@@ -115,7 +312,7 @@ test('configured companion destination is retained with the classic interface es
   page,
 }) => {
   await session(page, 2, 'https://seerr.example.test/base/?keep=1');
-  await page.goto('/me');
+  await page.goto(testAppPath('/me'));
   const link = page.getByRole('link', {
     name: 'Open Full SeerrNG',
     exact: true,
@@ -158,7 +355,7 @@ test('About opens release history on demand and retries a failed lookup', async 
             ],
           })
   );
-  await page.goto('./admin/about');
+  await page.goto(testAppPath('/admin/about'));
   const open = page.getByRole('button', { name: 'Show Releases' });
   await expect(open).toBeVisible();
   expect(lookups).toBe(0);
@@ -226,7 +423,7 @@ test('About links a development update to the installed commit comparison', asyn
       },
     })
   );
-  await page.goto('./admin/about');
+  await page.goto(testAppPath('/admin/about'));
   await expect(
     page.getByRole('link', { name: 'Update available' })
   ).toHaveAttribute(

@@ -4,6 +4,7 @@ import { api } from '../api';
 import { isAdministrator, useAuth } from '../auth';
 import { friendlyError } from '../errors';
 import { useApi } from '../hooks';
+import { useLumenLocale } from '../i18n';
 import { sessionGeneration } from '../sessionState';
 import { ConfirmSheet } from './ConfirmSheet';
 import { Section } from './cards';
@@ -21,6 +22,47 @@ type SimklAttempt = { userCode: string; expiresAt: number; interval: number };
 
 export default function DiscoveryAccounts({ userId }: { userId: number }) {
   const { user } = useAuth();
+  const { locale, t } = useLumenLocale();
+  const text = (
+    key: string,
+    fallback: string,
+    values?: Record<string, string | number>
+  ) => t(`lumen.discoveryAccounts.${key}`, fallback, values);
+  const localizedFailure = (error: unknown, fallback: string) => {
+    const message = friendlyError(error, fallback);
+    const generic: Record<string, [string, string]> = {
+      'The server had a problem. Try again in a moment.': [
+        'errorServer',
+        'The server had a problem. Try again in a moment.',
+      ],
+      'Your session ended. Sign in again.': [
+        'errorSession',
+        'Your session ended. Sign in again.',
+      ],
+      'You don’t have permission to do that.': [
+        'errorPermission',
+        'You don’t have permission to do that.',
+      ],
+      'The server took too long to answer. Try again.': [
+        'errorTimeout',
+        'The server took too long to answer. Try again.',
+      ],
+      'Too many requests. Wait a minute and try again.': [
+        'errorRateLimit',
+        'Too many requests. Wait a minute and try again.',
+      ],
+      'You’re offline. Check your connection and try again.': [
+        'errorOffline',
+        'You’re offline. Check your connection and try again.',
+      ],
+      'Couldn’t reach the server. Check your connection and try again.': [
+        'errorNetwork',
+        'Couldn’t reach the server. Check your connection and try again.',
+      ],
+    };
+    const localized = generic[message];
+    return localized ? text(localized[0], localized[1]) : message;
+  };
   const [params, setParams] = useSearchParams();
   const accounts = useApi<{ accounts: Account[] }>(base);
   const config = useApi<Partial<Record<Provider, { configured: boolean }>>>(
@@ -34,7 +76,9 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
     : undefined;
   const loadError =
     accounts.error ||
-    (accounts.data && !rows ? 'Invalid tracking account response.' : null);
+    (accounts.data && !rows
+      ? text('invalidResponse', 'Invalid tracking account response.')
+      : null);
   const [disconnect, setDisconnect] = useState<Provider>();
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState('');
@@ -72,8 +116,8 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
     if (error) {
       setFailure(
         error === 'denied'
-          ? 'Trakt authorization was denied.'
-          : 'Trakt authorization expired. Start again.'
+          ? text('traktDenied', 'Trakt authorization was denied.')
+          : text('traktExpired', 'Trakt authorization expired. Start again.')
       );
       return;
     }
@@ -84,10 +128,14 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
           body: '{}',
         });
         if (result.status !== 'authorized')
-          throw new Error('Trakt authorization did not complete.');
+          throw new Error(
+            text('traktIncomplete', 'Trakt authorization did not complete.')
+          );
       },
       reloadAccounts,
-      'Could not connect Trakt.'
+      text('connectFailure', 'Could not connect {provider}.', {
+        provider: 'Trakt',
+      })
     );
   });
 
@@ -116,11 +164,16 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
           link.username ||
           link.password
         )
-          throw new Error('Invalid Trakt authorization link.');
+          throw new Error(
+            text('invalidTraktLink', 'Invalid Trakt authorization link.')
+          );
         const callback = new URL(link.searchParams.get('redirect_uri') ?? '');
         if (callback.origin !== window.location.origin)
           throw new Error(
-            'Open Lumen at the configured SeerrNG application URL to connect Trakt.'
+            text(
+              'applicationUrl',
+              'Open Lumen at the configured SeerrNG application URL to connect Trakt.'
+            )
           );
         return link.href;
       },
@@ -128,7 +181,9 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
         sessionStorage.setItem(traktAttemptKey, String(userId));
         window.location.assign(url);
       },
-      'Could not start Trakt authorization.'
+      text('startFailure', 'Could not start {provider} authorization.', {
+        provider: 'Trakt',
+      })
     );
   }
 
@@ -142,7 +197,12 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
       !controller.signal.aborted && generation === sessionGeneration();
     const expire = () => {
       setSimkl(undefined);
-      setFailure('Simkl authorization expired. Start again for a new code.');
+      setFailure(
+        text(
+          'simklExpired',
+          'Simkl authorization expired. Start again for a new code.'
+        )
+      );
     };
     function schedule(interval: number) {
       const remaining = expiresAt - Date.now();
@@ -178,7 +238,14 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
       } catch (error) {
         if (!active()) return;
         setSimkl(undefined);
-        setFailure(friendlyError(error, 'Could not connect Simkl.'));
+        setFailure(
+          localizedFailure(
+            error,
+            text('connectFailure', 'Could not connect {provider}.', {
+              provider: 'Simkl',
+            })
+          )
+        );
       }
     }
     schedule(initialInterval);
@@ -204,7 +271,7 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
       onSuccess(result);
     } catch (error) {
       if (generation === sessionGeneration())
-        setFailure(friendlyError(error, fallback));
+        setFailure(localizedFailure(error, fallback));
     } finally {
       working.current = false;
       if (generation === sessionGeneration()) setBusy(false);
@@ -224,7 +291,9 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
           !Number.isFinite(result.expiresIn) ||
           result.expiresIn <= 0
         )
-          throw new Error('Invalid Simkl device code.');
+          throw new Error(
+            text('invalidSimklCode', 'Invalid Simkl device code.')
+          );
         return {
           userCode: result.userCode,
           expiresAt: Date.now() + result.expiresIn * 1000,
@@ -232,7 +301,9 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
         };
       },
       setSimkl,
-      'Could not start Simkl authorization.'
+      text('startFailure', 'Could not start {provider} authorization.', {
+        provider: 'Simkl',
+      })
     );
   }
 
@@ -250,7 +321,7 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
         setDisconnect(undefined);
         accounts.reload();
       },
-      'Could not update the tracking account.'
+      text('providerUpdateFailure', 'Could not update the tracking account.')
     );
   }
 
@@ -271,11 +342,15 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
           url.username ||
           url.password
         )
-          throw new Error('Invalid AniList authorization link.');
+          throw new Error(
+            text('invalidAniListLink', 'Invalid AniList authorization link.')
+          );
         return url.href;
       },
       setAuthorization,
-      'Could not start AniList authorization.'
+      text('startFailure', 'Could not start {provider} authorization.', {
+        provider: 'AniList',
+      })
     );
   }
 
@@ -290,14 +365,18 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
           }
         );
         if (result.status !== 'authorized')
-          throw new Error('AniList authorization did not complete.');
+          throw new Error(
+            text('anilistIncomplete', 'AniList authorization did not complete.')
+          );
       },
       () => {
         setCode('');
         setAuthorization('');
         finishConnection();
       },
-      'Could not connect AniList.'
+      text('connectFailure', 'Could not connect {provider}.', {
+        provider: 'AniList',
+      })
     );
   }
 
@@ -308,26 +387,37 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
   };
 
   return (
-    <Section title="Tracking Accounts">
+    <Section title={text('heading', 'Tracking Accounts')}>
       <ServiceNote
         error={loadError}
-        what="tracking accounts"
+        what={text('accountsWhat', 'tracking accounts')}
         retry={accounts.reload}
       />
       <ServiceNote
         error={config.error}
-        what="tracking provider configuration"
+        what={text('configurationWhat', 'tracking provider configuration')}
         retry={config.reload}
       />
       {unconfigured.length > 0 && (
         <p className="note">
-          {unconfigured.join(', ')}{' '}
-          {unconfigured.length === 1 ? 'requires' : 'require'} setup before
-          connecting.{' '}
+          {text(
+            unconfigured.length === 1
+              ? 'setupRequiredSingular'
+              : 'setupRequiredPlural',
+            unconfigured.length === 1
+              ? '{providers} requires setup before connecting.'
+              : '{providers} require setup before connecting.',
+            { providers: unconfigured.join(', ') }
+          )}{' '}
           {isAdministrator(user?.permissions) ? (
-            <Link to="/admin/discovery">Open Discovery Settings</Link>
+            <Link to="/admin/discovery">
+              {text('openDiscoverySettings', 'Open Discovery Settings')}
+            </Link>
           ) : (
-            'Ask your SeerrNG administrator to configure the integration.'
+            text(
+              'askAdministrator',
+              'Ask your SeerrNG administrator to configure the integration.'
+            )
           )}
         </p>
       )}
@@ -338,11 +428,13 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
       )}
       {!accounts.data && !loadError && (
         <p className="note" role="status">
-          Loading tracking accounts…
+          {text('loading', 'Loading tracking accounts…')}
         </p>
       )}
       {rows?.length === 0 && (
-        <p className="note">No tracking accounts are connected.</p>
+        <p className="note">
+          {text('empty', 'No tracking accounts are connected.')}
+        </p>
       )}
       {!!rows?.length && (
         <ul className="setlist">
@@ -361,7 +453,9 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
                     void update(provider, event.target.checked)
                   }
                 />
-                Allow writes to {providerNames[provider]}
+                {text('allowWrites', 'Allow writes to {provider}', {
+                  provider: providerNames[provider],
+                })}
               </label>
               {config.data?.[provider]?.configured &&
                 reconnect !== provider && (
@@ -370,7 +464,9 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
                     disabled={busy || !!simkl || !!authorization}
                     onClick={() => void startConnection[provider]()}
                   >
-                    Reconnect {providerNames[provider]}
+                    {text('reconnect', 'Reconnect {provider}', {
+                      provider: providerNames[provider],
+                    })}
                   </button>
                 )}
               <button
@@ -381,7 +477,9 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
                   setDisconnect(provider);
                 }}
               >
-                Disconnect {providerNames[provider]}
+                {text('disconnectProvider', 'Disconnect {provider}', {
+                  provider: providerNames[provider],
+                })}
               </button>
             </li>
           ))}
@@ -403,10 +501,14 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
               target="_blank"
               rel="noreferrer"
             >
-              Authorize on AniList
+              {text('authorizeProvider', 'Authorize on {provider}', {
+                provider: 'AniList',
+              })}
             </a>
             <label className="sel">
-              AniList authorization code
+              {text('authorizationCode', '{provider} authorization code', {
+                provider: 'AniList',
+              })}
               <input
                 value={code}
                 onChange={(event) => setCode(event.target.value)}
@@ -420,7 +522,9 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
               type="submit"
               disabled={busy || !code.trim()}
             >
-              Complete AniList Connection
+              {text('completeConnection', 'Complete {provider} Connection', {
+                provider: 'AniList',
+              })}
             </button>
             <button
               className="btn btn-quiet btn-sm"
@@ -432,7 +536,7 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
                 setFailure('');
               }}
             >
-              Cancel
+              {text('cancel', 'Cancel')}
             </button>
           </form>
         ) : (
@@ -441,17 +545,26 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
             disabled={busy}
             onClick={() => void startAniList()}
           >
-            {connected('anilist') ? 'Reconnect AniList' : 'Connect AniList'}
+            {text(
+              connected('anilist') ? 'reconnect' : 'connect',
+              connected('anilist')
+                ? 'Reconnect {provider}'
+                : 'Connect {provider}',
+              { provider: 'AniList' }
+            )}
           </button>
         ))}
       {simkl ? (
         <div className="toolbar">
           <p className="note" role="status">
-            Enter <b>{simkl.userCode}</b> on Simkl. This code expires at{' '}
-            <time dateTime={new Date(simkl.expiresAt).toISOString()}>
-              {new Date(simkl.expiresAt).toLocaleTimeString()}
-            </time>
-            .
+            {text(
+              'simklInstruction',
+              'Enter {code} on Simkl. This code expires at {time}.',
+              {
+                code: simkl.userCode,
+                time: new Date(simkl.expiresAt).toLocaleTimeString(locale),
+              }
+            )}
           </p>
           <a
             className="btn btn-tonal btn-sm"
@@ -459,13 +572,17 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
             target="_blank"
             rel="noreferrer"
           >
-            Authorize on Simkl
+            {text('authorizeProvider', 'Authorize on {provider}', {
+              provider: 'Simkl',
+            })}
           </a>
           <button
             className="btn btn-quiet btn-sm"
             onClick={() => setSimkl(undefined)}
           >
-            Cancel Simkl Connection
+            {text('cancelConnection', 'Cancel {provider} Connection', {
+              provider: 'Simkl',
+            })}
           </button>
         </div>
       ) : (
@@ -476,7 +593,13 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
             disabled={busy}
             onClick={() => void startSimkl()}
           >
-            {connected('simkl') ? 'Reconnect Simkl' : 'Connect Simkl'}
+            {text(
+              connected('simkl') ? 'reconnect' : 'connect',
+              connected('simkl')
+                ? 'Reconnect {provider}'
+                : 'Connect {provider}',
+              { provider: 'Simkl' }
+            )}
           </button>
         )
       )}
@@ -486,15 +609,24 @@ export default function DiscoveryAccounts({ userId }: { userId: number }) {
           disabled={busy}
           onClick={() => void startTrakt()}
         >
-          {connected('trakt') ? 'Reconnect Trakt' : 'Connect Trakt'}
+          {text(
+            connected('trakt') ? 'reconnect' : 'connect',
+            connected('trakt') ? 'Reconnect {provider}' : 'Connect {provider}',
+            { provider: 'Trakt' }
+          )}
         </button>
       )}
       {disconnect && (
         <ConfirmSheet
-          title={`Disconnect ${providerNames[disconnect]}?`}
-          body="SeerrNG will stop using this tracking account."
-          confirm="Disconnect"
-          cancel="Keep connected"
+          title={text('disconnectTitle', 'Disconnect {provider}?', {
+            provider: providerNames[disconnect],
+          })}
+          body={text(
+            'disconnectBody',
+            'SeerrNG will stop using this tracking account.'
+          )}
+          confirm={text('disconnectConfirm', 'Disconnect')}
+          cancel={text('keepConnected', 'Keep connected')}
           busy={busy}
           onConfirm={() => void update(disconnect)}
           onClose={() => {

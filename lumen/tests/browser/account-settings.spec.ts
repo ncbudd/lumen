@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+const mount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
+const appPath = (path: string) =>
+  `${mount}${path.startsWith('./') ? path.slice(1) : path}`;
+
 test('password and Episode Queue bookmarks scroll to the selected section after loading', async ({
   page,
 }) => {
@@ -35,13 +39,13 @@ test('password and Episode Queue bookmarks scroll to the selected section after 
     ['./me/account/tv-requests#episode-queue', 'episode-queue'],
     ['./me/account#advanced-theme', 'advanced-theme'],
   ]) {
-    await page.goto(path);
+    await page.goto(appPath(path));
     await expect(page.locator(`section#${id}`)).toHaveAttribute(
       'data-bookmark-target',
       'true'
     );
   }
-  await page.goto('./me/account');
+  await page.goto(appPath('./me/account'));
   await expect(page.getByText('Jellyfin User', { exact: true })).toBeVisible();
   await expect(
     page.locator('dd').getByText('User', { exact: true })
@@ -99,18 +103,18 @@ test('account settings preserve failed profile edits and save only changes and p
     }
     return route.fulfill({ json: {} });
   });
-  await page.goto('./me');
+  await page.goto(appPath('./me'));
   await page.getByRole('link', { name: 'Open Account Settings' }).click();
   const displayName = page.getByLabel('Display Name');
   await expect(displayName).toHaveValue('Viewer');
   await displayName.fill('Updated Viewer');
-  await page.getByRole('button', { name: 'Save Profile' }).click();
+  await page.getByRole('button', { name: 'Save Changes' }).click();
   await expect(
     page.getByText('Could not save the profile.', { exact: false })
   ).toBeVisible();
   await expect(displayName).toHaveValue('Updated Viewer');
-  await page.getByRole('button', { name: 'Save Profile' }).click();
-  await expect(page.getByText('Profile saved.')).toBeVisible();
+  await page.getByRole('button', { name: 'Save Changes' }).click();
+  await expect(page.getByText('Settings saved successfully!')).toBeVisible();
   expect(writes).toEqual([
     { username: 'Updated Viewer' },
     { username: 'Updated Viewer' },
@@ -122,9 +126,9 @@ test('account settings preserve failed profile edits and save only changes and p
   await expect(page.getByLabel('Book Language Override')).toHaveValue('zz');
   await movieLanguage.selectOption('inherit');
   await seriesLanguage.selectOption('fr');
-  await page.getByRole('button', { name: 'Save Profile' }).click();
+  await page.getByRole('button', { name: 'Save Changes' }).click();
   await expect(
-    page.getByRole('button', { name: 'Save Profile' })
+    page.getByRole('button', { name: 'Save Changes' })
   ).toBeDisabled();
   expect(writes.at(-1)).toEqual({
     preferredLanguages: { all: 'en', tv: 'fr', book: 'zz' },
@@ -136,13 +140,205 @@ test('account settings preserve failed profile edits and save only changes and p
   await page.getByLabel('Confirm Password').fill('synthetic-new');
   await savePassword.click();
   await expect(
-    page.getByText('Password saved.', { exact: false })
+    page.getByText('Password saved successfully!', { exact: false })
   ).toBeVisible();
   expect(writes.at(-1)).toEqual({
     currentPassword: 'synthetic-current',
     newPassword: 'synthetic-new',
   });
   await expect(page.getByLabel('New Password')).toHaveValue('');
+});
+
+test('display language persists and localizes the shell and account settings', async ({
+  page,
+}, testInfo) => {
+  const profile = { username: 'Viewer', locale: null as string | null };
+  const writes: unknown[] = [];
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname.slice('/api/v1'.length);
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 2,
+          displayName: profile.username,
+          permissions: 32,
+          userType: 2,
+        },
+      });
+    if (path === '/user/2/settings/main') {
+      if (request.method() === 'POST') {
+        const body = request.postDataJSON();
+        writes.push(body);
+        Object.assign(profile, body);
+      }
+      return route.fulfill({ json: profile });
+    }
+    if (path === '/languages') return route.fulfill({ json: [] });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('./me/account'));
+  const language = page.getByRole('combobox', { name: 'Display Language' });
+  await expect(language).toHaveValue('');
+  if (
+    process.env.LUMEN_VISUAL_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(testInfo.project.name)
+  ) {
+    await page.goto(appPath('./me'));
+    await expect(page.getByRole('heading', { name: 'You' })).toBeVisible();
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/baseline-${testInfo.project.name}-english-you.png`,
+      fullPage: false,
+    });
+    await page.goto(appPath('./me/account'));
+  }
+  await language.selectOption('fr');
+  await page.getByRole('button', { name: 'Save Changes' }).click();
+  await expect(
+    page.getByText('Les paramètres ont été enregistrés !')
+  ).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Découvrir' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Demandes' }).first()
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Paramètres utilisateur' })
+  ).toBeVisible();
+  await expect(page.getByLabel('Nom affiché')).toHaveValue('Viewer');
+  await page.goto(appPath('./me'));
+  await expect(page.getByRole('heading', { name: 'Vous' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Bibliothèque' })
+  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Apparence' })).toBeVisible();
+  await expect(
+    page.getByRole('switch', { name: /Demande rapide depuis les affiches/ })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Ouvrir Ma médiathèque' })
+  ).toBeVisible();
+  if (
+    process.env.LUMEN_VISUAL_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(testInfo.project.name)
+  )
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/candidate-${testInfo.project.name}-french-you.png`,
+      fullPage: false,
+    });
+  await page.goto(appPath('./me/account'));
+  await expect(page.getByLabel('Langue des métadonnées')).toBeVisible();
+  await expect(page.getByText('Type de compte')).toBeVisible();
+  await expect(page.getByText('Utilisateur local')).toBeVisible();
+  await expect(page.getByText('Rôle', { exact: true })).toBeVisible();
+  await expect(
+    page.getByLabel('Langue préférée pour tous les médias')
+  ).toBeVisible();
+  await expect(page.getByLabel('Préférence de langue des films')).toBeVisible();
+  await expect(
+    page.getByRole('heading', {
+      name: 'Abonnements aux services de streaming',
+    })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Titres des cartes' })
+  ).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Thème avancé' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Paramètres des demandes TV' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Retour à votre espace' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Préférences de thème avancées' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Modifier toutes les préférences' })
+  ).toBeVisible();
+  if (
+    process.env.LUMEN_VISUAL_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(testInfo.project.name)
+  )
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/candidate-${testInfo.project.name}-french-account.png`,
+      fullPage: false,
+    });
+  await expect(
+    page.getByRole('combobox', { name: "Langue d'affichage" })
+  ).toHaveValue('fr');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  expect(writes).toEqual([{ locale: 'fr' }]);
+
+  await page.reload();
+  await expect(page.getByRole('link', { name: 'Découvrir' })).toBeVisible();
+  await expect(page.getByLabel('Nom affiché')).toHaveValue('Viewer');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await expect(
+    page.getByRole('combobox', { name: "Langue d'affichage" })
+  ).toHaveValue('fr');
+
+  await page
+    .getByRole('combobox', { name: "Langue d'affichage" })
+    .selectOption('ar');
+  await page
+    .getByRole('button', { name: 'Enregistrer les modifications' })
+    .click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.getByRole('link', { name: 'اكتشف' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'الطلبات' }).first()
+  ).toBeVisible();
+  await expect(page.getByLabel('إسم العرض')).toHaveValue('Viewer');
+  await page.goto(appPath('./me'));
+  await expect(page.getByRole('heading', { name: 'أنت' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'المكتبة' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'المظهر', exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('switch', { name: /طلب سريع من الملصقات/ })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'فتح مكتبتي الإعلامية' })
+  ).toBeVisible();
+  if (
+    process.env.LUMEN_VISUAL_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(testInfo.project.name)
+  )
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/candidate-${testInfo.project.name}-arabic-you.png`,
+      fullPage: false,
+    });
+  await page.goto(appPath('./me/account'));
+  await expect(page.getByText('مستخدم محلي')).toBeVisible();
+  await expect(page.getByText('الدور', { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'إعدادات طلبات التلفاز' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'العودة إلى صفحتك' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'تجاوزات المظهر المتقدمة' })
+  ).toBeVisible();
+  if (
+    process.env.LUMEN_VISUAL_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(testInfo.project.name)
+  )
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/candidate-${testInfo.project.name}-arabic-account.png`,
+      fullPage: false,
+    });
+  await expect(
+    page.getByLabel('اللغة المفضلة لجميع وسائط الإعلام')
+  ).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth))
+    .toBeLessThanOrEqual(await page.evaluate(() => window.innerWidth));
 });
 
 test('watchlist preferences honor account type and category permissions and persist false', async ({
@@ -180,13 +376,13 @@ test('watchlist preferences honor account type and category permissions and pers
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('./me/account');
+  await page.goto(appPath('./me/account'));
   const music = page.getByRole('checkbox', { name: 'Auto-Request Music' });
   await expect(music).toBeChecked();
   await expect(page.getByLabel('Auto-Request Movies')).toHaveCount(0);
   await expect(page.getByLabel('Auto-Request Books')).toHaveCount(0);
   await music.uncheck();
-  await page.getByRole('button', { name: 'Save Profile' }).click();
+  await page.getByRole('button', { name: 'Save Changes' }).click();
   await expect(
     page.getByText(
       'Could not save the profile. Check the values and try again.'
@@ -194,8 +390,8 @@ test('watchlist preferences honor account type and category permissions and pers
   ).toBeVisible();
   await expect(music).not.toBeChecked();
   rejectSave = false;
-  await page.getByRole('button', { name: 'Save Profile' }).click();
-  await expect(page.getByText('Profile saved.')).toBeVisible();
+  await page.getByRole('button', { name: 'Save Changes' }).click();
+  await expect(page.getByText('Settings saved successfully!')).toBeVisible();
   expect(writes).toEqual([
     { watchlistSyncMusic: false },
     { watchlistSyncMusic: false },
@@ -288,7 +484,7 @@ for (const scenario of [
       return route.fulfill({ json: {} });
     });
 
-    await page.goto('./me/account');
+    await page.goto(appPath('./me/account'));
     for (const label of [
       'Auto-Request Movies',
       'Auto-Request Series',
@@ -346,7 +542,7 @@ test('account theme colors preserve stored overrides for other controls', async 
     }
     return route.fulfill({ json: {} });
   });
-  await page.goto('./me/account');
+  await page.goto(appPath('./me/account'));
   const background = page.getByLabel('Page Background');
   const save = page.getByRole('button', { name: 'Save Theme Colors' });
   await background.fill('invalid');
@@ -467,7 +663,7 @@ test('account theme colors preserve stored overrides for other controls', async 
   await expect(background).toBeVisible();
   await page.getByRole('button', { name: 'Edit All Overrides' }).click();
   await expect(editor).toHaveValue('[]');
-  await page.getByRole('button', { name: 'Save Theme Overrides' }).click();
+  await page.getByRole('button', { name: 'Save overrides' }).click();
   await expect(
     page.getByText(
       'Enter a JSON object with string or numeric override values.'
@@ -476,7 +672,9 @@ test('account theme colors preserve stored overrides for other controls', async 
   await editor.fill(
     JSON.stringify({ '--theme-page-spotlight-strength': 0.75 })
   );
-  await page.getByRole('button', { name: 'Save Theme Overrides' }).click();
-  await expect(page.getByText('Theme overrides saved.')).toBeVisible();
+  await page.getByRole('button', { name: 'Save overrides' }).click();
+  await expect(
+    page.getByText('Your theme overrides were saved.')
+  ).toBeVisible();
   expect(overrides).toEqual({ '--theme-page-spotlight-strength': 0.75 });
 });

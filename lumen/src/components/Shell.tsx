@@ -18,6 +18,7 @@ import {
   usePublicSettings,
   type PublicSettings,
 } from '../hooks';
+import { useLumenLocale } from '../i18n';
 import { Icon, type IconName } from '../icons';
 import { canSearchIndexers } from '../indexerPermissions';
 import { canReadIssues } from '../issuePermissions';
@@ -28,7 +29,12 @@ import { usePrefs } from '../settings';
 import { VideoAvailabilityProvider } from '../videoAvailability';
 import AvatarContent from './AvatarContent';
 import { BrandMark, brandName } from './brand';
-import { canManageRequests, canRequestMovies } from './detail';
+import {
+  canManageRequests,
+  canRequestMovies,
+  canUseRequestAccess,
+  canUseShare,
+} from './detail';
 
 // scroll position of each history entry, for Back
 const scrollSpots = new Map<string, number>();
@@ -53,25 +59,35 @@ export const fullSeerrUrl = (configured?: string): string => {
   }
 };
 
-const SIDE: [string, IconName, string][] = [
-  ['/', 'home', 'Discover'],
-  ['/movies', 'film', 'Movies'],
-  ['/series', 'tv', 'Series'],
-  ['/books', 'book', 'Books'],
-  ['/audiobooks', 'headphones', 'Audiobooks'],
+const SIDE: [string, IconName, string, string][] = [
+  ['/', 'home', 'components.Layout.Sidebar.discover', 'Discover'],
+  ['/movies', 'film', 'components.Layout.Sidebar.browsemovies', 'Movies'],
+  ['/series', 'tv', 'components.Layout.Sidebar.browsetv', 'Series'],
+  ['/books', 'book', 'components.Layout.Sidebar.browsebooks', 'Books'],
+  [
+    '/audiobooks',
+    'headphones',
+    'components.Layout.Sidebar.browseaudiobooks',
+    'Audiobooks',
+  ],
 ];
-const TABS: [string, IconName, string][] = [
-  ['/', 'home', 'Discover'],
-  ['/search', 'search', 'Search'],
-  ['/books', 'book', 'Books'],
-  ['/requests', 'inbox', 'Requests'],
-  ['/me', 'user', 'You'],
+const TABS: [string, IconName, string, string][] = [
+  ['/', 'home', 'components.Layout.Sidebar.discover', 'Discover'],
+  ['/search', 'search', 'i18n.searchLabel', 'Search'],
+  ['/books', 'book', 'components.Layout.Sidebar.browsebooks', 'Books'],
+  ['/requests', 'inbox', 'components.Layout.Sidebar.requests', 'Requests'],
+  ['/me', 'user', 'components.Layout.UserDropdown.myprofile', 'You'],
 ];
 
 export function Avatar({ className = 'avatar' }: { className?: string }) {
   const { user } = useAuth();
+  const { t } = useLumenLocale();
   return (
-    <Link className={className} to="/me" aria-label="Your profile">
+    <Link
+      className={className}
+      to="/me"
+      aria-label={t('components.Layout.UserDropdown.myprofile', 'Profile')}
+    >
       <AvatarContent
         key={user?.id}
         name={user?.displayName}
@@ -83,6 +99,7 @@ export function Avatar({ className = 'avatar' }: { className?: string }) {
 
 export default function Shell({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const { t } = useLumenLocale();
   const liveTv = useLiveTvStatus();
   const { prefs } = usePrefs();
   const extras = useExtras();
@@ -148,23 +165,29 @@ export default function Shell({ children }: { children: ReactNode }) {
               : path === '/comics' || path.startsWith('/comic/')
                 ? 'comic'
                 : 'all';
-  const word: Record<string, string> = {
-    movie: 'movies',
-    tv: 'series',
-    ebook: 'books and authors',
-    audio: 'audiobooks and narrators',
-    comic: 'comics and manga',
-  };
   const comics = extras.list.some((e) => e.key === 'comic');
-  const placeholder = word[scope]
-    ? `Search ${word[scope]}…`
+  const searchMessages: Record<string, [string, string]> = {
+    movie: ['lumen.shell.searchMovies', 'Search movies…'],
+    tv: ['lumen.shell.searchSeries', 'Search series…'],
+    audio: ['lumen.shell.searchAudio', 'Search audiobooks and narrators…'],
+    ebook: ['lumen.shell.searchBooks', 'Search books and authors…'],
+    comic: ['lumen.shell.searchComics', 'Search comics and manga…'],
+  };
+  const placeholder = searchMessages[scope]
+    ? t(...searchMessages[scope])
     : prefs.showBooks
       ? comics
-        ? 'Search movies, series, books, manga…'
-        : 'Search movies, series, books, narrators…'
+        ? t(
+            'lumen.shell.searchAllWithComics',
+            'Search movies, series, books, manga…'
+          )
+        : t('lumen.shell.searchAll', 'Search movies, series, books, narrators…')
       : comics
-        ? 'Search movies, series, comics…'
-        : 'Search movies and series…';
+        ? t(
+            'lumen.shell.searchVideoWithComics',
+            'Search movies, series, comics…'
+          )
+        : t('lumen.shell.searchVideo', 'Search movies and series…');
   const [term, setTerm] = useState('');
   useEffect(() => {
     setTerm(path === '/search' ? params.get('q') || '' : '');
@@ -276,7 +299,7 @@ export default function Shell({ children }: { children: ReactNode }) {
             <BrandMark />
           </Link>
           {SIDE.filter(([h]) => prefs.showBooks || !isBook(h)).map(
-            ([h, i, t]) => (
+            ([h, i, message, fallback]) => (
               <NavLink
                 key={h}
                 to={h}
@@ -285,7 +308,7 @@ export default function Shell({ children }: { children: ReactNode }) {
                 className={({ isActive }) => (isActive ? 'active' : '')}
               >
                 <Icon name={i} />
-                {t}
+                {t(message, fallback)}
               </NavLink>
             )
           )}
@@ -298,26 +321,37 @@ export default function Shell({ children }: { children: ReactNode }) {
               className={({ isActive }) => (isActive ? 'active' : '')}
             >
               <Icon name={e.icon} />
-              {e.label}
+              {t(e.message, e.label)}
             </NavLink>
           ))}
+          {canUseShare(user?.permissions) && (
+            <NavLink
+              to="/share"
+              className={({ isActive }) => (isActive ? 'active' : '')}
+            >
+              <Icon name="share" />
+              {t('components.Layout.Sidebar.share', 'Share & Identify')}
+            </NavLink>
+          )}
           {isAdministrator(user?.permissions) && (
             <>
-              <div className="lbl">Administration</div>
+              <div className="lbl">
+                {t('lumen.nav.administration', 'Administration')}
+              </div>
               <Link to="/me/lumen">
                 <Icon name="lock" />
-                Lumen Settings
+                {t('lumen.nav.lumenSettings', 'Lumen Settings')}
               </Link>
               <Link to="/admin">
                 <Icon name="list" />
-                SeerrNG Administration
+                {t('lumen.nav.seerrAdministration', 'SeerrNG Administration')}
               </Link>
             </>
           )}
-          <div className="lbl">You</div>
+          <div className="lbl">{t('components.Layout.Sidebar.you', 'You')}</div>
           <NavLink to="/requests">
             <Icon name="inbox" />
-            Requests
+            {t('components.Layout.Sidebar.requests', 'Requests')}
             {pendingRequests > 0 && (
               <span
                 className="n"
@@ -330,66 +364,66 @@ export default function Shell({ children }: { children: ReactNode }) {
           {canViewFollowing(user?.permissions) && (
             <NavLink to="/following">
               <Icon name="list" />
-              Following
+              {t('components.Layout.Sidebar.following', 'Following')}
             </NavLink>
           )}
           {canManageDownloads(user?.permissions) && (
             <NavLink to="/downloads">
               <Icon name="down" />
-              Download Inbox
+              {t('components.Layout.Sidebar.downloads', 'Download Inbox')}
             </NavLink>
           )}
           {canSearchIndexers(user?.permissions) && (
             <NavLink to="/indexer-search">
               <Icon name="search" />
-              Indexer Search
+              {t('components.Layout.Sidebar.indexerSearch', 'Indexer Search')}
             </NavLink>
           )}
           {canReadIssues(user?.permissions) && (
             <NavLink to="/issues">
               <Icon name="list" />
-              Issues
+              {t('components.Layout.Sidebar.issues', 'Issues')}
             </NavLink>
           )}
           {showBlocklist && (
             <NavLink to="/blocklist">
               <Icon name="list" />
-              Blocklist
+              {t('components.Layout.Sidebar.blocklist', 'Blocklist')}
             </NavLink>
           )}
           <NavLink to="/watchlist">
             <Icon name="star" />
-            Watchlist
+            {t('library.watchlist', 'Watchlist')}
           </NavLink>
           <NavLink to="/library">
             <Icon name="book" />
-            My Media
+            {t('components.Layout.Sidebar.myMedia', 'My Media')}
           </NavLink>
-          {swipeEnabled && (
+          {swipeEnabled && canUseRequestAccess(user?.permissions) && (
             <NavLink to="/swipe">
               <Icon name="star" />
-              Swipe
+              {t('components.Layout.Sidebar.swipe', 'Swipe')}
             </NavLink>
           )}
           {canRequestMovies(user?.permissions) && (
             <NavLink to="/watch-sessions">
               <Icon name="cal" />
-              Watch Sessions
+              {t('components.Layout.Sidebar.watchSessions', 'Watch Sessions')}
             </NavLink>
           )}
           {liveTv.data?.configured && (
             <NavLink to="/recordings">
               <Icon name="cal" />
-              Recordings
+              {t('components.LiveTv.RecordingList.title', 'Recordings')}
             </NavLink>
           )}
           <NavLink to="/calendar">
             <Icon name="cal" />
-            Release Calendar
+            {t('components.Layout.Sidebar.calendar', 'Release Calendar')}
           </NavLink>
           <NavLink to="/soon">
             <Icon name="cal" />
-            Coming soon
+            {t('components.Layout.Sidebar.comingSoon', 'Coming soon')}
           </NavLink>
           <Link className="me" to="/me">
             <span className="avatar">
@@ -401,7 +435,7 @@ export default function Shell({ children }: { children: ReactNode }) {
             </span>
             <span>
               <b>{user?.displayName}</b>
-              <small>Signed in</small>
+              <small>{t('lumen.nav.signedIn', 'Signed in')}</small>
             </span>
           </Link>
         </nav>
@@ -409,7 +443,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           <div className="topbar" ref={topbar}>
             <button
               className="icon-btn tb-back"
-              aria-label="Back"
+              aria-label={t('lumen.shell.back', 'Back')}
               onClick={back}
             >
               <Icon name="chevL" />
@@ -446,10 +480,12 @@ export default function Shell({ children }: { children: ReactNode }) {
           <main className="view" id="view">
             {user?.warnings?.includes('mediaServerSignInRequired') && (
               <p className="note" role="status">
-                Sign out on You, then sign in with your Jellyfin or Emby account
-                again to restore library availability and playback.{' '}
+                {t(
+                  'lumen.shell.mediaServerSignInRequired',
+                  'Sign out on You, then sign in with your Jellyfin or Emby account again to restore library availability and playback.'
+                )}{' '}
                 <Link className="btn btn-quiet btn-sm" to="/me">
-                  Open You
+                  {t('lumen.shell.openYou', 'Open You')}
                 </Link>
               </p>
             )}
@@ -461,13 +497,17 @@ export default function Shell({ children }: { children: ReactNode }) {
       </div>
       {/* phones: detail pages hide the tab bar, so this is the way out (also while loading) */}
       {detail && (
-        <button className="dback ph-only" aria-label="Back" onClick={back}>
+        <button
+          className="dback ph-only"
+          aria-label={t('lumen.shell.back', 'Back')}
+          onClick={back}
+        >
           <Icon name="chevL" />
         </button>
       )}
       <nav className="tabbar" aria-label="Tabs">
         {TABS.filter(([h]) => prefs.showBooks || !isBook(h)).map(
-          ([h, i, t]) => (
+          ([h, i, message, fallback]) => (
             <NavLink
               key={h}
               className="tab"
@@ -476,7 +516,7 @@ export default function Shell({ children }: { children: ReactNode }) {
               onClick={toTop(h)}
             >
               <Icon name={i} />
-              {t}
+              {t(message, fallback)}
               {h === '/requests' && pendingRequests > 0 && (
                 <span
                   className="badge"
@@ -494,6 +534,7 @@ export default function Shell({ children }: { children: ReactNode }) {
 }
 
 export function Placeholder({ title }: { title: string }) {
+  const { t } = useLumenLocale();
   const { seerrPublicUrl } = usePrefs();
   const { user } = useAuth();
   const lockedToLumen =
@@ -504,24 +545,29 @@ export function Placeholder({ title }: { title: string }) {
       <header className="ph">
         <div className="ph-row">
           <div>
-            <h1>{title}</h1>
+            <h1>
+              {title === 'Page not found'
+                ? t('lumen.shell.pageNotFound', title)
+                : title}
+            </h1>
           </div>
           <Avatar className="avatar ph-only-avatar" />
         </div>
       </header>
       <div className="empty">
-        <b>Nothing here</b>This page doesn’t exist in Lumen.{' '}
+        <b>{t('lumen.shell.nothingHere', 'Nothing here')}</b>
+        {t('lumen.shell.pageMissing', 'This page doesn’t exist in Lumen.')}{' '}
         <Link to="/" style={{ color: 'var(--accent)' }}>
-          Back to Discover
+          {t('lumen.shell.backToDiscover', 'Back to Discover')}
         </Link>{' '}
         {!lockedToLumen && (
           <>
-            or{' '}
+            {t('lumen.shell.or', 'or')}{' '}
             <a
               href={fullSeerrUrl(seerrPublicUrl)}
               style={{ color: 'var(--accent)' }}
             >
-              open full SeerrNG
+              {t('lumen.shell.openFullSeerrNG', 'open full SeerrNG')}
             </a>
           </>
         )}

@@ -9,7 +9,13 @@ import {
 import { api, artUrl } from '../api';
 import { useAuth } from '../auth';
 import { GridSkeleton, MoreOnScroll, type Stat } from '../components/cards';
-import { DetailTop, Facts, fmtHrs, Pill } from '../components/detail';
+import {
+  canUseRequestAccess,
+  DetailTop,
+  Facts,
+  fmtHrs,
+  Pill,
+} from '../components/detail';
 import {
   ExtraCard,
   ExtraGate,
@@ -170,6 +176,7 @@ export function SoftwareBookmark() {
 }
 
 export function Games() {
+  const { user } = useAuth();
   const x = useExtras();
   const [p, setP] = useSearchParams();
   const { key: locationKey } = useLocation();
@@ -215,13 +222,17 @@ export function Games() {
         }
       >
         <div className="toolbar">
-          <Link className="chip" to="/patches">
-            Translations and Hacks
-          </Link>
-          {x.games.includes('game') && (
-            <Link className="chip" to="/games/discovery">
-              Game Finder
-            </Link>
+          {canUseRequestAccess(user?.permissions) && (
+            <>
+              <Link className="chip" to="/patches">
+                Translations and Hacks
+              </Link>
+              {x.games.includes('game') && (
+                <Link className="chip" to="/games/discovery">
+                  Game Finder
+                </Link>
+              )}
+            </>
           )}
           <Link className="chip" to="/game-library">
             My Games
@@ -423,7 +434,7 @@ function GameDetailView({
       setBusy(false);
     }
   };
-  const main =
+  const main = canUseRequestAccess(user?.permissions) ? (
     baseBlocked || done ? (
       <button className="btn btn-tonal" disabled>
         <Icon name={s?.ico || 'clock'} />
@@ -438,7 +449,8 @@ function GameDetailView({
         <Icon name="plus" />
         Request
       </button>
-    );
+    )
+  ) : null;
 
   const screenshots = [
     ...new Set(
@@ -465,7 +477,7 @@ function GameDetailView({
           <div className="dstatus">
             <StatPill s={s} />
             <IndexerSearchLink category={cat} title={g.title} />
-            {patchSearch && (
+            {patchSearch && canUseRequestAccess(user?.permissions) && (
               <Link
                 className="btn btn-quiet btn-sm"
                 to={`/patches?${patchSearch}`}

@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+const testMount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
+const testAppPath = (path: string) => `${testMount}${path}`;
+const testApiPath = (url: string) =>
+  new URL(url).pathname.replace(/^\/lumen(?=\/)/, '').replace(/^\/api\/v1/, '');
+
 test('movie poster Watchlist action checks current state before add and remove', async ({
   page,
 }, testInfo) => {
@@ -10,7 +15,7 @@ test('movie poster Watchlist action checks current state before add and remove',
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/api/v1/**', (route) => {
     const url = new URL(route.request().url());
-    const path = url.pathname.slice('/api/v1'.length);
+    const path = testApiPath(route.request().url());
     if (path === '/auth/me')
       return route.fulfill({
         json: {
@@ -76,7 +81,7 @@ test('movie poster Watchlist action checks current state before add and remove',
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/movies');
+  await page.goto(testAppPath('/movies'));
   const poster = page.locator('.poster').filter({
     has: page.getByRole('link', { name: 'Watchlist Fixture Film' }),
   });
@@ -116,8 +121,7 @@ test('first poster activation never removes an item already on the Watchlist', a
   let mutations = 0;
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/api/v1/**', (route) => {
-    const url = new URL(route.request().url());
-    const path = url.pathname.slice('/api/v1'.length);
+    const path = testApiPath(route.request().url());
     if (path === '/auth/me')
       return route.fulfill({
         json: {
@@ -170,7 +174,7 @@ test('first poster activation never removes an item already on the Watchlist', a
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/movies');
+  await page.goto(testAppPath('/movies'));
   const poster = page.locator('.poster').filter({
     has: page.getByRole('link', { name: 'Saved Fixture Film' }),
   });
@@ -197,7 +201,7 @@ test('series poster Watchlist action uses the TV detail and media identity', asy
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/api/v1/**', (route) => {
     const url = new URL(route.request().url());
-    const path = url.pathname.slice('/api/v1'.length);
+    const path = testApiPath(route.request().url());
     if (path === '/auth/me')
       return route.fulfill({
         json: {
@@ -257,7 +261,7 @@ test('series poster Watchlist action uses the TV detail and media identity', asy
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/series');
+  await page.goto(testAppPath('/series'));
   const poster = page.locator('.poster').filter({
     has: page.getByRole('link', { name: 'Watchlist Fixture Series' }),
   });
@@ -283,8 +287,7 @@ test('poster Watchlist control is unavailable for a Plex primary account', async
 }) => {
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/api/v1/**', (route) => {
-    const { pathname } = new URL(route.request().url());
-    const path = pathname.slice('/api/v1'.length);
+    const path = testApiPath(route.request().url());
     if (path === '/auth/me')
       return route.fulfill({
         json: { id: 1, displayName: 'Plex', permissions: 32, userType: 1 },
@@ -317,7 +320,7 @@ test('poster Watchlist control is unavailable for a Plex primary account', async
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/movies');
+  await page.goto(testAppPath('/movies'));
   const poster = page.locator('.poster').filter({
     has: page.getByRole('link', { name: 'Watchlist Fixture Film' }),
   });
@@ -335,8 +338,7 @@ test('book poster Watchlist action preserves the Open Library work identity', as
   let writes = 0;
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/api/v1/**', (route) => {
-    const url = new URL(route.request().url());
-    const path = url.pathname.slice('/api/v1'.length);
+    const path = testApiPath(route.request().url());
     if (path === '/auth/me')
       return route.fulfill({
         json: { id: 1, displayName: 'Reader', permissions: 32, userType: 2 },
@@ -392,7 +394,7 @@ test('book poster Watchlist action preserves the Open Library work identity', as
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/books');
+  await page.goto(testAppPath('/books?search=Watchlist'));
   const poster = page
     .locator('.poster')
     .filter({
@@ -400,7 +402,9 @@ test('book poster Watchlist action preserves the Open Library work identity', as
     })
     .first();
   await expect(poster).toBeVisible();
-  await poster.scrollIntoViewIfNeeded();
+  await poster.evaluate((element) =>
+    element.scrollIntoView({ block: 'center', inline: 'nearest' })
+  );
   if (testInfo.project.name === 'desktop') await poster.hover();
   const action = poster.getByRole('button', {
     name: 'Add Watchlist Fixture Book to your Watchlist',
@@ -412,6 +416,113 @@ test('book poster Watchlist action preserves the Open Library work identity', as
   await expect(
     poster.getByRole('button', {
       name: 'Remove Watchlist Fixture Book from your Watchlist',
+    })
+  ).toBeVisible();
+});
+
+test('comic poster Watchlist action preserves the ComicVine edition identity', async ({
+  page,
+}, testInfo) => {
+  let listed = false;
+  let detailReads = 0;
+  let writes = 0;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const path = testApiPath(route.request().url());
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 1, displayName: 'Reader', permissions: 32, userType: 2 },
+      });
+    if (path === '/settings/public')
+      return route.fulfill({
+        json: {
+          applicationTitle: 'SeerrNG',
+          comicsEnabled: true,
+          enabledMediaCategories: { comic: true },
+        },
+      });
+    if (path === '/user/1/settings/main') return route.fulfill({ json: {} });
+    if (path.startsWith('/service/')) return route.fulfill({ json: [] });
+    if (path === '/discover/comics/landing')
+      return route.fulfill({
+        json: {
+          library: [],
+          trending: [],
+          newest: [],
+          western: [],
+          failed: [],
+          genres: [],
+          publishers: ['Fixture Press'],
+          comicVineConfigured: true,
+        },
+      });
+    if (path === '/discover/comics/browse')
+      return route.fulfill({
+        json: {
+          page: 1,
+          totalPages: 1,
+          totalResults: 1,
+          results: [
+            {
+              id: '67890',
+              mediaType: 'comic',
+              kind: 'comic',
+              title: 'Watchlist Fixture Comic',
+              publisher: 'Fixture Press',
+              editions: [
+                {
+                  id: '67890',
+                  publisher: 'Fixture Press',
+                  languageName: 'English',
+                  recommended: true,
+                },
+              ],
+              editionsResolved: true,
+              recommendedId: '67890',
+            },
+          ],
+        },
+      });
+    if (path === '/comic/67890') {
+      detailReads++;
+      return route.fulfill({
+        json: {
+          id: 67890,
+          title: 'Watchlist Fixture Comic',
+          onUserWatchlist: listed,
+        },
+      });
+    }
+    if (path === '/watchlist' && route.request().method() === 'POST') {
+      expect(route.request().postDataJSON()).toMatchObject({
+        mediaType: 'comic',
+        externalId: '67890',
+        title: 'Watchlist Fixture Comic',
+      });
+      listed = true;
+      writes++;
+      return route.fulfill({ json: { id: 9002 } });
+    }
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(testAppPath('/comics?type=comic'));
+  const poster = page.locator('.comic-card').filter({
+    has: page.getByRole('link', { name: 'Watchlist Fixture Comic' }),
+  });
+  await expect(poster).toBeVisible();
+  await poster.scrollIntoViewIfNeeded();
+  if (testInfo.project.name === 'desktop') await poster.hover();
+  const action = poster.getByRole('button', {
+    name: 'Add Watchlist Fixture Comic to your Watchlist',
+  });
+  await expect(action).toBeVisible();
+  await action.click();
+  await expect.poll(() => detailReads).toBeGreaterThan(0);
+  await expect.poll(() => writes).toBe(1);
+  await expect(
+    poster.getByRole('button', {
+      name: 'Remove Watchlist Fixture Comic from your Watchlist',
     })
   ).toBeVisible();
 });
@@ -463,8 +574,7 @@ test('album and magazine posters preserve their Watchlist identities', async ({
   const writes: unknown[] = [];
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/api/v1/**', (route) => {
-    const url = new URL(route.request().url());
-    const path = url.pathname.slice('/api/v1'.length);
+    const path = testApiPath(route.request().url());
     if (path === '/auth/me')
       return route.fulfill({
         json: { id: 1, displayName: 'Reader', permissions: 32, userType: 2 },
@@ -528,7 +638,7 @@ test('album and magazine posters preserve their Watchlist identities', async ({
   });
 
   for (const [index, record] of records.entries()) {
-    await page.goto(record.path);
+    await page.goto(testAppPath(record.path));
     const poster = page
       .locator('.poster')
       .filter({

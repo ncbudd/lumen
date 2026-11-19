@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+const testAppPath = (path: string) =>
+  `${process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : ''}${path}`;
+
 test('Swipe records decisions and restores or clears history', async ({
   page,
 }, info) => {
@@ -63,7 +66,7 @@ test('Swipe records decisions and restores or clears history', async ({
       json: path.endsWith('/undo') ? { card: cards[1] } : {},
     });
   });
-  await page.goto('/swipe');
+  await page.goto(testAppPath('/swipe'));
   await expect(page.getByRole('heading', { name: 'First Film' })).toBeVisible();
   await expect(page.locator('.gesture-surface img')).toHaveAttribute(
     'src',
@@ -198,7 +201,7 @@ test('saved Swipe preferences apply to the active series deck', async ({
       decisions.push(request.postDataJSON());
     return route.fulfill({ json: {} });
   });
-  await page.goto('/swipe');
+  await page.goto(testAppPath('/swipe'));
   await page.getByText('Swipe Preferences', { exact: true }).click();
   await page
     .getByRole('combobox', { name: 'Series Request Default' })
@@ -296,7 +299,7 @@ test('Swipe catalog decisions preserve magazine identity and destination', async
     if (request.method() === 'POST') writes.push(request.postDataJSON());
     return route.fulfill({ json: {} });
   });
-  await page.goto('/swipe');
+  await page.goto(testAppPath('/swipe'));
   await expect(page.getByRole('heading', { name: 'New Issue' })).toBeVisible();
   await page.getByLabel('Search Titles').fill('Issue');
   await page.getByRole('button', { name: 'Search Deck' }).click();
@@ -384,7 +387,7 @@ test('Swipe software requests use the chosen PC variant and next catalog offset'
       writes.push({ path, body: request.postDataJSON() });
     return route.fulfill({ json: {} });
   });
-  await page.goto('/swipe');
+  await page.goto(testAppPath('/swipe'));
   await expect(page.getByRole('heading', { name: 'First Game' })).toBeVisible();
   const request = page.getByRole('button', { name: 'Request', exact: true });
   await expect(request).toBeDisabled();
@@ -464,7 +467,7 @@ test('Swipe software title search follows and retains the catalog cursor', async
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/swipe');
+  await page.goto(testAppPath('/swipe'));
   await page
     .getByRole('combobox', { name: 'Category' })
     .selectOption('software-game');
@@ -483,4 +486,194 @@ test('Swipe software title search follows and retains the catalog cursor', async
   ).toBeVisible();
   expect(searches[1]?.get('q')).toBe('Search');
   expect(searches[1]?.get('cursor')).toBe('cursor-2');
+});
+
+test('Swipe software decks preserve category filters and exact request targets', async ({
+  page,
+}, info) => {
+  const catalogQueries: URLSearchParams[] = [];
+  const requests: unknown[] = [];
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/lumen-config.json', (route) =>
+    route.fulfill({ json: {} })
+  );
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const path = url.pathname;
+    if (path.endsWith('/auth/me'))
+      return route.fulfill({ json: { id: 1, permissions: 2 } });
+    if (path.endsWith('/swipe/status'))
+      return route.fulfill({
+        json: {
+          mediaTypes: ['software-retro', 'software-modern', 'software-game'],
+          bookFormats: [],
+        },
+      });
+    if (path.endsWith('/swipe/profile'))
+      return route.fulfill({
+        json: { seriesRequest: 'first-season', bookFormat: 'ebook' },
+      });
+    if (path.endsWith('/request/software/catalog/popular')) {
+      catalogQueries.push(url.searchParams);
+      const category = url.searchParams.get('category');
+      const result = {
+        retro: {
+          id: 'retro-1',
+          catalogId: 'retro-1',
+          igdbId: 101,
+          catalogProvider: 'igdb',
+          title: 'Retro Fixture',
+          tags: ['platform'],
+          emulationSystems: [
+            { slug: 'snes', name: 'Super Nintendo', group: 'retro' },
+          ],
+        },
+        modern: {
+          id: 'modern-1',
+          catalogId: 'modern-1',
+          igdbId: 102,
+          catalogProvider: 'igdb',
+          title: 'Modern Fixture',
+          emulationSystems: [
+            { slug: 'ps5', name: 'PlayStation 5', group: 'modern' },
+          ],
+        },
+        game: {
+          id: '82',
+          catalogId: '82',
+          igdbId: 82,
+          catalogProvider: 'igdb',
+          title: 'PC Fixture',
+          platformOptions: [{ id: 6, name: 'PC (Microsoft Windows)' }],
+        },
+      }[category ?? ''];
+      return route.fulfill({
+        json: { results: result ? [result] : [], nextOffset: null },
+      });
+    }
+    if (path.endsWith('/swipe/decisions') && request.method() === 'GET')
+      return route.fulfill({ json: { decisions: [] } });
+    if (request.method() === 'POST' && path.endsWith('/request/software'))
+      requests.push({ path, body: request.postDataJSON() });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(testAppPath('/swipe'));
+  const category = page.getByRole('combobox', { name: 'Category' });
+  await category.selectOption('software-retro');
+  await expect(
+    page.getByRole('heading', { name: 'Retro Fixture' })
+  ).toBeVisible();
+  await page.getByText('Deck Filters', { exact: true }).click();
+  await page.getByLabel('Genre or Subject').fill('platform');
+  await page.getByRole('button', { name: 'Apply Filters' }).click();
+  await expect
+    .poll(() =>
+      catalogQueries.some((query) => query.get('genre') === 'platform')
+    )
+    .toBe(true);
+  await page.getByRole('combobox', { name: 'Target System' }).selectOption('0');
+  await page.evaluate(() =>
+    window.scrollTo(0, document.documentElement.scrollHeight)
+  );
+  await expect
+    .poll(async () => {
+      const tabbar = page.locator('.tabbar');
+      if (!(await tabbar.isVisible())) return true;
+      const tabs = await tabbar.boundingBox();
+      const undo = await page
+        .getByRole('button', { name: 'Undo Last Decision' })
+        .boundingBox();
+      return !!tabs && !!undo && undo.y + undo.height <= tabs.y;
+    })
+    .toBe(true);
+  await page.screenshot({
+    path: info.outputPath('software-retro.png'),
+    fullPage: true,
+  });
+  await page.getByRole('button', { name: 'Request', exact: true }).click();
+  await expect(page.getByText('Retro Fixture requested.')).toBeVisible();
+
+  await category.selectOption('software-modern');
+  await expect(
+    page.getByRole('heading', { name: 'Modern Fixture' })
+  ).toBeVisible();
+  await page.getByRole('combobox', { name: 'Target System' }).selectOption('0');
+  await page.evaluate(() =>
+    window.scrollTo(0, document.documentElement.scrollHeight)
+  );
+  await expect
+    .poll(async () => {
+      const tabbar = page.locator('.tabbar');
+      if (!(await tabbar.isVisible())) return true;
+      const tabs = await tabbar.boundingBox();
+      const undo = await page
+        .getByRole('button', { name: 'Undo Last Decision' })
+        .boundingBox();
+      return !!tabs && !!undo && undo.y + undo.height <= tabs.y;
+    })
+    .toBe(true);
+  await page.screenshot({
+    path: info.outputPath('software-modern.png'),
+    fullPage: true,
+  });
+  await page.getByRole('button', { name: 'Request', exact: true }).click();
+  await expect(page.getByText('Modern Fixture requested.')).toBeVisible();
+
+  await category.selectOption('software-game');
+  await expect(page.getByRole('heading', { name: 'PC Fixture' })).toBeVisible();
+  await page
+    .getByRole('combobox', { name: 'PC Variant' })
+    .selectOption({ label: 'Windows · x64' });
+  await page.evaluate(() =>
+    window.scrollTo(0, document.documentElement.scrollHeight)
+  );
+  await expect
+    .poll(async () => {
+      const tabbar = page.locator('.tabbar');
+      if (!(await tabbar.isVisible())) return true;
+      const tabs = await tabbar.boundingBox();
+      const undo = await page
+        .getByRole('button', { name: 'Undo Last Decision' })
+        .boundingBox();
+      return !!tabs && !!undo && undo.y + undo.height <= tabs.y;
+    })
+    .toBe(true);
+  await page.screenshot({
+    path: info.outputPath('software-game.png'),
+    fullPage: true,
+  });
+  await page.getByRole('button', { name: 'Request', exact: true }).click();
+  await expect(page.getByText('PC Fixture requested.')).toBeVisible();
+
+  expect(requests).toEqual([
+    {
+      path: '/api/v1/request/software',
+      body: {
+        category: 'retro',
+        catalogProvider: 'igdb',
+        catalogId: 101,
+        platformSlug: 'snes',
+      },
+    },
+    {
+      path: '/api/v1/request/software',
+      body: {
+        category: 'modern',
+        catalogProvider: 'igdb',
+        catalogId: 102,
+        platformSlug: 'ps5',
+      },
+    },
+    {
+      path: '/api/v1/request/software',
+      body: {
+        category: 'game',
+        catalogProvider: 'igdb',
+        catalogId: 82,
+        variant: { operatingSystem: 'windows', architecture: 'x64' },
+      },
+    },
+  ]);
 });

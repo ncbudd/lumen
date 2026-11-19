@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+const mount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
+const appPath = (path: string) => `${mount}${path}`;
+
 test('book details reach the author and series and send the exact shelf target', async ({
   page,
 }, info) => {
@@ -29,6 +32,7 @@ test('book details reach the author and series and send the exact shelf target',
     series: [{ ...first.series[0], position: '2' }],
   };
   const targets: unknown[] = [];
+  const creations: unknown[] = [];
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/lumen-config.json', (route) =>
     route.fulfill({ json: {} })
@@ -63,6 +67,27 @@ test('book details reach the author and series and send the exact shelf target',
           grimmoryUrl: 'https://reader.example.test',
         },
       });
+    if (
+      path === '/settings/reader-delivery/groupings' &&
+      request.method() === 'POST'
+    ) {
+      creations.push(request.postDataJSON());
+      const body = request.postDataJSON();
+      return route.fulfill({
+        json: {
+          grouping: {
+            targetType: body.target.type,
+            targetId: body.target.id,
+            provider: body.provider,
+            isPublic: body.isPublic,
+            syncToKobo: body.syncToKobo,
+            countVerified: true,
+            lastMatchCount: 1,
+            serviceUrl: 'https://reader.example.test',
+          },
+        },
+      });
+    }
     if (path === '/settings/reader-delivery/groupings')
       return route.fulfill({ json: [] });
     if (path.endsWith('/groupings/preview')) {
@@ -77,7 +102,7 @@ test('book details reach the author and series and send the exact shelf target',
     }
     return route.fulfill({ json: {} });
   });
-  await page.goto('/book/OL11W');
+  await page.goto(appPath('/book/OL11W'));
   await page.getByRole('link', { name: 'Fixture Author', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'Fixture Author' })
@@ -96,24 +121,29 @@ test('book details reach the author and series and send the exact shelf target',
     const dialog = page.getByRole('dialog', { name: 'Reader Shelf' });
     await dialog.getByRole('button', { name: 'Preview Matches' }).click();
     await expect(dialog.getByText('Matches fixture books')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Create Shelf' }).click();
+    await expect(dialog.getByRole('status')).toHaveText('Reader shelf saved');
     await dialog.getByRole('button', { name: 'Close', exact: true }).click();
   }
   await preview();
-  await page.goto('/book/OL11W');
+  await page.goto(appPath('/book/OL11W'));
   await page.getByRole('link', { name: 'Fixture Series #1' }).click();
   await expect(
     page.getByRole('heading', { name: 'Fixture Series' })
   ).toBeVisible();
   await expect(page.locator('.grid a.hit').first()).toHaveAttribute(
     'href',
-    '/book/OL11W'
+    appPath('/book/OL11W')
   );
   await page.screenshot({ path: info.outputPath('series.png') });
   const filters = page.getByRole('group', { name: 'Book Series Filters' });
   const cards = page.locator('.grid a.hit');
   await filters.getByLabel('Format').selectOption('audiobook');
   await expect(cards).toHaveCount(1);
-  await expect(cards.first()).toHaveAttribute('href', '/book/OL22W?f=audio');
+  await expect(cards.first()).toHaveAttribute(
+    'href',
+    appPath('/book/OL22W?f=audio')
+  );
   await filters.getByLabel('Minimum Rating').selectOption('4.0');
   await expect(page.getByText('No books match these filters.')).toBeVisible();
   await filters.getByRole('button', { name: 'Clear Filters' }).click();
@@ -121,15 +151,31 @@ test('book details reach the author and series and send the exact shelf target',
   await filters.getByLabel('Subject').selectOption('fantasy');
   await filters.getByLabel('Language').selectOption('eng');
   await expect(cards).toHaveCount(1);
-  await expect(cards.first()).toHaveAttribute('href', '/book/OL11W');
+  await expect(cards.first()).toHaveAttribute('href', appPath('/book/OL11W'));
   await page.screenshot({ path: info.outputPath('series-filtered.png') });
   await filters.getByRole('button', { name: 'Clear Filters' }).click();
-  await expect(cards.first()).toHaveAttribute('href', '/book/OL11W');
-  await expect(cards.nth(1)).toHaveAttribute('href', '/book/OL22W');
+  await expect(cards.first()).toHaveAttribute('href', appPath('/book/OL11W'));
+  await expect(cards.nth(1)).toHaveAttribute('href', appPath('/book/OL22W'));
   await preview();
   expect(targets).toEqual([
     { type: 'author', id: 'OL42A', name: 'Fixture Author' },
     { type: 'book-series', id: seriesId, name: 'Fixture Series' },
+  ]);
+  expect(creations).toEqual([
+    {
+      provider: 'grimmory',
+      target: { type: 'author', id: 'OL42A', name: 'Fixture Author' },
+      isPublic: true,
+      syncToKobo: false,
+      allowEmpty: false,
+    },
+    {
+      provider: 'grimmory',
+      target: { type: 'book-series', id: seriesId, name: 'Fixture Series' },
+      isPublic: true,
+      syncToKobo: false,
+      allowEmpty: false,
+    },
   ]);
 });
 
@@ -206,7 +252,7 @@ test('bulk bibliography requests preserve selection across pages and report part
     }
     return route.fulfill({ json: {} });
   });
-  await page.goto('/author/OL42A');
+  await page.goto(appPath('/author/OL42A'));
   await page
     .getByRole('button', { name: 'Request Books', exact: true })
     .click();
@@ -292,7 +338,7 @@ test('advanced bulk book options send the selected destination and clear format-
     }
     return route.fulfill({ json: responses[path] ?? {} });
   });
-  await page.goto('/author/OL42A');
+  await page.goto(appPath('/author/OL42A'));
   await page
     .getByRole('button', { name: 'Request Books', exact: true })
     .click();
