@@ -20,6 +20,10 @@ import IndexerSearchLink from '../components/IndexerSearchLink';
 import ReportIssueButton from '../components/ReportIssueButton';
 import WatchlistButton from '../components/WatchlistButton';
 import {
+  discoveryVisibility,
+  showDiscoveryTitle,
+} from '../discoveryVisibility';
+import {
   artistOf,
   fmtTrack,
   requestExtra,
@@ -27,7 +31,7 @@ import {
   type AlbumDetails,
   type ArtistDetails,
 } from '../extras';
-import { useApi, usePaged } from '../hooks';
+import { useApi, usePaged, usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
 import { useLiveMediaProgress } from '../useLiveDownloadProgress';
 import { AssociationLink } from './Associations';
@@ -73,6 +77,95 @@ const MUSIC_FILTERS = [
   { key: 'primaryReleaseDateLte', label: 'Released Through', type: 'date' },
 ] as const;
 
+function MusicArtistFilter({
+  artist,
+  artistId,
+}: {
+  artist: string;
+  artistId: string;
+}) {
+  const [name, setName] = useState(artist);
+  const [selectedId, setSelectedId] = useState(artistId);
+  const [term, setTerm] = useState('');
+  const [debouncedTerm, setDebouncedTerm] = useState('');
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedTerm(term), 350);
+    return () => clearTimeout(timer);
+  }, [term]);
+  const path =
+    term && term === debouncedTerm
+      ? '/search?' + new URLSearchParams({ query: term, type: 'artist' })
+      : null;
+  const lookup = useApi<{
+    results: {
+      id: string;
+      mediaType: string;
+      name: string;
+      disambiguation?: string;
+    }[];
+  }>(path, { currentPathOnly: true });
+  const matches =
+    lookup.data?.results.filter((result) => result.mediaType === 'artist') ??
+    [];
+  return (
+    <>
+      <label className="sel">
+        <span className="lbl">Artist</span>
+        <input
+          className="cfg-input"
+          type="search"
+          name="artist"
+          maxLength={256}
+          value={name}
+          onChange={(event) => {
+            setName(event.currentTarget.value);
+            setTerm(event.currentTarget.value.trim());
+            setSelectedId('');
+          }}
+        />
+      </label>
+      <input type="hidden" name="artistId" value={selectedId} />
+      {matches.length > 0 && (
+        <label className="sel">
+          <span className="lbl">Artist Match</span>
+          <select
+            value={selectedId}
+            onChange={(event) => {
+              const match = matches.find(
+                ({ id }) => id === event.currentTarget.value
+              );
+              setSelectedId(match?.id ?? '');
+              if (match) setName(match.name);
+            }}
+          >
+            <option value="">Use Artist Text</option>
+            {matches.map((match) => (
+              <option key={match.id} value={match.id}>
+                {match.name}
+                {match.disambiguation ? ` (${match.disambiguation})` : ''}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      {lookup.error && (
+        <button
+          className="btn btn-quiet btn-sm"
+          type="button"
+          onClick={lookup.reload}
+        >
+          Retry Artist Lookup
+        </button>
+      )}
+      {lookup.data && matches.length === 0 && (
+        <span className="note" role="status">
+          No matching artists.
+        </span>
+      )}
+    </>
+  );
+}
+
 const big = (n?: number) =>
   !n
     ? ''
@@ -91,6 +184,7 @@ export const AlbumCard = ({ a }: { a: Album }) => (
     titleKind="album"
     icon="music"
     stat={extraStat(a.mediaInfo)}
+    watchlist={{ mediaType: 'music', id: a.id }}
     meta={[artistOf(a), (a['first-release-date'] || '').slice(0, 4)]
       .filter(Boolean)
       .join(' · ')}
@@ -148,7 +242,17 @@ export function Music() {
   useEffect(() => {
     setQ((value) => (value.trim() === query ? value : query));
   }, [query]);
-  const items = list.items;
+  const { user } = useAuth();
+  const visibility = discoveryVisibility(
+    usePublicSettings(),
+    user?.permissions
+  );
+  if (filters.has('availability')) visibility.hideAvailable = false;
+  visibility.hideRequested = false;
+  const items = list.items.filter((album) =>
+    showDiscoveryTitle(album, visibility)
+  );
+  const filtered = items.length < list.items.length;
 
   return (
     <ExtraGate k="music">
@@ -200,29 +304,36 @@ export function Music() {
           const next = new URLSearchParams(p);
           for (const key of [
             ...MUSIC_FILTERS.map((field) => field.key),
+            'artistId',
             'availability',
           ]) {
             const value = String(form.get(key) ?? '').trim();
             if (value) next.set(key, value);
             else next.delete(key);
           }
-          if ((next.get('artist') ?? '') !== (filters.get('artist') ?? ''))
-            next.delete('artistId');
           setP(next, { replace: true });
         }}
       >
-        {MUSIC_FILTERS.map(({ key, label, type }) => (
-          <label className="sel" key={key}>
-            <span className="lbl">{label}</span>
-            <input
-              className="cfg-input"
-              type={type}
-              name={key}
-              defaultValue={filters.get(key) ?? ''}
-              maxLength={type === 'search' ? 256 : undefined}
+        {MUSIC_FILTERS.map(({ key, label, type }) =>
+          key === 'artist' ? (
+            <MusicArtistFilter
+              key={key}
+              artist={filters.get(key) ?? ''}
+              artistId={filters.get('artistId') ?? ''}
             />
-          </label>
-        ))}
+          ) : (
+            <label className="sel" key={key}>
+              <span className="lbl">{label}</span>
+              <input
+                className="cfg-input"
+                type={type}
+                name={key}
+                defaultValue={filters.get(key) ?? ''}
+                maxLength={type === 'search' ? 256 : undefined}
+              />
+            </label>
+          )
+        )}
         <label className="sel">
           <span className="lbl">In Library</span>
           <select
@@ -270,7 +381,7 @@ export function Music() {
         )}
       </form>
       <ServiceNote error={list.items.length ? null : list.error} what="music" />
-      {!list.error && !items.length && !list.loading && (
+      {!list.error && !items.length && !list.loading && list.done && (
         <div className="empty">
           <b>Nothing here</b>
           {query
@@ -283,8 +394,19 @@ export function Music() {
           <AlbumCard key={a.id} a={a} />
         ))}
       </div>
+      {filtered && !list.done && !list.error && (
+        <div className="more-scroll">
+          <button
+            className="btn btn-tonal"
+            disabled={list.loading}
+            onClick={list.more}
+          >
+            {list.loading ? 'Loading…' : 'Show More Music'}
+          </button>
+        </div>
+      )}
       <MoreOnScroll
-        done={list.done}
+        done={list.done || filtered}
         loading={list.loading}
         more={list.more}
         error={list.error}
@@ -468,6 +590,18 @@ export function Artist() {
               to={`/collections/music/${encodeURIComponent(id)}?view=discography`}
             >
               View Discography
+            </Link>
+            <Link
+              className="btn btn-tonal btn-sm"
+              to={{
+                pathname: '/music',
+                search: new URLSearchParams({
+                  artist: a.artist.name,
+                  artistId: id,
+                }).toString(),
+              }}
+            >
+              Filter Music by Artist
             </Link>
             <IndexerSearchLink category="music" title={a.artist.name} />
             <AssociationLink mediaType="artist" id={id} />

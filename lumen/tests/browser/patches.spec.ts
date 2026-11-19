@@ -5,6 +5,7 @@ test('Patch discovery filters, follows the exact project and pages through resul
 }) => {
   const key = `dat-${'a'.repeat(64)}`;
   let followed = false;
+  let invalidProject = true;
   const searches: Record<string, string>[] = [];
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/api/v1/**', (route) => {
@@ -15,8 +16,18 @@ test('Patch discovery filters, follows the exact project and pages through resul
         return route.fulfill({
           json: { id: 1, displayName: 'Player', permissions: 32 },
         });
+      case '/settings/public':
+        return route.fulfill({
+          json: {
+            softwareEnabled: true,
+            romarrEnabled: true,
+            enabledMediaCategories: { game: true, modern: true },
+          },
+        });
       case '/patches/search':
         searches.push(Object.fromEntries(url.searchParams));
+        if (searches.length === 1)
+          return route.fulfill({ json: { available: true, results: [null] } });
         return route.fulfill({
           json: {
             available: true,
@@ -51,13 +62,50 @@ test('Patch discovery filters, follows the exact project and pages through resul
           return route.fulfill({ status: 201, json: { id: 1, ...subject } });
         }
         return route.fulfill({ json: { results: [] } });
+      case '/patches/projects/patch-1':
+        if (invalidProject) {
+          invalidProject = false;
+          return route.fulfill({ json: { id: 'patch-1' } });
+        }
+        return route.fulfill({
+          json: {
+            id: 'patch-1',
+            name: 'Fixture Translation',
+            kind: 'translation',
+            status: 'complete',
+            game: { catalogKey: key, title: 'Fixture Game' },
+            versions: [{ id: 'v2', version: '2.0' }],
+            latestVersionId: 'v2',
+          },
+        });
+      case `/request/software/catalog/games/${key}`:
+        expect(url.searchParams.get('category')).toBe('modern');
+        return route.fulfill({
+          json: {
+            catalogProvider: 'dat',
+            catalogId: key,
+            title: 'Fixture Game',
+            genres: [],
+            platforms: [],
+            emulationSystems: [
+              { group: 'modern', slug: '3ds', name: 'Nintendo 3DS' },
+              { group: 'modern', slug: 'switch', name: 'Switch' },
+            ],
+          },
+        });
       default:
         return route.fulfill({ json: {} });
     }
   });
   await page.goto('/patches');
+  const searchError = page
+    .getByRole('alert')
+    .filter({ hasText: 'Invalid patch catalogue response.' });
+  await expect(searchError).toBeVisible();
+  await searchError.getByRole('button', { name: 'Retry' }).click();
   await expect(page.getByText('Fixture Translation')).toBeVisible();
   expect(searches[0]).toEqual({ language: 'en', completeOnly: 'true' });
+  expect(searches[1]).toEqual(searches[0]);
   await expect(page.getByRole('link', { name: 'Open Game' })).toHaveAttribute(
     'href',
     `/game/retro/${key}?dat=1`
@@ -80,6 +128,55 @@ test('Patch discovery filters, follows the exact project and pages through resul
   expect(searches.at(-1)?.cursor).toBe('fixture-cursor');
   await page.getByRole('button', { name: 'First Page' }).click();
   await expect(page.getByText('Fixture Translation')).toBeVisible();
+  await page.goto(`/patches?catalogKey=${key}&platform=switch&category=modern`);
+  await expect(page.getByRole('link', { name: 'Open Game' })).toHaveAttribute(
+    'href',
+    `/game/modern/${key}?dat=1&platform=switch`
+  );
+  const choose = page.getByRole('link', { name: 'Choose a Version' });
+  await expect(choose).toHaveAttribute(
+    'href',
+    '/patches/patch-1?category=modern&platform=switch'
+  );
+  await choose.click();
+  const invalid = page
+    .getByRole('alert')
+    .filter({ hasText: 'Invalid patch project response.' });
+  await expect(invalid).toBeVisible();
+  await invalid.getByRole('button', { name: 'Retry' }).click();
+  await expect(page.getByLabel('Game Type')).toHaveValue('modern');
+  await expect(page.getByLabel('System', { exact: true })).toHaveValue(
+    'switch'
+  );
+  await page.reload();
+  await expect(page.getByLabel('System', { exact: true })).toHaveValue(
+    'switch'
+  );
+  await page.goto(
+    '/patches/patch-1?category=modern&platform=unknown&version=missing'
+  );
+  await expect(
+    page.getByText(/This patch version is no longer listed/)
+  ).toBeVisible();
+  await expect(
+    page.getByText(/The selected console is incompatible/)
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Request Patch' })
+  ).toBeDisabled();
+  await page.getByLabel('Patch Version').selectOption('v2');
+  await page.getByLabel('System', { exact: true }).selectOption('switch');
+  await page.getByRole('link', { name: 'Open Game' }).click();
+  await expect(page.getByRole('combobox', { name: 'Console' })).toHaveValue(
+    'switch'
+  );
+  await page.goto(`/game/modern/${key}?dat=1&platform=unsupported`);
+  await expect(page.getByRole('combobox', { name: 'Console' })).toHaveValue('');
+  await expect(
+    page
+      .getByRole('button', { name: 'Request', exact: true })
+      .filter({ visible: true })
+  ).toBeDisabled();
 });
 
 test('a Following update opens its exact patch version and submits only with a compatible base', async ({
@@ -137,12 +234,14 @@ test('a Following update opens its exact patch version and submits only with a c
       case `/request/software/catalog/games/${key}`:
         return route.fulfill({
           json: {
-            catalogProvider: 'dat',
-            catalogId: key,
-            emulationSystems: [
-              { group: 'retro', slug: 'snes', name: 'SNES' },
-              { group: 'retro', slug: 'other', name: 'Other System' },
-            ],
+            game: {
+              catalogProvider: 'dat',
+              catalogId: key,
+              emulationSystems: [
+                { group: 'retro', slug: 'snes', name: 'SNES' },
+                { group: 'retro', slug: 'other', name: 'Other System' },
+              ],
+            },
           },
         });
       case '/request/software':
@@ -202,7 +301,13 @@ test('a Following update opens its exact patch version and submits only with a c
     page.getByText('The required base revision is unavailable.')
   ).toBeVisible();
   expect(submissions).toBe(0);
+  await page.getByLabel('Patch Version').selectOption('');
+  await page.reload();
+  await expect(page.getByLabel('Patch Version')).toHaveValue('');
+  await expect(submit).toBeDisabled();
   await page.getByLabel('Patch Version').selectOption('v2');
+  await page.reload();
+  await expect(page.getByLabel('Patch Version')).toHaveValue('v2');
   await expect(page.getByLabel('System', { exact: true })).toHaveValue('snes');
   await submit.click();
   await expect(page.getByText('Waiting for approval')).toBeVisible();

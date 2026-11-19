@@ -125,3 +125,113 @@ test('configured companion destination is retained with the classic interface es
     'https://seerr.example.test/base/?keep=1&interface=classic'
   );
 });
+
+test('About opens release history on demand and retries a failed lookup', async ({
+  page,
+}) => {
+  await session(page, 2);
+  await page.route('**/api/v1/settings/about', (route) =>
+    route.fulfill({
+      json: {
+        version: '3.72.38',
+        totalMediaItems: 10,
+        totalRequests: 5,
+        appDataPath: '/config',
+      },
+    })
+  );
+  let lookups = 0;
+  const longWord = 'a'.repeat(200);
+  const notes = `### Fixes\n\n- **Fixture release notes.** ${longWord}\n- [Compare versions](https://github.com/snapetech-org/seerrng/compare/v3.72.37...v3.72.38)`;
+  await page.route(
+    'https://api.github.com/repos/snapetech-org/seerrng/releases?per_page=20',
+    (route) =>
+      ++lookups === 1
+        ? route.fulfill({ status: 503 })
+        : route.fulfill({
+            json: [
+              {
+                tag_name: 'v3.72.38',
+                name: 'Fixture Release',
+                body: notes,
+              },
+            ],
+          })
+  );
+  await page.goto('./admin/about');
+  const open = page.getByRole('button', { name: 'Show Releases' });
+  await expect(open).toBeVisible();
+  expect(lookups).toBe(0);
+  await open.click();
+  await expect(page.getByRole('alert')).toContainText(
+    'Release history could not be loaded'
+  );
+  await page.getByRole('button', { name: 'Retry', exact: true }).click();
+  await page
+    .getByText('Fixture Release · Latest · Installed', { exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: 'Fixes' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Compare versions' })
+  ).toHaveAttribute(
+    'href',
+    'https://github.com/snapetech-org/seerrng/compare/v3.72.37...v3.72.38'
+  );
+  const releaseNotes = page
+    .getByRole('listitem')
+    .filter({ hasText: longWord })
+    .last();
+  await expect(releaseNotes).toBeVisible();
+  expect(
+    await releaseNotes.evaluate((element) => {
+      const bounds = element.getBoundingClientRect();
+      return (
+        element.scrollWidth <= element.clientWidth &&
+        bounds.right <= document.documentElement.clientWidth
+      );
+    })
+  ).toBe(true);
+  await expect(
+    page.getByRole('link', { name: 'View on GitHub' })
+  ).toHaveAttribute(
+    'href',
+    'https://github.com/snapetech-org/seerrng/releases/tag/v3.72.38'
+  );
+  expect(lookups).toBe(2);
+});
+
+test('About links a development update to the installed commit comparison', async ({
+  page,
+}) => {
+  await session(page, 2);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { versionCheck: true } })
+  );
+  await page.route('**/api/v1/settings/about', (route) =>
+    route.fulfill({
+      json: {
+        version: 'main-abcdef0',
+        totalMediaItems: 10,
+        totalRequests: 5,
+        appDataPath: '/config',
+      },
+    })
+  );
+  await page.route('**/api/v1/status', (route) =>
+    route.fulfill({
+      json: {
+        commitTag: 'abcdef0',
+        updateCheckSucceeded: true,
+        updateAvailable: true,
+      },
+    })
+  );
+  await page.goto('./admin/about');
+  await expect(
+    page.getByRole('link', { name: 'Update available' })
+  ).toHaveAttribute(
+    'href',
+    'https://github.com/snapetech-org/seerrng/compare/abcdef0...main'
+  );
+  await expect(page.getByRole('heading', { name: 'Legal Use' })).toBeVisible();
+});

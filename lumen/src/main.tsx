@@ -66,6 +66,7 @@ import './styles/touch.css';
 const BookSeriesSearch = lazy(() => import('./pages/BookSeriesSearch'));
 const BookSeriesCatalog = lazy(() => import('./pages/BookSeriesCatalog'));
 const BookSeriesRequests = lazy(() => import('./pages/BookSeriesRequests'));
+const GameDiscovery = lazy(() => import('./pages/GameDiscovery'));
 const AdminUsers = lazy(() => import('./pages/AdminUsers'));
 const AdminAbout = lazy(() => import('./pages/AdminAbout'));
 const AdminDiscovery = lazy(() => import('./pages/AdminDiscovery'));
@@ -77,6 +78,7 @@ const AdminMediaLibraries = lazy(() => import('./pages/AdminMediaLibraries'));
 const AdminMetadata = lazy(() => import('./pages/AdminMetadata'));
 const AdminReaders = lazy(() => import('./pages/AdminReaders'));
 const AdminUrlConnection = lazy(() => import('./pages/AdminUrlConnection'));
+const AdminOverrideRules = lazy(() => import('./pages/AdminOverrideRules'));
 const AdminDownloadClients = lazy(() => import('./pages/AdminDownloadClients'));
 const AdminReaderDelivery = lazy(() => import('./pages/AdminReaderDelivery'));
 const AdminSoftwareAcquisition = lazy(
@@ -281,6 +283,20 @@ function App() {
           <Route path="/magazines" element={<Magazines />} />
           <Route path="/magazine/:title" element={<MagazineDetail />} />
           <Route path="/games" element={<Games />} />
+          <Route
+            path="/games/discovery"
+            element={
+              <Suspense
+                fallback={
+                  <p className="note" role="status">
+                    Loading Game Finder…
+                  </p>
+                }
+              >
+                <GameDiscovery />
+              </Suspense>
+            }
+          />
           <Route path="/software" element={<SoftwareBookmark />} />
           <Route path="/patches" element={<Patches />} />
           <Route path="/patches/:id" element={<PatchDetail />} />
@@ -513,6 +529,24 @@ function App() {
             element={
               isAdministrator(user.permissions) ? (
                 <AdminHome />
+              ) : (
+                <Navigate to="/me" replace />
+              )
+            }
+          />
+          <Route
+            path="/admin/override-rules"
+            element={
+              isAdministrator(user.permissions) ? (
+                <Suspense
+                  fallback={
+                    <p className="note" role="status">
+                      Loading request override rules…
+                    </p>
+                  }
+                >
+                  <AdminOverrideRules />
+                </Suspense>
               ) : (
                 <Navigate to="/me" replace />
               )

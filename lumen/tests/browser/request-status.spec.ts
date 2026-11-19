@@ -4,7 +4,8 @@ async function fixture(
   page: Page,
   status: Record<string, unknown> | undefined,
   legacy = false,
-  unavailable = false
+  unavailable = false,
+  permissions = 2
 ) {
   const calls: string[] = [];
   await page.route('https://**/*', (r) => r.abort());
@@ -19,7 +20,7 @@ async function fixture(
       });
     if (path === '/auth/me')
       return r.fulfill({
-        json: { id: 1, displayName: 'reader', permissions: 2 },
+        json: { id: 1, displayName: 'reader', permissions },
       });
     if (path === '/settings/public')
       return r.fulfill({
@@ -472,4 +473,98 @@ test('available request history finds download copies on demand and links the se
   await expect(file).toHaveAttribute('href', `${path}/downloads/${assetId}`);
   await expect(file).toHaveAttribute('download', '');
   expect(lookups).toBe(1);
+});
+
+test('a bookmarked TV request shows its season and episode selection', async ({
+  page,
+}) => {
+  await fixture(page, undefined);
+  let attempts = 0;
+  await page.route('**/api/v1/request/status/615', (route) => {
+    if (++attempts === 1) return route.fulfill({ json: {} });
+    return route.fulfill({
+      json: {
+        request: {
+          id: 615,
+          type: 'tv',
+          status: 1,
+          is4k: true,
+          requestedBy: { id: 1, displayName: 'Reader' },
+          media: { mediaType: 'tv', tmdbId: 22, status: 1 },
+          seasons: [
+            { seasonNumber: 0, episodeNumbers: [2], status: 3 },
+            { seasonNumber: 2, episodeNumbers: [3, 5], status: 2 },
+            { seasonNumber: 4, status: 1 },
+          ],
+        },
+        current: { stage: 'requested', attempt: 1 },
+        history: { results: [], total: 0 },
+      },
+    });
+  });
+  await page.goto('/requests?requestId=615');
+  const history = page.getByRole('dialog', { name: 'Request history' });
+  await expect(
+    history.getByText('Invalid request history response.')
+  ).toBeVisible();
+  await history.getByRole('button', { name: 'Retry' }).click();
+  await expect(
+    history.getByRole('link', { name: 'Open Title' })
+  ).toHaveAttribute('href', '/tv/22?quality=4k');
+  const seasons = history.getByRole('list', { name: 'Requested seasons' });
+  await expect(
+    seasons.getByRole('link', { name: 'Season 2', exact: true })
+  ).toHaveAttribute('href', '/tv/22?quality=4k#season-2');
+  await expect(
+    seasons.getByRole('link', { name: 'Specials', exact: true })
+  ).toHaveAttribute('href', '/tv/22?quality=4k#season-0');
+  await expect(seasons.getByRole('listitem')).toHaveText([
+    /Specials.*Episodes 2 · Declined/,
+    /Season 2.*Episodes 3, 5 · Approved/,
+    /Season 4.*All episodes · Waiting for approval/,
+  ]);
+});
+
+test('a focused request link keeps its resolved title in the owner cancel confirmation', async ({
+  page,
+}) => {
+  await fixture(page, undefined, false, false, 0);
+  let cancelled = 0;
+  await page.route('**/api/v1/request/status/616', (route) =>
+    route.fulfill({
+      json: {
+        request: {
+          id: 616,
+          type: 'book',
+          status: 1,
+          bookFormat: 'ebook',
+          is4k: false,
+          createdAt: '2026-11-18T12:00:00Z',
+          requestedBy: { id: 1, displayName: 'reader' },
+          media: {
+            mediaType: 'book',
+            status: 2,
+            identifiers: [{ provider: 'openlibrary', value: 'OL616W' }],
+          },
+        },
+        current: { stage: 'requested', attempt: 1 },
+        history: { results: [], total: 0 },
+      },
+    })
+  );
+  await page.route('**/api/v1/request/616', (route) => {
+    if (route.request().method() !== 'DELETE') return route.fallback();
+    cancelled++;
+    return route.fulfill({ status: 204 });
+  });
+
+  await page.goto('/requests?requestId=616');
+  const history = page.getByRole('dialog', { name: 'Request history' });
+  await history.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(
+    page.getByText(/Requested audio won’t be fetched/)
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Cancel request' }).click();
+  await expect(page.getByText('Request cancelled')).toBeVisible();
+  expect(cancelled).toBe(1);
 });

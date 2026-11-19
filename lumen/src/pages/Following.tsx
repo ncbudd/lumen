@@ -14,6 +14,9 @@ interface Subscription {
   id: number;
   kind: string;
   subjectLabel: string;
+  conditions?: {
+    ref?: { tmdbId?: unknown; genreId?: unknown; mediaType?: unknown };
+  } | null;
   notify: boolean;
   autoRequest: boolean;
 }
@@ -23,13 +26,80 @@ interface FollowEvent {
   title: string;
   seen: boolean;
   follow: Pick<Subscription, 'subjectLabel' | 'kind'>;
-  reasonValues?: { relation?: string };
+  reasonKey?: string;
+  reasonValues?: Record<string, string>;
   target: { mediaType: string; id: string; variantKey?: string } | null;
 }
 
 const PAGE_SIZE = 30;
 const BOOK_FOLLOW_KINDS = ['narrator', 'author', 'series-language', 'edition'];
 
+const eventReasons = new Map(
+  Object.entries({
+    nextVolumeAnnounced:
+      'The next volume of {series} is announced in {language}: {title}.',
+    newVolumeReleased: 'A new {language} volume of {series} is out: {title}.',
+    newNarrationAvailable:
+      'A different narration of {title} exists: {narrators}.',
+    fullCastProduction: 'A full-cast production of {title} exists.',
+    newBookByNarrator: '{narrator} narrates a new audiobook: {title}.',
+    newBookByAuthor: '{author} has a new work: {title}.',
+    newExpansion: 'New content for {game}: {title}.',
+    newPatchVersion: '{project} {version} is available for {game}.',
+    newArtistRelease: '{artist} released {title}.',
+    newFranchiseRelation: 'New connection in {franchise}: {relation}.',
+    savedDiscoveryMatch: 'A new match for “{discovery}”: {attributes}.',
+    collectorsAreSharing: 'Collectors you follow are sharing {title}.',
+    newVideoTitle:
+      'New movie or series title related to {subject}: {title} ({date}).',
+    upcomingVideoTitle:
+      'Upcoming movie or series related to {subject}: {title} ({date}).',
+    videoReleaseDateReached:
+      'The listed release date has passed for {title}, related to {subject} ({date}).',
+  })
+);
+
+function eventReason(event: FollowEvent) {
+  const template = event.reasonKey && eventReasons.get(event.reasonKey);
+  if (!template) return undefined;
+
+  const parameters: Record<string, string> = {
+    title: event.title,
+    ...event.reasonValues,
+  };
+  const placeholders = [...template.matchAll(/\{(\w+)\}/g)];
+  if (placeholders.some(([, name]) => !parameters[name])) return undefined;
+
+  return template.replace(/\{(\w+)\}/g, (_, name: string) =>
+    name === 'relation'
+      ? parameters[name].replaceAll('-', ' ')
+      : parameters[name]
+  );
+}
+
+function tmdbSourceHref(subscription: Subscription) {
+  const ref = subscription.conditions?.ref;
+  const id = subscription.kind === 'tmdb-genre' ? ref?.genreId : ref?.tmdbId;
+  if (
+    typeof id !== 'number' ||
+    !Number.isSafeInteger(id) ||
+    id < 1 ||
+    id > 1_000_000_000
+  )
+    return undefined;
+
+  switch (subscription.kind) {
+    case 'tmdb-person':
+      return `/person/${id}`;
+    case 'tmdb-studio':
+      return `/movies?studio=${id}`;
+    case 'tmdb-network':
+      return `/series?network=${id}`;
+    case 'tmdb-genre':
+      if (ref?.mediaType === 'movie') return `/movies?genre=${id}`;
+      if (ref?.mediaType === 'tv') return `/series?genre=${id}`;
+  }
+}
 function eventHref({ target, title }: FollowEvent) {
   if (target?.mediaType === 'patch') {
     const patch = patchHref(target.id, target.variantKey);
@@ -37,6 +107,13 @@ function eventHref({ target, title }: FollowEvent) {
   }
   if (target?.mediaType === 'anime' && /^\d{1,10}$/.test(target.id)) {
     return `/franchise/anime/${target.id}`;
+  }
+  if (
+    target?.mediaType === 'game' &&
+    /^[1-9]\d{0,15}$/.test(target.id) &&
+    Number.isSafeInteger(Number(target.id))
+  ) {
+    return `/game/game/${target.id}`;
   }
   if (
     target &&
@@ -56,7 +133,8 @@ function eventHref({ target, title }: FollowEvent) {
     if (target.id && target.id !== '.' && target.id !== '..')
       return `/${kind}/${encodeURIComponent(target.id)}${format}`;
   }
-  return `/search?q=${encodeURIComponent(title)}`;
+  const query = target?.mediaType === 'search' ? target.id || title : title;
+  return `/search?q=${encodeURIComponent(query)}`;
 }
 
 export default function Following() {
@@ -131,36 +209,56 @@ export default function Following() {
             )}
             {!!rows?.length && (
               <ul className="setlist">
-                {rows.map((event) => (
-                  <li className="set" key={event.id}>
-                    <span>
-                      <Link className="go" to={eventHref(event)}>
-                        {event.title}
-                      </Link>
-                      <small>From {event.follow.subjectLabel}</small>
-                      {event.follow.kind === 'franchise' &&
-                        event.reasonValues?.relation && (
-                          <small>
-                            {event.reasonValues.relation.replaceAll('-', ' ')}
-                          </small>
-                        )}
-                    </span>
-                    {!event.seen && (
-                      <button
-                        className="btn btn-quiet btn-sm"
-                        aria-label={`Mark Seen: ${event.title}`}
-                        disabled={saving}
-                        onClick={() =>
-                          void save('/follow/events/seen', 'POST', {
-                            ids: [event.id],
-                          })
-                        }
-                      >
-                        Mark Seen
-                      </button>
-                    )}
-                  </li>
-                ))}
+                {rows.map((event) => {
+                  const reason =
+                    eventReason(event) ??
+                    (event.follow.kind === 'franchise'
+                      ? event.reasonValues?.relation?.replaceAll('-', ' ')
+                      : undefined);
+                  return (
+                    <li className="set" key={event.id}>
+                      <span>
+                        <Link
+                          className="go"
+                          to={eventHref(event)}
+                          onClick={(click) => {
+                            if (
+                              !event.seen &&
+                              !click.defaultPrevented &&
+                              click.button === 0 &&
+                              !click.metaKey &&
+                              !click.altKey &&
+                              !click.ctrlKey &&
+                              !click.shiftKey
+                            ) {
+                              void save('/follow/events/seen', 'POST', {
+                                ids: [event.id],
+                              });
+                            }
+                          }}
+                        >
+                          {event.title}
+                        </Link>
+                        <small>From {event.follow.subjectLabel}</small>
+                        {reason && <small>{reason}</small>}
+                      </span>
+                      {!event.seen && (
+                        <button
+                          className="btn btn-quiet btn-sm"
+                          aria-label={`Mark Seen: ${event.title}`}
+                          disabled={saving}
+                          onClick={() =>
+                            void save('/follow/events/seen', 'POST', {
+                              ids: [event.id],
+                            })
+                          }
+                        >
+                          Mark Seen
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             )}
             {page > 0 && (
@@ -200,9 +298,16 @@ export default function Following() {
               <ul className="setlist">
                 {subscriptions.data.results.map((subscription) => {
                   const path = `/follow/${subscription.id}`;
+                  const sourceHref = tmdbSourceHref(subscription);
                   return (
                     <li className="set" key={subscription.id}>
-                      <b>{subscription.subjectLabel}</b>
+                      {sourceHref ? (
+                        <Link className="go" to={sourceHref}>
+                          {subscription.subjectLabel}
+                        </Link>
+                      ) : (
+                        <b>{subscription.subjectLabel}</b>
+                      )}
                       <label>
                         <input
                           type="checkbox"

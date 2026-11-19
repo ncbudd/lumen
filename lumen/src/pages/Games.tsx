@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+  Link,
+  Navigate,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { api, artUrl } from '../api';
+import { useAuth } from '../auth';
 import { GridSkeleton, MoreOnScroll, type Stat } from '../components/cards';
 import { DetailTop, Facts, fmtHrs, Pill } from '../components/detail';
 import {
@@ -11,6 +18,8 @@ import {
   ServiceNote,
   StatPill,
 } from '../components/extra';
+import FollowButton from '../components/FollowButton';
+import GameContentPicker from '../components/GameContentPicker';
 import IndexerSearchLink from '../components/IndexerSearchLink';
 import { useToast } from '../components/toast';
 import {
@@ -19,11 +28,14 @@ import {
   PC_ARCH,
   PC_OS,
   requestGame,
+  unwrapCatalogGame,
   useExtras,
   type Game,
   type GameCategory,
+  type GameContentSelection,
   type GamePage,
 } from '../extras';
+import { canViewFollowing } from '../followPermissions';
 import { useApi } from '../hooks';
 import { Icon } from '../icons';
 
@@ -52,6 +64,7 @@ function useGames(category: GameCategory | undefined, query: string) {
   // where a failed page was, so Retry asks for it again
   const failedAt = useRef<string | number | undefined>(undefined);
   useEffect(() => {
+    if (live.current === key) return;
     live.current = key;
     inFlight.current = null;
     failedAt.current = undefined;
@@ -60,46 +73,75 @@ function useGames(category: GameCategory | undefined, query: string) {
     setNext(undefined);
     setError(null);
   }, [key]);
-  const more = useCallback(async () => {
-    if (!category || loading || inFlight.current || next === null) return;
-    const token = Symbol();
-    inFlight.current = token;
-    const ownsRequest = () =>
-      live.current === key && inFlight.current === token;
-    setLoading(true);
-    const p = new URLSearchParams({ category, limit: '24' });
-    if (query) p.set('q', query);
-    if (next !== undefined) p.set(query ? 'cursor' : 'offset', String(next));
-    try {
-      const d = await api<GamePage>(
-        `/request/software/catalog/${query ? 'search' : 'popular'}?${p}`
-      );
-      if (!ownsRequest()) return;
-      setItems((x) => {
-        const seen = new Set(x.map((g) => g.id));
-        return x.concat(d.results.filter((g) => !seen.has(g.id)));
-      });
-      setNext((query ? d.nextCursor : d.nextOffset) ?? null);
-    } catch (e) {
-      if (ownsRequest()) {
-        setError(e instanceof Error ? e.message : 'Failed to load');
-        failedAt.current = next;
-        setNext(null);
+  const load = useCallback(
+    async (position: string | number | null | undefined) => {
+      if (
+        !category ||
+        live.current !== key ||
+        inFlight.current ||
+        position === null
+      )
+        return;
+      const token = Symbol();
+      inFlight.current = token;
+      const ownsRequest = () =>
+        live.current === key && inFlight.current === token;
+      setLoading(true);
+      setError(null);
+      const p = new URLSearchParams({ category, limit: '24' });
+      if (query) p.set('q', query);
+      if (position !== undefined)
+        p.set(query ? 'cursor' : 'offset', String(position));
+      try {
+        const d = await api<GamePage>(
+          `/request/software/catalog/${query ? 'search' : 'popular'}?${p}`
+        );
+        if (!ownsRequest()) return;
+        if (
+          !Array.isArray(d?.results) ||
+          !d.results.every(
+            (game) =>
+              typeof game?.id === 'string' && typeof game.title === 'string'
+          )
+        )
+          throw new Error('Invalid game catalogue response.');
+        const continuation = query ? d.nextCursor : d.nextOffset;
+        if (
+          continuation != null &&
+          (query
+            ? typeof continuation !== 'string' ||
+              !continuation ||
+              continuation === position
+            : typeof continuation !== 'number' ||
+              !Number.isSafeInteger(continuation) ||
+              continuation <= Number(position ?? 0))
+        )
+          throw new Error('Invalid game catalogue continuation.');
+        setItems((x) => {
+          const seen = new Set(x.map((g) => g.id));
+          return x.concat(d.results.filter((g) => !seen.has(g.id)));
+        });
+        setNext(continuation ?? null);
+      } catch (e) {
+        if (ownsRequest()) {
+          setError(e instanceof Error ? e.message : 'Failed to load');
+          failedAt.current = position;
+          setNext(null);
+        }
+      } finally {
+        if (ownsRequest()) {
+          inFlight.current = null;
+          setLoading(false);
+        }
       }
-    } finally {
-      if (ownsRequest()) {
-        inFlight.current = null;
-        setLoading(false);
-      }
-    }
-  }, [category, query, next, loading, key]);
+    },
+    [category, query, key]
+  );
+  const more = useCallback(() => void load(next), [load, next]);
   useEffect(() => {
     if (next === undefined && !loading) void more();
   }, [key, next, loading, more]);
-  const retry = useCallback(() => {
-    setError(null);
-    setNext(failedAt.current);
-  }, []);
+  const retry = () => void load(failedAt.current);
   return { items, more, retry, loading, error, done: next === null };
 }
 
@@ -130,28 +172,35 @@ export function SoftwareBookmark() {
 export function Games() {
   const x = useExtras();
   const [p, setP] = useSearchParams();
+  const { key: locationKey } = useLocation();
   const cat = (
     x.games.includes(p.get('c') as GameCategory) ? p.get('c') : x.games[0]
   ) as GameCategory | undefined;
-  const query = p.get('q') || '';
-  const [q, setQ] = useState(query);
+  const query = (p.get('q') ?? '').trim().slice(0, 200);
+  const [draft, setDraft] = useState({ key: locationKey, value: query });
+  const q = draft.key === locationKey ? draft.value : query;
   useEffect(() => {
+    setDraft({ key: locationKey, value: query });
+  }, [locationKey, query]);
+  useEffect(() => {
+    const term = q.trim();
+    if (term === query) return;
     const t = setTimeout(() => {
-      if (q.trim() === query) return;
       const n = new URLSearchParams(p);
-      if (q.trim()) n.set('q', q.trim());
+      if (term) n.set('q', term);
       else n.delete('q');
       setP(n, { replace: true });
     }, 350);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q]);
+  }, [p, q, query, setP]);
   // no game service behind the category: the gate explains, so don't ask SeerrNG for lists
   const list = useGames(x.enabled('game') ? cat : undefined, query);
   const checking = x.enabled('game') && !x.gamesChecked;
   const setCat = (c: GameCategory) => {
     const n = new URLSearchParams(p);
     n.set('c', c);
+    if (q.trim()) n.set('q', q.trim());
+    else n.delete('q');
     setP(n, { replace: true });
   };
 
@@ -169,6 +218,11 @@ export function Games() {
           <Link className="chip" to="/patches">
             Translations and Hacks
           </Link>
+          {x.games.includes('game') && (
+            <Link className="chip" to="/games/discovery">
+              Game Finder
+            </Link>
+          )}
           <Link className="chip" to="/game-library">
             My Games
           </Link>
@@ -188,7 +242,9 @@ export function Games() {
         )}
         <ExtraSearch
           value={q}
-          onChange={setQ}
+          onChange={(value) =>
+            setDraft({ key: locationKey, value: value.slice(0, 200) })
+          }
           placeholder={
             {
               game: 'Search PC games…',
@@ -252,12 +308,14 @@ export function GameDetail() {
   const [p] = useSearchParams();
   const cat = category as GameCategory;
   const dat = p.get('dat') === '1';
+  const platform = p.get('platform') ?? '';
   return (
     <GameDetailView
-      key={JSON.stringify([cat, id, dat])}
+      key={JSON.stringify([cat, id, dat, platform])}
       id={id}
       cat={cat}
       dat={dat}
+      platform={platform}
     />
   );
 }
@@ -266,22 +324,44 @@ function GameDetailView({
   id,
   cat,
   dat,
+  platform,
 }: {
   id: string;
   cat: GameCategory;
   dat: boolean;
+  platform: string;
 }) {
-  const { data, error, reload } = useApi<Game | { game: Game }>(
+  const { user } = useAuth();
+  const {
+    data,
+    error: loadError,
+    reload,
+  } = useApi<Game | { game: Game }>(
     `/request/software/catalog/games/${encodeURIComponent(id)}?category=${encodeURIComponent(cat)}${dat ? '&catalogProvider=dat' : ''}`
   );
-  const g = data && ('game' in data ? data.game : data);
+  const game = unwrapCatalogGame(data);
+  const g =
+    game &&
+    typeof game.title === 'string' &&
+    Array.isArray(game.genres) &&
+    Array.isArray(game.platforms) &&
+    (game.emulationSystems === undefined ||
+      Array.isArray(game.emulationSystems))
+      ? game
+      : null;
+  const error =
+    loadError || (data && !g ? 'Invalid game catalogue response.' : null);
   const toast = useToast();
   const [os, setOs] = useState('');
   const [arch, setArch] = useState('');
-  const [system, setSystem] = useState('');
+  const [system, setSystem] = useState(platform);
   const [busy, setBusy] = useState(false);
   const pending = useRef(false);
   const [done, setDone] = useState('');
+  const [requestId, setRequestId] = useState<number>();
+  const [selection, setSelection] = useState<
+    GameContentSelection | null | undefined
+  >(null);
   if (error)
     return (
       <ExtraGate k="game">
@@ -291,18 +371,45 @@ function GameDetailView({
   if (!g) return <div className="detail-loading" aria-busy="true" />;
   const s = statOf(g);
   const systems = (g.emulationSystems || []).filter((x) => x.group === cat);
-  const sys =
-    systems.find(({ slug }) => slug === system)?.slug ?? systems[0]?.slug ?? '';
-  const ready = cat === 'game' ? !!os && !!arch : !!sys;
+  const sys = system
+    ? (systems.find(({ slug }) => slug === system)?.slug ?? '')
+    : (systems[0]?.slug ?? '');
+  const patchSearch =
+    (cat === 'retro' || cat === 'modern') && sys && (g.catalogId || id)
+      ? new URLSearchParams({
+          catalogKey: g.catalogId || id,
+          platform: sys,
+          category: cat,
+          language: '',
+          completeOnly: 'false',
+        })
+      : undefined;
+  const contentId =
+    cat === 'game' &&
+    !dat &&
+    typeof g.igdbId === 'number' &&
+    Number.isSafeInteger(g.igdbId) &&
+    g.igdbId > 0
+      ? g.igdbId
+      : undefined;
+  const baseBlocked = !!s && selection === null;
+  const ready =
+    cat === 'game' ? !!os && !!arch && selection !== undefined : !!sys;
   const go = async () => {
-    if (!ready || pending.current) return;
+    if (!ready || baseBlocked || pending.current) return;
     pending.current = true;
     setBusy(true);
     try {
-      const r = await requestGame(cat, g, { os, arch, system: sys });
+      const r = await requestGame(cat, g, {
+        os,
+        arch,
+        system: sys,
+        selection: selection ?? undefined,
+      });
       setDone(
         r.request.status === 'pending' ? 'Waiting for approval' : 'Requested'
       );
+      setRequestId(r.request.id);
       toast(`Requested ${g.title}`);
     } catch (e) {
       const m = e instanceof Error ? e.message : '';
@@ -317,10 +424,10 @@ function GameDetailView({
     }
   };
   const main =
-    s || done ? (
+    baseBlocked || done ? (
       <button className="btn btn-tonal" disabled>
         <Icon name={s?.ico || 'clock'} />
-        {s?.word || done}
+        {done || s?.word}
       </button>
     ) : (
       <button
@@ -358,13 +465,44 @@ function GameDetailView({
           <div className="dstatus">
             <StatPill s={s} />
             <IndexerSearchLink category={cat} title={g.title} />
+            {patchSearch && (
+              <Link
+                className="btn btn-quiet btn-sm"
+                to={`/patches?${patchSearch}`}
+              >
+                Translations and Hacks for This Game
+              </Link>
+            )}
+            {cat === 'game' &&
+              !dat &&
+              typeof g.igdbId === 'number' &&
+              Number.isSafeInteger(g.igdbId) &&
+              g.igdbId > 0 &&
+              canViewFollowing(user?.permissions) && (
+                <FollowButton
+                  label="Follow Story Expansions"
+                  subject={{
+                    kind: 'expansion',
+                    subjectKey: `igdb:${g.igdbId}`,
+                    subjectLabel: g.title,
+                    conditions: { ref: { igdbId: g.igdbId, storyOnly: true } },
+                  }}
+                />
+              )}
             {g.rating != null && (
               <Pill k="neutral" icon="star">
                 {Math.round(g.rating)} / 100
               </Pill>
             )}
           </div>
-          {!s && !done && (
+          {contentId && canViewFollowing(user?.permissions) && (
+            <GameContentPicker
+              id={contentId}
+              disabled={busy || !!done}
+              onChange={setSelection}
+            />
+          )}
+          {!baseBlocked && !done && (
             <div className="adv-grid game-pick">
               {cat === 'game' ? (
                 <>
@@ -401,6 +539,7 @@ function GameDetailView({
                     value={sys}
                     onChange={(e) => setSystem(e.target.value)}
                   >
+                    {!sys && <option value="">Choose a console</option>}
                     {systems.map((x) => (
                       <option key={x.slug} value={x.slug}>
                         {x.name}
@@ -418,6 +557,18 @@ function GameDetailView({
             </div>
           )}
           <div className="dacts pc">{main}</div>
+          {typeof requestId === 'number' &&
+            Number.isSafeInteger(requestId) &&
+            requestId > 0 && (
+              <div className="toolbar">
+                <Link
+                  className="chip"
+                  to={`/requests?softwareRequestId=${requestId}`}
+                >
+                  Request History
+                </Link>
+              </div>
+            )}
           <div className="dcols">
             <div style={{ display: 'grid', gap: 22 }}>
               {g.summary && <p className="ov">{g.summary}</p>}

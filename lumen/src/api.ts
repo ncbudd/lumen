@@ -167,6 +167,8 @@ export interface TitleResult {
   releaseDate?: string;
   firstAirDate?: string;
   voteAverage?: number;
+  directors?: string[];
+  writers?: string[];
   genreIds?: number[];
   originalLanguage?: string;
   mediaInfo?: MediaInfo;
@@ -187,6 +189,7 @@ export interface BookResult {
   provider?: 'openlibrary' | 'bookshelf';
   title: string;
   author?: string;
+  publisher?: string;
   authorId?: string;
   isbn13?: string;
   editionId?: string;
@@ -241,6 +244,7 @@ export interface User {
   warnings?: string[];
   tvSeasonWatchGateStatus?: string;
   settings?: {
+    advancedThemeOverrides?: Record<string, string | number> | null;
     detailDisclosureCastPinned?: boolean;
     detailDisclosureCrewPinned?: boolean;
     detailDisclosureSubjectTagsPinned?: boolean;
@@ -578,6 +582,37 @@ export const narratorKey = (names?: (string | null | undefined)[] | null) =>
 export const isBookshelf = (id: string) => id.startsWith('bookshelf:');
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const bookIdFor = (id: string, _format: 'ebook' | 'audiobook') => id;
+export function bookRequestLabel(format?: string) {
+  if (format === 'both') return 'Ebook and Audiobook';
+  return format === 'audiobook' ? 'Audiobook' : 'Ebook';
+}
+
+export function videoDetailPath(
+  kind: 'movie' | 'tv',
+  id: number,
+  is4k: boolean,
+  season?: number,
+  episode?: number
+) {
+  const anchor =
+    kind === 'tv' &&
+    season !== undefined &&
+    Number.isSafeInteger(season) &&
+    season >= 0
+      ? `#season-${season}`
+      : '';
+  const query = new URLSearchParams();
+  if (is4k) query.set('quality', '4k');
+  if (
+    anchor &&
+    episode !== undefined &&
+    Number.isSafeInteger(episode) &&
+    episode > 0
+  )
+    query.set('episode', String(episode));
+  return `/${kind}/${id}${query.size ? `?${query}` : ''}${anchor}`;
+}
+
 export function bookDetailPath(
   id: string,
   format: 'ebook' | 'audiobook',

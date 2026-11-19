@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { api, type Paged, type TitleResult } from '../api';
-import { ExtraHeader, ServiceNote } from '../components/extra';
-import { useToast } from '../components/toast';
-import { friendlyError } from '../errors';
+import { artUrl } from '../api';
+import { Cover } from '../components/cards';
+import { ExtraHeader } from '../components/extra';
+import IdentityMapping, {
+  type MappingCandidate,
+  videoHref,
+} from '../components/IdentityMapping';
+import ProviderFailure from '../components/ProviderFailure';
 import { useApi } from '../hooks';
 
 const feeds = {
@@ -19,258 +22,17 @@ const feeds = {
   'mdblist/list': 'MDBList Public List',
 };
 
+const matchDescriptions = {
+  personal: 'Personal match',
+  curated: 'Curated match',
+  'external-id': 'Matched by catalog ID',
+};
+
 interface FeedPage {
   page: number;
   hasMore: boolean;
-  items: {
-    id: string;
-    title: string;
-    year?: number;
-    tmdbId?: number;
-    mediaType?: 'movie' | 'tv';
-    mappingAvailable?: boolean;
-    identityMapped?: boolean;
-    identityResolution?: 'personal' | 'curated' | 'external-id';
-  }[];
-}
-
-function videoHref(item: FeedPage['items'][number]) {
-  if (
-    (item.mediaType === 'movie' || item.mediaType === 'tv') &&
-    typeof item.tmdbId === 'number' &&
-    Number.isSafeInteger(item.tmdbId) &&
-    item.tmdbId > 0 &&
-    item.tmdbId <= 1_000_000_000
-  )
-    return `/${item.mediaType}/${item.tmdbId}`;
-}
-
-function IdentityMapping({
-  item,
-  updated,
-}: {
-  item: FeedPage['items'][number];
-  updated: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [matches, setMatches] = useState<{ term: string; type: string }>();
-  const [busy, setBusy] = useState(false);
-  const pending = useRef(false);
-  const toast = useToast();
-  const search = useApi<Paged<TitleResult>>(
-    open && matches
-      ? `/search?${new URLSearchParams({ query: matches.term, type: matches.type, page: '1' })}`
-      : null
-  );
-
-  async function change(id?: number) {
-    if (pending.current) return;
-    pending.current = true;
-    setBusy(true);
-    try {
-      const path = '/integrations/discovery/mappings';
-      if (id === undefined) {
-        await api(
-          `${path}/${encodeURIComponent(item.id)}`,
-          { method: 'DELETE' },
-          'empty'
-        );
-      } else {
-        await api(path, {
-          method: 'PUT',
-          body: JSON.stringify({
-            identity: item.id,
-            tmdbId: id,
-            mediaType: matches?.type,
-          }),
-        });
-      }
-      setOpen(false);
-      setMatches(undefined);
-      updated();
-    } catch (cause) {
-      toast(friendlyError(cause, 'Couldn’t update the provider match'));
-    } finally {
-      pending.current = false;
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div>
-      <div className="toolbar">
-        <button
-          className="btn btn-quiet btn-sm"
-          type="button"
-          disabled={busy}
-          aria-expanded={open}
-          onClick={() => {
-            setOpen(!open);
-            setMatches(undefined);
-          }}
-        >
-          {videoHref(item) ? 'Change Match' : 'Match Title'}
-        </button>
-        {item.identityMapped && (
-          <button
-            className="btn btn-quiet btn-sm"
-            type="button"
-            disabled={busy}
-            onClick={() => void change()}
-          >
-            Reset Match
-          </button>
-        )}
-      </div>
-      {open && (
-        <>
-          <form
-            className="toolbar"
-            onSubmit={(event) => {
-              event.preventDefault();
-              const form = new FormData(event.currentTarget);
-              const term = String(form.get('query') ?? '').trim();
-              const type = form.get('type') === 'tv' ? 'tv' : 'movie';
-              if (term.length < 2 || term.length > 256) return;
-              if (matches?.term === term && matches.type === type)
-                search.reload();
-              else setMatches({ term, type });
-            }}
-          >
-            <label className="search">
-              <input
-                name="query"
-                type="search"
-                aria-label="Find a Match"
-                defaultValue={item.title}
-                required
-                minLength={2}
-                maxLength={256}
-                disabled={busy}
-              />
-            </label>
-            <label className="sel">
-              <span className="lbl">Media Type</span>
-              <select
-                name="type"
-                aria-label="Match Media Type"
-                defaultValue={item.mediaType ?? 'movie'}
-                disabled={busy}
-              >
-                <option value="movie">Movies</option>
-                <option value="tv">Series</option>
-              </select>
-            </label>
-            <button
-              className="btn btn-tonal btn-sm"
-              type="submit"
-              disabled={busy}
-            >
-              Search Matches
-            </button>
-          </form>
-          {matches && (
-            <ServiceNote
-              error={search.error}
-              what="catalogue matches"
-              retry={search.reload}
-            />
-          )}
-          {matches && !search.data && !search.error && (
-            <p className="note" role="status">
-              Searching for matches…
-            </p>
-          )}
-          {matches && search.data && (
-            <ul className="setlist">
-              {search.data.results
-                .filter(
-                  (result) =>
-                    result.mediaType === matches.type &&
-                    Number.isSafeInteger(result.id) &&
-                    result.id > 0 &&
-                    result.id <= 1_000_000_000
-                )
-                .map((result) => {
-                  const title =
-                    result.title ?? result.name ?? String(result.id);
-                  return (
-                    <li className="set" key={result.id}>
-                      <div>
-                        <b>{title}</b>
-                        <small>
-                          {(result.releaseDate ?? result.firstAirDate)?.slice(
-                            0,
-                            4
-                          )}{' '}
-                          · TMDB {result.id}
-                        </small>
-                      </div>
-                      <button
-                        className="btn btn-tonal btn-sm"
-                        type="button"
-                        disabled={busy}
-                        aria-label={`Match ${title}`}
-                        onClick={() => void change(result.id)}
-                      >
-                        Use Match
-                      </button>
-                    </li>
-                  );
-                })}
-            </ul>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
-
-function FeedFailure({
-  error,
-  code,
-  retryAt,
-  retry,
-}: {
-  error: string;
-  code?: string;
-  retryAt?: number;
-  retry: () => void;
-}) {
-  const remaining = () =>
-    Math.max(0, Math.ceil(((retryAt ?? 0) - Date.now()) / 1000));
-  const [seconds, setSeconds] = useState(remaining);
-  useEffect(() => {
-    if (!retryAt) return;
-    const timer = window.setInterval(() => {
-      const next = Math.max(0, Math.ceil((retryAt - Date.now()) / 1000));
-      setSeconds(next);
-      if (!next) window.clearInterval(timer);
-    }, 250);
-    return () => window.clearInterval(timer);
-  }, [retryAt]);
-
-  const retryable =
-    code !== 'PROVIDER_LIST_NOT_FOUND' &&
-    code !== 'PROVIDER_SETUP_REQUIRED' &&
-    code !== 'RECONNECT_REQUIRED';
-  return (
-    <>
-      <ServiceNote
-        error={seconds ? `${error} Retry in ${seconds} seconds.` : error}
-        what="provider feed"
-        retry={retryable ? retry : undefined}
-        retryDisabled={seconds > 0}
-      />
-      {code === 'RECONNECT_REQUIRED' && (
-        <div className="toolbar">
-          <Link className="chip" to="/me/account/linked-accounts">
-            Reconnect Provider
-          </Link>
-        </div>
-      )}
-    </>
-  );
+  missingMappings?: number;
+  items: (MappingCandidate & { imageUrl?: string })[];
 }
 
 export default function ProviderDiscovery() {
@@ -295,6 +57,7 @@ export default function ProviderDiscovery() {
   );
   const current = data?.page === page ? data : null;
   const items = current?.items.filter((item) => !unmatched || !videoHref(item));
+  const missingMappings = current?.missingMappings;
 
   function update(name: string, value: string, resetPage = true) {
     const next = new URLSearchParams(params);
@@ -341,6 +104,12 @@ export default function ProviderDiscovery() {
           />{' '}
           Unmatched Only
         </label>
+        {typeof missingMappings === 'number' && missingMappings > 0 && (
+          <span className="note">
+            {missingMappings} unmatched{' '}
+            {missingMappings === 1 ? 'title' : 'titles'} on this page
+          </span>
+        )}
       </div>
       {needsList && (
         <form
@@ -370,9 +139,11 @@ export default function ProviderDiscovery() {
         </form>
       )}
       {error && (
-        <FeedFailure
+        <ProviderFailure
           key={`${feed}:${page}:${apiError?.retryAt ?? ''}`}
           error={error}
+          what="provider feed"
+          provider={feed.split('/')[0]}
           code={apiError?.code}
           retryAt={apiError?.retryAt}
           retry={reload}
@@ -399,8 +170,26 @@ export default function ProviderDiscovery() {
         <ul className="setlist">
           {items.map((item) => {
             const href = videoHref(item);
+            const animeId = feed.startsWith('anilist/')
+              ? /^anilist:([1-9]\d{0,9})$/.exec(item.id)?.[1]
+              : undefined;
+            const cover = animeId ? artUrl(item.imageUrl) : undefined;
+            const matchDescription =
+              item.identityResolution &&
+              Object.hasOwn(matchDescriptions, item.identityResolution)
+                ? matchDescriptions[item.identityResolution]
+                : item.identityMapped
+                  ? matchDescriptions.personal
+                  : undefined;
             return (
               <li className="set" key={item.id}>
+                {!href && cover?.startsWith('/imageproxy/anilist/') && (
+                  <div className="poster" aria-hidden="true">
+                    <div className="art">
+                      <Cover src={cover} title={item.title} icon="tv" />
+                    </div>
+                  </div>
+                )}
                 <div>
                   {href ? (
                     <Link className="go" to={href}>
@@ -417,10 +206,25 @@ export default function ProviderDiscovery() {
                           ? 'Movie'
                           : 'Series'
                         : 'No catalogue match',
+                      href ? matchDescription : undefined,
                     ]
                       .filter(Boolean)
                       .join(' · ')}
                   </small>
+                  {!href && !item.mappingAvailable && (
+                    <small>
+                      This title has no stable provider ID for saving a match.
+                    </small>
+                  )}
+                  {animeId && (
+                    <Link
+                      className="btn btn-quiet btn-sm"
+                      to={`/franchise/anime/${animeId}`}
+                      aria-label={`Explore Franchise: ${item.title}`}
+                    >
+                      Explore Franchise
+                    </Link>
+                  )}
                 </div>
                 {(item.mappingAvailable ||
                   item.identityMapped ||

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   ApiError,
   mediaLink,
@@ -14,6 +14,7 @@ import {
   type TvDetails,
 } from '../api';
 import { isAdministrator, useAuth, useMediaServerName } from '../auth';
+import AnimeContinuation from '../components/AnimeContinuation';
 import BlocklistButton from '../components/BlocklistButton';
 import {
   Rail,
@@ -49,7 +50,7 @@ import TvEpisodeRequestSheet from '../components/TvEpisodeRequestSheet';
 import WatchlistButton from '../components/WatchlistButton';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
-import { useApi, usePublicSettings } from '../hooks';
+import { useApi, usePublicSettings, useVisibleMediaRefresh } from '../hooks';
 import { Icon } from '../icons';
 import { scrollBehavior } from '../motion';
 import { seasonList, seriesRequestSummary } from '../seriesRequestSummary';
@@ -82,7 +83,17 @@ export default function TvDetail() {
 
   const { id } = useParams();
   const loc = useLocation();
-  const { data: t, error, reload, refresh } = useApi<TvDetails>(`/tv/${id}`);
+  const navigate = useNavigate();
+  const {
+    data: t,
+    error,
+    reload,
+    refresh,
+    revalidate,
+  } = useApi<TvDetails>(`/tv/${id}`, {
+    currentPathOnly: true,
+    keepDuringRefresh: true,
+  });
   const like = useApi<Paged<TitleResult>>(`/tv/${id}/recommendations`).data;
   const progressMedia = useLiveMediaProgress(
     t?.mediaInfo,
@@ -122,8 +133,26 @@ export default function TvDetail() {
   const onOpts = useCallback((o: RequestOptions) => setOpts(o), []);
   // people who may request 4K series pick 1080p or 4K here, admins or not
   const offers4k = useOffers4k('tv');
-  const [fourK, setFourK] = useState(false);
+  const params = new URLSearchParams(loc.search);
+  const fourK = params.get('quality') === '4k';
+  const setFourK = (selected: boolean) => {
+    const next = new URLSearchParams(params);
+    if (selected) next.set('quality', '4k');
+    else next.delete('quality');
+    navigate(
+      { search: next.toString(), hash: loc.hash },
+      { replace: true, preventScrollReset: true }
+    );
+  };
   const is4k = offers4k && fourK;
+  const pending4k = (status?: number) =>
+    status === MediaStatus.PENDING || status === MediaStatus.PROCESSING;
+  useVisibleMediaRefresh(
+    is4k &&
+      (pending4k(t?.mediaInfo?.status4k) ||
+        !!t?.mediaInfo?.seasons?.some(({ status4k }) => pending4k(status4k))),
+    revalidate
+  );
 
   const specials = pub?.enableSpecialEpisodes === true;
   const seasons = useMemo(
@@ -214,14 +243,23 @@ export default function TvDetail() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [missingKey]);
+  const loaded = !!t;
+  const seasonAnchor = /^#season-(0|[1-9]\d*)$/.exec(loc.hash)?.[1];
+  const anchor =
+    seasonAnchor !== undefined &&
+    seasons.some(({ seasonNumber }) => String(seasonNumber) === seasonAnchor)
+      ? `season-${seasonAnchor}`
+      : loc.hash === '#seasons' || seasonAnchor !== undefined
+        ? 'seasons'
+        : undefined;
   useEffect(() => {
-    if (t && loc.hash === '#seasons')
+    if (loaded && anchor)
       document
-        .getElementById('seasons')
+        .getElementById(anchor)
         ?.scrollIntoView({ behavior: scrollBehavior() });
-  }, [t, loc.hash]);
+  }, [loaded, id, anchor]);
 
-  if (error)
+  if (error && !t)
     return <ServiceNote error={error} what="this series" retry={reload} />;
   if (!t) return <div className="detail-loading" aria-busy="true" />;
 
@@ -508,6 +546,7 @@ export default function TvDetail() {
         ]}
       />
       <div className="dbody">
+        <ServiceNote error={error} what="this series" retry={reload} />
         <div className="dstatus">
           {watchable && (
             <Pill k="ok" icon="check">
@@ -708,6 +747,16 @@ export default function TvDetail() {
                   key={String(is4k)}
                   tvId={t.id}
                   seasons={episodeSeasons}
+                  initialSeason={
+                    seasonAnchor === undefined
+                      ? undefined
+                      : Number(seasonAnchor)
+                  }
+                  initialEpisode={
+                    /^[1-9]\d{0,8}$/.test(params.get('episode') ?? '')
+                      ? Number(params.get('episode'))
+                      : undefined
+                  }
                   pending={pendingEpisodes}
                   is4k={is4k}
                   approval={episodeApproval}
@@ -736,6 +785,7 @@ export default function TvDetail() {
                   return (
                     <div
                       key={s.seasonNumber}
+                      id={`season-${s.seasonNumber}`}
                       className={`srow ${locked ? 'locked' : ''}`}
                       role="checkbox"
                       aria-checked={on}
@@ -878,6 +928,15 @@ export default function TvDetail() {
             />
           </aside>
         </div>
+        {t.originalLanguage === 'ja' &&
+          t.genres?.some(({ id }) => id === 16) && (
+            <AnimeContinuation
+              key={id}
+              source="tv"
+              id={t.id}
+              seasons={seasons.filter(({ seasonNumber }) => seasonNumber > 0)}
+            />
+          )}
         <Section
           title="Related Titles"
           link={['Recommendations', `/tv/${id}/recommendations`]}

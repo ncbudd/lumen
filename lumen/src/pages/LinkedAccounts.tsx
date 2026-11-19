@@ -8,6 +8,7 @@ import {
   useAuth,
 } from '../auth';
 import { ConfirmSheet } from '../components/ConfirmSheet';
+import DiscoveryAccounts from '../components/DiscoveryAccounts';
 import { Section } from '../components/cards';
 import { ServiceNote } from '../components/extra';
 import { useApi, usePublicSettings } from '../hooks';
@@ -440,8 +441,14 @@ export default function LinkedAccounts() {
         <Link className="btn btn-quiet btn-sm" to="/me/account">
           Back to Account Settings
         </Link>
+        <Link className="btn btn-quiet btn-sm" to="/library">
+          Open My Media
+        </Link>
       </div>
       {user && <Accounts key={user.id} user={user} />}
+      {user && (
+        <DiscoveryAccounts key={`tracking-${user.id}`} userId={user.id} />
+      )}
     </>
   );
 }

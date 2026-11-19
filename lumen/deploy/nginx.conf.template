@@ -15,13 +15,19 @@ map "$lumen_via_proxy:$http_x_forwarded_proto" $lumen_forwarded_proto {
   "1:http" http;
 }
 
+map "$uri:$arg_steam" $legacy_steam {
+  default "";
+  ~^/games/?:connected$ connected;
+  ~^/games/?:error$ error;
+}
+
 # The same protections full SeerrNG sends with its pages: no framing (clickjacking), scripts only
 # from this origin. Outside hosts: Google Fonts, Plex sign-in, and cover art from many CDNs.
 # saves "Lumen settings for everyone" from the admin page (see lumen-config.js)
 js_import lumen from /etc/nginx/lumen/lumen-config.js;
 
 map "" $lumen_csp {
-  default "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://plex.tv https://*.plex.tv; manifest-src 'self'; worker-src 'self'; frame-src 'none'";
+  default "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://plex.tv https://*.plex.tv https://api.github.com; manifest-src 'self'; worker-src 'self'; frame-src 'none'";
 }
 
 server {
@@ -54,6 +60,10 @@ server {
       client_max_body_size 5m;
       proxy_pass ${SEERR_URL};
     }
+    location = /api/v1/integrations/discovery/mappings/pack {
+      client_max_body_size 5m;
+      proxy_pass ${SEERR_URL};
+    }
   }
   location ~ ^/(imageproxy|avatarproxy)/ {
     proxy_pass ${SEERR_URL};
@@ -80,6 +90,9 @@ server {
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $remote_addr;
     proxy_set_header X-Real-IP $remote_addr;
+    # Shared settings require an interactive session, never a client token.
+    proxy_set_header X-API-Key "";
+    proxy_set_header Authorization "";
     proxy_set_header CF-Connecting-IP "";
     proxy_set_header Forwarded "";
     proxy_set_header X-Forwarded-Proto $lumen_forwarded_proto;
@@ -144,7 +157,10 @@ server {
   }
 
   location ~ ^/profile/?$ {
-    return 302 /me;
+    return 302 /household/me;
+  }
+  location ~ ^/profile/advanced-theme/?$ {
+    return 302 "/me/account#advanced-theme";
   }
   location ~ ^/profile/settings/tv-request-access/?$ {
     return 302 /me/account/tv-requests;
@@ -182,16 +198,24 @@ server {
   location ~ ^/discover/collectors/?$ {
     return 302 /music/collectors;
   }
-  location ~ ^/discover/(adult|audiobooks|books|comics|games|magazines|music|patches|providers|sports)/?$ {
+  location ~ ^/discover/games/?$ {
+    return 302 /games/discovery;
+  }
+  location ~ ^/discover/(?<book_catalog>books|audiobooks)/?$ {
+    if ($arg_libraryView = available) { return 302 /$book_catalog?show=have&$args; }
+    if ($arg_libraryView = missing) { return 302 /$book_catalog?show=not&$args; }
+    return 302 /$book_catalog$is_args$args;
+  }
+  location ~ ^/discover/(adult|comics|magazines|music|patches|providers|sports)/?$ {
     return 302 /$1$is_args$args;
   }
   location ~ "^/discover/list/([1-9][0-9]{0,9})/?$" {
     return 302 /list/$1$is_args$args;
   }
   location ~ ^/discover/trending/?$ {
-    if ($arg_mediaType = music) { return 302 /music; }
-    if ($arg_mediaType = book) { return 302 /books; }
-    if ($arg_mediaType = audiobook) { return 302 /audiobooks; }
+    if ($arg_mediaType = music) { rewrite ^ /discover/music last; }
+    if ($arg_mediaType = book) { rewrite ^ /discover/books last; }
+    if ($arg_mediaType = audiobook) { rewrite ^ /discover/audiobooks last; }
     return 302 /trending$is_args$args;
   }
   location ~ ^/discover/movies/upcoming/?$ {
@@ -256,7 +280,11 @@ server {
   location ~ ^/settings/notifications(/(?:email|telegram|pushbullet|pushover|gotify|ntfy|apprise|discord|slack|webhook|webpush))?/?$ {
     return 302 /admin/notifications$1;
   }
-  location ~ ^/settings/(jobs|logs|about|categories|network|discovery|metadata|library-migration|prowlarr)/?$ {
+  location ~ ^/settings/logs/?$ {
+    if ($arg_page ~ "^[1-9][0-9]{0,4}$") { return 302 /admin/logs?page=$arg_page; }
+    return 302 /admin/logs;
+  }
+  location ~ ^/settings/(jobs|about|categories|network|discovery|metadata|library-migration|prowlarr)/?$ {
     return 302 /admin/$1;
   }
   location ~ ^/settings/(plex|jellyfin)/?$ {
@@ -264,6 +292,7 @@ server {
   }
   location ~ ^/settings/services/?$ {
     if ($arg_settingsSearchTarget ~ ^prowlarr(-|$)) { return 302 /admin/prowlarr; }
+    if ($arg_settingsSearchTarget = download-clients-interval) { return 302 "/admin/download-clients#download-clients-interval"; }
     if ($arg_settingsSearchTarget ~ ^download-clients-) { return 302 /admin/download-clients; }
     if ($arg_settingsSearchTarget ~ ^slskdn-) { return 302 /admin/soulseek; }
     if ($arg_settingsSearchTarget ~ ^tunerr-) { return 302 /admin/tunerr; }
@@ -323,6 +352,9 @@ server {
   }
   # client-side routes (/movie/123, /books, ...) all load the app
   location / {
+    if ($legacy_steam != "") {
+      return 302 /game-library?steam=$legacy_steam;
+    }
     add_header Cache-Control "no-cache" always;
     add_header Content-Security-Policy $lumen_csp always;
     add_header X-Frame-Options DENY always;

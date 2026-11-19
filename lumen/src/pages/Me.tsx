@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { isAdministrator, useAuth } from '../auth';
 import { useBlocklistNavigation } from '../blocklist';
+import AvatarContent from '../components/AvatarContent';
 import { Section } from '../components/cards';
 import { ConfirmSheet } from '../components/ConfirmSheet';
 import {
@@ -9,12 +10,13 @@ import {
   canRequestMovies,
 } from '../components/detail';
 import RequestLimits from '../components/RequestLimits';
-import { fullSeerrUrl, initials } from '../components/Shell';
+import { fullSeerrUrl } from '../components/Shell';
 import { useToast } from '../components/toast';
 import { canManageDownloads } from '../downloadPermissions';
 import { canViewFollowing } from '../followPermissions';
 import { CAN_HOVER, usePublicSettings } from '../hooks';
 import { Icon } from '../icons';
+import { canSearchIndexers } from '../indexerPermissions';
 import { canReadIssues } from '../issuePermissions';
 import { useLiveTvStatus } from '../liveTv';
 import { mediaServer, services } from '../mediaServer';
@@ -85,7 +87,13 @@ export default function Me() {
         </div>
       </header>
       <div className="me-card">
-        <span className="avatar">{initials(user?.displayName || '?')}</span>
+        <span className="avatar">
+          <AvatarContent
+            key={user?.id}
+            name={user?.displayName}
+            avatar={user?.avatar}
+          />
+        </span>
         <div>
           <b>{user?.displayName}</b>
           <small>Signed in to SeerrNG</small>
@@ -196,19 +204,34 @@ export default function Me() {
         </div>
       </Section>
 
-      {canManageDownloads(user?.permissions) && (
+      {(canManageDownloads(user?.permissions) ||
+        canSearchIndexers(user?.permissions)) && (
         <Section title="Acquisition">
           <div className="setlist">
-            <div className="set">
-              <b>Download Inbox</b>
-              <Link
-                className="go"
-                to="/downloads"
-                aria-label="Open Download Inbox"
-              >
-                Open <Icon name="chev" size="sm" />
-              </Link>
-            </div>
+            {canManageDownloads(user?.permissions) && (
+              <div className="set">
+                <b>Download Inbox</b>
+                <Link
+                  className="go"
+                  to="/downloads"
+                  aria-label="Open Download Inbox"
+                >
+                  Open <Icon name="chev" size="sm" />
+                </Link>
+              </div>
+            )}
+            {canSearchIndexers(user?.permissions) && (
+              <div className="set">
+                <b>Indexer Search</b>
+                <Link
+                  className="go"
+                  to="/indexer-search"
+                  aria-label="Open Indexer Search"
+                >
+                  Open <Icon name="chev" size="sm" />
+                </Link>
+              </div>
+            )}
           </div>
         </Section>
       )}
@@ -242,6 +265,18 @@ export default function Me() {
 
       <Section title="Account">
         <div className="setlist">
+          {user && (
+            <div className="set">
+              <b>My Profile</b>
+              <Link
+                className="go"
+                to="/household/me"
+                aria-label="Open My Profile"
+              >
+                Open <Icon name="chev" size="sm" />
+              </Link>
+            </div>
+          )}
           <div className="set">
             <b>Profile and Password</b>
             <Link

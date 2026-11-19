@@ -10,6 +10,7 @@ import {
   PATCH_ID,
   patchHref,
   requestGame,
+  unwrapCatalogGame,
   type Game,
 } from '../extras';
 import { canViewFollowing } from '../followPermissions';
@@ -46,14 +47,35 @@ interface PatchProject {
   }[];
 }
 
-function gameLink(key?: string, category = 'retro') {
+function isPatchProject(
+  project: PatchProject | null | undefined
+): project is PatchProject {
+  return (
+    !!project &&
+    typeof project.id === 'string' &&
+    typeof project.name === 'string' &&
+    typeof project.game?.title === 'string' &&
+    (project.game.catalogKey == null ||
+      typeof project.game.catalogKey === 'string') &&
+    (project.language == null || typeof project.language === 'string') &&
+    Array.isArray(project.versions) &&
+    project.versions.every(
+      (version) =>
+        typeof version?.id === 'string' && typeof version.version === 'string'
+    )
+  );
+}
+
+function gameLink(key?: string, category = 'retro', platform?: string | null) {
   if (!key) return;
-  if (/^dat-[0-9a-f]{64}$/.test(key)) {
-    return `/game/${category}/${encodeURIComponent(key)}?dat=1`;
-  }
-  if (/^[1-9]\d{0,9}$/.test(key) && Number(key) <= 2_147_483_647) {
-    return `/game/${category}/${key}`;
-  }
+  const dat = /^dat-[0-9a-f]{64}$/.test(key);
+  if (!dat && !(/^[1-9]\d{0,9}$/.test(key) && Number(key) <= 2_147_483_647))
+    return;
+  const query = new URLSearchParams();
+  if (dat) query.set('dat', '1');
+  if (platform && /^[a-z0-9][a-z0-9_-]{0,63}$/i.test(platform))
+    query.set('platform', platform);
+  return `/game/${category}/${key}${query.size ? `?${query}` : ''}`;
 }
 
 export default function Patches() {
@@ -68,23 +90,53 @@ export default function Patches() {
     : '';
   const completeOnly = params.get('completeOnly') !== 'false';
   const cursor = (params.get('cursor') ?? '').slice(0, 256);
+  const catalogKey = (params.get('catalogKey') ?? '').trim().slice(0, 128);
+  const platform = (params.get('platform') ?? '').trim().slice(0, 64);
+  const category = params.get('category') === 'modern' ? 'modern' : 'retro';
   const query = new URLSearchParams();
+  if (catalogKey) query.set('catalogKey', catalogKey);
+  if (platform) query.set('platform', platform);
   if (search) query.set('q', search);
   if (kind) query.set('kind', kind);
   if (language) query.set('language', language);
   if (completeOnly) query.set('completeOnly', 'true');
   if (cursor) query.set('cursor', cursor);
-  const { data, error, reload } = useApi<{
+  const {
+    data: response,
+    error: loadError,
+    reload,
+  } = useApi<{
     available: boolean;
     results: PatchProject[];
     nextCursor?: string | null;
-  }>(`/patches/search?${query}`);
+  }>(`/patches/search?${query}`, { currentPathOnly: true });
 
-  const nextCursor = data?.nextCursor;
+  const data =
+    response &&
+    typeof response.available === 'boolean' &&
+    Array.isArray(response.results) &&
+    response.results.every(isPatchProject)
+      ? response
+      : null;
+  const error =
+    loadError ||
+    (response && !data ? 'Invalid patch catalogue response.' : null);
+  const nextCursor =
+    typeof data?.nextCursor === 'string' ? data.nextCursor : undefined;
 
   return (
     <>
       <ExtraHeader title="Translations and Hacks" />
+      {catalogKey && (
+        <div className="toolbar">
+          <p className="note">
+            Showing projects for the selected game and console.
+          </p>
+          <Link className="btn btn-quiet btn-sm" to="/patches">
+            Browse All Projects
+          </Link>
+        </div>
+      )}
       <form
         key={query.toString()}
         className="toolbar"
@@ -92,6 +144,9 @@ export default function Patches() {
           event.preventDefault();
           const form = new FormData(event.currentTarget);
           const filters = new URLSearchParams();
+          if (catalogKey) filters.set('catalogKey', catalogKey);
+          if (platform) filters.set('platform', platform);
+          if (category === 'modern') filters.set('category', category);
           for (const key of ['q', 'kind', 'language']) {
             filters.set(key, String(form.get(key) ?? '').trim());
           }
@@ -161,8 +216,17 @@ export default function Patches() {
       {!!data?.results.length && (
         <ul className="setlist">
           {data.results.map((project) => {
-            const game = gameLink(project.game.catalogKey);
-            const detail = patchHref(project.id);
+            const game = gameLink(
+              project.game.catalogKey,
+              category,
+              platform || project.game.platformSlug
+            );
+            const detail = patchHref(
+              project.id,
+              undefined,
+              category,
+              platform || project.game.platformSlug
+            );
             const latest =
               project.versions.find(
                 (version) => version.id === project.latestVersionId
@@ -211,7 +275,7 @@ export default function Patches() {
           })}
         </ul>
       )}
-      {(cursor || data?.nextCursor) && (
+      {(cursor || nextCursor) && (
         <nav className="toolbar" aria-label="Patch Catalogue Pages">
           {cursor && (
             <button
@@ -247,25 +311,34 @@ export default function Patches() {
 
 export function PatchDetail() {
   const { id = '' } = useParams();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const { user } = useAuth();
   const canRequest = canViewFollowing(user?.permissions);
   const patch = useApi<PatchProject>(
     PATCH_ID.test(id) ? `/patches/projects/${encodeURIComponent(id)}` : null
   );
-  const project = patch.data?.id === id ? patch.data : null;
-  const [category, setCategory] = useState<'retro' | 'modern'>('retro');
+  const project =
+    isPatchProject(patch.data) && patch.data.id === id ? patch.data : null;
+  const patchError =
+    patch.error ||
+    (patch.data && !project ? 'Invalid patch project response.' : null);
+  const category = params.get('category') === 'modern' ? 'modern' : 'retro';
   const key = project?.game.catalogKey;
-  const link = gameLink(key, category);
+  const link = gameLink(
+    key,
+    category,
+    params.get('platform') || project?.game.platformSlug
+  );
   const lookupQuery = new URLSearchParams({ category });
   const isDat = key?.startsWith('dat-');
   if (isDat) lookupQuery.set('catalogProvider', 'dat');
-  const game = useApi<Game>(
+  const game = useApi<Game | { game: Game }>(
     link && key && canRequest
       ? `/request/software/catalog/games/${encodeURIComponent(key)}?${lookupQuery}`
-      : null
+      : null,
+    { currentPathOnly: true }
   );
-  const resolvedGame = game.data;
+  const resolvedGame = unwrapCatalogGame(game.data);
   const matchingGame = isDat
     ? resolvedGame?.catalogProvider === 'dat' && resolvedGame.catalogId === key
     : resolvedGame?.catalogProvider === 'igdb' &&
@@ -278,13 +351,13 @@ export function PatchDetail() {
             option.slug === project.game.platformSlug)
       )
     : [];
-  const [system, setSystem] = useState('');
-  const targetSystem =
-    systems.find((option) => option.slug === system) ??
-    (systems.length === 1 ? systems[0] : undefined);
-  const [picked, setPicked] = useState<string>();
-  const versionId =
-    picked ?? params.get('version') ?? project?.latestVersionId ?? '';
+  const system = params.get('platform');
+  const targetSystem = system
+    ? systems.find((option) => option.slug === system)
+    : systems.length === 1
+      ? systems[0]
+      : undefined;
+  const versionId = params.get('version') ?? project?.latestVersionId ?? '';
   const version = project?.versions.find((item) => item.id === versionId);
   const [keepOriginal, setKeepOriginal] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -355,11 +428,11 @@ export function PatchDetail() {
       </ExtraHeader>
       {!PATCH_ID.test(id) && <p className="note">Patch project not found.</p>}
       <ServiceNote
-        error={patch.error}
+        error={patchError}
         what="patch project"
         retry={patch.reload}
       />
-      {PATCH_ID.test(id) && !project && !patch.error && (
+      {PATCH_ID.test(id) && !project && !patchError && (
         <p className="note" role="status">
           Loading patch project…
         </p>
@@ -374,7 +447,11 @@ export function PatchDetail() {
                 aria-label="Patch Version"
                 value={version?.id ?? ''}
                 disabled={busy || Boolean(receipt)}
-                onChange={(event) => setPicked(event.target.value)}
+                onChange={(event) => {
+                  const next = new URLSearchParams(params);
+                  next.set('version', event.target.value);
+                  setParams(next, { replace: true });
+                }}
               >
                 <option value="">Choose a version</option>
                 {project.versions.map((item) => (
@@ -393,10 +470,12 @@ export function PatchDetail() {
                     value={category}
                     disabled={busy || Boolean(receipt)}
                     onChange={(event) => {
-                      setCategory(
-                        event.target.value === 'modern' ? 'modern' : 'retro'
-                      );
-                      setSystem('');
+                      const next = new URLSearchParams(params);
+                      if (event.target.value === 'modern')
+                        next.set('category', 'modern');
+                      else next.delete('category');
+                      next.delete('platform');
+                      setParams(next, { replace: true });
                     }}
                   >
                     <option value="retro">{GAME_LABEL.retro}</option>
@@ -409,7 +488,13 @@ export function PatchDetail() {
                     aria-label="System"
                     value={targetSystem?.slug ?? ''}
                     disabled={busy || Boolean(receipt) || !systems.length}
-                    onChange={(event) => setSystem(event.target.value)}
+                    onChange={(event) => {
+                      const next = new URLSearchParams(params);
+                      if (event.target.value)
+                        next.set('platform', event.target.value);
+                      else next.delete('platform');
+                      setParams(next, { replace: true });
+                    }}
                   >
                     <option value="">Choose a system</option>
                     {systems.map((option) => (
@@ -423,6 +508,11 @@ export function PatchDetail() {
             )}
           </div>
           {version?.notes && <p className="note">{version.notes}</p>}
+          {versionId && !version && (
+            <p className="note">
+              This patch version is no longer listed. Choose another version.
+            </p>
+          )}
           {version && !version.base?.available && (
             <p className="note">The required base revision is unavailable.</p>
           )}
@@ -434,13 +524,24 @@ export function PatchDetail() {
                 </p>
               )}
               <ServiceNote
-                error={game.error}
+                error={
+                  game.error ||
+                  (game.data && !matchingGame
+                    ? 'The catalogue returned a different base game.'
+                    : null)
+                }
                 what="associated game"
                 retry={game.reload}
               />
-              {resolvedGame && !systems.length && (
+              {matchingGame && !systems.length && (
                 <p className="note">
                   No compatible system was found in this game type.
+                </p>
+              )}
+              {!!systems.length && system && !targetSystem && (
+                <p className="note">
+                  The selected console is incompatible with this patch. Choose a
+                  compatible system.
                 </p>
               )}
               <div className="toolbar">

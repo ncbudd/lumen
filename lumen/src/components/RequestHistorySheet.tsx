@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import type { RequestItem } from '../api';
+import { Link } from 'react-router-dom';
+import { bookRequestLabel, videoDetailPath, type RequestItem } from '../api';
 import { useApi } from '../hooks';
 import { Pill } from './detail';
 import { ServiceNote } from './extra';
@@ -41,6 +42,13 @@ interface RequestHistory {
 }
 
 const downloadableTypes = new Set(['movie', 'tv', 'book', 'comic', 'magazine']);
+const seasonStatus = new Map([
+  [1, 'Waiting for approval'],
+  [2, 'Approved'],
+  [3, 'Declined'],
+  [4, 'Failed'],
+  [5, 'Completed'],
+]);
 
 const stages = new Map([
   ['requested', 'Requested'],
@@ -146,34 +154,49 @@ export default function RequestHistorySheet({
 }: {
   id: number;
   title?: string;
-  describeRequest?: (request: RequestItem) => Promise<{ title: string }>;
+  describeRequest?: (
+    request: RequestItem
+  ) => Promise<{ title: string; href: string }>;
   close: () => void;
   renderActions?: (request: RequestItem, title: string) => ReactNode;
 }) {
   const [showFiles, setShowFiles] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useDialog(ref, close);
-  const { data, error, reload } = useApi<RequestHistory>(
-    `/request/status/${id}`
-  );
+  const history = useApi<RequestHistory>(`/request/status/${id}`);
+  const data =
+    typeof history.data?.current?.stage === 'string' &&
+    Array.isArray(history.data?.history?.results)
+      ? history.data
+      : null;
+  const error =
+    history.error ||
+    (history.data && !data ? 'Invalid request history response.' : null);
+  const reload = history.reload;
 
-  const [resolvedTitle, setResolvedTitle] = useState<string>();
+  const [description, setDescription] = useState<{
+    request: RequestItem;
+    title: string;
+    href: string;
+  }>();
   const request = data?.request;
   useEffect(() => {
-    if (title || !describeRequest || request?.id !== id || !request.media)
-      return;
+    if (!describeRequest || request?.id !== id || !request.media) return;
     let active = true;
     void describeRequest(request).then(
-      (description) => {
-        if (active && description.title) setResolvedTitle(description.title);
+      (row) => {
+        if (active)
+          setDescription({ request, title: row.title, href: row.href });
       },
       () => {}
     );
     return () => {
       active = false;
     };
-  }, [describeRequest, id, request, title]);
-  const displayTitle = title || resolvedTitle || `Request #${id}`;
+  }, [describeRequest, id, request]);
+  const resolved = description?.request === request ? description : undefined;
+  const displayTitle = title || resolved?.title || `Request #${id}`;
+  const href = resolved?.href;
 
   return createPortal(
     <div className="sheet-wrap open">
@@ -190,6 +213,20 @@ export default function RequestHistorySheet({
           <header>
             <h2>Request History</h2>
             <p className="note">{displayTitle}</p>
+            {href && /^\/(?!\/)[^?]*[^/?](?:\?|$)/.test(href) && (
+              <Link className="go" to={href}>
+                Open Title
+              </Link>
+            )}
+            {request?.type === 'book' && (
+              <p className="note">{bookRequestLabel(request.bookFormat)}</p>
+            )}
+            {request?.is4k &&
+              (request.type === 'movie' || request.type === 'tv') && (
+                <p className="note">
+                  {request.type === 'movie' ? 'Movie' : 'Series'} · 4K
+                </p>
+              )}
           </header>
           <ServiceNote error={error} what="request history" retry={reload} />
           {!data && !error && (
@@ -200,6 +237,47 @@ export default function RequestHistorySheet({
           {data && (
             <>
               <RequestProgress current={data.current} />
+              {request?.type === 'tv' && !!request.seasons?.length && (
+                <ul className="setlist" aria-label="Requested seasons">
+                  {request.seasons.map(
+                    ({ seasonNumber, episodeNumbers, status }) => {
+                      const name =
+                        seasonNumber === 0
+                          ? 'Specials'
+                          : `Season ${seasonNumber}`;
+                      const tmdbId = request.media?.tmdbId;
+                      const target =
+                        Number.isSafeInteger(tmdbId) && tmdbId > 0
+                          ? videoDetailPath(
+                              'tv',
+                              tmdbId,
+                              request.is4k,
+                              seasonNumber
+                            )
+                          : undefined;
+                      return (
+                        <li className="set" key={seasonNumber}>
+                          {target ? (
+                            <Link className="go" to={target}>
+                              {name}
+                            </Link>
+                          ) : (
+                            <b>{name}</b>
+                          )}
+                          <small>
+                            {episodeNumbers?.length
+                              ? `Episodes ${episodeNumbers.join(', ')}`
+                              : 'All episodes'}
+                            {status !== undefined &&
+                              seasonStatus.has(status) &&
+                              ` · ${seasonStatus.get(status)}`}
+                          </small>
+                        </li>
+                      );
+                    }
+                  )}
+                </ul>
+              )}
               {data.request?.status === 1 && data.request.quotaException && (
                 <Pill k="wait">Over Quota</Pill>
               )}

@@ -22,10 +22,15 @@ const malformedPermissions = new Map([
 ]);
 const echo = createServer((req, res) => {
   if (req.url === '/api/v1/auth/me') {
+    const tokenUser =
+      req.headers['x-api-key'] === 'fixture-limited-admin-token' ||
+      req.headers.authorization === 'Bearer fixture-limited-admin-token';
     res.statusCode =
       ['fixture-session=valid', 'fixture-session=family'].includes(
         req.headers.cookie
-      ) || malformedPermissions.has(req.headers.cookie)
+      ) ||
+      malformedPermissions.has(req.headers.cookie) ||
+      tokenUser
         ? 200
         : req.headers.cookie === 'fixture-session=forbidden'
           ? 403
@@ -36,7 +41,7 @@ const echo = createServer((req, res) => {
     const body = JSON.stringify({
       permissions: malformedPermissions.has(req.headers.cookie)
         ? malformedPermissions.get(req.headers.cookie)
-        : req.headers.cookie === 'fixture-session=valid'
+        : req.headers.cookie === 'fixture-session=valid' || tokenUser
           ? 2
           : 32,
       // Real /auth/me responses contain settings and exceed the compression threshold.
@@ -105,6 +110,7 @@ const paths = [
   '/imageproxy/probe',
   '/avatarproxy/probe',
   packPath,
+  packPath.slice(0, -1),
 ];
 async function check(settings, clientIp, scheme, headers = {}) {
   const id = await docker(
@@ -139,10 +145,11 @@ async function check(settings, clientIp, scheme, headers = {}) {
     );
     for (const [path, target] of [
       ['/users/19/', '/household/19'],
-      ['/profile/', '/me'],
+      ['/profile/', '/household/me'],
       ['/profile/settings/', '/me/account'],
       ['/profile/settings/permissions', '/me/account#account-permissions'],
       ['/profile/settings/password/', '/me/account#password'],
+      ['/profile/advanced-theme/', '/me/account#advanced-theme'],
       [
         '/profile/settings/episode-queue/',
         '/me/account/tv-requests#episode-queue',
@@ -158,6 +165,15 @@ async function check(settings, clientIp, scheme, headers = {}) {
         '/requests/by-user/19?requestedBy=11&filter=pending&mediaType=movie&timeFrame=7d&sort=added&sortDirection=asc',
       ],
       ['/discover/comics?q=Example', '/comics?q=Example'],
+      [
+        '/discover/books?libraryView=available&subject=History',
+        '/books?show=have&libraryView=available&subject=History',
+      ],
+      [
+        '/discover/books?format=audiobook&libraryView=missing&narrator=Reader',
+        '/books?show=not&format=audiobook&libraryView=missing&narrator=Reader',
+      ],
+      ['/discover/audiobooks?libraryView=all', '/audiobooks?libraryView=all'],
       ['/discover/watchlist/?page=3', '/watchlist/discover?page=3'],
       [
         '/discover/movies/studio/42?sortBy=vote_average.desc',
@@ -176,10 +192,28 @@ async function check(settings, clientIp, scheme, headers = {}) {
         '/movies?nativeFilters=1&keywords=17',
       ],
       ['/coming-soon/', '/soon'],
+      ['/discover/games/', '/games/discovery'],
+      [
+        '/discover/patches/?catalogKey=42&category=modern&platform=switch&language=&completeOnly=false',
+        '/patches?catalogKey=42&category=modern&platform=switch&language=&completeOnly=false',
+      ],
+      ['/games?steam=connected', '/game-library?steam=connected'],
+      ['/games/?steam=error&ignored=1', '/game-library?steam=error'],
       ['/coming-soon/?media=tv&extra=1', '/soon?media=tv'],
       ['/discover/movies/upcoming/', '/soon?media=movie'],
       ['/discover/tv/upcoming', '/soon?media=tv'],
-      ['/discover/trending?mediaType=audiobook', '/audiobooks'],
+      [
+        '/discover/trending?mediaType=audiobook',
+        '/audiobooks?mediaType=audiobook',
+      ],
+      [
+        '/discover/trending?mediaType=audiobook&libraryView=missing&narrator=Reader',
+        '/audiobooks?show=not&mediaType=audiobook&libraryView=missing&narrator=Reader',
+      ],
+      [
+        '/discover/trending?mediaType=music&releaseType=ep&availability=flac',
+        '/music?mediaType=music&releaseType=ep&availability=flac',
+      ],
       ['/discover/list/12345/?page=2', '/list/12345?page=2'],
       ['/discover/trending?mediaType=tv', '/trending?mediaType=tv'],
       ['/discover/patches?kind=hack', '/patches?kind=hack'],
@@ -203,6 +237,9 @@ async function check(settings, clientIp, scheme, headers = {}) {
       ],
       ['/users/19/settings/notifications/', '/admin/users/19/notifications'],
       ['/settings/logs', '/admin/logs'],
+      ['/settings/logs?page=2&search=private', '/admin/logs?page=2'],
+      ['/settings/logs?page=10001', '/admin/logs?page=10001'],
+      ['/settings/logs?page=0', '/admin/logs'],
       [
         '/settings/main?settingsSearchTarget=spotifyClientId',
         '/admin/general#spotifyClientId',
@@ -237,6 +274,10 @@ async function check(settings, clientIp, scheme, headers = {}) {
       ...[
         ['prowlarr-settings-title', 'prowlarr'],
         ['download-clients-settings-title', 'download-clients'],
+        [
+          'download-clients-interval',
+          'download-clients#download-clients-interval',
+        ],
         ['slskdn-settings-title', 'soulseek'],
         ['tunerr-settings-title', 'tunerr'],
         ['reader-settings-title', 'reader-delivery'],
@@ -270,6 +311,8 @@ async function check(settings, clientIp, scheme, headers = {}) {
       '/swipe',
       '/swipe/',
       '/recordings',
+      '/games?c=retro&q=Zelda',
+      '/games?steam=unknown',
       '/movie/12/cast',
       '/tv/1000000000/crew/',
       '/collections/tv/19',
@@ -281,20 +324,22 @@ async function check(settings, clientIp, scheme, headers = {}) {
       assert.equal(response.status, 200, pathname);
       assert.match(await response.text(), /<div id="root"><\/div>/);
     }
-    const supportedPack = await fetch(base + packPath, {
-      method: 'POST',
-      headers: { 'content-type': 'text/plain' },
-      body: ' '.repeat(2 * 1024 * 1024),
-    });
-    assert.equal(supportedPack.status, 200);
-    await supportedPack.text();
-    const oversizedPack = await fetch(base + packPath, {
-      method: 'POST',
-      headers: { 'content-type': 'text/plain' },
-      body: ' '.repeat(5 * 1024 * 1024 + 1),
-    });
-    assert.equal(oversizedPack.status, 413);
-    await oversizedPack.text();
+    for (const uploadPath of [packPath, packPath.slice(0, -1)]) {
+      const supportedPack = await fetch(base + uploadPath, {
+        method: 'POST',
+        headers: { 'content-type': 'text/plain' },
+        body: ' '.repeat(2 * 1024 * 1024),
+      });
+      assert.equal(supportedPack.status, 200);
+      await supportedPack.text();
+      const oversizedPack = await fetch(base + uploadPath, {
+        method: 'POST',
+        headers: { 'content-type': 'text/plain' },
+        body: ' '.repeat(5 * 1024 * 1024 + 1),
+      });
+      assert.equal(oversizedPack.status, 413);
+      await oversizedPack.text();
+    }
     for (const path of paths) {
       const response = await fetch(base + path, {
         headers: {
@@ -496,6 +541,24 @@ test('actual nginx saves and serves admin branding without deleting the live log
           expected
         );
       }
+    }
+    for (const headers of [
+      { 'x-api-key': 'fixture-limited-admin-token' },
+      { authorization: 'Bearer fixture-limited-admin-token' },
+      {
+        cookie: 'fixture-session=valid',
+        'x-api-key': 'fixture-limited-admin-token',
+        authorization: 'Bearer fixture-limited-admin-token',
+      },
+    ]) {
+      const response = await fetch(base + '/lumen/config', {
+        headers: { ...headers, accept: 'application/json' },
+      });
+      assert.equal(
+        response.status,
+        headers.cookie ? 200 : 401,
+        'Only the interactive session may authorize shared settings'
+      );
     }
     for (const [body, type, expected] of [
       ['[]', 'application/json', 400],

@@ -1,11 +1,31 @@
 import { expect, test } from '@playwright/test';
 
-for (const permissions of [2, 24, 16, 32]) {
-  const authorized = permissions !== 32;
+const appHref = (path: string, baseURL: string | undefined) => {
+  const url = new URL(path, baseURL);
+  return url.pathname + url.search;
+};
+
+for (const permissions of [2, 24, 16, 32, 16384, 134217728]) {
+  const canManageRequests = [2, 24, 16].includes(permissions);
+  const canReadRequests = canManageRequests || permissions === 16384;
+  const canReadWatchlist = canManageRequests || permissions === 134217728;
   test(`household profile permissions ${permissions} gate each preview`, async ({
     page,
+    baseURL,
   }) => {
     const fetched: string[] = [];
+    const avatar = 'https://plex.tv/users/example/avatar';
+    await page.route('**/avatarproxy/remote?*', (route) => {
+      expect(new URL(route.request().url()).searchParams.get('url')).toBe(
+        avatar
+      );
+      return permissions === 32
+        ? route.fulfill({ status: 404 })
+        : route.fulfill({
+            contentType: 'image/svg+xml',
+            body: '<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38"/>',
+          });
+    });
     await page.route('**/lumen-config.json', (route) =>
       route.fulfill({ json: {} })
     );
@@ -25,7 +45,14 @@ for (const permissions of [2, 24, 16, 32]) {
           });
         case '/user/19':
           return route.fulfill({
-            json: { id: 19, displayName: 'Household Member', userType: 1 },
+            json: {
+              id: 19,
+              displayName: 'Household Member',
+              userType: 1,
+              createdAt: '2020-06-15T12:00:00.000Z',
+              email: 'member@example.test',
+              avatar,
+            },
           });
         case '/user/19/watch_data':
           return route.fulfill({
@@ -70,9 +97,28 @@ for (const permissions of [2, 24, 16, 32]) {
                 {
                   id: 3,
                   type: 'movie',
+                  status: 1,
+                  quotaException: true,
+                  is4k: true,
                   media: { tmdbId: 24, mediaType: 'movie' },
                 },
               ],
+            },
+          });
+        case '/request/status/3':
+          return route.fulfill({
+            json: {
+              request: {
+                id: 3,
+                type: 'movie',
+                status: 1,
+                is4k: true,
+                requestedBy: { id: 19, displayName: 'Household Member' },
+                seasons: [],
+                media: { tmdbId: 24, mediaType: 'movie', status: 1 },
+              },
+              current: { stage: 'requested', attempt: 1 },
+              history: { results: [], total: 0 },
             },
           });
         case '/movie/24':
@@ -81,15 +127,36 @@ for (const permissions of [2, 24, 16, 32]) {
           return route.fulfill({ json: {} });
       }
     });
-    await page.goto('/household/19');
+    await page.goto('./household/19');
     await expect(
       page.getByRole('heading', { name: 'Household Member' })
     ).toBeVisible();
+    await expect(page.getByText(/Joined Jun 15, 2020/)).toBeVisible();
+    const portrait = page.locator('.ph .avatar[aria-hidden="true"]');
+    if (permissions === 32) await expect(portrait).toHaveText('HM');
+    else
+      await expect(portrait.locator('img')).toHaveAttribute(
+        'src',
+        '/avatarproxy/remote?url=https%3A%2F%2Fplex.tv%2Fusers%2Fexample%2Favatar'
+      );
+    await expect(page.getByText(/member@example\.test/)).toHaveCount(
+      permissions === 2 || permissions === 24 ? 1 : 0
+    );
+    await expect(page.getByText(/User ID: 19/)).toHaveCount(
+      canManageRequests ? 1 : 0
+    );
+    const edit = page.getByRole('link', { name: 'Edit Settings' });
+    if (permissions === 2 || permissions === 24)
+      await expect(edit).toHaveAttribute(
+        'href',
+        appHref('admin/users/19', baseURL)
+      );
+    else await expect(edit).toHaveCount(0);
     if (permissions === 2) {
       await expect(page.getByText('Total plays: 3')).toBeVisible();
       await expect(
         page.getByRole('link', { name: 'Watched Series' })
-      ).toHaveAttribute('href', '/tv/25');
+      ).toHaveAttribute('href', appHref('tv/25', baseURL));
       await expect(page.locator('.rail img')).toHaveAttribute(
         'src',
         '/imageproxy/tmdb/t/p/w342/watched.jpg'
@@ -111,22 +178,194 @@ for (const permissions of [2, 24, 16, 32]) {
       ).toHaveCount(0);
       expect(fetched).not.toContain('/user/19/quota');
     }
-    if (authorized) {
+    if (canReadWatchlist) {
       await expect(
         page.getByRole('link', { name: 'Saved Film' })
-      ).toHaveAttribute('href', '/movie/23');
+      ).toHaveAttribute('href', appHref('movie/23', baseURL));
+    } else {
       await expect(
-        page.getByRole('link', { name: 'Requested Film' })
-      ).toHaveAttribute('href', '/requests?requestId=3');
+        page.getByRole('link', { name: 'View Watchlist' })
+      ).toHaveCount(0);
+      expect(fetched).not.toContain('/user/19/watchlist');
+    }
+    if (canReadRequests) {
+      await expect(
+        page.getByText('Waiting for approval', { exact: true })
+      ).toBeVisible();
+      await expect(page.getByText('Over Quota', { exact: true })).toBeVisible();
+      await expect(page.getByText('Movie · 4K', { exact: true })).toBeVisible();
+      await page.getByRole('link', { name: 'Requested Film' }).click();
+      await expect(page).toHaveURL('./requests?requestedBy=19&requestId=3');
+      const history = page.getByRole('dialog', { name: 'Request history' });
+      await expect(
+        history.getByRole('link', { name: 'Open Title' })
+      ).toHaveAttribute('href', appHref('movie/24?quality=4k', baseURL));
+      await expect(
+        history.getByText('Movie · 4K', { exact: true })
+      ).toBeVisible();
+      await expect(
+        history.getByText('Current status: Requested', { exact: true })
+      ).toBeVisible();
+      await history.getByRole('button', { name: 'Close', exact: true }).click();
+      await expect(page).toHaveURL('./requests?requestedBy=19');
     } else {
       await expect(
         page.getByRole('link', { name: 'View Requests' })
       ).toHaveCount(0);
-      await expect(
-        page.getByRole('link', { name: 'View Watchlist' })
-      ).toHaveCount(0);
       expect(fetched).not.toContain('/user/19/requests');
-      expect(fetched).not.toContain('/user/19/watchlist');
     }
   });
 }
+
+test('incomplete household preview responses recover independently', async ({
+  page,
+  baseURL,
+}) => {
+  let attempts = 0;
+  let watchlistAttempts = 0;
+  let requestAttempts = 0;
+  await page.route('**/api/v1/**', (route) => {
+    const path = new URL(route.request().url()).pathname;
+    switch (path) {
+      case '/api/v1/auth/me':
+        return route.fulfill({
+          json: { id: 19, displayName: 'Household Member', permissions: 32 },
+        });
+      case '/api/v1/user/19':
+        return route.fulfill({
+          json: { id: 19, displayName: 'Household Member', userType: 1 },
+        });
+      case '/api/v1/user/19/watch_data':
+        if (++attempts === 1) return route.fulfill({ json: {} });
+        return route.fulfill({
+          json: {
+            playCount: 3,
+            recentlyWatched: [{ id: 7, tmdbId: 0, mediaType: 'tv' }],
+          },
+        });
+      case '/api/v1/user/19/watchlist':
+        return route.fulfill({
+          json: ++watchlistAttempts === 1 ? {} : { results: [] },
+        });
+      case '/api/v1/user/19/requests':
+        return route.fulfill({
+          json: ++requestAttempts === 1 ? {} : { results: [] },
+        });
+      default:
+        return route.fulfill({ json: {} });
+    }
+  });
+  await page.goto('./me');
+  await page.getByRole('link', { name: 'Open My Profile' }).click();
+  await expect(page).toHaveURL('./household/me');
+  await expect(
+    page.getByRole('heading', { name: 'Household Member' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Edit Settings' })
+  ).toHaveAttribute('href', appHref('me/account', baseURL));
+  await expect(
+    page.getByRole('link', { name: 'View Requests' })
+  ).toHaveAttribute('href', appHref('requests?tab=all', baseURL));
+  const error = page.getByRole('alert').filter({
+    hasText: 'Invalid playback activity response.',
+  });
+  await expect(error).toBeVisible();
+  await error.getByRole('button', { name: 'Retry' }).click();
+  await expect(page.getByText('Total plays: 3')).toBeVisible();
+  await expect(
+    page.getByText('No recently watched titles to display.')
+  ).toBeVisible();
+  await expect(page.locator('[aria-label="Recently watched"]')).toHaveCount(0);
+  const watchlistError = page.getByRole('alert').filter({
+    hasText: 'Invalid watchlist response.',
+  });
+  await watchlistError.getByRole('button', { name: 'Retry' }).click();
+  await expect(page.getByText('No titles on this watchlist.')).toBeVisible();
+  const requestError = page.getByRole('alert').filter({
+    hasText: 'Invalid recent requests response.',
+  });
+  await requestError.getByRole('button', { name: 'Retry' }).click();
+  await expect(page.getByText('No requests yet.')).toBeVisible();
+  await expect(page.getByText('Total plays: 3')).toBeVisible();
+});
+
+test('a local account can retry a picture upload without losing its current avatar', async ({
+  page,
+}) => {
+  const avatar = '/avatarproxy/local/19?v=' + 'a'.repeat(64);
+  const oldAvatar = '/avatarproxy/local/19?v=' + 'b'.repeat(64);
+  let attempts = 0;
+  let uploaded = false;
+  await page.route('**/avatarproxy/local/19?*', (route) =>
+    route.fulfill({
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38"/>',
+    })
+  );
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    switch (new URL(request.url()).pathname) {
+      case '/api/v1/auth/me':
+        return route.fulfill({
+          json: {
+            id: 19,
+            displayName: 'Local Member',
+            permissions: 32,
+            avatar: uploaded ? avatar : oldAvatar,
+          },
+        });
+      case '/api/v1/user/19':
+        return route.fulfill({
+          json: {
+            id: 19,
+            displayName: 'Local Member',
+            userType: 2,
+            avatar: uploaded ? avatar : oldAvatar,
+          },
+        });
+      case '/api/v1/user/19/avatar':
+        expect(request.method()).toBe('PUT');
+        expect(request.headers()['content-type']).toBe('image/png');
+        expect(request.postDataBuffer()?.toString()).toBe('picture bytes');
+        if (++attempts === 1)
+          return route.fulfill({
+            status: 503,
+            json: { message: 'Picture service temporarily unavailable.' },
+          });
+        uploaded = true;
+        return route.fulfill({ json: { id: 19, avatar } });
+      default:
+        return route.fulfill({ json: { results: [] } });
+    }
+  });
+  await page.goto('./household/me');
+  const button = page.getByRole('button', { name: 'Change Profile Picture' });
+  const picture = page.locator('.ph .avatar[aria-hidden="true"] img');
+  async function selectPicture() {
+    const chooser = page.waitForEvent('filechooser');
+    await button.click();
+    await (
+      await chooser
+    ).setFiles({
+      name: 'profile.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from('picture bytes'),
+    });
+  }
+  await expect(picture).toHaveAttribute('src', oldAvatar);
+  await selectPicture();
+  await expect(
+    page.getByRole('alert').filter({
+      hasText: 'Picture service temporarily unavailable.',
+    })
+  ).toBeVisible();
+  await expect(picture).toHaveAttribute('src', oldAvatar);
+  await selectPicture();
+  await expect(picture).toHaveAttribute('src', avatar);
+  await expect(page.locator('.side .me .avatar img')).toHaveAttribute(
+    'src',
+    avatar
+  );
+  expect(attempts).toBe(2);
+});

@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../auth';
 import { ServiceNote } from '../components/extra';
 import { useApi } from '../hooks';
 
@@ -17,15 +18,54 @@ const levels = [
   ['warn', 'Warnings and errors'],
   ['error', 'Errors only'],
 ];
+const MAX_LOG_OFFSET = 100_000;
+const pageSizes = [10, 25, 50, 100];
 
 export default function AdminLogs() {
+  const { user } = useAuth();
+  if (!user) return null;
+  const storageKey = `lumen-log-display:${user.id}`;
+  return <LogViewer key={storageKey} storageKey={storageKey} />;
+}
+
+function LogViewer({ storageKey }: { storageKey: string }) {
   const [input, setInput] = useState('');
   const [search, setSearch] = useState('');
-  const [level, setLevel] = useState('info');
-  const [take, setTake] = useState(25);
-  const [page, setPage] = useState(1);
+  const [{ level, take }, setDisplay] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) ?? 'null');
+      return {
+        level: levels.find(([value]) => value === saved?.level)?.[0] ?? 'info',
+        take: pageSizes.find((value) => value === saved?.take) ?? 25,
+      };
+    } catch {
+      return { level: 'info', take: 25 };
+    }
+  });
+  const [params, setParams] = useSearchParams();
+  const lastPage = Math.floor(MAX_LOG_OFFSET / take) + 1;
+  const bookmarkPage = params.get('page') ?? '';
+  const page = /^[1-9]\d{0,4}$/.test(bookmarkPage)
+    ? Math.min(Number(bookmarkPage), lastPage)
+    : 1;
   const [live, setLive] = useState(false);
   const [copyStatus, setCopyStatus] = useState('');
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({ level, take }));
+    } catch {
+      // The current controls still work when storage is unavailable.
+    }
+  }, [level, storageKey, take]);
+
+  function setPage(nextPage: number, replace = false) {
+    if (nextPage === 1 && !params.has('page')) return;
+    const next = new URLSearchParams(params);
+    if (nextPage === 1) next.delete('page');
+    else next.set('page', String(nextPage));
+    setParams(next, { replace });
+  }
   const query = new URLSearchParams({
     take: String(take),
     skip: String((page - 1) * take),
@@ -39,6 +79,22 @@ export default function AdminLogs() {
     currentPathOnly: true,
     keepDuringRefresh: true,
   });
+  const entries = useMemo(() => {
+    const occurrences = new Map<string, number>();
+    return data?.results.map((entry) => {
+      const details = entry.data ? JSON.stringify(entry.data) : undefined;
+      const identity = JSON.stringify([
+        entry.timestamp,
+        entry.level,
+        entry.label,
+        entry.message,
+        details,
+      ]);
+      const occurrence = (occurrences.get(identity) ?? 0) + 1;
+      occurrences.set(identity, occurrence);
+      return { entry, details, key: `${identity}:${occurrence}` };
+    });
+  }, [data]);
 
   useEffect(() => {
     if (!live || error) return;
@@ -82,7 +138,7 @@ export default function AdminLogs() {
         className="toolbar"
         onSubmit={(event) => {
           event.preventDefault();
-          setPage(1);
+          setPage(1, true);
           setSearch(input.trim());
         }}
       >
@@ -101,8 +157,8 @@ export default function AdminLogs() {
           <select
             value={level}
             onChange={(event) => {
-              setLevel(event.target.value);
-              setPage(1);
+              setDisplay({ level: event.target.value, take });
+              setPage(1, true);
             }}
           >
             {levels.map(([value, label]) => (
@@ -117,11 +173,11 @@ export default function AdminLogs() {
           <select
             value={take}
             onChange={(event) => {
-              setTake(Number(event.target.value));
-              setPage(1);
+              setDisplay({ level, take: Number(event.target.value) });
+              setPage(1, true);
             }}
           >
-            {[25, 50, 100].map((size) => (
+            {pageSizes.map((size) => (
               <option key={size}>{size}</option>
             ))}
           </select>
@@ -138,13 +194,13 @@ export default function AdminLogs() {
           Loading system logs…
         </p>
       )}
-      {data?.results.length === 0 && (
+      {entries?.length === 0 && (
         <p className="note">No logs match these filters.</p>
       )}
-      {!!data?.results.length && (
+      {!!entries?.length && (
         <ul className="setlist">
-          {data.results.map((entry, index) => (
-            <li className="set" key={`${entry.timestamp}:${index}`}>
+          {entries.map(({ entry, details, key }) => (
+            <li className="set" key={key}>
               <div>
                 <b>{entry.message}</b>
                 <small>
@@ -152,10 +208,10 @@ export default function AdminLogs() {
                     .filter(Boolean)
                     .join(' · ')}
                 </small>
-                {entry.data && (
+                {details && (
                   <details>
                     <summary>Details</summary>
-                    <small>{JSON.stringify(entry.data)}</small>
+                    <small>{details}</small>
                   </details>
                 )}
               </div>
@@ -174,15 +230,15 @@ export default function AdminLogs() {
           <button
             className="btn btn-quiet btn-sm"
             disabled={page === 1}
-            onClick={() => setPage((value) => value - 1)}
+            onClick={() => setPage(page - 1)}
           >
             Previous Page
           </button>
           <span>Page {page}</span>
           <button
             className="btn btn-quiet btn-sm"
-            disabled={!data || page >= data.pageInfo.pages}
-            onClick={() => setPage((value) => value + 1)}
+            disabled={!data || page >= Math.min(data.pageInfo.pages, lastPage)}
+            onClick={() => setPage(page + 1)}
           >
             Next Page
           </button>

@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import type { BookResult, Paged, VideoSearchResult } from '../api';
+import { useAuth } from '../auth';
+import {
+  discoveryVisibility,
+  showDiscoveryTitle,
+} from '../discoveryVisibility';
 import type { Album } from '../extras';
 import { useApi, usePublicSettings } from '../hooks';
 import { AlbumCard } from '../pages/Music';
@@ -143,7 +148,12 @@ function DiscoverShelf({
   endpoint,
   href,
   kind,
-}: ShelfDestination & { id: number; title?: string }) {
+  visibility,
+}: ShelfDestination & {
+  id: number;
+  title?: string;
+  visibility: ReturnType<typeof discoveryVisibility>;
+}) {
   const anchor = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const { data, error, reload } = useApi<ShelfPage>(visible ? endpoint : null);
@@ -164,16 +174,14 @@ function DiscoverShelf({
     return () => observer.disconnect();
   }, [visible]);
 
-  const items = data?.results.filter(({ mediaType }) =>
-    kind === 'music'
-      ? mediaType === 'album'
-      : kind === 'books'
-        ? mediaType === 'book'
-        : mediaType === 'movie' ||
-          mediaType === 'tv' ||
-          mediaType === 'person' ||
-          mediaType === 'collection'
-  );
+  const items = data?.results.filter((item) => {
+    if (kind === 'music')
+      return item.mediaType === 'album' && showDiscoveryTitle(item, visibility);
+    if (kind === 'books') return item.mediaType === 'book';
+    if (item.mediaType === 'movie' || item.mediaType === 'tv')
+      return showDiscoveryTitle(item, visibility);
+    return item.mediaType === 'person' || item.mediaType === 'collection';
+  });
   if (items?.length === 0) return null;
 
   return (
@@ -229,6 +237,8 @@ export function ConfiguredDiscoverShelves({
   showMusic: boolean;
 }) {
   const settings = usePublicSettings();
+  const { user } = useAuth();
+  const visibility = discoveryVisibility(settings, user?.permissions);
   const categories = settings?.enabledMediaCategories;
   const ebook =
     showBooks &&
@@ -264,6 +274,11 @@ export function ConfiguredDiscoverShelves({
           key={`${slider.id}:${destination.endpoint}`}
           id={slider.id}
           title={slider.title}
+          visibility={
+            destination.kind === 'music' || slider.type === TMDB_SEARCH
+              ? { ...visibility, hideRequested: false }
+              : visibility
+          }
           {...destination}
         />
       ) : null;

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
   ApiError,
   mediaLink,
@@ -46,7 +46,7 @@ import { useToast } from '../components/toast';
 import WatchlistButton from '../components/WatchlistButton';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
-import { useApi, usePublicSettings } from '../hooks';
+import { useApi, usePublicSettings, useVisibleMediaRefresh } from '../hooks';
 import { Icon } from '../icons';
 import { useTitleRegions } from '../streamingRegion';
 import { useLiveMediaProgress } from '../useLiveDownloadProgress';
@@ -74,12 +74,24 @@ function movieCurrency(value?: number) {
 export default function MovieDetail() {
   const serverName = useMediaServerName();
   const { id } = useParams();
+  const [quality] = useSearchParams();
   const {
     data: m,
     error,
     reload,
     refresh,
-  } = useApi<MovieDetails>(`/movie/${id}`);
+    revalidate,
+  } = useApi<MovieDetails>(`/movie/${id}`, {
+    currentPathOnly: true,
+    keepDuringRefresh: true,
+  });
+  const selected4k = quality.get('quality') === '4k';
+  const status4k = m?.mediaInfo?.status4k;
+  useVisibleMediaRefresh(
+    selected4k &&
+      (status4k === MediaStatus.PENDING || status4k === MediaStatus.PROCESSING),
+    revalidate
+  );
   const like = useApi<Paged<TitleResult>>(`/movie/${id}/recommendations`).data;
   const pub = usePublicSettings();
   const { user } = useAuth();
@@ -107,7 +119,7 @@ export default function MovieDetail() {
   }>();
   const onOpts = useCallback((o: RequestOptions) => setOpts(o), []);
 
-  if (error)
+  if (error && !m)
     return <ServiceNote error={error} what="this movie" retry={reload} />;
   if (!m) return <div className="detail-loading" aria-busy="true" />;
 
@@ -205,41 +217,53 @@ export default function MovieDetail() {
     });
   };
 
-  const main =
-    playableStatus?.k === 'ok' ? (
-      <a
-        className="btn btn-primary"
-        {...mediaLink(
-          videoPlaybackMedia(m.mediaInfo, mode),
-          false,
+  const playback = videoPlaybackMedia(m.mediaInfo, mode);
+  const fourKPlayback =
+    selected4k && visible4k && !shared4k
+      ? mediaLink(
+          {
+            mediaUrl4k: playback?.mediaUrl4k,
+            iOSPlexUrl4k: playback?.iOSPlexUrl4k,
+          },
+          true,
           'movie',
           serverName
-        )}
-      >
-        <Icon name="play" />
-        Watch on {serverName}
-      </a>
-    ) : s ? (
-      visibleStatus && (
-        <button className="btn btn-tonal" disabled>
-          <Icon name={visibleStatus.ico} />
-          {visibleStatus.word}
-        </button>
-      )
-    ) : (
-      <button
-        className="btn btn-primary"
-        disabled={busy}
-        onClick={() => request()}
-      >
-        <Icon name="plus" />
-        {requireApproval
-          ? 'Request Approval'
-          : unreleased
-            ? 'Request · downloads on release'
-            : 'Request'}
+        )
+      : undefined;
+  const main = fourKPlayback?.href ? (
+    <a className="btn btn-primary" {...fourKPlayback}>
+      <Icon name="play" />
+      Watch 4K on {serverName}
+    </a>
+  ) : playableStatus?.k === 'ok' ? (
+    <a
+      className="btn btn-primary"
+      {...mediaLink(playback, false, 'movie', serverName)}
+    >
+      <Icon name="play" />
+      Watch on {serverName}
+    </a>
+  ) : s ? (
+    visibleStatus && (
+      <button className="btn btn-tonal" disabled>
+        <Icon name={visibleStatus.ico} />
+        {visibleStatus.word}
       </button>
-    );
+    )
+  ) : (
+    <button
+      className="btn btn-primary"
+      disabled={busy}
+      onClick={() => request()}
+    >
+      <Icon name="plus" />
+      {requireApproval
+        ? 'Request Approval'
+        : unreleased
+          ? 'Request · downloads on release'
+          : 'Request'}
+    </button>
+  );
   // offered whether or not the HD copy is here or requested: they're separate files
   const fourK =
     !blocklisted && pub?.movie4kEnabled && can4k && !has4k ? (
@@ -273,6 +297,12 @@ export default function MovieDetail() {
         ]}
       />
       <div className="dbody">
+        <ServiceNote error={error} what="this movie" retry={reload} />
+        {selected4k && !fourKPlayback?.href && (
+          <p className="note" role="status">
+            4K playback is unavailable.
+          </p>
+        )}
         <div className="dstatus">
           {visibleStatus && (
             <Pill k={visibleStatus.k} icon={visibleStatus.ico}>

@@ -88,6 +88,17 @@ async function fixtures(page: Page) {
       body = paged(path === '/discover/tv' ? [] : [movie]);
     else if (path === '/discover/books') body = paged([]);
     else if (path === '/media') body = paged([]);
+    else if (path === '/live-tv/status')
+      body = { configured: false, guideReady: false, canRequest: false };
+    else if (path === '/blocklist/count') body = { count: 0 };
+    else if (
+      /^\/blocklist\/(101|202)$/.test(path) &&
+      request.method() === 'GET'
+    ) {
+      status = 404;
+      body = { message: 'Title is not blocklisted' };
+    } else if (path === '/request/status/users')
+      body = { pageInfo: { page: 1, pages: 1 }, results: [] };
     else if (path === '/request')
       body = { pageInfo: { pages: 1, results: 0 }, results: [] };
     else if (path === '/request/count')
@@ -741,30 +752,27 @@ test('movie posters distinguish or hide shared copies without offering duplicate
   );
   await page.route(/\/api\/v1\/discover\/movies(?:\?|$)/, (route) =>
     route.fulfill({
-      json: {
-        totalPages: 1,
-        results: [
-          {
-            id: 90,
-            title: 'Shared Movie',
-            mediaType: 'movie',
-            mediaInfo: {
-              status: 5,
-              viewerRequestCoverage: { standard: false },
-              mediaUrl: 'https://plex.example.test/shared',
-            },
+      json: paged([
+        {
+          id: 90,
+          title: 'Shared Movie',
+          mediaType: 'movie',
+          mediaInfo: {
+            status: 5,
+            viewerRequestCoverage: { standard: false },
+            mediaUrl: 'https://plex.example.test/shared',
           },
-          {
-            id: 91,
-            title: 'Viewer Movie',
-            mediaType: 'movie',
-            mediaInfo: {
-              status: 5,
-              viewerRequestCoverage: { standard: true },
-            },
+        },
+        {
+          id: 91,
+          title: 'Viewer Movie',
+          mediaType: 'movie',
+          mediaInfo: {
+            status: 5,
+            viewerRequestCoverage: { standard: true },
           },
-        ],
-      },
+        },
+      ]),
     })
   );
   await page.goto('/movies');
@@ -2008,23 +2016,51 @@ test('adult scene details keep the catalog and default request sources distinct'
   expect(reads.sort()).toEqual(['1', '2']);
 });
 
-test('book requests reopen the Bookshelf title and format', async ({
-  page,
-}) => {
-  await fixtures(page);
-  await page.route('**/api/v1/request?*', (route) =>
-    route.fulfill({
-      json: {
-        pageInfo: { pages: 1, results: 1 },
-        results: [
-          {
+for (const format of ['audiobook', 'both'] as const) {
+  test(`book requests reopen the Bookshelf title for ${format}`, async ({
+    page,
+  }) => {
+    await fixtures(page);
+    await page.route('**/api/v1/request?*', (route) =>
+      route.fulfill({
+        json: {
+          pageInfo: { pages: 1, results: 1 },
+          results: [
+            {
+              id: 615,
+              type: 'book',
+              status: 1,
+              bookFormat: format,
+              is4k: false,
+              seasons: [],
+              createdAt: '2026-11-08T12:00:00Z',
+              requestedBy: { id: 1, displayName: 'Owner' },
+              media: {
+                mediaType: 'book',
+                status: 1,
+                identifiers: [
+                  { provider: 'bookshelf', value: 'bookshelf:1:fixture' },
+                ],
+              },
+            },
+          ],
+        },
+      })
+    );
+    await page.route('**/api/v1/book/bookshelf%3A1%3Afixture', (route) =>
+      route.fulfill({
+        json: { id: 'bookshelf:1:fixture', title: 'Requested Audiobook' },
+      })
+    );
+    await page.route('**/api/v1/request/status/615', (route) =>
+      route.fulfill({
+        json: {
+          request: {
             id: 615,
             type: 'book',
             status: 1,
-            bookFormat: 'audiobook',
-            is4k: false,
+            bookFormat: format,
             seasons: [],
-            createdAt: '2026-11-08T12:00:00Z',
             requestedBy: { id: 1, displayName: 'Owner' },
             media: {
               mediaType: 'book',
@@ -2034,23 +2070,39 @@ test('book requests reopen the Bookshelf title and format', async ({
               ],
             },
           },
-        ],
-      },
-    })
-  );
-  await page.route('**/api/v1/book/bookshelf%3A1%3Afixture', (route) =>
-    route.fulfill({
-      json: { id: 'bookshelf:1:fixture', title: 'Requested Audiobook' },
-    })
-  );
-  await page.goto('/requests?tab=active');
-  await expect(
-    page.getByRole('link', { name: 'Requested Audiobook', exact: true })
-  ).toHaveAttribute(
-    'href',
-    '/book/bookshelf%3A1%3Afixture?f=audio&lookupTitle=Requested+Audiobook'
-  );
-});
+          current: { stage: 'requested', attempt: 1 },
+          history: { results: [], total: 0 },
+        },
+      })
+    );
+    await page.goto('/requests?tab=active');
+    await expect(
+      page.getByText(
+        format === 'both' ? /^Ebook and Audiobook · / : /^Audiobook · /
+      )
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Requested Audiobook', exact: true })
+    ).toHaveAttribute(
+      'href',
+      `/book/bookshelf%3A1%3Afixture?${format === 'audiobook' ? 'f=audio&' : ''}lookupTitle=Requested+Audiobook`
+    );
+    await page.goto('/requests?requestId=615');
+    const history = page.getByRole('dialog', { name: 'Request history' });
+    await expect(
+      history.getByRole('link', { name: 'Open Title' })
+    ).toHaveAttribute(
+      'href',
+      `/book/bookshelf%3A1%3Afixture?${format === 'audiobook' ? 'f=audio&' : ''}lookupTitle=Requested+Audiobook`
+    );
+    await expect(
+      history.getByText(
+        format === 'both' ? 'Ebook and Audiobook' : 'Audiobook',
+        { exact: true }
+      )
+    ).toBeVisible();
+  });
+}
 
 test('adult request links use the saved Whisparr destination', async ({
   page,
@@ -2492,7 +2544,16 @@ test('explicit series vote counts override the Top rated default and reset clean
   page,
 }) => {
   await fixtures(page);
-  await page.goto('/series?sort=vote_average.desc');
+  const defaultQuery = page.waitForRequest((request) => {
+    const url = new URL(request.url());
+    return (
+      url.pathname.endsWith('/discover/tv') &&
+      url.searchParams.get('sortBy') === 'vote_average.desc' &&
+      url.searchParams.get('voteCountGte') === '50'
+    );
+  });
+  await page.goto('./series?sort=vote_average.desc');
+  await defaultQuery;
   await page.getByLabel('Minimum Votes').fill('10');
   await page.getByLabel('Maximum Votes').fill('50');
   const query = page.waitForRequest((request) => {
@@ -3265,6 +3326,11 @@ test('configured video shelves preserve keyword and streaming filters', async ({
   page,
 }) => {
   await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { hideAvailable: true, hideRequested: true, hideBlocklisted: true },
+    })
+  );
   const reads: string[] = [];
   await page.route('**/api/v1/settings/discover', (route) =>
     route.fulfill({
@@ -3304,6 +3370,19 @@ test('configured video shelves preserve keyword and streaming filters', async ({
         url.pathname.endsWith('/tv')
           ? { id: 88, mediaType: 'tv', name: 'Streaming Fixture' }
           : { ...movie, title: 'Keyword Fixture' },
+        { ...movie, id: 501, title: 'Available Fixture', mediaInfo: available },
+        {
+          ...movie,
+          id: 502,
+          title: 'Requested Fixture',
+          mediaInfo: { status: 2, hasActiveRequest: true },
+        },
+        {
+          ...movie,
+          id: 503,
+          title: 'Blocklisted Fixture',
+          mediaInfo: { status: 6 },
+        },
       ]),
     });
   });
@@ -3325,6 +3404,14 @@ test('configured video shelves preserve keyword and streaming filters', async ({
   await expect(
     keywords.getByRole('link', { name: 'Keyword Fixture' })
   ).toBeVisible();
+  for (const shelf of [streaming, keywords]) {
+    for (const title of [
+      'Available Fixture',
+      'Requested Fixture',
+      'Blocklisted Fixture',
+    ])
+      await expect(shelf.getByRole('link', { name: title })).toHaveCount(0);
+  }
   await expect(keywords.getByRole('link', { name: 'See all' })).toHaveAttribute(
     'href',
     '/movies?keywords=12%2C34'
@@ -3342,6 +3429,9 @@ test('configured search shelves link mixed results and preserve the search term'
   page,
 }) => {
   await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { hideRequested: true } })
+  );
   await page.route('**/api/v1/settings/discover', (route) =>
     route.fulfill({
       json: [
@@ -3362,7 +3452,11 @@ test('configured search shelves link mixed results and preserve the search term'
     queries.push(term ?? '');
     return route.fulfill({
       json: paged([
-        { ...movie, title: 'Shelf Film' },
+        {
+          ...movie,
+          title: 'Shelf Film',
+          mediaInfo: { status: 2, hasActiveRequest: true },
+        },
         { id: 101, mediaType: 'tv', name: 'Shelf Series' },
         { id: 101, mediaType: 'person', name: 'Shelf Person' },
         { id: 101, mediaType: 'collection', title: 'Shelf Collection' },
@@ -3717,7 +3811,12 @@ test('configured music shelves preserve genre and yearly chart in Music', async 
   await fixtures(page);
   await page.route('**/api/v1/settings/public', (route) =>
     route.fulfill({
-      json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+      json: {
+        musicEnabled: true,
+        enabledMediaCategories: { music: true },
+        hideAvailable: true,
+        hideBlocklisted: true,
+      },
     })
   );
   await page.route('**/api/v1/user/1/settings/main', (route) =>
@@ -3756,6 +3855,18 @@ test('configured music shelves preserve genre and yearly chart in Music', async 
           mediaType: 'album',
           title: query.has('genre') ? 'Genre Fixture' : 'Chart Fixture',
         },
+        {
+          id: 'available-album-fixture',
+          mediaType: 'album',
+          title: 'Available Fixture',
+          mediaInfo: { status: 5 },
+        },
+        {
+          id: 'blocklisted-album-fixture',
+          mediaType: 'album',
+          title: 'Blocklisted Fixture',
+          mediaInfo: { status: 6 },
+        },
       ]),
     });
   });
@@ -3774,6 +3885,14 @@ test('configured music shelves preserve genre and yearly chart in Music', async 
   await expect(
     chart.getByRole('link', { name: 'Chart Fixture' })
   ).toBeVisible();
+  for (const shelf of [genre, chart]) {
+    await expect(
+      shelf.getByRole('link', { name: 'Available Fixture' })
+    ).toHaveCount(0);
+    await expect(
+      shelf.getByRole('link', { name: 'Blocklisted Fixture' })
+    ).toHaveCount(0);
+  }
   expect(reads.some((q) => q.get('sortBy') === 'popular.year')).toBe(true);
   await expect(chart.getByRole('link', { name: 'See all' })).toHaveAttribute(
     'href',
@@ -3989,7 +4108,7 @@ test('native companion discovery filters retain genre matching and clear without
     return route.fulfill({ json: paged([movie]) });
   });
   await page.goto(
-    '/movies?nativeFilters=1&genre=18%2C35&sortBy=vote_average.desc&keywords=12'
+    './movies?nativeFilters=1&genre=18%2C35&sortBy=vote_average.desc&keywords=12&search=The+Film'
   );
   await expect
     .poll(() => Object.fromEntries(reads.at(-1) ?? []))
@@ -3997,11 +4116,21 @@ test('native companion discovery filters retain genre matching and clear without
       genre: '18,35',
       sortBy: 'vote_average.desc',
       keywords: '12',
+      voteCountGte: '50',
+      search: 'The Film',
     });
+  const title = page.getByRole('searchbox', { name: 'Title', exact: true });
+  await expect(title).toHaveValue('The Film');
+  await title.fill('all');
+  await page.getByRole('button', { name: 'Apply Title' }).click();
+  await expect.poll(() => reads.at(-1)?.get('search')).toBe('all');
+  expect(reads.at(-1)?.get('genre')).toBe('18,35');
   await page.getByRole('button', { name: /clear discovery filters/i }).click();
   await expect.poll(() => reads.at(-1)?.get('sortBy')).toBe('popularity.desc');
   expect(reads.at(-1)?.has('genre')).toBe(false);
   expect(reads.at(-1)?.has('keywords')).toBe(false);
+  expect(reads.at(-1)?.has('voteCountGte')).toBe(false);
+  expect(reads.at(-1)?.has('search')).toBe(false);
   await expect(page).toHaveURL(/\/movies$/);
 });
 
@@ -4009,16 +4138,35 @@ test('native companion discovery bookmarks retain library availability', async (
   page,
 }) => {
   await fixtures(page);
+  const queries: (string | null)[] = [];
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { enable4k: false, movie4kEnabled: true } })
+  );
+  await page.route('**/api/v1/discover/movies?**', (route) => {
+    queries.push(
+      new URL(route.request().url()).searchParams.get('availability')
+    );
+    return route.fulfill({ json: paged([movie]) });
+  });
   for (const [search, selected] of [
     ['libraryView=missing', /^Not on /],
     ['libraryView=available', /^On /],
-    ['libraryView=missing&availability=4k', /^On /],
+    ['libraryView=missing&availability=4k&search=Test', /^On /],
   ] as const) {
-    await page.goto(`/movies?nativeFilters=1&${search}`);
+    queries.length = 0;
+    await page.goto(`./movies?nativeFilters=1&${search}`);
     const availability = page.getByRole('group', { name: 'Availability' });
     await expect(
       availability.getByRole('button', { name: selected })
     ).toHaveAttribute('aria-pressed', 'true');
+    if (search.includes('availability=4k')) {
+      await expect(page.getByText('4K discovery is unavailable')).toBeVisible();
+      expect(queries).toEqual([]);
+      await page.getByRole('button', { name: 'Show HD Results' }).click();
+      await expect(page.getByRole('link', { name: movie.title })).toBeVisible();
+      expect(queries).toEqual(['hd']);
+      expect(new URL(page.url()).searchParams.has('quality')).toBe(false);
+    }
     const all = availability.getByRole('button', { name: 'All', exact: true });
     await all.click();
     await expect(all).toHaveAttribute('aria-pressed', 'true');
@@ -4026,23 +4174,80 @@ test('native companion discovery bookmarks retain library availability', async (
   }
 });
 
+test('a saved 4K discovery filter waits for availability settings and retries failures', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let settingsAvailable = false;
+  const queries: (string | null)[] = [];
+  await page.route('**/api/v1/settings/public', (route) =>
+    settingsAvailable
+      ? route.fulfill({ json: { enable4k: true } })
+      : route.fulfill({
+          status: 503,
+          json: { message: 'Settings unavailable' },
+        })
+  );
+  await page.route('**/api/v1/discover/movies?**', (route) => {
+    queries.push(
+      new URL(route.request().url()).searchParams.get('availability')
+    );
+    return route.fulfill({ json: paged([movie]) });
+  });
+  await page.goto('./movies?nativeFilters=1&availability=4k');
+  const error = page.getByRole('alert').filter({ hasText: 'sign-in options' });
+  await expect(error).toBeVisible();
+  expect(queries).toEqual([]);
+  await expect(page.getByText('Nothing here', { exact: true })).toHaveCount(0);
+  settingsAvailable = true;
+  await page.getByRole('button', { name: 'Retry', exact: true }).click();
+  await expect(page.getByLabel('Availability Quality')).toHaveValue('4k');
+  await expect(page.getByRole('link', { name: movie.title })).toBeVisible();
+  expect(queries).toEqual(['4k']);
+});
+
 test('native search bookmarks retain the decoded term and media scope', async ({
   page,
 }) => {
   await fixtures(page);
   const queries: string[] = [];
+  const types: (string | null)[] = [];
+  const creditFlags: (string | null)[] = [];
   await page.route(/\/api\/v1\/search\?/, (route) => {
-    queries.push(
-      new URL(route.request().url()).searchParams.get('query') ?? ''
-    );
+    const params = new URL(route.request().url()).searchParams;
+    queries.push(params.get('query') ?? '');
+    const type = params.get('type');
+    types.push(type);
+    const includeCredits = params.get('includeCredits');
+    creditFlags.push(includeCredits);
     return route.fulfill({
       json: paged([
         { ...movie, title: 'Bookmark Film' },
-        { id: 202, mediaType: 'tv', name: 'Bookmark Series' },
+        {
+          id: 202,
+          mediaType: 'tv',
+          name: 'Bookmark Series',
+          firstAirDate: '2020-03-01',
+          voteAverage: 7.12,
+          ...(type === 'tv' && includeCredits !== 'false'
+            ? { writers: ['Zara'], directors: ['Ada'] }
+            : {}),
+        },
+        {
+          id: 203,
+          mediaType: 'tv',
+          name: 'Another Series',
+          firstAirDate: '2024-03-01',
+          voteAverage: 7.9,
+          ...(type === 'tv' && includeCredits !== 'false'
+            ? { writers: ['Ada'], directors: ['Zara'] }
+            : {}),
+        },
+        { id: 204, mediaType: 'tv', name: 'Undated Series' },
       ]),
     });
   });
-  await page.goto('/search?query=A+%26+B&type=tv');
+  await page.goto('./search?query=A+%26+B&type=tv&sort=title&order=desc');
   await expect(page.getByRole('searchbox')).toHaveValue('A & B');
   await expect(
     page.getByRole('button', { name: 'Series', exact: true })
@@ -4054,6 +4259,34 @@ test('native search bookmarks retain the decoded term and media scope', async ({
     0
   );
   expect(queries).toContain('A & B');
+  expect(types.at(-1)).toBe('tv');
+  expect(creditFlags.at(-1)).toBe('false');
+  const seriesLinks = page.getByRole('link', {
+    name: /^(Bookmark|Another|Undated) Series$/,
+  });
+  await expect(seriesLinks.first()).toHaveAccessibleName('Undated Series');
+  await page.getByLabel('Sort Results').selectOption('title:asc');
+  await expect(seriesLinks.first()).toHaveAccessibleName('Another Series');
+  await page.getByLabel('Sort Results').selectOption('date:asc');
+  await expect(seriesLinks.first()).toHaveAccessibleName('Bookmark Series');
+  await expect(seriesLinks.last()).toHaveAccessibleName('Undated Series');
+  await page.getByLabel('Sort Results').selectOption('date:desc');
+  await expect(seriesLinks.first()).toHaveAccessibleName('Another Series');
+  await expect(seriesLinks.last()).toHaveAccessibleName('Undated Series');
+  await page.getByLabel('Sort Results').selectOption('rating:desc');
+  await expect(seriesLinks.first()).toHaveAccessibleName('Another Series');
+  await expect(seriesLinks.last()).toHaveAccessibleName('Undated Series');
+  await page.getByLabel('Sort Results').selectOption('rating:asc');
+  await expect(seriesLinks.first()).toHaveAccessibleName('Bookmark Series');
+  await expect(seriesLinks.last()).toHaveAccessibleName('Undated Series');
+  await page.getByLabel('Sort Results').selectOption('writer:asc');
+  await expect(seriesLinks.first()).toHaveAccessibleName('Another Series');
+  expect(types.at(-1)).toBe('tv');
+  expect(creditFlags.at(-1)).toBeNull();
+  await page.getByLabel('Sort Results').selectOption('director:asc');
+  await expect(seriesLinks.first()).toHaveAccessibleName('Bookmark Series');
+  await expect(seriesLinks.last()).toHaveAccessibleName('Undated Series');
+  await page.getByLabel('Sort Results').selectOption('');
   await page.getByRole('button', { name: 'Movies', exact: true }).click();
   await expect(page).toHaveURL(/\/search\?q=A\+%26\+B&f=movie$/);
   await expect(page.getByRole('link', { name: 'Bookmark Film' })).toBeVisible();
@@ -4220,6 +4453,7 @@ test('Following opens the exact anime franchise from a relationship update', asy
 
 test('Provider Discovery filters unmatched rows and opens a bookmarked MDBList feed', async ({
   page,
+  baseURL,
 }) => {
   await fixtures(page);
   const requests: URLSearchParams[] = [];
@@ -4233,7 +4467,7 @@ test('Provider Discovery filters unmatched rows and opens a bookmarked MDBList f
         json: {
           page: number,
           hasMore: number === 1,
-          missingMappings: 1,
+          missingMappings: number === 1 ? 1 : 0,
           items:
             number === 1
               ? [
@@ -4242,6 +4476,14 @@ test('Provider Discovery filters unmatched rows and opens a bookmarked MDBList f
                     title: 'Matched Fixture',
                     mediaType: 'movie',
                     tmdbId: 101,
+                    identityResolution: 'curated',
+                  },
+                  {
+                    id: 'external',
+                    title: 'External Fixture',
+                    mediaType: 'tv',
+                    tmdbId: 202,
+                    identityResolution: 'external-id',
                   },
                   { id: 'unmatched', title: 'Unmatched Fixture' },
                 ]
@@ -4250,15 +4492,21 @@ test('Provider Discovery filters unmatched rows and opens a bookmarked MDBList f
       });
     }
   );
-  await page.goto('/providers?feed=mdblist%2Flist&list=viewer%2Ffixture');
+  await page.goto('./providers?feed=mdblist%2Flist&list=viewer%2Ffixture');
   await expect(
     page.getByRole('link', { name: 'Matched Fixture' })
-  ).toHaveAttribute('href', '/movie/101');
+  ).toHaveAttribute('href', new URL('./movie/101', baseURL).pathname);
   expect(requests[0].get('list')).toBe('viewer/fixture');
+  await expect(page.getByText(/Curated match/)).toBeVisible();
+  await expect(page.getByText(/Matched by catalog ID/)).toBeVisible();
+  await expect(page.getByText('1 unmatched title on this page')).toBeVisible();
   const unmatched = page.getByRole('checkbox', { name: 'Unmatched Only' });
   await unmatched.click();
   await expect(unmatched).toBeChecked();
   await expect(page.getByText('Unmatched Fixture')).toBeVisible();
+  await expect(
+    page.getByText('This title has no stable provider ID for saving a match.')
+  ).toBeVisible();
   await expect(page.getByRole('link', { name: 'Matched Fixture' })).toHaveCount(
     0
   );
@@ -4267,10 +4515,12 @@ test('Provider Discovery filters unmatched rows and opens a bookmarked MDBList f
     page.getByText('No unmatched titles on this page.')
   ).toBeVisible();
   expect(requests.at(-1)?.get('page')).toBe('2');
+  await expect(page.getByText('1 unmatched title on this page')).toHaveCount(0);
 });
 
 test('Provider Discovery saves and resets an exact viewer title match', async ({
   page,
+  baseURL,
 }) => {
   await fixtures(page);
   let matched = false;
@@ -4324,17 +4574,18 @@ test('Provider Discovery saves and resets an exact viewer title match', async ({
     }
   );
 
-  await page.goto('/providers');
+  await page.goto('./providers');
   await page.getByRole('button', { name: 'Match Title', exact: true }).click();
   await page.getByLabel('Match Media Type').selectOption('tv');
   await page.getByRole('button', { name: 'Search Matches' }).click();
   await page.getByRole('button', { name: 'Match Catalogue Series' }).click();
   await expect(
-    page.getByRole('link', { name: 'Provider Fixture' })
-  ).toHaveAttribute('href', '/tv/202');
+    page.getByRole('link', { name: 'Provider Fixture', exact: true })
+  ).toHaveAttribute('href', new URL('./tv/202', baseURL).pathname);
+  await expect(page.getByText(/Personal match/)).toBeVisible();
   await page.getByRole('button', { name: 'Reset Match' }).click();
   await expect(
-    page.getByRole('link', { name: 'Provider Fixture' })
+    page.getByRole('link', { name: 'Provider Fixture', exact: true })
   ).toHaveCount(0);
   await expect(
     page.getByRole('button', { name: 'Match Title', exact: true })
@@ -4344,6 +4595,7 @@ test('Provider Discovery saves and resets an exact viewer title match', async ({
 
 test('Provider Discovery waits for Retry-After and offers provider reconnect', async ({
   page,
+  baseURL,
 }) => {
   await fixtures(page);
   let attempts = 0;
@@ -4374,7 +4626,7 @@ test('Provider Discovery waits for Retry-After and offers provider reconnect', a
         },
       })
   );
-  await page.goto('/providers');
+  await page.goto('./providers');
   const retry = page.getByRole('button', { name: 'Retry', exact: true });
   await expect(retry).toBeDisabled();
   await expect(page.getByRole('alert')).toContainText('Retry in');
@@ -4386,7 +4638,11 @@ test('Provider Discovery waits for Retry-After and offers provider reconnect', a
   await page.getByLabel('Provider Feed').selectOption('trakt/watchlist');
   await expect(
     page.getByRole('link', { name: 'Reconnect Provider' })
-  ).toHaveAttribute('href', '/me/account/linked-accounts');
+  ).toHaveAttribute(
+    'href',
+    new URL('./me/account/linked-accounts', baseURL).pathname +
+      '?reconnect=trakt'
+  );
   await expect(retry).toHaveCount(0);
 });
 
@@ -5075,11 +5331,99 @@ test('Provider Discovery clears feed rows when the next feed needs a list', asyn
         },
       })
   );
-  await page.goto('/providers');
+  await page.goto('./providers');
   await expect(page.getByText('Prior Feed Title')).toBeVisible();
   await page.getByLabel('Provider Feed').selectOption('mdblist/list');
   await expect(page.getByText('Prior Feed Title')).toHaveCount(0);
   await expect(page.getByText('Loading feed…')).toHaveCount(0);
+});
+
+test('System Logs restores display preferences without retaining search text', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const queries: URLSearchParams[] = [];
+  await page.route(/\/api\/v1\/settings\/logs\?/, (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    queries.push(query);
+    return route.fulfill({
+      json: {
+        pageInfo: { pages: query.get('skip') === '100000' ? 10002 : 1 },
+        results: [],
+      },
+    });
+  });
+  await page.goto('/admin/logs');
+  await page.getByRole('combobox', { name: 'Severity' }).selectOption('error');
+  await page.getByRole('combobox', { name: 'Page Size' }).selectOption('10');
+  await page.getByLabel('Search Logs').fill('temporary search');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect
+    .poll(() => queries.at(-1)?.get('search'))
+    .toBe('temporary search');
+  await page.reload();
+  await expect(page.getByRole('combobox', { name: 'Severity' })).toHaveValue(
+    'error'
+  );
+  await expect(page.getByRole('combobox', { name: 'Page Size' })).toHaveValue(
+    '10'
+  );
+  await expect(page.getByLabel('Search Logs')).toHaveValue('');
+  await expect
+    .poll(() => queries.at(-1)?.toString())
+    .toBe('take=10&skip=0&filter=error');
+  expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain(
+    'temporary search'
+  );
+  await page.goto('/admin/logs?page=10001');
+  await expect(page.getByText('Page 10001', { exact: true })).toBeVisible();
+  await expect.poll(() => queries.at(-1)?.get('skip')).toBe('100000');
+  await expect(page.getByRole('button', { name: 'Next Page' })).toBeDisabled();
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({
+      json: { id: 12, displayName: 'Another Admin', permissions: 2 },
+    })
+  );
+  await page.goto('/admin/logs');
+  await expect(page.getByRole('combobox', { name: 'Severity' })).toHaveValue(
+    'info'
+  );
+  await expect(page.getByRole('combobox', { name: 'Page Size' })).toHaveValue(
+    '25'
+  );
+});
+
+test('System Logs keeps the same entry expanded when a newer log arrives', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let refresh = false;
+  const entry = {
+    timestamp: '2026-11-18T00:00:00Z',
+    level: 'info',
+    message: 'Original entry',
+    data: { value: 1 },
+  };
+  await page.route(/\/api\/v1\/settings\/logs\?/, (route) =>
+    route.fulfill({
+      json: {
+        pageInfo: { pages: 1 },
+        results: refresh
+          ? [{ ...entry, message: 'New entry', data: { value: 2 } }, entry]
+          : [entry],
+      },
+    })
+  );
+  await page.goto('/admin/logs');
+  const row = page.getByRole('listitem').filter({ hasText: 'Original entry' });
+  await row.getByText('Details', { exact: true }).click();
+  await expect(row.getByText('{"value":1}', { exact: true })).toBeVisible();
+  refresh = true;
+  await page.getByRole('button', { name: 'Refresh', exact: true }).click();
+  const latest = page.getByRole('listitem').filter({ hasText: 'New entry' });
+  await expect(latest).toBeVisible();
+  await expect(row.getByText('{"value":1}', { exact: true })).toBeVisible();
+  await expect(latest.getByText('{"value":2}', { exact: true })).toBeHidden();
 });
 
 test('System Logs filters server entries and excludes non-admins', async ({
@@ -5092,7 +5436,7 @@ test('System Logs filters server entries and excludes non-admins', async ({
     const query = new URL(route.request().url()).searchParams;
     return route.fulfill({
       json: {
-        pageInfo: { pages: 1 },
+        pageInfo: { pages: 3 },
         results: [
           {
             timestamp: '2026-11-18T00:00:00Z',
@@ -5101,7 +5445,9 @@ test('System Logs filters server entries and excludes non-admins', async ({
             message:
               query.get('search') === 'a&b'
                 ? 'Filtered result'
-                : 'Initial result',
+                : query.get('skip') === '25'
+                  ? 'Second page result'
+                  : 'Initial result',
             data: { attempts: 2 },
           },
         ],
@@ -5111,9 +5457,15 @@ test('System Logs filters server entries and excludes non-admins', async ({
   await page.goto('/me');
   await page.getByRole('link', { name: 'Open System Logs' }).click();
   await expect(page.getByText('Initial result')).toBeVisible();
+  await page.getByRole('button', { name: 'Next Page' }).click();
+  await expect(page).toHaveURL(/\/admin\/logs\?page=2$/);
+  await expect(page.getByText('Second page result')).toBeVisible();
+  await page.reload();
+  await expect(page.getByText('Second page result')).toBeVisible();
   await page.getByLabel('Search Logs').fill('a&b');
   await page.getByRole('button', { name: 'Search', exact: true }).click();
   await expect(page.getByText('Filtered result')).toBeVisible();
+  await expect(page).toHaveURL(/\/admin\/logs$/);
   await page.getByText('Details', { exact: true }).click();
   await expect(page.getByText('{"attempts":2}', { exact: true })).toBeVisible();
   expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain(
@@ -5819,7 +6171,42 @@ test('Classic service category bookmarks filter the Lumen administration menu', 
   ).toHaveCount(0);
 });
 
-test('Steam settings bookmark brings the key field into view', async ({
+test('Administration searches all settings and opens exact controls', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.goto('/admin?serviceCategory=music');
+  const search = page.getByRole('searchbox', { name: 'Search Settings' });
+  await search.fill('system logs');
+  await expect(
+    page.getByRole('link', { name: 'Open System Logs' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Open Lidarr Services' })
+  ).toHaveCount(0);
+  await search.fill('not-an-existing-setting');
+  await expect(page.getByText('No settings match this search.')).toBeVisible();
+  await search.fill('apikey');
+  await expect(
+    page.getByRole('link', { name: 'Open Application API Key' })
+  ).toHaveAttribute('href', '/admin/general#apiKey');
+  await search.fill('uhd');
+  await page.getByRole('link', { name: 'Open 4K Requests' }).click();
+  await expect(page).toHaveURL(/\/admin\/general#enable4k$/);
+});
+
+test('Administration resolves the legacy Prowlarr bookmark fragment', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.goto('/admin#prowlarr');
+  await expect(page).toHaveURL('/admin/prowlarr');
+  await expect(
+    page.getByRole('heading', { name: 'Prowlarr Settings', exact: true })
+  ).toBeVisible();
+});
+
+test('Administration search brings the Steam key field into view', async ({
   page,
 }) => {
   await fixtures(page);
@@ -5832,13 +6219,101 @@ test('Steam settings bookmark brings the key field into view', async ({
       },
     })
   );
-  await page.goto('/admin/software-acquisition#steam-library-import');
+  await page.goto('/admin');
+  await page
+    .getByRole('searchbox', { name: 'Search Settings' })
+    .fill('steam key');
+  await page.getByRole('link', { name: 'Open Steam Library Import' }).click();
+  await expect(page).toHaveURL(
+    /\/admin\/software-acquisition#steam-library-import$/
+  );
   await expect(
     page.getByRole('heading', { name: 'Steam Library Import' })
   ).toBeInViewport();
   const key = page.getByLabel('Steam Web API Key', { exact: true });
   await expect(key).toBeInViewport();
   await expect(key).toHaveValue('');
+});
+
+test('override rules save multiple language and country selections', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/radarr', (route) =>
+    route.fulfill({ json: [{ id: 1, name: 'Test Radarr' }] })
+  );
+  for (const [path, json] of [
+    [
+      'service/radarr/1',
+      { profiles: [{ id: 4, name: 'HD' }], rootFolders: [], tags: [] },
+    ],
+    ['genres/movie', []],
+    [
+      'languages',
+      [
+        { iso_639_1: 'en', english_name: 'English' },
+        { iso_639_1: 'fr', english_name: 'French' },
+      ],
+    ],
+    [
+      'regions',
+      [
+        { iso_3166_1: 'CA', english_name: 'Canada' },
+        { iso_3166_1: 'US', english_name: 'United States' },
+      ],
+    ],
+  ] as const) {
+    await page.route(`**/api/v1/${path}`, (route) => route.fulfill({ json }));
+  }
+  await page.route('**/api/v1/overrideRule', (route) =>
+    route.fulfill({ json: route.request().method() === 'GET' ? [] : { id: 1 } })
+  );
+  await page.goto('/admin/override-rules');
+  await page.getByRole('button', { name: 'New Override Rule' }).click();
+  const choice = (name: string) =>
+    page.getByRole('combobox', { name, exact: true });
+  await choice('Service').selectOption({ label: 'Radarr · Test Radarr' });
+  await choice('Language').selectOption({ label: 'English' });
+  await choice('Language').selectOption({ label: 'French' });
+  await choice('Production Country').selectOption({ label: 'Canada' });
+  await choice('Production Country').selectOption({ label: 'United States' });
+  await choice('Quality Profile').selectOption({ label: 'HD' });
+  const write = page.waitForRequest(
+    (request) =>
+      request.method() === 'POST' &&
+      new URL(request.url()).pathname === '/api/v1/overrideRule'
+  );
+  await page.getByRole('button', { name: 'Save Rule', exact: true }).click();
+  expect((await write).postDataJSON()).toMatchObject({
+    radarrServiceId: 1,
+    language: 'en|fr',
+    productionCountries: 'CA|US',
+    profileId: 4,
+  });
+});
+
+test('Administration search opens the download client polling interval', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/download-clients', (route) =>
+    route.fulfill({ json: { pollIntervalSeconds: 7, clients: [] } })
+  );
+  await page.goto('/admin');
+  await page
+    .getByRole('searchbox', { name: 'Search Settings' })
+    .fill('poll frequency');
+  await page
+    .getByRole('link', { name: 'Open Download Client Refresh Interval' })
+    .click();
+  await expect(page).toHaveURL(
+    /\/admin\/download-clients#download-clients-interval$/
+  );
+  const interval = page.getByLabel('Refresh Interval (Seconds)', {
+    exact: true,
+  });
+  await expect(interval).toBeInViewport({ ratio: 1 });
+  await expect(interval).toHaveValue('7');
 });
 
 test('General Settings saves default request quotas without changing other media drafts', async ({
@@ -5848,6 +6323,7 @@ test('General Settings saves default request quotas without changing other media
   const defaultQuotas = {
     movie: { quotaLimit: 4, quotaDays: 7 },
     adult: { quotaLimit: 1, quotaDays: 14 },
+    book: {},
   };
   const writes: unknown[] = [];
   await page.route('**/api/v1/settings/main', (route) => {
@@ -5855,6 +6331,7 @@ test('General Settings saves default request quotas without changing other media
       const body = route.request().postDataJSON();
       writes.push(body);
       Object.assign(defaultQuotas.adult, body.defaultQuotas.adult);
+      Object.assign(defaultQuotas.book, body.defaultQuotas.book);
     }
     return route.fulfill({
       json: {
@@ -5899,6 +6376,13 @@ test('General Settings saves default request quotas without changing other media
   await category.selectOption('adult');
   await expect(limit).toHaveValue('0');
   await expect(days).toHaveValue('0');
+  await category.selectOption('book');
+  await expect(limit).toHaveValue('0');
+  await expect(days).toHaveValue('0');
+  await limit.fill('3');
+  await save.click();
+  await expect(page.getByText('Default request quota saved.')).toBeVisible();
+  expect(writes.at(-1)).toEqual({ defaultQuotas: { book: { quotaLimit: 3 } } });
   await page.getByRole('link', { name: 'Default User Categories' }).click();
   await expect(page).toHaveURL(/\/admin\/categories#default-user-categories$/);
   await expect(
@@ -5969,15 +6453,29 @@ test('Scheduled Jobs confirms a run and saves an edited schedule', async ({
     cronSchedule: '0 */15 * * * *',
     enabled: true,
     running: false,
+    canCancel: false,
   };
   let runs = 0;
   await page.route('**/api/v1/settings/jobs', (route) =>
-    route.fulfill({ json: [job] })
+    route.fulfill({
+      json: [
+        job,
+        {
+          ...job,
+          id: 'fixed',
+          name: 'Non-Cancellable Job',
+          running: true,
+          cronSchedule: '0 0 4 * * *',
+          canCancel: false,
+        },
+      ],
+    })
   );
   await page.route('**/api/v1/settings/jobs/sample/run', (route) => {
     expect(route.request().method()).toBe('POST');
     runs++;
     job.running = true;
+    job.canCancel = true;
     return route.fulfill({ json: job });
   });
   await page.route('**/api/v1/settings/jobs/sample/schedule', (route) => {
@@ -5988,6 +6486,9 @@ test('Scheduled Jobs confirms a run and saves an edited schedule', async ({
   });
   await page.goto('/me');
   await page.getByRole('link', { name: 'Open Scheduled Jobs' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Cancellation Unavailable' })
+  ).toBeDisabled();
   await page.getByRole('button', { name: 'Run Now' }).click();
   expect(runs).toBe(0);
   await page
@@ -5996,7 +6497,11 @@ test('Scheduled Jobs confirms a run and saves an edited schedule', async ({
     .click();
   await expect(page.getByRole('button', { name: 'Cancel Job' })).toBeVisible();
   expect(runs).toBe(1);
-  await page.getByRole('button', { name: 'Edit Schedule' }).click();
+  await page
+    .getByRole('listitem')
+    .filter({ hasText: 'Fixture Job' })
+    .getByRole('button', { name: 'Edit Schedule' })
+    .click();
   await expect(page.getByLabel('Frequency')).toHaveValue('15');
   await page.getByLabel('Frequency').selectOption('20');
   await expect(page.getByLabel('Cron Schedule')).toHaveValue('0 */20 * * * *');
@@ -6307,6 +6812,8 @@ test('Users saves and resets a selected media quota', async ({ page }) => {
   let quotas: Record<string, number | null> = {
     globalMusicQuotaLimit: 4,
     globalMusicQuotaDays: 7,
+    globalBookQuotaLimit: 1,
+    globalBookQuotaDays: 0,
   };
   await page.route('**/api/v1/user/19/settings/main', (route) => {
     if (route.request().method() === 'POST') {
@@ -6318,6 +6825,13 @@ test('Users saves and resets a selected media quota', async ({ page }) => {
   });
   await page.goto('/admin/users');
   await page.getByRole('button', { name: 'Request Quotas' }).click();
+  await expect(
+    page.getByText('Server default unlimited requests')
+  ).toBeVisible();
+  await page.getByLabel('Media Type').selectOption('book');
+  await expect(
+    page.getByText('Server default 1 request across all time')
+  ).toBeVisible();
   await page.getByLabel('Media Type').selectOption('music');
   await expect(
     page.getByText('Server default 4 requests per 7 days')
@@ -7089,12 +7603,20 @@ test('General Settings shortcuts scroll to their controls after settings load', 
       },
     })
   );
-  for (const [anchor, label] of [
-    ['enable4k', 'Enable 4K'],
-    ['spotifyClientId', 'Spotify Client ID'],
-    ['apiKey', 'API Key'],
+  for (const [anchor, label, query, result] of [
+    ['enable4k', 'Enable 4K', 'uhd', '4K Requests'],
+    [
+      'spotifyClientId',
+      'Spotify Client ID',
+      'spotify client id',
+      'Spotify Playlist Import',
+    ],
+    ['apiKey', 'API Key', 'apikey', 'Application API Key'],
   ] as const) {
-    await page.goto(`/admin/general#${anchor}`);
+    await page.goto('/admin');
+    await page.getByRole('searchbox', { name: 'Search Settings' }).fill(query);
+    await page.getByRole('link', { name: `Open ${result}` }).click();
+    await expect(page).toHaveURL(`/admin/general#${anchor}`);
     const control = page.getByLabel(label, { exact: true });
     await expect(control).toBeInViewport({ ratio: 1 });
     await page.screenshot({ path: info.outputPath(`settings-${anchor}.png`) });
@@ -7331,7 +7853,7 @@ test('Discover and Movies apply visibility defaults while the library view still
       });
     }
   );
-  await page.goto('/');
+  await page.goto('./');
   const rail = page.getByRole('heading', {
     name: 'Trending movies',
     exact: true,
@@ -7347,7 +7869,7 @@ test('Discover and Movies apply visibility defaults while the library view still
   ]) {
     await expect(page.getByRole('link', { name: title })).toHaveCount(0);
   }
-  await page.goto('/movies');
+  await page.goto('./movies');
   await expect(
     page.getByRole('link', { name: 'Visible fixture' })
   ).toBeVisible();
@@ -7360,6 +7882,78 @@ test('Discover and Movies apply visibility defaults while the library view still
   }
   await page.getByRole('button', { name: /^On / }).click();
   await expect(page.getByRole('link', { name: 'Owned fixture' })).toBeVisible();
+  const librarySearch = page.waitForRequest((request) => {
+    const url = new URL(request.url());
+    return (
+      url.pathname === '/api/v1/discover/movies' &&
+      url.searchParams.get('availability') === 'hd' &&
+      url.searchParams.get('search') === 'fixture'
+    );
+  });
+  await page
+    .getByRole('searchbox', { name: 'Title', exact: true })
+    .fill('fixture');
+  await page.getByRole('button', { name: 'Apply Title' }).click();
+  await librarySearch;
+  await expect(page.getByRole('link', { name: 'Owned fixture' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Visible fixture' })).toHaveCount(
+    0
+  );
+  const sortedLibrarySearch = page.waitForRequest((request) => {
+    const url = new URL(request.url());
+    return (
+      url.pathname === '/api/v1/discover/movies' &&
+      url.searchParams.get('availability') === 'hd' &&
+      url.searchParams.get('search') === 'fixture' &&
+      url.searchParams.get('sortBy') === 'original_title.asc'
+    );
+  });
+  await page
+    .getByRole('combobox', { name: 'Sort', exact: true })
+    .selectOption('original_title.asc');
+  await sortedLibrarySearch;
+  await expect(page.getByRole('link', { name: 'Owned fixture' })).toBeVisible();
+  await page.getByRole('button', { name: 'All', exact: true }).click();
+  await expect(
+    page.getByRole('link', { name: 'Requested fixture' })
+  ).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Blocked fixture' })).toHaveCount(
+    0
+  );
+  const seriesSort = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return (
+      url.pathname === '/api/v1/discover/tv' &&
+      url.searchParams.get('availability') === 'hd' &&
+      url.searchParams.get('firstAirDateGte') === '2020-01-01' &&
+      url.searchParams.get('sortBy') === 'first_air_date.desc'
+    );
+  });
+  await page.goto(
+    './series?show=have&sort=first_air_date.desc&firstAirDateGte=2020-01-01'
+  );
+  await seriesSort;
+  const invertedQueries: string[] = [];
+  await page.route('**/api/v1/discover/tv?**', (route) => {
+    invertedQueries.push(route.request().url());
+    return route.fulfill({ json: paged([]) });
+  });
+  await page.goto(
+    './series?show=have&firstAirDateGte=2025-12-31&firstAirDateLte=2025-01-01'
+  );
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'lower bound' })
+  ).toBeVisible();
+  await expect(page.getByText('Nothing here', { exact: true })).toHaveCount(0);
+  expect(invertedQueries).toEqual([]);
+  await page.goto('./series?show=have&firstAirDateGte=2025-02-29');
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'invalid date' })
+  ).toBeVisible();
+  expect(invertedQueries).toEqual([]);
+  await page.getByRole('button', { name: 'Clear Release Dates' }).click();
+  await expect(page).toHaveURL(/series\?show=have$/);
+  await expect.poll(() => invertedQueries.length).toBe(1);
 });
 
 test('Trending and Coming Soon apply discovery visibility and keep later pages reachable', async ({
@@ -7422,6 +8016,51 @@ test('Trending and Coming Soon apply discovery visibility and keep later pages r
     '/api/v1/discover/movies/upcoming:1',
     '/api/v1/discover/movies/upcoming:2',
   ]);
+});
+
+test('Coming Soon retries a mismatched page without dropping loaded titles', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const reads: number[] = [];
+  await page.route('**/api/v1/discover/movies/upcoming?page=*', (route) => {
+    const page = Number(
+      new URL(route.request().url()).searchParams.get('page')
+    );
+    const returnedPage = page === 2 && !reads.includes(2) ? 1 : page;
+    reads.push(page);
+    return route.fulfill({
+      json: {
+        page: returnedPage,
+        totalPages: 2,
+        totalResults: 2,
+        results: [
+          {
+            ...movie,
+            id: movie.id + returnedPage,
+            title: `Upcoming Page ${returnedPage}`,
+          },
+        ],
+      },
+    });
+  });
+  await page.goto('/soon?media=movie');
+  const first = page.getByRole('link', { name: 'Upcoming Page 1' });
+  const second = page.getByRole('link', { name: 'Upcoming Page 2' });
+  const more = page.getByRole('button', { name: 'Show more upcoming movies' });
+  await expect(first).toBeVisible();
+  await more.click();
+  await expect(
+    page.getByText('The server returned a different page. Try again.')
+  ).toBeVisible();
+  await expect(first).toBeVisible();
+  await expect(second).toHaveCount(0);
+  expect(reads).toEqual([1, 2]);
+  await page.getByRole('button', { name: 'Retry', exact: true }).click();
+  await expect(second).toBeVisible();
+  await expect(first).toHaveCount(1);
+  await expect(more).toHaveCount(0);
+  expect(reads).toEqual([1, 2, 2]);
 });
 
 test('Streaming Request Policy preserves edits across a failed save', async ({
@@ -7695,13 +8334,24 @@ test('a filter-only Classic series bookmark shows matching titles without a sear
             mediaType: 'tv',
             id: second ? 92 : 91,
             name: second ? 'Second Filtered Series' : 'Filtered Series Fixture',
+            directors: ['Zara'],
           },
+          ...(url.searchParams.get('includeCredits') === 'true'
+            ? [
+                {
+                  mediaType: 'tv',
+                  id: 93,
+                  name: 'Directed Series',
+                  directors: ['Ada'],
+                },
+              ]
+            : []),
         ]),
         totalPages: 2,
       },
     });
   });
-  await page.goto('/search?type=tv&genre=18&language=fr');
+  await page.goto('./search?type=tv&genre=18&language=fr');
   await expect(
     page.getByRole('link', { name: 'Filtered Series Fixture' })
   ).toBeVisible();
@@ -7722,6 +8372,13 @@ test('a filter-only Classic series bookmark shows matching titles without a sear
     page.getByRole('link', { name: 'Filtered Series Fixture' })
   ).toHaveCount(0);
   await expect(page).toHaveURL(/\/search\?f=tv$/);
+  await page.goto('./search?type=tv&genre=18&language=fr&sort=director');
+  const series = page.getByRole('link', {
+    name: /^(Directed Series|Filtered Series Fixture)$/,
+  });
+  await expect(series.first()).toHaveAccessibleName('Directed Series');
+  await page.getByLabel('Sort Results').selectOption('director:desc');
+  await expect(series.first()).toHaveAccessibleName('Filtered Series Fixture');
 });
 
 test('regular video search links to later pages and resets on scope change', async ({
@@ -7744,7 +8401,7 @@ test('regular video search links to later pages and resets on scope change', asy
       },
     });
   });
-  await page.goto('/search?q=Test');
+  await page.goto('./search?q=Test&sort=title&order=desc');
   await expect(
     page.getByRole('link', { name: 'First Page Film' })
   ).toBeVisible();
@@ -7753,10 +8410,12 @@ test('regular video search links to later pages and resets on scope change', asy
     page.getByRole('link', { name: 'Second Page Film' })
   ).toBeVisible();
   await expect(page).toHaveURL(/page=2$/);
+  await expect(page.getByLabel('Sort Results')).toHaveValue('title:desc');
   await page.reload();
   await expect(
     page.getByRole('link', { name: 'Second Page Film' })
   ).toBeVisible();
+  await expect(page.getByLabel('Sort Results')).toHaveValue('title:desc');
   await page
     .getByRole('group', { name: 'Search in' })
     .getByRole('button', { name: 'Movies' })
@@ -7764,7 +8423,98 @@ test('regular video search links to later pages and resets on scope change', asy
   await expect(
     page.getByRole('link', { name: 'First Page Film' })
   ).toBeVisible();
-  await expect(page).toHaveURL(/q=Test&f=movie$/);
+  await expect(page).toHaveURL(/q=Test&sort=title&order=desc&f=movie$/);
+});
+
+test('All search reaches later book pages after the video results end', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/search?**', (route) =>
+    route.fulfill({ json: paged([{ ...movie, title: 'Only Film' }]) })
+  );
+  await page.route('**/api/v1/discover/books?**', (route) => {
+    const params = new URL(route.request().url()).searchParams;
+    const audio = params.get('format') === 'audiobook';
+    const current = Number(params.get('page'));
+    const title = audio ? 'Only Audiobook' : `Book Page ${current}`;
+    return route.fulfill({
+      json: {
+        ...paged([
+          { id: audio ? 'audio' : `book-${current}`, mediaType: 'book', title },
+        ]),
+        totalPages: audio ? 1 : 2,
+      },
+    });
+  });
+  await page.goto('./search?q=Test');
+  await expect(page.getByRole('link', { name: 'Book Page 1' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Only Audiobook' })
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Next Page' }).click();
+  await expect(page.getByRole('link', { name: 'Book Page 2' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Only Film' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Only Audiobook' })).toHaveCount(
+    0
+  );
+  await expect(page.getByRole('button', { name: 'Next Page' })).toBeDisabled();
+  await page.goBack();
+  await expect(page.getByRole('link', { name: 'Book Page 1' })).toBeVisible();
+});
+
+test('All search keeps successful results and retries a failed book catalog', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let bookCatalogUnavailable = true;
+  let videoPartial = false;
+  let videoCalls = 0;
+  await page.route('**/api/v1/search?**', (route) => {
+    videoCalls++;
+    return route.fulfill({
+      json: {
+        ...paged([{ ...movie, title: 'Available Film' }]),
+        partial: videoPartial,
+      },
+    });
+  });
+  await page.route('**/api/v1/discover/books?**', (route) => {
+    const audio =
+      new URL(route.request().url()).searchParams.get('format') === 'audiobook';
+    if (audio) return route.fulfill({ json: paged([]) });
+    if (bookCatalogUnavailable) return route.fulfill({ status: 503, json: {} });
+    return route.fulfill({
+      json: paged([
+        { id: 'recovered', mediaType: 'book', title: 'Recovered Book' },
+      ]),
+    });
+  });
+  await page.goto('./search?q=Test');
+  const film = page.getByRole('link', { name: 'Available Film' });
+  const warning = page
+    .getByRole('alert')
+    .filter({ hasText: 'some search results' });
+  await expect(film).toBeVisible();
+  await expect(warning).toBeVisible();
+  bookCatalogUnavailable = false;
+  await warning.getByRole('button', { name: 'Retry' }).click();
+  await expect(film).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Recovered Book' })
+  ).toBeVisible();
+  await expect(warning).toHaveCount(0);
+  expect(videoCalls).toBe(1);
+  videoPartial = true;
+  await page.goto('./search?q=Other');
+  await expect(film).toBeVisible();
+  expect(videoCalls).toBe(2);
+  await expect(warning).toContainText('A search provider did not respond.');
+  videoPartial = false;
+  await warning.getByRole('button', { name: 'Retry' }).click();
+  await expect.poll(() => videoCalls).toBe(3);
+  await expect(warning).toHaveCount(0);
+  await expect(film).toBeVisible();
 });
 
 test('scoped book and comic searches retain their catalogue page in the URL', async ({
@@ -7795,7 +8545,7 @@ test('scoped book and comic searches retain their catalogue page in the URL', as
       (route) => route.fulfill({ json: { ...paged([]), totalPages: 2 } })
     );
     const first = page.waitForRequest((request) => matches(request, '1'));
-    await page.goto('/search?q=Fixture&f=' + scope);
+    await page.goto('./search?q=Fixture&f=' + scope);
     await first;
     const second = page.waitForRequest((request) => matches(request, '2'));
     await page.getByRole('button', { name: 'Next Page' }).click();
@@ -7847,27 +8597,43 @@ test('Classic music search bookmarks open the Music scope with album and artist 
   await fixtures(page);
   const albumId = 'ca52c0ec-764d-4705-9fac-6315533215a2';
   const artistId = '8a7ca096-0778-49cb-8a0e-02cdabd91735';
+  const secondAlbumId = 'a9ac219a-1d5c-4844-ab4b-9164f779c5e8';
   await page.route('**/api/v1/search?*', (route) => {
     const query = new URL(route.request().url()).searchParams;
     expect(query.get('type')).toBe('music');
     expect(query.get('genre')).toBe('jazz');
     return route.fulfill({
       json: paged([
-        { mediaType: 'album', id: albumId, title: 'Fixture Album' },
+        {
+          mediaType: 'album',
+          id: albumId,
+          title: 'Fixture Album',
+          'artist-credit': [{ name: 'Zara' }],
+        },
+        {
+          mediaType: 'album',
+          id: secondAlbumId,
+          title: 'Second Album',
+          'artist-credit': [{ name: 'Ada' }],
+        },
         { mediaType: 'artist', id: artistId, name: 'Fixture Artist' },
       ]),
     });
   });
-  await page.goto('/search?query=Fixture&type=music&genre=jazz');
+  await page.goto('./search?query=Fixture&type=music&genre=jazz&sort=artist');
   await expect(
     page.getByRole('button', { name: 'Music', exact: true })
   ).toHaveAttribute('aria-pressed', 'true');
   await expect(
     page.getByRole('link', { name: 'Fixture Album' })
-  ).toHaveAttribute('href', '/music/' + albumId);
+  ).toHaveAttribute('href', new RegExp('/music/' + albumId + '$'));
   await expect(
     page.getByRole('link', { name: 'Fixture Artist' })
-  ).toHaveAttribute('href', '/artist/' + artistId);
+  ).toHaveAttribute('href', new RegExp('/artist/' + artistId + '$'));
+  const albums = page.getByRole('link', { name: /^(Fixture|Second) Album$/ });
+  await expect(albums.first()).toHaveAccessibleName('Second Album');
+  await page.getByLabel('Sort Results').selectOption('artist:desc');
+  await expect(albums.first()).toHaveAccessibleName('Fixture Album');
   await page.route('**/api/v1/discover/music?*', (route) => {
     const query = new URL(route.request().url()).searchParams;
     expect(query.get('genre')).toBe('jazz');
@@ -7883,7 +8649,7 @@ test('Classic music search bookmarks open the Music scope with album and artist 
       },
     });
   });
-  await page.goto('/search?type=music&genre=jazz&page=2');
+  await page.goto('./search?type=music&genre=jazz&page=2');
   await expect(
     page.getByRole('link', { name: 'Jazz Catalogue Album' })
   ).toBeVisible();
@@ -7892,6 +8658,53 @@ test('Classic music search bookmarks open the Music scope with album and artist 
   await expect(
     page.getByRole('link', { name: 'Jazz Catalogue Album' })
   ).toHaveCount(0);
+});
+
+test('Classic book bookmarks sort search results by author and publisher', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/discover/books?**', (route) =>
+    route.fulfill({
+      json: paged([
+        {
+          id: 'first',
+          mediaType: 'book',
+          title: 'First Book',
+          author: 'Zara',
+          publisher: 'Alpha Press',
+          bookFormat: 'ebook',
+        },
+        {
+          id: 'second',
+          mediaType: 'book',
+          title: 'Second Book',
+          author: 'Ada',
+          publisher: 'Zeta Press',
+          bookFormat: 'ebook',
+        },
+        {
+          id: 'third',
+          mediaType: 'book',
+          title: 'Third Book',
+          bookFormat: 'ebook',
+        },
+      ]),
+    })
+  );
+  await page.goto('./search?query=Fixture&type=book&sort=author');
+  const books = page.getByRole('link', { name: /^(First|Second|Third) Book$/ });
+  await expect(books.first()).toHaveAccessibleName('Second Book');
+  await expect(books.last()).toHaveAccessibleName('Third Book');
+  await page.getByLabel('Sort Results').selectOption('author:desc');
+  await expect(books.first()).toHaveAccessibleName('First Book');
+  await expect(books.last()).toHaveAccessibleName('Third Book');
+  await page.goto('./search?query=Fixture&type=book&sort=publisher&order=desc');
+  await expect(books.first()).toHaveAccessibleName('Second Book');
+  await expect(books.last()).toHaveAccessibleName('Third Book');
+  await page.getByLabel('Sort Results').selectOption('publisher:asc');
+  await expect(books.first()).toHaveAccessibleName('First Book');
+  await expect(books.last()).toHaveAccessibleName('Third Book');
 });
 
 for (const { advanced, detail } of [

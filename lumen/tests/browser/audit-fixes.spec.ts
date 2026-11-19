@@ -178,6 +178,116 @@ test('a 4K-only movie links Watch to the 4K copy', async ({ page }) => {
   await expect(watch).toHaveAttribute('href', url);
 });
 
+test('a 4K movie bookmark selects the 4K playback copy', async ({ page }) => {
+  const hd = 'https://app.plex.tv/desktop/#!/server/s/details?key=hd';
+  const uhd = 'https://app.plex.tv/desktop/#!/server/s/details?key=uhd';
+  await fixtures(page, (path) => {
+    if (path === '/movie/60' || path === '/movie/61')
+      return {
+        json: {
+          id: Number(path.split('/').at(-1)),
+          title: 'Two Copies',
+          genres: [],
+          mediaInfo: {
+            id: 3,
+            status: 5,
+            status4k: path.endsWith('/60') ? 5 : 1,
+            mediaUrl: hd,
+            mediaUrl4k: path.endsWith('/60') ? uhd : undefined,
+          },
+        },
+      };
+  });
+  await page.goto('/movie/60?quality=4k');
+  await expect(
+    page.getByRole('link', { name: 'Watch 4K on Plex' }).first()
+  ).toHaveAttribute('href', uhd);
+  await page.goto('/movie/60');
+  await expect(
+    page.getByRole('link', { name: 'Watch on Plex' }).first()
+  ).toHaveAttribute('href', hd);
+  await page.goto('/movie/61?quality=4k');
+  await expect(page.getByText('4K playback is unavailable.')).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Watch 4K on Plex' })
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('link', { name: 'Watch on Plex' }).first()
+  ).toHaveAttribute('href', hd);
+});
+
+test('an open 4K movie bookmark refreshes when the requested copy arrives', async ({
+  page,
+}) => {
+  const uhd = 'https://app.plex.tv/desktop/#!/server/s/details?key=uhd';
+  let available = false;
+  await page.clock.install();
+  await fixtures(page, (path) => {
+    if (path === '/movie/62')
+      return {
+        json: {
+          id: 62,
+          title: 'Pending Copy',
+          genres: [],
+          mediaInfo: {
+            id: 3,
+            status: 1,
+            status4k: available ? 5 : 3,
+            mediaUrl4k: available ? uhd : undefined,
+          },
+        },
+      };
+  });
+  await page.goto('/movie/62?quality=4k');
+  await expect(page.getByText('4K playback is unavailable.')).toBeVisible();
+  available = true;
+  await page.clock.fastForward(30_100);
+  await expect(
+    page.getByRole('link', { name: 'Watch 4K on Plex' }).first()
+  ).toHaveAttribute('href', uhd);
+});
+
+test('a pending 4K refresh removes the cached title when access is revoked', async ({
+  page,
+}) => {
+  let denied = false;
+  await page.clock.install();
+  await fixtures(page, (path) => {
+    if (path !== '/movie/63') return;
+    if (denied) return { status: 403, json: { message: 'Access denied.' } };
+    return {
+      json: {
+        id: 63,
+        title: 'Restricted Copy',
+        genres: [],
+        mediaInfo: {
+          id: 3,
+          status: 5,
+          status4k: 3,
+          mediaUrl: 'https://app.plex.tv/desktop/#!/server/s/details?key=hd',
+        },
+      },
+    };
+  });
+  await page.goto('/movie/63?quality=4k');
+  const watch = page.getByRole('link', { name: 'Watch on Plex' }).first();
+  await expect(watch).toBeVisible();
+  denied = true;
+  await page.clock.fastForward(30_100);
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'Access denied.' })
+  ).toBeVisible();
+  await expect(watch).toHaveCount(0);
+  await expect(
+    page.getByRole('heading', { name: 'Restricted Copy' })
+  ).toHaveCount(0);
+  await page.reload();
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'Access denied.' })
+  ).toBeVisible();
+  await expect(watch).toHaveCount(0);
+});
+
 test('the audiobooks page is titled Audiobooks', async ({ page }) => {
   await fixtures(page, (path) => {
     if (path === '/settings/public') return undefined;

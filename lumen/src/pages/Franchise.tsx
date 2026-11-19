@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth } from '../auth';
+import AnimeContinuation from '../components/AnimeContinuation';
 import { Section } from '../components/cards';
 import { ExtraHeader, ServiceNote } from '../components/extra';
 import FollowButton from '../components/FollowButton';
@@ -39,6 +40,9 @@ const targetTypes = {
   album: 'Album',
   book: 'Book',
 };
+const bookshelfId = /^bookshelf:\d+:[A-Za-z0-9_-]+$/;
+const validGameId = (id: string) =>
+  /^[1-9]\d{0,15}$/.test(id) && Number.isSafeInteger(Number(id));
 const targetRoutes: Record<string, string> = {
   movie: '/movie',
   tv: '/tv',
@@ -52,6 +56,7 @@ interface FranchiseItem {
   title: string;
   href: string;
   mediaType: string;
+  anilistId?: number;
   format?: string;
   year?: number;
   confidence: 'high' | 'moderate' | 'low';
@@ -68,11 +73,19 @@ interface FranchiseData {
 }
 
 function itemHref(item: FranchiseItem) {
+  if (item.mediaType === 'game' && item.href.startsWith('/game/game/')) {
+    const id = item.href.slice('/game/game/'.length);
+    if (validGameId(id)) return item.href;
+  }
+  if (item.href.startsWith('/search?')) {
+    const query = new URLSearchParams(item.href.slice('/search?'.length));
+    return `/search?${new URLSearchParams({ q: query.get('q') || query.get('query') || item.title })}`;
+  }
   if (
+    /^\/book\/bookshelf(?::|%3a)\d+(?::|%3a)[A-Za-z0-9_-]+$/i.test(item.href) ||
     /^\/(movie|tv|book|music|artist|comic|collection|franchise)(?:\/[A-Za-z0-9_-]+){1,2}$/.test(
       item.href
-    ) ||
-    /^\/search\?[^#]*$/.test(item.href)
+    )
   )
     return item.href;
   return `/search?${new URLSearchParams({ q: item.title })}`;
@@ -80,6 +93,12 @@ function itemHref(item: FranchiseItem) {
 
 export default function Franchise() {
   const { mediaType = '', id = '' } = useParams();
+  return (
+    <FranchiseTitle key={`${mediaType}:${id}`} mediaType={mediaType} id={id} />
+  );
+}
+
+function FranchiseTitle({ mediaType, id }: { mediaType: string; id: string }) {
   const { user } = useAuth();
   const valid =
     (mediaType === 'tv' || mediaType === 'anime') && /^\d{1,10}$/.test(id);
@@ -133,9 +152,15 @@ export default function Franchise() {
       ? targetRoutes[toType]
       : '';
     const href =
-      route && /^[A-Za-z0-9_-]{1,128}$/.test(toId)
-        ? `${route}/${toId}`
-        : undefined;
+      toType === 'game' && validGameId(toId)
+        ? `/game/game/${toId}`
+        : route &&
+            (/^[A-Za-z0-9_-]{1,128}$/.test(toId) ||
+              (toType === 'book' &&
+                toId.length <= 128 &&
+                bookshelfId.test(toId)))
+          ? `${route}/${encodeURIComponent(toId)}`
+          : undefined;
     pending.current = true;
     setBusy(true);
     try {
@@ -199,6 +224,12 @@ export default function Franchise() {
           )}
         </div>
       </ExtraHeader>
+      {data &&
+        mediaType === 'anime' &&
+        Number(id) > 0 &&
+        Number(id) <= 1_000_000_000 && (
+          <AnimeContinuation source="anilist" id={Number(id)} />
+        )}
       {!valid && (
         <p className="note" role="alert">
           Invalid franchise title.
@@ -302,6 +333,19 @@ export default function Franchise() {
                             .join(' · ')}
                         </small>
                         {item.evidence && <small>{item.evidence}</small>}
+                        {item.mediaType === 'anime' &&
+                          typeof item.anilistId === 'number' &&
+                          Number.isSafeInteger(item.anilistId) &&
+                          item.anilistId > 0 &&
+                          item.anilistId <= 9_999_999_999 && (
+                            <Link
+                              className="btn btn-quiet btn-sm"
+                              to={`/franchise/anime/${item.anilistId}`}
+                              aria-label={`Explore Franchise: ${item.title}`}
+                            >
+                              Explore Franchise
+                            </Link>
+                          )}
                       </div>
                       {data.canCurate && item.relationId && (
                         <div className="toolbar">

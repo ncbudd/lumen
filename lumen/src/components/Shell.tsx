@@ -26,6 +26,7 @@ import { scrollBehavior } from '../motion';
 import { normalizeSearchParams } from '../searchParams';
 import { usePrefs } from '../settings';
 import { VideoAvailabilityProvider } from '../videoAvailability';
+import AvatarContent from './AvatarContent';
 import { BrandMark, brandName } from './brand';
 import { canManageRequests, canRequestMovies } from './detail';
 
@@ -67,20 +68,15 @@ const TABS: [string, IconName, string][] = [
   ['/me', 'user', 'You'],
 ];
 
-export const initials = (n: string) =>
-  n
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-
 export function Avatar({ className = 'avatar' }: { className?: string }) {
   const { user } = useAuth();
   return (
     <Link className={className} to="/me" aria-label="Your profile">
-      {initials(user?.displayName || '?')}
+      <AvatarContent
+        key={user?.id}
+        name={user?.displayName}
+        avatar={user?.avatar}
+      />
     </Link>
   );
 }
@@ -189,18 +185,24 @@ export default function Shell({ children }: { children: ReactNode }) {
   const navType = useNavigationType();
   const back = useBack();
   const entry = useRef(loc.key);
+  const topbar = useRef<HTMLDivElement>(null);
   entry.current = loc.key;
   useEffect(() => {
     history.scrollRestoration = 'manual';
     let raf = 0;
     const save = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() =>
-        scrollSpots.set(entry.current, window.scrollY)
-      );
+      raf = requestAnimationFrame(() => {
+        const offset = window.scrollY;
+        scrollSpots.set(entry.current, offset);
+        topbar.current?.toggleAttribute('data-scrolled', offset > 0);
+      });
     };
     window.addEventListener('scroll', save, { passive: true });
-    return () => window.removeEventListener('scroll', save);
+    return () => {
+      window.removeEventListener('scroll', save);
+      cancelAnimationFrame(raf);
+    };
   }, []);
   const lastPath = useRef(loc.pathname);
   useEffect(() => {
@@ -390,7 +392,13 @@ export default function Shell({ children }: { children: ReactNode }) {
             Coming soon
           </NavLink>
           <Link className="me" to="/me">
-            <span className="avatar">{initials(user?.displayName || '?')}</span>
+            <span className="avatar">
+              <AvatarContent
+                key={user?.id}
+                name={user?.displayName}
+                avatar={user?.avatar}
+              />
+            </span>
             <span>
               <b>{user?.displayName}</b>
               <small>Signed in</small>
@@ -398,7 +406,7 @@ export default function Shell({ children }: { children: ReactNode }) {
           </Link>
         </nav>
         <div className="main">
-          <div className="topbar">
+          <div className="topbar" ref={topbar}>
             <button
               className="icon-btn tb-back"
               aria-label="Back"

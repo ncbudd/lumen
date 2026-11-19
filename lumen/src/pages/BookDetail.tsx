@@ -29,6 +29,7 @@ import {
   Pill,
 } from '../components/detail';
 import { ServiceNote } from '../components/extra';
+import FollowButton from '../components/FollowButton';
 import IndexerSearchLink from '../components/IndexerSearchLink';
 import ReaderDeliveryLink from '../components/ReaderDeliveryLink';
 import ReportIssueButton from '../components/ReportIssueButton';
@@ -36,6 +37,7 @@ import { ReaderDownloads } from '../components/RequestFiles';
 import { useToast } from '../components/toast';
 import WatchlistButton from '../components/WatchlistButton';
 import { friendlyError } from '../errors';
+import { canViewFollowing } from '../followPermissions';
 import { dropBookStates, useApi } from '../hooks';
 import { Icon } from '../icons';
 import { usePrefs } from '../settings';
@@ -225,6 +227,18 @@ export default function BookDetail() {
     () => narrations(eds.data?.editions || []),
     [eds.data]
   );
+  const soloNarrators = new Map<string, string>();
+  if (showNarr && canViewFollowing(user?.permissions)) {
+    for (const edition of allRows) {
+      const name = edition.narrators?.[0]?.trim();
+      if (
+        edition.narrators?.length === 1 &&
+        name &&
+        name.toLowerCase() !== 'full cast'
+      )
+        soloNarrators.set(name.toLowerCase(), name);
+    }
+  }
   const [pick, setPick] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   // set at once, unlike busy: a double tap can't send a request twice before the re-render
@@ -531,6 +545,18 @@ export default function BookDetail() {
           <ReaderDeliveryLink target={f} />
           <ReaderDownloads mediaId={b.mediaInfo?.id} type="book" format={f} />
           <ReportIssueButton type="book" title={b.title} media={b.mediaInfo} />
+          {canViewFollowing(user?.permissions) && b.authorId && b.author && (
+            <FollowButton
+              key={b.authorId}
+              label="Follow New Releases"
+              subject={{
+                kind: 'author',
+                subjectKey: `author:${b.authorId}`,
+                subjectLabel: b.author,
+                conditions: { ref: { authorId: b.authorId } },
+              }}
+            />
+          )}
           <WatchlistButton mediaType="book" detail={b} requestedId={plainId} />
         </div>
         {/* phones: the action bar holds only the request, so the owned copy's link goes here */}
@@ -734,6 +760,21 @@ export default function BookDetail() {
                         </span>
                       </div>
                     )}
+                  </div>
+                )}
+                {soloNarrators.size > 0 && (
+                  <div className="dacts">
+                    {[...soloNarrators].map(([key, name]) => (
+                      <FollowButton
+                        key={key}
+                        label={`Follow ${name}`}
+                        subject={{
+                          kind: 'narrator',
+                          subjectKey: `narrator:${key}`,
+                          subjectLabel: name,
+                        }}
+                      />
+                    ))}
                   </div>
                 )}
               </div>

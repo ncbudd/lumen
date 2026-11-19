@@ -39,19 +39,21 @@ export function useApi<T>(
   );
   const [error, setError] = useState<string | null>(null);
   const [apiError, setApiError] = useState<ApiError>();
-  const [tick, setTick] = useState(0);
+  const [trigger, setTrigger] = useState<{ forcePath?: string }>({});
   useEffect(() => {
     if (!path) return;
     let live = true;
     const generation = sessionGeneration();
-    const keep = keepDuringRefresh && lastRequestedPath.current === path;
+    const samePath = lastRequestedPath.current === path;
+    const keep = keepDuringRefresh && samePath;
+    const force = samePath && trigger.forcePath === path;
     lastRequestedPath.current = path;
     setResponsePath(path);
     setError(null);
     setApiError(undefined);
     const saved = cached<T>(path);
     if (!keep || saved !== undefined) setData(saved ?? null);
-    if (saved !== undefined && isFresh(path)) return;
+    if (saved !== undefined && isFresh(path) && !force) return;
     fetchShared<T>(path)
       .then((d) => {
         if (generation !== sessionGeneration()) return;
@@ -59,9 +61,17 @@ export function useApi<T>(
       })
       .catch((e) => {
         // a saved answer stays up if refreshing it fails
-        if (live && generation === sessionGeneration() && saved === undefined) {
-          if (e instanceof ApiError && (e.status === 401 || e.status === 403))
+        const denied =
+          e instanceof ApiError && (e.status === 401 || e.status === 403);
+        if (
+          live &&
+          generation === sessionGeneration() &&
+          (saved === undefined || (force && denied))
+        ) {
+          if (denied) {
+            if (force) forget(path);
             setData(null);
+          }
           setError(friendlyError(e, 'Failed to load'));
           setApiError(e instanceof ApiError ? e : undefined);
         }
@@ -69,14 +79,17 @@ export function useApi<T>(
     return () => {
       live = false;
     };
-  }, [path, tick, keepDuringRefresh]);
+  }, [path, trigger, keepDuringRefresh]);
   const reload = useCallback(() => {
     if (path) forget(path);
-    setTick((t) => t + 1);
+    setTrigger({});
   }, [path]);
   // ask again but keep what is on screen meanwhile (after a request the saved copy is already
   // marked stale, so the page updates in place instead of blanking)
-  const refresh = useCallback(() => setTick((t) => t + 1), []);
+  const refresh = useCallback(() => setTrigger({}), []);
+  const revalidate = useCallback(() => {
+    if (path) setTrigger({ forcePath: path });
+  }, [path]);
   const current = !currentPathOnly || responsePath === path;
   return {
     data: current ? data : null,
@@ -85,7 +98,21 @@ export function useApi<T>(
     apiError: current ? apiError : undefined,
     reload,
     refresh,
+    revalidate,
   };
+}
+
+export function useVisibleMediaRefresh(
+  active: boolean,
+  revalidate: () => void
+) {
+  useEffect(() => {
+    if (!active) return;
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') revalidate();
+    }, 30_000);
+    return () => window.clearInterval(timer);
+  }, [active, revalidate]);
 }
 
 // one call for everyone asking for the same path at once; the answer is saved
@@ -159,6 +186,17 @@ const pagedSnap = new Map<
 >();
 const pageItemId = (item: unknown) => String((item as { id?: unknown }).id);
 
+async function readCatalogPage<T>(base: string, page: number) {
+  const separator = base.includes('?') ? '&' : '?';
+  const path = `${base}${separator}page=${page}`;
+  const result = await cachedApi<T & { page: number }>(path);
+  if (result?.page !== page) {
+    forget(path);
+    throw new Error('The server returned a different page. Try again.');
+  }
+  return result;
+}
+
 export function usePaged<T, Metadata extends object = object>(
   base: string | null,
   idOf: (item: T) => string = pageItemId
@@ -207,12 +245,10 @@ export function usePaged<T, Metadata extends object = object>(
     if (!base || !s || s.gen === cacheGeneration()) return;
     let live = true;
     const gen = cacheGeneration();
-    const sep = base.includes('?') ? '&' : '?';
     const head = Math.min(2, s.page);
     const tail = [s.page - 1, s.page].filter((p) => p > head);
     (async () => {
-      const read = (p: number) =>
-        cachedApi<Paged<T> & Metadata>(`${base}${sep}page=${p}`);
+      const read = (p: number) => readCatalogPage<Paged<T> & Metadata>(base, p);
       const rows: T[] = [];
       const seen = new Set<string>();
       let totalPages = s.total;
@@ -286,10 +322,7 @@ export function usePaged<T, Metadata extends object = object>(
       setError(null);
       setLoading(true);
       try {
-        const sep = base.includes('?') ? '&' : '?';
-        const d = await cachedApi<Paged<T> & Metadata>(
-          `${base}${sep}page=${page + 1}`
-        );
+        const d = await readCatalogPage<Paged<T> & Metadata>(base, page + 1);
         if (!ownsRequest()) return; // an old filter must not replace the current list
         // popular lists shift between pages, so a title can come back; show it once
         setItems((x) => {

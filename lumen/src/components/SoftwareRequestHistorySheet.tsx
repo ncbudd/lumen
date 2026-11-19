@@ -4,7 +4,12 @@ import { Link } from 'react-router-dom';
 import { api, ApiError } from '../api';
 import { isAdministrator, useAuth } from '../auth';
 import { friendlyError } from '../errors';
-import { patchHref, type SoftwareRequest } from '../extras';
+import {
+  patchHref,
+  softwareSelectionLabel,
+  useGameContentCatalog,
+  type SoftwareRequest,
+} from '../extras';
 import { useApi } from '../hooks';
 import { sessionGeneration } from '../sessionState';
 import { canManageRequests } from './detail';
@@ -80,8 +85,32 @@ export function SoftwareRequestHistorySheet({
   const manage = canManageRequests(user?.permissions);
   const status = data?.request.status;
   const selection = data?.request.selection;
+  const { data: catalog } = useGameContentCatalog(
+    selection?.kind === 'game-content' ? data?.request.catalogId : null
+  );
+  const requestedEdition =
+    selection?.kind === 'game-content' && selection.mode === 'edition'
+      ? selection.editionId
+      : undefined;
+  const requestedAddons =
+    selection?.kind === 'game-content' && selection.mode === 'missing-selected'
+      ? selection.addonIds
+      : undefined;
+  const editionTitle =
+    requestedEdition && Array.isArray(catalog?.editions)
+      ? catalog.editions.find((edition) => edition?.igdbId === requestedEdition)
+          ?.title
+      : undefined;
+  const addons = Array.isArray(catalog?.addons) ? catalog.addons : [];
   const patch = selection?.kind === 'patch' ? selection : null;
-  const project = patch && patchHref(patch.projectId, patch.versionId);
+  const project =
+    patch &&
+    patchHref(
+      patch.projectId,
+      patch.versionId,
+      data?.request.category,
+      data?.request.platform?.slug
+    );
   const capabilities = data?.request.actions;
   const actions: Action[] = [];
   if (status === 'pending') {
@@ -191,6 +220,21 @@ export function SoftwareRequestHistorySheet({
                 {data.request.platform?.name &&
                   ` · ${data.request.platform.name}`}
               </p>
+              {selection?.kind === 'game-content' && (
+                <p className="note">
+                  {softwareSelectionLabel(selection)}
+                  {requestedEdition &&
+                    ` · ${editionTitle || `IGDB edition ${requestedEdition}`}`}
+                  {!!requestedAddons?.length &&
+                    ` · ${requestedAddons
+                      .map(
+                        (id) =>
+                          addons.find((addon) => addon?.igdbId === id)?.title ||
+                          `IGDB add-on ${id}`
+                      )
+                      .join(', ')}`}
+                </p>
+              )}
               {patch && (
                 <div className="toolbar">
                   {project && (

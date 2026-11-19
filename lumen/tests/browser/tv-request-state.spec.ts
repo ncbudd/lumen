@@ -604,3 +604,56 @@ test('a permitted streaming override retries only the selected seasons', async (
     .toEqual([original, { ...original, bypassStreamingRequestPolicy: true }]);
   await expect(confirm).toHaveCount(0);
 });
+
+for (const scenario of ['eligible', 'owned season', 'owned episode']) {
+  const expected = scenario === 'owned season' ? 1 : 2;
+  test(`the episode picker respects the bookmark for an ${scenario}`, async ({
+    page,
+  }) => {
+    await show(
+      page,
+      scenario === 'owned season'
+        ? { seasons: [{ seasonNumber: 2, status: 5 }] }
+        : {},
+      [],
+      32,
+      undefined,
+      { partialRequestsEnabled: true }
+    );
+    await page.route(`**/api/v1/tv/84773/season/${expected}`, (route) =>
+      route.fulfill({
+        json: {
+          episodes: [
+            {
+              episodeNumber: 3,
+              name: 'Bookmarked Episode',
+              sonarrAvailability: {
+                hd: scenario === 'owned episode',
+                fourK: false,
+              },
+            },
+          ],
+        },
+      })
+    );
+    await page.goto('/tv/84773?episode=3#season-2');
+    await page
+      .getByRole('button', { name: 'Request Episodes', exact: true })
+      .click();
+    const sheet = page.getByRole('dialog', { name: 'Request Episodes' });
+    await expect(sheet.getByRole('combobox', { name: 'Season' })).toHaveValue(
+      String(expected)
+    );
+    const episode = sheet.getByRole('checkbox', {
+      name: /E3 Bookmarked Episode/,
+    });
+    if (scenario === 'eligible') await expect(episode).toBeChecked();
+    else await expect(episode).not.toBeChecked();
+    if (scenario === 'owned episode') {
+      await expect(episode).toBeDisabled();
+      await expect(
+        sheet.getByRole('button', { name: 'Request Selected Episodes' })
+      ).toBeDisabled();
+    }
+  });
+}

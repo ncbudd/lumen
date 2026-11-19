@@ -285,7 +285,7 @@ export interface ArtistDetails {
   artistBackdrop?: string;
   releaseGroups: Album[];
 }
-export const artistOf = (a: Album) =>
+export const artistOf = (a: Pick<Album, 'artist-credit'>) =>
   a['artist-credit']?.map((c) => c.name).join(', ') || '';
 export const fmtTrack = (ms?: number) =>
   ms
@@ -456,6 +456,12 @@ export interface GamePage {
   nextCursor?: string | null;
   nextOffset?: number | null;
 }
+
+export function unwrapCatalogGame(response: Game | { game: Game } | null) {
+  if (!response || typeof response !== 'object') return null;
+  const game = 'game' in response ? response.game : response;
+  return game && typeof game === 'object' ? game : null;
+}
 export const PC_OS = [
   ['windows', 'Windows'],
   ['linux', 'Linux'],
@@ -469,10 +475,19 @@ export const PC_ARCH = [
 ] as const;
 export const PATCH_ID = /^[A-Za-z0-9][A-Za-z0-9:_.-]{0,127}$/;
 
-export function patchHref(id: string, version?: string) {
+export function patchHref(
+  id: string,
+  version?: string,
+  category?: GameCategory,
+  platform?: string | null
+) {
   if (!PATCH_ID.test(id) || (version && !PATCH_ID.test(version))) return;
-  const query = version ? `?${new URLSearchParams({ version })}` : '';
-  return `/patches/${encodeURIComponent(id)}${query}`;
+  const query = new URLSearchParams();
+  if (version) query.set('version', version);
+  if (category === 'modern') query.set('category', category);
+  if (platform && /^[a-z0-9][a-z0-9_-]{0,63}$/i.test(platform))
+    query.set('platform', platform);
+  return `/patches/${encodeURIComponent(id)}${query.size ? `?${query}` : ''}`;
 }
 
 export type PatchSelection = {
@@ -482,6 +497,36 @@ export type PatchSelection = {
   keepOriginal: boolean;
 };
 
+type Content = {
+  igdbId: number;
+  title: string;
+  owned: boolean;
+  storyContent: boolean | null;
+};
+type Edition = {
+  igdbId: number;
+  title: string;
+  owned: boolean;
+  contentKnown: boolean;
+  includes: Content[];
+};
+type GameContentCatalog = {
+  available: boolean;
+  editions?: Edition[];
+  addons?: Content[];
+};
+export function useGameContentCatalog(id?: number | null) {
+  return useApi<GameContentCatalog>(
+    typeof id === 'number' && Number.isSafeInteger(id) && id > 0
+      ? `/game-content/${id}/editions`
+      : null
+  );
+}
+
+export type GameContentSelection =
+  | { kind: 'game-content'; mode: 'edition'; editionId: number; addonIds: [] }
+  | { kind: 'game-content'; mode: 'missing-selected'; addonIds: number[] };
+
 export const requestGame = (
   category: GameCategory,
   g: Game,
@@ -489,7 +534,7 @@ export const requestGame = (
     os?: string;
     arch?: string;
     system?: string;
-    selection?: PatchSelection;
+    selection?: PatchSelection | GameContentSelection;
   }
 ) =>
   api<{ request: { status: string; id?: number } }>('/request/software', {
@@ -536,11 +581,25 @@ export interface SoftwareRequest {
           addonIds?: number[];
         }
       | null;
-    platform: { name: string } | null;
+    platform: { name: string; slug?: string } | null;
     percent: number | null;
     error: string | null;
     createdAt: string;
   };
+}
+
+export function softwareSelectionLabel(
+  selection: SoftwareRequest['request']['selection']
+) {
+  if (selection?.kind === 'patch') return 'Patch';
+  if (selection?.kind !== 'game-content') return undefined;
+  if (selection.mode === 'edition') return 'Complete Edition';
+  const count = selection.addonIds?.length ?? 0;
+  return count === 1
+    ? '1 Add-on'
+    : count > 1
+      ? `${count} Add-ons`
+      : 'Selected Add-ons';
 }
 
 // ---- sports (Sportarr leagues) and adult (Whisparr scenes, StashDB ids) ----

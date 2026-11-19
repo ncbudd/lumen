@@ -7,11 +7,13 @@ import {
   bookArt,
   bookDetailPath,
   bookMediaForFormat,
+  bookRequestLabel,
   cancelRequest,
   mediaLink,
   MediaStatus,
   plexUrl,
   tmdbImg,
+  videoDetailPath,
   type BookResult,
   type RequestItem,
   type TvDetails,
@@ -39,6 +41,7 @@ import {
   adultScenePath,
   GAME_LABEL,
   patchHref,
+  softwareSelectionLabel,
   useExtras,
   type AlbumDetails,
   type Comic,
@@ -284,6 +287,25 @@ function otherEditionInLibrary(r: RequestItem): boolean {
       : ebook;
 }
 
+export function RequestStatusPills({
+  request,
+  status,
+}: {
+  request: RequestItem;
+  status: ReturnType<typeof requestRowStatus>;
+}) {
+  return (
+    <>
+      <Pill k={status.k} icon={status.ico}>
+        {status.word}
+      </Pill>
+      {request.status === 1 && request.quotaException && (
+        <Pill k="wait">Over Quota</Pill>
+      )}
+    </>
+  );
+}
+
 function requestDownloads(r: RequestItem) {
   return (
     (r.is4k
@@ -294,7 +316,7 @@ function requestDownloads(r: RequestItem) {
   );
 }
 
-function state(
+export function requestRowStatus(
   x: Row,
   serverName = 'Plex',
   live?: ReadonlyMap<string, LiveDownload>,
@@ -609,10 +631,13 @@ function cachedRow(r: RequestItem, known: Omit<Row, 'r'>): Row {
   return {
     ...known,
     r,
+    sub: r.type === 'book' ? bookRequestLabel(r.bookFormat) : known.sub,
     href:
       r.type === 'book'
         ? requestBookPath(r, known.title === 'Book' ? undefined : known.title)
-        : known.href,
+        : r.type === 'tv' || r.type === 'movie'
+          ? videoDetailPath(r.type, r.media.tmdbId, r.is4k)
+          : known.href,
   };
 }
 
@@ -738,18 +763,19 @@ function titlePlaceholder(r: RequestItem): Row {
   return {
     r,
     title: kind === 'tv' ? 'Series' : 'Movie',
-    href: `/${kind}/${r.media.tmdbId}`,
-    sub: kind === 'tv' ? 'Series' : 'Movie',
+    href: videoDetailPath(kind, r.media.tmdbId, r.is4k),
+    sub: [kind === 'tv' ? 'Series' : 'Movie', r.is4k ? '4K' : '']
+      .filter(Boolean)
+      .join(' · '),
   };
 }
 function bookPlaceholder(r: RequestItem): Row {
-  const audio = r.bookFormat === 'audiobook';
   return {
     r,
     title: 'Book',
     cover: true,
     href: requestBookPath(r),
-    sub: audio ? 'Audiobook' : 'Ebook',
+    sub: bookRequestLabel(r.bookFormat),
   };
 }
 const keepUnless404 = (r: RequestItem) => {
@@ -766,7 +792,6 @@ async function describeOnce(r: RequestItem): Promise<Row> {
   const generation = sessionGeneration();
   if (r.type === 'book') {
     const id = bookId(r);
-    const audio = r.bookFormat === 'audiobook';
     // a 404 is permanent (kept, so it isn't asked again); a 429 or outage is retried next visit
     const look = async (bid: string) => {
       const { b, st } = await fetchBook(bid);
@@ -784,7 +809,7 @@ async function describeOnce(r: RequestItem): Promise<Row> {
       art: bookArt(b?.posterPath),
       cover: true,
       href: requestBookPath(r, b?.title),
-      sub: audio ? 'Audiobook' : 'Ebook',
+      sub: bookRequestLabel(r.bookFormat),
     };
   }
   const extra = await describeExtra(r);
@@ -803,7 +828,7 @@ async function describeOnce(r: RequestItem): Promise<Row> {
     r,
     title: t ? t.title || t.name || '' : kind === 'tv' ? 'Series' : 'Movie',
     art: tmdbImg(t?.backdropPath || t?.posterPath, 'w500'),
-    href: `/${kind}/${r.media.tmdbId}`,
+    href: videoDetailPath(kind, r.media.tmdbId, r.is4k),
     sub: [kind === 'tv' ? 'Series' : 'Movie', seasons, r.is4k ? '4K' : '']
       .filter(Boolean)
       .join(' · '),
@@ -925,7 +950,9 @@ function gameRow(g: SoftwareRequest): Row {
   } as unknown as RequestItem;
   const id = q.catalogProvider === 'dat' ? q.catalogKey : q.catalogId;
   const patch = q.selection?.kind === 'patch' ? q.selection : null;
-  const patchLink = patch && patchHref(patch.projectId, patch.versionId);
+  const patchLink =
+    patch &&
+    patchHref(patch.projectId, patch.versionId, q.category, q.platform?.slug);
   return {
     r,
     title: q.title,
@@ -936,7 +963,11 @@ function gameRow(g: SoftwareRequest): Row {
       (id
         ? `/game/${q.category}/${encodeURIComponent(String(id))}${q.catalogProvider === 'dat' ? '?dat=1' : ''}`
         : ''),
-    sub: [GAME_LABEL[q.category], q.platform?.name, patch && 'Patch']
+    sub: [
+      GAME_LABEL[q.category],
+      q.platform?.name,
+      softwareSelectionLabel(q.selection),
+    ]
       .filter(Boolean)
       .join(' · '),
   };
@@ -1446,18 +1477,20 @@ export default function Requests() {
   }, [user, browseRequests, tick, extras.games.length]);
 
   const all = rows || [];
-  const act = all.filter((x) => state(x, serverName).active);
+  const act = all.filter((x) => requestRowStatus(x, serverName).active);
   const ready = all.filter(
-    (x) => state(x, serverName).k === 'ok' && !state(x, serverName).active
+    (x) =>
+      requestRowStatus(x, serverName).k === 'ok' &&
+      !requestRowStatus(x, serverName).active
   );
   const list = ownSoftware
     ? others || []
     : everyone
       ? (others || []).filter((row) =>
           show === 'available'
-            ? state(row, serverName).k === 'ok' &&
-              !state(row, serverName).active
-            : show !== 'processing' || state(row, serverName).active
+            ? requestRowStatus(row, serverName).k === 'ok' &&
+              !requestRowStatus(row, serverName).active
+            : show !== 'processing' || requestRowStatus(row, serverName).active
         )
       : tab === 'ready'
         ? ready
@@ -1476,7 +1509,7 @@ export default function Requests() {
   const shown = browseRequests ? others : rows;
 
   // keep download percentages moving while anything shown is downloading
-  const busy = list.some((x) => state(x, serverName).pct != null);
+  const busy = list.some((x) => requestRowStatus(x, serverName).pct != null);
   const [poll, setPoll] = useState(0);
   useEffect(() => {
     if (!busy) return;
@@ -1515,7 +1548,9 @@ export default function Requests() {
       !everyone || (priorityOrder && (show === 'all' || show === 'processing'));
     const gameBusy =
       !everyone &&
-      current.some((x) => x.r.id < 0 && state(x, serverName).pct != null);
+      current.some(
+        (x) => x.r.id < 0 && requestRowStatus(x, serverName).pct != null
+      );
     Promise.all([
       processingRequests(everyone ? mediaQuery : `&requestedBy=${user.id}`),
       gameBusy
@@ -1530,7 +1565,9 @@ export default function Requests() {
         const gameById = new Map(games.map((g) => [g.r.id, g]));
         const finished = current.some(
           (x) =>
-            x.r.id > 0 && state(x, serverName).pct != null && !byId.has(x.r.id)
+            x.r.id > 0 &&
+            requestRowStatus(x, serverName).pct != null &&
+            !byId.has(x.r.id)
         );
         const started =
           withStarted &&
@@ -1610,7 +1647,7 @@ export default function Requests() {
   };
 
   const renderRequestActions = (x: Row, moderate: boolean) => {
-    const st = state(x, serverName, liveDownloads, allowRawHashes);
+    const st = requestRowStatus(x, serverName, liveDownloads, allowRawHashes);
     return (
       <>
         {canEditEpisodeQueue(x.r, user?.permissions) && (
@@ -2000,7 +2037,12 @@ export default function Requests() {
       )}
       <div className="rqlist">
         {list.map((x) => {
-          const st = state(x, serverName, liveDownloads, allowRawHashes);
+          const st = requestRowStatus(
+            x,
+            serverName,
+            liveDownloads,
+            allowRawHashes
+          );
           const detail = requestFailureMessage(x.r) ?? st.detail;
           const artwork = artUrl(x.art);
           return (
@@ -2048,12 +2090,7 @@ export default function Requests() {
                   {x.sub} · {shortDate(x.r.createdAt.slice(0, 10))}
                 </div>
                 <div className="st">
-                  <Pill k={st.k} icon={st.ico}>
-                    {st.word}
-                  </Pill>
-                  {x.r.status === 1 && x.r.quotaException && (
-                    <Pill k="wait">Over Quota</Pill>
-                  )}
+                  <RequestStatusPills request={x.r} status={st} />
                   {x.r.watchAheadParentRequestId ? (
                     <span className="d">Auto-Queued</span>
                   ) : (x.r.watchAheadEpisodeCount ?? 0) > 0 ? (

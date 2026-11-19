@@ -14,6 +14,7 @@ import {
   type TitleResult,
   type VideoSearchResult,
 } from '../api';
+import { cacheGeneration } from '../apiCache';
 import {
   BookCard,
   CollectionCard,
@@ -25,6 +26,7 @@ import { ComicCard } from '../components/comics';
 import { MagazineCard, ServiceNote } from '../components/extra';
 import { friendlyError } from '../errors';
 import {
+  artistOf,
   useExtras,
   type Album,
   type ComicWork,
@@ -46,6 +48,7 @@ import {
   searchResultPage,
   videoFilterKeys,
 } from '../searchParams';
+import { sessionGeneration } from '../sessionState';
 import { usePrefs } from '../settings';
 import { BookSeriesResults } from './BookSeriesSearch';
 import { AlbumCard } from './Music';
@@ -68,7 +71,151 @@ type AuthorResult = { mediaType: 'author'; id: string; name: string };
 type ArtistResult = { mediaType: 'artist'; id: string; name: string };
 type SearchResult =
   VideoSearchResult | AuthorResult | ArtistResult | Album | Magazine | League;
+type SearchPage = Paged<SearchResult> & { partial?: boolean };
+type SearchReply = {
+  path: string;
+  session: number;
+  generation: number;
+  page: SearchPage;
+};
 type Scope = keyof typeof SCOPES;
+const searchTitleCollator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: 'base',
+});
+
+type SearchSortFields = {
+  title?: string;
+  name?: string;
+  releaseDate?: string;
+  firstAirDate?: string;
+  firstPublishYear?: number;
+  'first-release-date'?: string;
+  startYear?: string;
+  year?: number;
+  voteAverage?: number;
+  author?: string;
+  publisher?: string;
+  directors?: string[];
+  writers?: string[];
+  'artist-credit'?: Album['artist-credit'];
+};
+
+function searchDate(item: SearchSortFields) {
+  const value = String(
+    item.releaseDate ||
+      item.firstAirDate ||
+      item['first-release-date'] ||
+      item.firstPublishYear ||
+      item.startYear ||
+      item.year ||
+      ''
+  );
+  return /^\d{4}(?:-\d{2}(?:-\d{2})?)?$/.test(value) &&
+    Number.isFinite(Date.parse(value))
+    ? value
+    : '';
+}
+
+const searchSortKeys = {
+  title: (item: SearchSortFields) => item.title || item.name,
+  date: searchDate,
+  rating: (item: SearchSortFields) => {
+    const rating = item.voteAverage;
+    return typeof rating === 'number' && rating > 0 && rating <= 10
+      ? rating
+      : undefined;
+  },
+  artist: artistOf,
+  author: (item: SearchSortFields) => item.author,
+  publisher: (item: SearchSortFields) => item.publisher,
+  writer: (item: SearchSortFields) => item.writers?.[0],
+  director: (item: SearchSortFields) => item.directors?.[0],
+};
+
+const searchSortOptions: {
+  field: keyof typeof searchSortKeys;
+  asc: string;
+  desc: string;
+  scopes: Scope[] | null;
+  defaultOrder: 'asc' | 'desc';
+}[] = [
+  {
+    field: 'title',
+    asc: 'Title A–Z',
+    desc: 'Title Z–A',
+    scopes: null,
+    defaultOrder: 'asc',
+  },
+  {
+    field: 'date',
+    asc: 'Oldest First',
+    desc: 'Newest First',
+    scopes: null,
+    defaultOrder: 'desc',
+  },
+  {
+    field: 'rating',
+    asc: 'Lowest Rated',
+    desc: 'Highest Rated',
+    scopes: ['movie', 'tv'],
+    defaultOrder: 'desc',
+  },
+  {
+    field: 'writer',
+    asc: 'Writer A–Z',
+    desc: 'Writer Z–A',
+    scopes: ['movie', 'tv'],
+    defaultOrder: 'asc',
+  },
+  {
+    field: 'director',
+    asc: 'Director A–Z',
+    desc: 'Director Z–A',
+    scopes: ['movie', 'tv'],
+    defaultOrder: 'asc',
+  },
+  {
+    field: 'artist',
+    asc: 'Artist A–Z',
+    desc: 'Artist Z–A',
+    scopes: ['music'],
+    defaultOrder: 'asc',
+  },
+  {
+    field: 'author',
+    asc: 'Author A–Z',
+    desc: 'Author Z–A',
+    scopes: ['ebook', 'audio'],
+    defaultOrder: 'asc',
+  },
+  {
+    field: 'publisher',
+    asc: 'Publisher A–Z',
+    desc: 'Publisher Z–A',
+    scopes: ['ebook', 'audio'],
+    defaultOrder: 'asc',
+  },
+];
+
+function sortSearchResults<T extends SearchSortFields>(
+  items: T[] | null,
+  field: keyof typeof searchSortKeys | undefined,
+  order: 'asc' | 'desc'
+) {
+  if (!items || !field) return items ?? [];
+  const value = searchSortKeys[field];
+  return [...items].sort((left, right) => {
+    const a = value(left);
+    const b = value(right);
+    if (!a || !b) return Number(!a) - Number(!b);
+    const comparison =
+      typeof a === 'number' && typeof b === 'number'
+        ? a - b
+        : searchTitleCollator.compare(String(a), String(b));
+    return comparison * (order === 'desc' ? -1 : 1);
+  });
+}
 // Search stays in the section you came from (?f=movie|tv|ebook|audio|comic); "All" widens it
 export default function Search() {
   const [params, setP] = useSearchParams();
@@ -108,8 +255,9 @@ function SearchResults({
   const [recent, setRecent] = useState<string[]>(readRecentSearches);
   const [totalPages, setTotalPages] = useState(1);
   const [searching, setSearching] = useState(false);
-  // a lookup failed and nothing was found: an error with Retry, not "No matches"
-  const [failed, setFailed] = useState<string | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const lastReply = useRef<SearchReply | null>(null);
+  const retryReply = useRef<SearchReply | null>(null);
   const [attempt, setAttempt] = useState(0);
   const navType = useNavigationType();
   // a new key per history entry, even when Enter pushes the same URL typing already showed
@@ -124,7 +272,9 @@ function SearchResults({
   const publicSettings = usePublicSettings();
   const seriesFormat =
     f === 'ebook' ? 'ebook' : f === 'audio' ? 'audiobook' : undefined;
+  const resultPage = searchResultPage(p);
   const showSeries =
+    resultPage === 1 &&
     prefs.showBooks &&
     publicSettings?.booksEnabled === true &&
     (f === 'all' || seriesFormat !== undefined) &&
@@ -141,7 +291,6 @@ function SearchResults({
     (f === 'movie' || f === 'tv') && titlePath.startsWith('/discover/');
   const hasMusicFilters = f === 'music' && activeMusicSearchFilters(p);
   const hasDiscoveryFilters = hasVideoFilters || hasMusicFilters;
-  const resultPage = searchResultPage(p);
   const hasSearch = !!term0 || hasDiscoveryFilters;
   const wantsTitles =
     hasSearch &&
@@ -152,7 +301,6 @@ function SearchResults({
       f === 'music' ||
       f === 'magazine' ||
       f === 'sports');
-  const cataloguePage = f === 'all' ? 1 : resultPage;
   // nothing typed yet: something to tap instead of an empty screen
   const trending = useApi<Paged<VideoSearchResult>>(
     hasSearch ? null : '/discover/trending'
@@ -204,10 +352,14 @@ function SearchResults({
       setBooks(null);
       setComics(null);
       setSearching(false);
-      setFailed(null);
+      setSearchError(null);
       return;
     }
     let live = true;
+    const session = sessionGeneration();
+    const generation = cacheGeneration();
+    const reusable = retryReply.current;
+    retryReply.current = null;
     setSearching(true);
     const t = setTimeout(async () => {
       const wantBooks =
@@ -225,15 +377,21 @@ function SearchResults({
       };
       const comicsAsk = wantComics
         ? cachedApi<Paged<ComicWork>>(
-            `/discover/comics?query=${encodeURIComponent(term)}&group=works&page=${cataloguePage}`
+            `/discover/comics?query=${encodeURIComponent(term)}&group=works&page=${resultPage}`
           ).catch(failure)
         : null;
       const [tr, ...brs] = await Promise.all([
-        wantsTitles ? api<Paged<SearchResult>>(titlePath).catch(failure) : null,
+        wantsTitles
+          ? reusable?.path === titlePath &&
+            reusable.session === session &&
+            reusable.generation === generation
+            ? reusable.page
+            : api<SearchPage>(titlePath).catch(failure)
+          : null,
         ...formats.map((fmt) =>
           wantBooks
             ? cachedApi<Paged<BookResult>>(
-                `/discover/books?format=${fmt}&query=${encodeURIComponent(term)}&page=${cataloguePage}`
+                `/discover/books?format=${fmt}&query=${encodeURIComponent(term)}&page=${resultPage}`
               ).catch((e: unknown) => {
                 catalogueUnavailable ||=
                   e instanceof ApiError && e.status >= 500;
@@ -245,14 +403,19 @@ function SearchResults({
       const br = brs.find(Boolean) ?? null;
       const cr = await comicsAsk;
       if (!live) return;
-      const foundComics = cr?.results || [];
-      const foundTitles = (tr?.results || []).filter(({ mediaType }) => {
+      lastReply.current =
+        tr && !tr.partial
+          ? { path: titlePath, session, generation, page: tr }
+          : null;
+      const resultsOnPage = <T,>(response: Paged<T> | null) =>
+        response && resultPage <= response.totalPages ? response.results : [];
+      const foundComics = resultsOnPage(cr);
+      const foundTitles = resultsOnPage(tr).filter(({ mediaType }) => {
         if (f === 'music')
           return mediaType === 'album' || mediaType === 'artist';
         if (f === 'author' || f === 'tv' || f === 'magazine' || f === 'sports')
           return mediaType === f;
-        if (f === 'movie')
-          return mediaType === 'movie' || mediaType === 'collection';
+        if (f === 'movie') return mediaType === 'movie';
         return (
           mediaType === 'movie' ||
           mediaType === 'tv' ||
@@ -264,7 +427,7 @@ function SearchResults({
         );
       });
       let foundBooks = brs.flatMap((r, i) =>
-        (r?.results || [])
+        resultsOnPage(r)
           .filter((b) => b.mediaType === 'book')
           .map((b) =>
             f === 'all' && formats[i] === 'audiobook'
@@ -275,7 +438,7 @@ function SearchResults({
       // The format-neutral metadata endpoint also serves audiobook-only households.
       // Only canonical Open Library works can be retargeted as audiobook cards.
       if (
-        cataloguePage === 1 &&
+        resultPage === 1 &&
         format === 'audiobook' &&
         wantBooks &&
         (br || catalogueUnavailable) &&
@@ -289,15 +452,21 @@ function SearchResults({
           .filter((b) => b.mediaType === 'book' && /^OL[1-9]\d*W$/.test(b.id))
           .map((b) => ({ ...b, bookFormat: 'audiobook' }));
       }
-      const pagedResults = wantsTitles ? tr : f === 'comic' ? cr : br;
-      setTotalPages(Math.min(500, pagedResults?.totalPages ?? 1));
+      setTotalPages(
+        Math.min(
+          500,
+          Math.max(
+            1,
+            ...[tr, cr, ...brs].map((result) => result?.totalPages ?? 1)
+          )
+        )
+      );
       setTitles(foundTitles);
       setBooks(foundBooks);
       setComics(foundComics);
-      setFailed(
-        foundTitles.length || foundBooks.length || foundComics.length
-          ? null
-          : error
+      setSearchError(
+        error ??
+          (tr?.partial ? 'A search provider did not respond. Try again.' : null)
       );
       setSearching(false);
     }, 300);
@@ -312,7 +481,7 @@ function SearchResults({
     term0,
     hasSearch,
     wantsTitles,
-    cataloguePage,
+    resultPage,
     prefs.showBooks,
     attempt,
     comicsOn,
@@ -346,36 +515,45 @@ function SearchResults({
       : f === 'comic'
         ? 'Search comics and manga…'
         : `Search ${SCOPES[f].toLowerCase()}…`;
+  const sortOptions = searchSortOptions.filter(
+    ({ scopes }) => !scopes || scopes.includes(f)
+  );
+  const activeSort = sortOptions.find(({ field }) => field === p.get('sort'));
+  const sortField = activeSort?.field;
+  const requestedOrder = p.get('order');
+  const sortOrder =
+    requestedOrder === 'asc' || requestedOrder === 'desc'
+      ? requestedOrder
+      : (activeSort?.defaultOrder ?? 'desc');
+  const orderedTitles = sortSearchResults(titles, sortField, sortOrder);
   const people =
     f === 'all'
-      ? (titles || []).filter((t): t is TitleResult => t.mediaType === 'person')
+      ? orderedTitles.filter((t): t is TitleResult => t.mediaType === 'person')
       : [];
-  const collections = (titles || []).filter(
-    (t) => t.mediaType === 'collection'
-  );
-  const movies = (titles || []).filter(
+  const collections = orderedTitles.filter((t) => t.mediaType === 'collection');
+  const movies = orderedTitles.filter(
     (t): t is TitleResult => t.mediaType === 'movie'
   );
-  const shows = (titles || []).filter(
+  const shows = orderedTitles.filter(
     (t): t is TitleResult => t.mediaType === 'tv'
   );
-  const authors = (titles || []).filter(
+  const authors = orderedTitles.filter(
     (item): item is AuthorResult => item.mediaType === 'author'
   );
-  const albums = (titles || []).filter(
+  const albums = orderedTitles.filter(
     (item): item is Album => item.mediaType === 'album'
   );
-  const artists = (titles || []).filter(
+  const artists = orderedTitles.filter(
     (item): item is ArtistResult => item.mediaType === 'artist'
   );
-  const magazines = (titles || []).filter(
+  const magazines = orderedTitles.filter(
     (item): item is Magazine => item.mediaType === 'magazine'
   );
-  const leagues = (titles || []).filter(
+  const leagues = orderedTitles.filter(
     (item): item is League => item.mediaType === 'sports'
   );
-  const bookCards = books || [];
-  const comicCards = comics || [];
+  const bookCards = sortSearchResults(books, sortField, sortOrder);
+  const comicCards = sortSearchResults(comics, sortField, sortOrder);
   const nothing =
     titles !== null &&
     books !== null &&
@@ -452,6 +630,36 @@ function SearchResults({
             </Link>
           )}
         </div>
+        {hasSearch && (
+          <div className="toolbar">
+            <label className="sel">
+              <span className="lbl">Sort Results</span>
+              <select
+                value={sortField ? `${sortField}:${sortOrder}` : ''}
+                onChange={(event) => {
+                  const next = new URLSearchParams(p);
+                  next.delete('sort');
+                  next.delete('order');
+                  const [field, order] = event.target.value.split(':');
+                  if (field) next.set('sort', field);
+                  if (order) next.set('order', order);
+                  setP(next, { replace: true });
+                }}
+              >
+                <option value="">Best Match</option>
+                {sortOptions.map(({ field, asc, desc }) => (
+                  <optgroup
+                    key={field}
+                    label={field[0].toUpperCase() + field.slice(1)}
+                  >
+                    <option value={`${field}:asc`}>{asc}</option>
+                    <option value={`${field}:desc`}>{desc}</option>
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
         {hasDiscoveryFilters && (
           <div className="toolbar">
             <button
@@ -557,12 +765,15 @@ function SearchResults({
       )}
       {!searching && (
         <ServiceNote
-          error={failed}
-          what="search results"
-          retry={() => setAttempt((n) => n + 1)}
+          error={searchError}
+          what={nothing ? 'search results' : 'some search results'}
+          retry={() => {
+            retryReply.current = lastReply.current;
+            setAttempt((n) => n + 1);
+          }}
         />
       )}
-      {nothing && !searching && !failed && (
+      {nothing && !searching && !searchError && (
         <div className="empty">
           <b>
             {term0
@@ -737,7 +948,11 @@ function SearchResults({
           <button
             className="btn btn-quiet btn-sm"
             type="button"
-            disabled={searching || !!failed || resultPage >= totalPages}
+            disabled={
+              searching ||
+              (nothing && !!searchError) ||
+              resultPage >= totalPages
+            }
             onClick={() => moveResultPage(resultPage + 1)}
           >
             Next Page

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Section } from '../components/cards';
 import { ServiceNote } from '../components/extra';
+import ReleaseHistory from '../components/ReleaseHistory';
 import { useApi, usePublicSettings } from '../hooks';
 
 const project = 'https://github.com/snapetech-org/seerrng';
@@ -20,6 +21,10 @@ export default function AdminAbout() {
     updateAvailable?: boolean;
   }>(settings?.versionCheck ? '/status' : null);
 
+  const developmentBuild = about.data?.version.startsWith('main-');
+  const commit = status.data?.commitTag;
+  const releases = project + '/releases';
+  let updateHref = releases;
   let update = '';
   if (settings?.versionCheck === false) update = 'Version check disabled';
   else if (status.error) update = 'Could not check for updates';
@@ -30,6 +35,19 @@ export default function AdminAbout() {
         ? 'Update available'
         : 'Up to date';
   }
+
+  if (
+    developmentBuild &&
+    (update === 'Up to date' || update === 'Version check disabled')
+  )
+    updateHref = project + '/commits/main';
+  if (
+    developmentBuild &&
+    update === 'Update available' &&
+    commit &&
+    /^[a-f0-9]{7,40}$/i.test(commit)
+  )
+    updateHref = `${project}/compare/${commit}...main`;
 
   const rows = about.data && [
     ['Version', about.data.version],
@@ -73,8 +91,14 @@ export default function AdminAbout() {
               </div>
             ))}
           </dl>
-          {update && <p className="note">{update}</p>}
-          {about.data?.version.startsWith('main-') && (
+          {update && (
+            <p className="note">
+              <a className="btn btn-quiet btn-sm" href={updateHref}>
+                {update}
+              </a>
+            </p>
+          )}
+          {developmentBuild && (
             <p className="note">This server is running a development build.</p>
           )}
         </Section>
@@ -106,6 +130,14 @@ export default function AdminAbout() {
             Support Development
           </a>
         </div>
+      </Section>
+      {about.data && <ReleaseHistory installed={about.data.version} />}
+      <Section title="Legal Use">
+        <p className="note">
+          SeerrNG is intended for lawful personal media management. Users are
+          responsible for complying with applicable laws, licenses, and service
+          terms in their region.
+        </p>
       </Section>
       <Section title="Metadata Attribution">
         <p className="note">

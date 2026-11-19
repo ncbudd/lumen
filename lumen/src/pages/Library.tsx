@@ -1,5 +1,13 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import IdentityMapping, {
+  type MappingCandidate,
+  videoHref,
+} from '../components/IdentityMapping';
+import LibraryRepair from '../components/LibraryRepair';
+import LibraryTracking from '../components/LibraryTracking';
+import PersonalIdentityPacks from '../components/PersonalIdentityPacks';
+import ProviderFailure from '../components/ProviderFailure';
 import { ServiceNote } from '../components/extra';
 import { useApi } from '../hooks';
 
@@ -21,12 +29,8 @@ interface Connections {
   mediaServer: { provider: NativeSource; connected: boolean } | null;
 }
 
-interface LibraryItem {
-  id: string;
-  title: string;
-  year?: number;
-  mediaType?: 'movie' | 'tv';
-  tmdbId?: number;
+interface LibraryItem extends MappingCandidate {
+  sourceId?: string;
   status?: string;
   rating?: number;
   progress?: number;
@@ -34,6 +38,7 @@ interface LibraryItem {
 }
 
 interface LibraryResult {
+  allowWrites?: boolean;
   items: LibraryItem[];
   libraries?: { id: string; name: string }[];
   hasMore: boolean;
@@ -56,16 +61,21 @@ type Shelf = keyof typeof SHELF_LABELS;
 const isNative = (source: Source): source is NativeSource =>
   source === 'plex' || source === 'jellyfin' || source === 'emby';
 
-function LibraryRows({ data }: { data: LibraryResult }) {
+function LibraryRows({
+  data,
+  updated,
+  provider,
+}: {
+  provider?: TrackingSource;
+  data: LibraryResult;
+  updated: () => void;
+}) {
   if (!data.items.length)
     return <p className="note">No titles match this shelf.</p>;
   return (
     <ul className="setlist">
       {data.items.map((item) => {
-        const mapped =
-          (item.mediaType === 'movie' || item.mediaType === 'tv') &&
-          Number.isSafeInteger(item.tmdbId) &&
-          (item.tmdbId ?? 0) > 0;
+        const href = videoHref(item);
         const summary = [
           item.year,
           item.status,
@@ -79,8 +89,8 @@ function LibraryRows({ data }: { data: LibraryResult }) {
         return (
           <li className="set" key={item.id}>
             <div>
-              {mapped ? (
-                <Link className="go" to={`/${item.mediaType}/${item.tmdbId}`}>
+              {href ? (
+                <Link className="go" to={href}>
                   {item.title}
                 </Link>
               ) : (
@@ -88,6 +98,14 @@ function LibraryRows({ data }: { data: LibraryResult }) {
               )}
               {summary && <small>{summary}</small>}
             </div>
+            <IdentityMapping item={item} updated={updated} />
+            {provider && data.allowWrites === true && (
+              <LibraryTracking
+                item={item}
+                provider={provider}
+                updated={updated}
+              />
+            )}
           </li>
         );
       })}
@@ -95,22 +113,36 @@ function LibraryRows({ data }: { data: LibraryResult }) {
   );
 }
 
-function LibraryShelf({ source }: { source: Source }) {
+function LibraryShelf({
+  source,
+  matchRevision,
+}: {
+  source: Source;
+  matchRevision: number;
+}) {
   const native = isNative(source);
   const shelves: Shelf[] = native
     ? ['all', 'watched', 'unwatched', 'in-progress']
     : source === 'trakt'
       ? ['watched', 'watchlist', 'rated']
       : ['all', 'watchlist', 'in-progress', 'completed', 'rated'];
-  const [shelf, setShelf] = useState<Shelf>(
-    source === 'trakt' ? 'watched' : 'all'
-  );
-  const [mediaType, setMediaType] = useState('');
-  const [libraryId, setLibraryId] = useState('');
-  const [cursors, setCursors] = useState([0]);
-  const page = cursors.length;
+  const [bookmark, setBookmark] = useSearchParams();
+  const shelf =
+    shelves.find((value) => value === bookmark.get('shelf')) ?? shelves[0];
+  const requestedType = bookmark.get('mediaType');
+  const mediaType =
+    !native && (requestedType === 'movie' || requestedType === 'tv')
+      ? requestedType
+      : '';
+  const libraryId = bookmark.get('libraryId');
   const [libraries, setLibraries] = useState<LibraryResult['libraries']>();
-  const selectedLibrary = libraryId || libraries?.[0]?.id;
+  const selectedLibrary = native
+    ? (libraries?.find(({ id }) => id === libraryId) ?? libraries?.[0])?.id
+    : undefined;
+  const scope = JSON.stringify([shelf, mediaType, selectedLibrary]);
+  const [paging, setPaging] = useState({ scope, cursors: [0] });
+  const cursors = paging.scope === scope ? paging.cursors : [0];
+  const page = cursors.length;
   const params = new URLSearchParams({ shelf, page: String(page) });
   if (native) {
     params.set('cursor', String(cursors[page - 1]));
@@ -120,9 +152,13 @@ function LibraryShelf({ source }: { source: Source }) {
   }
   const path = `${BASE}/library/${source}?${params}`;
 
-  function changeFilter(update: () => void) {
-    update();
-    setCursors([0]);
+  function changeFilter(key: string, value: string) {
+    const next = new URLSearchParams(bookmark);
+    next.set('source', source);
+    if (value) next.set(key, value);
+    else next.delete(key);
+    setPaging({ scope, cursors: [0] });
+    setBookmark(next);
   }
 
   return (
@@ -132,9 +168,7 @@ function LibraryShelf({ source }: { source: Source }) {
           <span className="lbl">Shelf</span>
           <select
             value={shelf}
-            onChange={(event) =>
-              changeFilter(() => setShelf(event.target.value as Shelf))
-            }
+            onChange={(event) => changeFilter('shelf', event.target.value)}
           >
             {shelves.map((value) => (
               <option key={value} value={value}>
@@ -150,7 +184,7 @@ function LibraryShelf({ source }: { source: Source }) {
               <select
                 value={selectedLibrary}
                 onChange={(event) =>
-                  changeFilter(() => setLibraryId(event.target.value))
+                  changeFilter('libraryId', event.target.value)
                 }
               >
                 {libraries.map(({ id, name }) => (
@@ -167,7 +201,7 @@ function LibraryShelf({ source }: { source: Source }) {
             <select
               value={mediaType}
               onChange={(event) =>
-                changeFilter(() => setMediaType(event.target.value))
+                changeFilter('mediaType', event.target.value)
               }
             >
               <option value="">Movies and Series</option>
@@ -178,14 +212,18 @@ function LibraryShelf({ source }: { source: Source }) {
         )}
       </div>
       <LibraryPage
-        key={path}
         path={path}
+        matchRevision={matchRevision}
         page={page}
         native={native}
+        trackingProvider={isNative(source) ? undefined : source}
+        repairPath={native ? undefined : `${BASE}/library/${source}/repair`}
+        shelf={shelf}
+        mediaType={mediaType}
         setLibraries={setLibraries}
         choosingLibrary={native && !selectedLibrary}
-        previous={() => setCursors(cursors.slice(0, -1))}
-        next={(cursor) => setCursors([...cursors, cursor])}
+        previous={() => setPaging({ scope, cursors: cursors.slice(0, -1) })}
+        next={(cursor) => setPaging({ scope, cursors: [...cursors, cursor] })}
       />
     </>
   );
@@ -193,29 +231,90 @@ function LibraryShelf({ source }: { source: Source }) {
 
 function LibraryPage({
   path,
+  matchRevision,
   page,
   native,
+  trackingProvider,
+  repairPath,
+  shelf,
+  mediaType,
   setLibraries,
   choosingLibrary,
   previous,
   next,
 }: {
   path: string;
+  matchRevision: number;
   page: number;
   native: boolean;
+  trackingProvider?: TrackingSource;
+  repairPath?: string;
+  shelf: Shelf;
+  mediaType: string;
   setLibraries: (libraries: LibraryResult['libraries']) => void;
   choosingLibrary: boolean;
   previous: () => void;
   next: (cursor: number) => void;
 }) {
-  const { data, error, reload } = useApi<LibraryResult>(path);
+  const {
+    data: response,
+    error: requestError,
+    apiError,
+    reload,
+    refresh,
+  } = useApi<LibraryResult>(path, {
+    currentPathOnly: true,
+    keepDuringRefresh: true,
+  });
+  const data =
+    response &&
+    Array.isArray(response.items) &&
+    response.items.every(
+      (item) => typeof item?.id === 'string' && typeof item.title === 'string'
+    ) &&
+    (response.libraries === undefined ||
+      (Array.isArray(response.libraries) &&
+        response.libraries.every(
+          (library) =>
+            typeof library?.id === 'string' && typeof library.name === 'string'
+        )))
+      ? response
+      : null;
+  const error =
+    requestError || (response && !data ? 'Invalid library response.' : null);
+  const previousRevision = useRef(matchRevision);
+  useEffect(() => {
+    if (previousRevision.current !== matchRevision) {
+      previousRevision.current = matchRevision;
+      refresh();
+    }
+  }, [matchRevision, refresh]);
   useEffect(() => {
     if (data) setLibraries(data.libraries);
   }, [data, setLibraries]);
 
   return (
     <>
-      <ServiceNote error={error} what="your library" retry={reload} />
+      {repairPath && (
+        <LibraryRepair
+          key={`${repairPath}:${shelf}:${mediaType}`}
+          path={repairPath}
+          shelf={shelf}
+          mediaType={mediaType || undefined}
+          reload={refresh}
+        />
+      )}
+      {error && (
+        <ProviderFailure
+          key={`${path}:${apiError?.retryAt ?? ''}`}
+          error={error}
+          what="your library"
+          provider={trackingProvider}
+          code={apiError?.code}
+          retryAt={apiError?.retryAt}
+          retry={reload}
+        />
+      )}
       {!data && !error && (
         <p className="note" role="status">
           Loading your library…
@@ -226,6 +325,15 @@ function LibraryPage({
       )}
       {data && !choosingLibrary && (
         <>
+          {trackingProvider && data.allowWrites === false && (
+            <p className="note">
+              Want to update tracking from My Media?{' '}
+              <Link to="/me/account/linked-accounts">
+                Enable writes in Linked Accounts
+              </Link>
+              .
+            </p>
+          )}
           {!!data.missingMappings && (
             <p className="note">
               Some titles do not have a confirmed catalog match.
@@ -236,7 +344,11 @@ function LibraryPage({
               This library reached its result limit.
             </p>
           )}
-          <LibraryRows data={data} />
+          <LibraryRows
+            data={data}
+            provider={trackingProvider}
+            updated={refresh}
+          />
         </>
       )}
       <nav className="toolbar" aria-label="Library Pages">
@@ -267,33 +379,61 @@ function LibraryPage({
 
 export default function Library() {
   const connections = useApi<Connections>(`${BASE}/accounts`);
-  const [source, setSource] = useState<Source>();
-  const nativeSource = connections.data?.mediaServer;
+  const [matchRevision, setMatchRevision] = useState(0);
+  const [bookmark, setBookmark] = useSearchParams();
+  const data = Array.isArray(connections.data?.accounts)
+    ? connections.data
+    : null;
+  const error =
+    connections.error ||
+    (connections.data && !data ? 'Invalid connected accounts response.' : null);
+  const nativeSource = data?.mediaServer;
   const sources = [
-    ...(nativeSource?.connected ? [nativeSource.provider] : []),
-    ...(connections.data?.accounts ?? []).map((account) => account.provider),
+    ...(nativeSource?.connected === true && isNative(nativeSource.provider)
+      ? [nativeSource.provider]
+      : []),
+    ...(data?.accounts ?? []).flatMap((account) => {
+      const provider = account?.provider;
+      return provider === 'trakt' ||
+        provider === 'anilist' ||
+        provider === 'simkl'
+        ? [provider]
+        : [];
+    }),
   ];
-  const current = source && sources.includes(source) ? source : sources[0];
+  const current =
+    sources.find((source) => source === bookmark.get('source')) ?? sources[0];
   return (
     <>
       <header className="ph">
         <h1>My Media</h1>
       </header>
       <ServiceNote
-        error={connections.error}
+        error={error}
         what="connected accounts"
         retry={connections.reload}
       />
-      {!connections.data && !connections.error && (
+      {!data && !error && (
         <p className="note" role="status">
           Loading connected accounts…
         </p>
       )}
-      {connections.data && !current && (
-        <p className="note">
-          Link a media server or tracking account to browse your library.
-        </p>
+      {data && !current && (
+        <div className="toolbar">
+          <p className="note">
+            Link a media server or tracking account to browse your library.
+          </p>
+          <Link
+            className="btn btn-tonal btn-sm"
+            to="/me/account/linked-accounts"
+          >
+            Open Linked Accounts
+          </Link>
+        </div>
       )}
+      <PersonalIdentityPacks
+        onImported={() => setMatchRevision((revision) => revision + 1)}
+      />
       {current && (
         <>
           <div className="toolbar">
@@ -301,7 +441,14 @@ export default function Library() {
               <span className="lbl">Library Source</span>
               <select
                 value={current}
-                onChange={(event) => setSource(event.target.value as Source)}
+                onChange={(event) => {
+                  const next = new URLSearchParams(bookmark);
+                  next.set('source', event.target.value);
+                  next.delete('shelf');
+                  next.delete('mediaType');
+                  next.delete('libraryId');
+                  setBookmark(next);
+                }}
               >
                 {sources.map((value) => (
                   <option key={value} value={value}>
@@ -310,8 +457,18 @@ export default function Library() {
                 ))}
               </select>
             </label>
+            <Link
+              className="btn btn-quiet btn-sm"
+              to="/me/account/linked-accounts"
+            >
+              Manage Linked Accounts
+            </Link>
           </div>
-          <LibraryShelf key={current} source={current} />
+          <LibraryShelf
+            key={current}
+            source={current}
+            matchRevision={matchRevision}
+          />
         </>
       )}
     </>

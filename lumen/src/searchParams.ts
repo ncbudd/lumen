@@ -96,12 +96,15 @@ export function scopedSearchPath(
   term: string
 ) {
   const page = String(searchResultPage(params));
+  const sort = params.get('sort');
+  const sortByCredit = sort === 'writer' || sort === 'director';
   if (scope === 'sports')
     return '/discover/sports?' + new URLSearchParams({ query: term, page });
   if (scope === 'movie' || scope === 'tv') {
     const filters = readFilters(params, videoFilterKeys);
     if (filters.size) {
       if (term) filters.set('search', term);
+      if (sortByCredit) filters.set('includeCredits', 'true');
       filters.set('page', page);
       return `/discover/${scope === 'movie' ? 'movies' : 'tv'}?${filters}`;
     }
@@ -117,7 +120,11 @@ export function scopedSearchPath(
     filters.set('type', 'music');
     return `/search?${filters}`;
   }
-  return `/search?query=${encodeURIComponent(term)}&page=${page}${scope === 'author' || scope === 'magazine' ? '&type=' + scope : ''}`;
+  const video = scope === 'movie' || scope === 'tv';
+  const scoped = scope === 'author' || scope === 'magazine' || video;
+  const query = `/search?query=${encodeURIComponent(term)}&page=${page}`;
+  if (!scoped) return query;
+  return `${query}&type=${scope}${video && !sortByCredit ? '&includeCredits=false' : ''}`;
 }
 
 export function activeMusicSearchFilters(params: URLSearchParams) {

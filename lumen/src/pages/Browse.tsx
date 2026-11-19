@@ -5,6 +5,7 @@ import { useAuth } from '../auth';
 import { GridSkeleton, MoreOnScroll, TitleCard } from '../components/cards';
 import { CardTitleToggle } from '../components/CardTitleToggle';
 import { ServiceNote } from '../components/extra';
+import FollowButton from '../components/FollowButton';
 import { GenrePicker } from '../components/GenrePicker';
 import GenreTiles from '../components/GenreTiles';
 import { useAsksRequestOptions } from '../components/requestSheet';
@@ -17,7 +18,8 @@ import {
   discoveryVisibility,
   showDiscoveryTitle,
 } from '../discoveryVisibility';
-import { CAN_HOVER, useApi, usePaged, usePublicSettings } from '../hooks';
+import { canViewFollowing } from '../followPermissions';
+import { CAN_HOVER, useApi, usePaged, type PublicSettings } from '../hooks';
 import { Icon } from '../icons';
 import { movieCertifications, tvCertifications } from '../maturityRatings';
 import { serverName } from '../mediaServer';
@@ -93,11 +95,13 @@ function RangeFilter({
   kind = 'rating',
   min,
   max,
+  invalidSaved = false,
   apply,
 }: {
   kind?: keyof typeof RANGE_FILTERS;
   min: string;
   max: string;
+  invalidSaved?: boolean;
   apply: (min: string, max: string) => void;
 }) {
   const [low, setLow] = useState(min);
@@ -137,7 +141,7 @@ function RangeFilter({
       <button className="btn btn-tonal btn-sm" disabled={reversed}>
         Apply {filter.name}
       </button>
-      {(min || max || low || high) && (
+      {(invalidSaved || min || max || low || high) && (
         <button
           className="btn btn-quiet btn-sm"
           type="button"
@@ -155,6 +159,12 @@ function RangeFilter({
           The lower bound must be at or below the upper bound.
         </p>
       )}
+      {invalidSaved && !reversed && (
+        <p className="note" role="alert">
+          The saved date filter contains an invalid date. Enter a valid date or
+          clear the filter.
+        </p>
+      )}
     </form>
   );
 }
@@ -164,6 +174,7 @@ const NETWORK_OPTIONS = tvNetworks.map(({ name, url }) => ({
   id: url.slice(url.lastIndexOf('/') + 1),
 }));
 const BROWSE_FILTER_PARAMS = [
+  'search',
   'show',
   'quality',
   'sort',
@@ -283,6 +294,13 @@ export function GenreDirectory({ kind }: { kind: 'movie' | 'tv' }) {
         <h1>{kind === 'movie' ? 'Movie Genres' : 'Series Genres'}</h1>
       </header>
       <ServiceNote error={genres.error} what="genres" retry={genres.reload} />
+      {Boolean(genres.data?.length) && (
+        <ServiceNote
+          error={artwork.error}
+          what="genre artwork"
+          retry={artwork.reload}
+        />
+      )}
       {genres.data ? (
         genres.data.length ? (
           <GenreTiles
@@ -311,14 +329,20 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
   const asks = useAsksRequestOptions();
   // "plex" is the old name for "have", kept so saved links still work
   const show = p.get('show') === 'plex' ? 'have' : p.get('show') || 'all';
+  const search = (p.get('search') ?? '').slice(0, 512).trim();
   const keywords = keywordIds(p.get('keywords'));
   const excludeKeywords = keywordIds(p.get('excludeKeywords'));
   const startKey =
     kind === 'movie' ? 'primaryReleaseDateGte' : 'firstAirDateGte';
   const endKey = kind === 'movie' ? 'primaryReleaseDateLte' : 'firstAirDateLte';
-  const start = dateBound(p.get(startKey));
-  const end = dateBound(p.get(endKey));
-  const validDates = !start || !end || start <= end;
+  const savedStart = p.get(startKey);
+  const savedEnd = p.get(endKey);
+  const start = dateBound(savedStart);
+  const end = dateBound(savedEnd);
+  const invalidSavedDate = Boolean(
+    (savedStart && !start) || (savedEnd && !end)
+  );
+  const validDates = !invalidSavedDate && (!start || !end || start <= end);
   const minRuntime = integerBound(p.get('withRuntimeGte'));
   const maxRuntime = integerBound(p.get('withRuntimeLte'));
   const validRuntime =
@@ -327,7 +351,8 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
   const maxRating = ratingBound(p.get('voteAverageLte'));
   const validRatingRange =
     !minRating || !maxRating || Number(minRating) <= Number(maxRating);
-  const publicSettings = usePublicSettings();
+  const settings = useApi<PublicSettings>('/settings/public');
+  const publicSettings = settings.data;
   const { user } = useAuth();
   const [showStudios, setShowStudios] = useState(false);
   const [showTags, setShowTags] = useState(false);
@@ -424,12 +449,9 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
   const genre = picked.join(matchAll ? ',' : '|');
   const genres =
     useApi<{ id: number; name: string }[]>(`/genres/${kind}`).data || [];
+  // Match Classic's default so a saved rating sort returns the same catalog.
   const defaultVotes =
-    sort === 'vote_average.desc' || sort === 'vote_average.asc'
-      ? kind === 'movie'
-        ? '500'
-        : '200'
-      : '';
+    sort === 'vote_average.desc' || sort === 'vote_average.asc' ? '50' : '';
   const minVotes = integerBound(p.get('voteCountGte'));
   const maxVotes = integerBound(p.get('voteCountLte'));
   const effectiveMinVotes = minVotes || (maxVotes ? '' : defaultVotes);
@@ -440,6 +462,7 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
   // top rated by average alone surfaces films with a handful of votes; ask for a real audience
   const q = new URLSearchParams({
     sortBy: sort,
+    ...(search ? { search } : {}),
     ...(studio
       ? { studio, ...(excludeStudio ? { excludeStudio: 'true' } : {}) }
       : {}),
@@ -486,23 +509,38 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
       (kind === 'movie'
         ? publicSettings?.movie4kEnabled
         : publicSettings?.series4kEnabled));
-  const quality = qualityEnabled && p.get('quality') === '4k' ? '4k' : 'hd';
+  const wants4k = show !== 'all' && p.get('quality') === '4k';
+  const quality = qualityEnabled && wants4k ? '4k' : 'hd';
+  const checkingQuality = wants4k && !publicSettings;
+  const unavailableQuality =
+    wants4k && Boolean(publicSettings) && !qualityEnabled;
   // The library endpoint only implements a subset of the catalog filters and sorts.
+  const localSort =
+    sort === 'popularity.desc' ||
+    (kind === 'movie'
+      ? /^(?:primary_release_date|release_date|original_title)\./.test(sort)
+      : /^(?:first_air_date|original_name)\./.test(sort));
   const libraryFirst =
     show === 'have' &&
-    sort === 'popularity.desc' &&
+    localSort &&
     [...q.keys()].every((key) =>
       [
         'sortBy',
+        'search',
         'genre',
         'excludeGenre',
+        startKey,
+        endKey,
         'withRuntimeGte',
         'withRuntimeLte',
       ].includes(key)
     );
   if (libraryFirst) q.set('availability', quality);
   const list = usePaged<TitleResult>(
-    regionPending && providers.length
+    !validDates ||
+      checkingQuality ||
+      unavailableQuality ||
+      (regionPending && providers.length)
       ? null
       : `/discover/${kind === 'movie' ? 'movies' : 'tv'}?${q}`
   );
@@ -515,6 +553,7 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
   };
   const visibility = discoveryVisibility(publicSettings, user?.permissions);
   if (show !== 'all') visibility.hideAvailable = false;
+  if (search) visibility.hideRequested = false;
   const items = list.items.filter(
     (x) =>
       (!filterCatalogRows || (show === 'have' ? onServer(x) : !onServer(x))) &&
@@ -574,6 +613,18 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
     setP(next, { replace: true });
   };
   const word = kind === 'movie' ? 'Movies' : 'Series';
+  const followedGenre =
+    !excludeGenre && picked.length === 1
+      ? genres.find(({ id }) => String(id) === picked[0])
+      : undefined;
+  const followedStudio =
+    studio && !excludeStudio && studioInfo.data?.id === Number(studio)
+      ? studioInfo.data
+      : undefined;
+  const followedNetwork =
+    network && networkLabel && networkLabel !== `#${network}`
+      ? { id: Number(network), name: networkLabel }
+      : undefined;
 
   return (
     <>
@@ -596,7 +647,76 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
           <span className="ph-text">Search {word.toLowerCase()}…</span>
         </Link>
       </header>
+      <form
+        key={`${kind}:${search}:${filterReset}`}
+        className="toolbar"
+        aria-label="Filter by Title"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const value = String(
+            new FormData(event.currentTarget).get('search') ?? ''
+          ).trim();
+          const next = new URLSearchParams(p);
+          if (value) next.set('search', value);
+          else next.delete('search');
+          setP(next, { replace: true });
+        }}
+      >
+        <label className="sel">
+          <span className="lbl">Title</span>
+          <input
+            className="cfg-input"
+            name="search"
+            type="search"
+            maxLength={512}
+            defaultValue={search}
+          />
+        </label>
+        <button className="btn btn-tonal btn-sm">Apply Title</button>
+      </form>
       <div className="toolbar">
+        {canViewFollowing(user?.permissions) && (
+          <>
+            {followedGenre && (
+              <FollowButton
+                key={`genre:${kind}:${followedGenre.id}`}
+                label={`Follow ${followedGenre.name}`}
+                subject={{
+                  kind: 'tmdb-genre',
+                  subjectKey: `tmdb:genre:${kind}:${followedGenre.id}`,
+                  subjectLabel: followedGenre.name,
+                  conditions: {
+                    ref: { genreId: followedGenre.id, mediaType: kind },
+                  },
+                }}
+              />
+            )}
+            {followedStudio && (
+              <FollowButton
+                key={`studio:${followedStudio.id}`}
+                label={`Follow ${followedStudio.name}`}
+                subject={{
+                  kind: 'tmdb-studio',
+                  subjectKey: `tmdb:studio:${followedStudio.id}`,
+                  subjectLabel: followedStudio.name,
+                  conditions: { ref: { tmdbId: followedStudio.id } },
+                }}
+              />
+            )}
+            {followedNetwork && (
+              <FollowButton
+                key={`network:${followedNetwork.id}`}
+                label={`Follow ${followedNetwork.name}`}
+                subject={{
+                  kind: 'tmdb-network',
+                  subjectKey: `tmdb:network:${followedNetwork.id}`,
+                  subjectLabel: followedNetwork.name,
+                  conditions: { ref: { tmdbId: followedNetwork.id } },
+                }}
+              />
+            )}
+          </>
+        )}
         <button
           className="btn btn-tonal btn-sm"
           type="button"
@@ -962,9 +1082,10 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
       )}
       <RangeFilter
         kind="dates"
-        key={`${filterReset}:dates:${start}:${end}`}
+        key={`${filterReset}:dates:${savedStart}:${savedEnd}`}
         min={start}
         max={end}
+        invalidSaved={invalidSavedDate}
         apply={(min, max) => {
           const next = new URLSearchParams(p);
           if (min) next.set(startKey, min);
@@ -1022,12 +1143,38 @@ export default function Browse({ kind }: { kind: 'movie' | 'tv' }) {
           retry={list.retry}
         />
       )}
-      {!list.error && !items.length && !list.loading && !capped && (
+      {checkingQuality && (
+        <ServiceNote
+          error={settings.error}
+          what="availability settings"
+          retry={settings.reload}
+        />
+      )}
+      {unavailableQuality && (
         <div className="empty">
-          <b>Nothing here</b>Try changing your filters.
+          <b>4K discovery is unavailable</b>
+          <button
+            className="btn btn-tonal btn-sm"
+            onClick={() => upd('quality', '')}
+          >
+            Show HD Results
+          </button>
         </div>
       )}
-      {list.loading && !items.length && list.page === 0 && <GridSkeleton />}
+      {validDates &&
+        !checkingQuality &&
+        !unavailableQuality &&
+        !list.error &&
+        !items.length &&
+        !list.loading &&
+        !capped && (
+          <div className="empty">
+            <b>Nothing here</b>Try changing your filters.
+          </div>
+        )}
+      {(list.loading || (checkingQuality && !settings.error)) &&
+        !items.length &&
+        list.page === 0 && <GridSkeleton />}
       <div className="grid">
         {items.map((x) => (
           <TitleCard key={x.id} it={{ ...x, mediaType: kind }} />

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { api, ApiError } from '../api';
 import { isAdministrator, useAuth } from '../auth';
+import AccountThemeOverrides from '../components/AccountThemeOverrides';
 import { Section } from '../components/cards';
 import { CardTitlePreferences } from '../components/CardTitlePreferences';
 import { ServiceNote } from '../components/extra';
@@ -9,6 +10,13 @@ import { StreamingSubscriptions } from '../components/StreamingSubscriptions';
 import { useApi, usePublicSettings } from '../hooks';
 import { permissionOptions } from '../permissionOptions';
 import { sessionGeneration } from '../sessionState';
+
+const accountTypes: Readonly<Record<number, string>> = {
+  1: 'Plex User',
+  2: 'Local User',
+  3: 'Jellyfin User',
+  4: 'Emby User',
+};
 
 const watchlistFields = [
   {
@@ -509,6 +517,13 @@ function PasswordForm({
 
 function Settings({ id, plex }: { id: number; plex: boolean }) {
   const { user } = useAuth();
+  const accountType = user?.userType ? accountTypes[user.userType] : undefined;
+  const role =
+    user?.id === 1
+      ? 'Owner'
+      : isAdministrator(user?.permissions)
+        ? 'Admin'
+        : 'User';
   const mask = user?.permissions ?? 0;
   const permissionBits =
     Number.isSafeInteger(mask) && mask >= 0 ? BigInt(mask) : 0n;
@@ -526,7 +541,10 @@ function Settings({ id, plex }: { id: number; plex: boolean }) {
     (profile.data || profile.error) && (password.data || password.error)
   );
   useEffect(() => {
-    if (loaded && (hash === '#password' || hash === '#account-permissions')) {
+    if (
+      hash === '#advanced-theme' ||
+      (loaded && (hash === '#password' || hash === '#account-permissions'))
+    ) {
       document
         .getElementById(hash.slice(1))
         ?.scrollIntoView({ block: 'start' });
@@ -535,6 +553,26 @@ function Settings({ id, plex }: { id: number; plex: boolean }) {
   return (
     <>
       <Section title="Profile">
+        <dl className="setlist">
+          {accountType && (
+            <div className="set">
+              <dt>
+                <b>Account Type</b>
+              </dt>
+              <dd>
+                <small>{accountType}</small>
+              </dd>
+            </div>
+          )}
+          <div className="set">
+            <dt>
+              <b>Role</b>
+            </dt>
+            <dd>
+              <small>{role}</small>
+            </dd>
+          </div>
+        </dl>
         <ServiceNote
           error={profile.error}
           what="profile settings"
@@ -611,6 +649,9 @@ export default function AccountSettings() {
         <h1>Account Settings</h1>
       </header>
       <div className="toolbar">
+        <Link className="btn btn-quiet btn-sm" to="#advanced-theme">
+          Theme Colors
+        </Link>
         <Link className="btn btn-quiet btn-sm" to="#account-permissions">
           Account Permissions
         </Link>
@@ -633,6 +674,7 @@ export default function AccountSettings() {
       {user && (
         <Settings id={user.id} key={user.id} plex={user.userType === 1} />
       )}
+      {user && <AccountThemeOverrides key={`theme:${user.id}`} />}
     </>
   );
 }

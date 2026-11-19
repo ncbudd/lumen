@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { bookDetailPath } from '../api';
+import { Link, useSearchParams } from 'react-router-dom';
+import { bookDetailPath, videoDetailPath } from '../api';
 import { isAdministrator, useAuth } from '../auth';
 import { canViewAllRequests, Pill } from '../components/detail';
 import { ServiceNote } from '../components/extra';
@@ -100,7 +100,13 @@ function releaseHref(item: Release) {
     case 'movie':
     case 'tv':
       return item.tmdbId
-        ? `/${item.mediaType}/${encode(item.tmdbId)}`
+        ? videoDetailPath(
+            item.mediaType,
+            item.tmdbId,
+            item.is4k,
+            item.seasonNumber,
+            item.episodeNumber
+          )
         : undefined;
     case 'music':
       return item.mbId ? `/music/${encode(item.mbId)}` : undefined;
@@ -122,8 +128,19 @@ function releaseHref(item: Release) {
 }
 
 function CalendarResults({ path }: { path: string }) {
-  const { data, error, reload } = useApi<CalendarResult>(path);
+  const {
+    data: response,
+    error: loadError,
+    reload,
+  } = useApi<CalendarResult>(path, { keepDuringRefresh: true });
   const [limit, setLimit] = useState(PAGE_SIZE);
+  const data =
+    Array.isArray(response?.results) && Array.isArray(response?.partialSources)
+      ? response
+      : null;
+  const error =
+    loadError ||
+    (response && !data ? 'Invalid release calendar response.' : null);
   if (!data) {
     return error ? (
       <ServiceNote error={error} what="releases" retry={reload} />
@@ -136,11 +153,16 @@ function CalendarResults({ path }: { path: string }) {
 
   return (
     <>
-      {!!data.partialSources.length && (
-        <p className="note" role="status">
-          Some release sources could not be reached. Their releases may be
-          missing.
-        </p>
+      {(loadError || !!data.partialSources.length) && (
+        <ServiceNote
+          error={
+            loadError
+              ? `Retry failed: ${loadError} Showing the previous results.`
+              : 'Some release sources could not be reached. Their releases may be missing.'
+          }
+          what="all release sources"
+          retry={reload}
+        />
       )}
       {data.truncated && (
         <p className="note" role="status">
@@ -148,7 +170,11 @@ function CalendarResults({ path }: { path: string }) {
         </p>
       )}
       {!data.results.length ? (
-        <p className="note">No releases match this month and scope.</p>
+        <p className="note">
+          {data.partialSources.length
+            ? 'No releases were returned by the sources that responded.'
+            : 'No releases match this month and scope.'}
+        </p>
       ) : (
         <ol className="setlist">
           {data.results.slice(0, limit).map((release) => {
@@ -225,16 +251,31 @@ export default function Calendar() {
   const { user } = useAuth();
   const admin = isAdministrator(user?.permissions);
   const canSeeAll = canViewAllRequests(user?.permissions);
-  const [month, setMonth] = useState(() => monthValue(new Date()));
-  const [scope, setScope] = useState('mine');
-  const [medium, setMedium] = useState('');
-  const [unmonitored, setUnmonitored] = useState(false);
+  const [params, setParams] = useSearchParams();
+  const bookmarkedMonth = params.get('month') ?? '';
+  const month =
+    /^\d{4}-(0[1-9]|1[0-2])$/.test(bookmarkedMonth) &&
+    bookmarkedMonth >= FIRST_MONTH &&
+    bookmarkedMonth <= LAST_MONTH
+      ? bookmarkedMonth
+      : monthValue(new Date());
+  const scope = canSeeAll && params.get('scope') === 'all' ? 'all' : 'mine';
+  const medium =
+    MEDIA.find(([value]) => value === params.get('mediaType'))?.[0] ?? '';
+  const unmonitored = admin && params.get('includeUnmonitored') === 'true';
+  function update(key: string, value: string) {
+    const next = new URLSearchParams(params);
+    if (value) next.set(key, value);
+    else next.delete(key);
+    setParams(next);
+  }
+  const setMonth = (value: string) => update('month', value);
   const query = new URLSearchParams({
     start: `${month}-01`,
     end: `${moveMonth(month, 1)}-01`,
-    scope: canSeeAll ? scope : 'mine',
+    scope,
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    includeUnmonitored: String(admin && unmonitored),
+    includeUnmonitored: String(unmonitored),
   });
   if (medium) query.set('mediaType', medium);
   const path = `/calendar?${query}`;
@@ -282,7 +323,9 @@ export default function Calendar() {
             <span className="lbl">Scope</span>
             <select
               value={scope}
-              onChange={(event) => setScope(event.target.value)}
+              onChange={(event) =>
+                update('scope', event.target.value === 'all' ? 'all' : '')
+              }
             >
               <option value="mine">My Requests</option>
               <option value="all">All Monitored Releases</option>
@@ -293,7 +336,7 @@ export default function Calendar() {
           <span className="lbl">Media Type</span>
           <select
             value={medium}
-            onChange={(event) => setMedium(event.target.value)}
+            onChange={(event) => update('mediaType', event.target.value)}
           >
             {MEDIA.map(([value, title]) => (
               <option key={value} value={value}>
@@ -307,7 +350,9 @@ export default function Calendar() {
             <input
               type="checkbox"
               checked={unmonitored}
-              onChange={(event) => setUnmonitored(event.target.checked)}
+              onChange={(event) =>
+                update('includeUnmonitored', event.target.checked ? 'true' : '')
+              }
             />
             Include Unmonitored Titles
           </label>

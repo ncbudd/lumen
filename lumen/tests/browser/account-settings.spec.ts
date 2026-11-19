@@ -7,7 +7,12 @@ test('password and Episode Queue bookmarks scroll to the selected section after 
   await page.route('**/api/v1/**', (route) => {
     const { pathname } = new URL(route.request().url());
     const responses: Record<string, object> = {
-      '/api/v1/auth/me': { id: 2, displayName: 'Viewer', permissions: 32 },
+      '/api/v1/auth/me': {
+        id: 2,
+        displayName: 'Viewer',
+        permissions: 32,
+        userType: 3,
+      },
       '/api/v1/user/2/settings/main': { username: 'Viewer' },
       '/api/v1/user/2/settings/password': { hasPassword: true },
       '/api/v1/user/2/settings/tv-season-watch-gate': {
@@ -26,8 +31,9 @@ test('password and Episode Queue bookmarks scroll to the selected section after 
     };
   });
   for (const [path, id] of [
-    ['/me/account#password', 'password'],
-    ['/me/account/tv-requests#episode-queue', 'episode-queue'],
+    ['./me/account#password', 'password'],
+    ['./me/account/tv-requests#episode-queue', 'episode-queue'],
+    ['./me/account#advanced-theme', 'advanced-theme'],
   ]) {
     await page.goto(path);
     await expect(page.locator(`section#${id}`)).toHaveAttribute(
@@ -35,6 +41,11 @@ test('password and Episode Queue bookmarks scroll to the selected section after 
       'true'
     );
   }
+  await page.goto('./me/account');
+  await expect(page.getByText('Jellyfin User', { exact: true })).toBeVisible();
+  await expect(
+    page.locator('dd').getByText('User', { exact: true })
+  ).toBeVisible();
 });
 
 test('account settings preserve failed profile edits and save only changes and password fields', async ({
@@ -88,7 +99,7 @@ test('account settings preserve failed profile edits and save only changes and p
     }
     return route.fulfill({ json: {} });
   });
-  await page.goto('/me');
+  await page.goto('./me');
   await page.getByRole('link', { name: 'Open Account Settings' }).click();
   const displayName = page.getByLabel('Display Name');
   await expect(displayName).toHaveValue('Viewer');
@@ -139,6 +150,7 @@ test('watchlist preferences honor account type and category permissions and pers
 }) => {
   const profile = { username: 'Viewer', watchlistSyncMusic: true };
   const writes: unknown[] = [];
+  let rejectSave = true;
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/api/v1/**', (route) => {
     const request = route.request();
@@ -156,6 +168,11 @@ test('watchlist preferences honor account type and category permissions and pers
       if (request.method() === 'POST') {
         const body = request.postDataJSON();
         writes.push(body);
+        if (rejectSave)
+          return route.fulfill({
+            status: 503,
+            json: { message: 'Profile service unavailable.' },
+          });
         Object.assign(profile, body);
       }
       return route.fulfill({ json: profile });
@@ -163,16 +180,303 @@ test('watchlist preferences honor account type and category permissions and pers
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/me/account');
+  await page.goto('./me/account');
   const music = page.getByRole('checkbox', { name: 'Auto-Request Music' });
   await expect(music).toBeChecked();
   await expect(page.getByLabel('Auto-Request Movies')).toHaveCount(0);
   await expect(page.getByLabel('Auto-Request Books')).toHaveCount(0);
   await music.uncheck();
   await page.getByRole('button', { name: 'Save Profile' }).click();
+  await expect(
+    page.getByText(
+      'Could not save the profile. Check the values and try again.'
+    )
+  ).toBeVisible();
+  await expect(music).not.toBeChecked();
+  rejectSave = false;
+  await page.getByRole('button', { name: 'Save Profile' }).click();
   await expect(page.getByText('Profile saved.')).toBeVisible();
-  expect(writes).toEqual([{ watchlistSyncMusic: false }]);
+  expect(writes).toEqual([
+    { watchlistSyncMusic: false },
+    { watchlistSyncMusic: false },
+  ]);
   await page.reload();
   await expect(music).toBeVisible();
   await expect(music).not.toBeChecked();
+});
+
+for (const scenario of [
+  {
+    name: 'member without watchlist permissions',
+    permissions: 32,
+    userType: 2,
+    visible: [],
+    emailDisabled: false,
+  },
+  {
+    name: 'Plex member with movie sync permission',
+    permissions: 16777216,
+    userType: 1,
+    visible: ['Auto-Request Movies'],
+    emailDisabled: true,
+  },
+  {
+    name: 'local member with music sync permission',
+    permissions: 8589934592,
+    userType: 2,
+    visible: ['Auto-Request Music'],
+    emailDisabled: false,
+  },
+  {
+    name: 'local member with global auto-request permission',
+    permissions: 8388608,
+    userType: 2,
+    visible: [
+      'Auto-Request Music',
+      'Auto-Request Books',
+      'Auto-Request Comics',
+      'Auto-Request Magazines',
+    ],
+    emailDisabled: false,
+  },
+  {
+    name: 'local administrator',
+    permissions: 2,
+    userType: 2,
+    visible: [
+      'Auto-Request Music',
+      'Auto-Request Books',
+      'Auto-Request Comics',
+      'Auto-Request Magazines',
+    ],
+    emailDisabled: false,
+  },
+  {
+    name: 'Plex administrator',
+    permissions: 2,
+    userType: 1,
+    visible: [
+      'Auto-Request Movies',
+      'Auto-Request Series',
+      'Auto-Request Music',
+      'Auto-Request Books',
+      'Auto-Request Comics',
+      'Auto-Request Magazines',
+    ],
+    emailDisabled: true,
+  },
+]) {
+  test(`account preference controls match the ${scenario.name} role`, async ({
+    page,
+  }) => {
+    await page.route('https://**/*', (route) => route.abort());
+    await page.route('**/api/v1/**', (route) => {
+      const requestUrl = new URL(route.request().url());
+      const path = requestUrl.pathname.slice('/api/v1'.length);
+      if (path === '/auth/me')
+        return route.fulfill({
+          json: {
+            id: 2,
+            displayName: 'Viewer',
+            permissions: scenario.permissions,
+            userType: scenario.userType,
+          },
+        });
+      if (path === '/user/2/settings/main')
+        return route.fulfill({ json: { username: 'Viewer' } });
+      if (path === '/languages') return route.fulfill({ json: [] });
+      return route.fulfill({ json: {} });
+    });
+
+    await page.goto('./me/account');
+    for (const label of [
+      'Auto-Request Movies',
+      'Auto-Request Series',
+      'Auto-Request Music',
+      'Auto-Request Books',
+      'Auto-Request Comics',
+      'Auto-Request Magazines',
+    ]) {
+      const control = page.getByRole('checkbox', { name: label });
+      await expect(control).toHaveCount(
+        scenario.visible.includes(label) ? 1 : 0
+      );
+    }
+    if (scenario.emailDisabled)
+      await expect(page.getByLabel('Email')).toBeDisabled();
+    else await expect(page.getByLabel('Email')).toBeEnabled();
+  });
+}
+
+test('account theme colors preserve stored overrides for other controls', async ({
+  page,
+}) => {
+  const classicOnly = { '--theme-page-spotlight-strength': 0.5 };
+  const overrides: Record<string, string | number> = { ...classicOnly };
+  let fail = true;
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname.slice(7);
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 2,
+          permissions: 32,
+          settings: { advancedThemeOverrides: overrides },
+        },
+      });
+    if (path === '/user/2/settings/advanced-theme') {
+      if (fail) {
+        fail = false;
+        return route.fulfill({
+          status: 503,
+          json: { message: 'Theme save unavailable.' },
+        });
+      }
+      for (const [key, value] of Object.entries(
+        request.postDataJSON().changes
+      )) {
+        if (typeof value === 'string' || typeof value === 'number')
+          overrides[key] = value;
+        else delete overrides[key];
+      }
+      if (overrides['--theme-page-bg'] === '#123')
+        overrides['--theme-page-bg'] = '#112233';
+      return route.fulfill({ json: { advancedThemeOverrides: overrides } });
+    }
+    return route.fulfill({ json: {} });
+  });
+  await page.goto('./me/account');
+  const background = page.getByLabel('Page Background');
+  const save = page.getByRole('button', { name: 'Save Theme Colors' });
+  await background.fill('invalid');
+  await expect(save).toBeDisabled();
+  await background.fill('#123');
+  await save.click();
+  await expect(page.getByText('Theme save unavailable.')).toBeVisible();
+  await expect(background).toHaveValue('#123');
+  expect(overrides).toEqual(classicOnly);
+  await save.click();
+  await expect(page.getByText('Theme colors saved.')).toBeVisible();
+  expect(overrides).toEqual({ ...classicOnly, '--theme-page-bg': '#112233' });
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        getComputedStyle(document.documentElement)
+          .getPropertyValue('--bg')
+          .trim()
+      )
+    )
+    .toBe('#112233');
+  await page.reload();
+  await expect(background).toHaveValue('#112233');
+  if (await page.locator('.side').isVisible()) {
+    const header = page.locator('.topbar');
+    await expect(header).toHaveCSS(
+      'background-color',
+      'rgba(24, 27, 34, 0.72)'
+    );
+    const headerHeight = (await header.boundingBox())?.height;
+    const scrolledColor = page.getByLabel('Scrolled Search Header');
+    await scrolledColor.fill('#26354a');
+    await save.click();
+    await page.evaluate(() => window.scrollTo(0, 300));
+    await expect(header).toHaveCSS('background-color', 'rgb(38, 53, 74)');
+    await expect(header).toHaveCSS('backdrop-filter', 'none');
+    expect((await header.boundingBox())?.height).toBe(headerHeight);
+    await scrolledColor.fill('');
+    await save.click();
+    await expect(header).toHaveCSS('background-color', 'rgb(20, 23, 29)');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(header).toHaveCSS(
+      'background-color',
+      'rgba(24, 27, 34, 0.72)'
+    );
+    const sidebar = page.locator('.side');
+    const width = (await sidebar.boundingBox())?.width;
+    await expect(sidebar).toHaveCSS('background-image', 'none');
+    await expect(sidebar).toHaveCSS('background-color', 'rgb(20, 23, 29)');
+    await expect(sidebar).toHaveCSS('border-right-color', 'rgb(42, 48, 59)');
+    await page.getByLabel('Sidebar Background Start').fill('#233446');
+    await page.getByLabel('Sidebar Background End').fill('#0d1927');
+    await page.getByLabel('Sidebar Border').fill('#506680');
+    await page.getByLabel('Sidebar Hover Background').fill('#29354d');
+    await save.click();
+    await expect(sidebar).toHaveCSS(
+      'background-image',
+      'linear-gradient(rgb(35, 52, 70), rgb(13, 25, 39))'
+    );
+    await expect(sidebar).toHaveCSS('border-right-color', 'rgb(80, 102, 128)');
+    expect((await sidebar.boundingBox())?.width).toBe(width);
+    const navLink = sidebar.locator('a:not([aria-current])').first();
+    await navLink.hover();
+    await expect(navLink).toHaveCSS('background-color', 'rgb(41, 53, 77)');
+    await page.getByLabel('Sidebar Background End').fill('');
+    await save.click();
+    await expect(sidebar).toHaveCSS(
+      'background-image',
+      'linear-gradient(rgb(35, 52, 70), rgb(20, 23, 29))'
+    );
+    for (const label of [
+      'Sidebar Background Start',
+      'Sidebar Background End',
+      'Sidebar Border',
+      'Sidebar Hover Background',
+    ]) {
+      await page.getByLabel(label).fill('');
+    }
+    await save.click();
+    await expect(sidebar).toHaveCSS('border-right-color', 'rgb(42, 48, 59)');
+    await expect(sidebar).toHaveCSS('background-image', 'none');
+  } else {
+    const tabs = page.getByRole('navigation', { name: 'Tabs' });
+    await expect(tabs).toHaveCSS('background-image', 'none');
+    const width = (await tabs.boundingBox())?.width;
+    const color = page.getByLabel('Sidebar Background Start');
+    const divider = page.getByLabel('Sidebar Border');
+    await color.fill('#233446');
+    await divider.fill('#506680');
+    await save.click();
+    await expect(tabs).toHaveCSS(
+      'background-image',
+      'linear-gradient(rgb(35, 52, 70), rgba(24, 27, 34, 0.72))'
+    );
+    await expect(tabs).toHaveCSS('border-top-color', 'rgb(80, 102, 128)');
+    expect((await tabs.boundingBox())?.width).toBe(width);
+    await color.fill('');
+    await divider.fill('');
+    await save.click();
+    await expect(tabs).toHaveCSS('background-image', 'none');
+  }
+  await background.fill('');
+  await save.click();
+  await expect(page.getByText('Theme colors saved.')).toBeVisible();
+  expect(overrides).toEqual(classicOnly);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.documentElement.style.getPropertyValue('--bg')
+      )
+    )
+    .toBe('');
+  await page.getByRole('button', { name: 'Edit All Overrides' }).click();
+  const editor = page.getByLabel('Theme Override JSON');
+  await expect(editor).toHaveValue(JSON.stringify(classicOnly, null, 2));
+  await editor.fill('[]');
+  await page.getByRole('button', { name: 'Edit Theme Colors' }).click();
+  await expect(background).toBeVisible();
+  await page.getByRole('button', { name: 'Edit All Overrides' }).click();
+  await expect(editor).toHaveValue('[]');
+  await page.getByRole('button', { name: 'Save Theme Overrides' }).click();
+  await expect(
+    page.getByText(
+      'Enter a JSON object with string or numeric override values.'
+    )
+  ).toBeVisible();
+  await editor.fill(
+    JSON.stringify({ '--theme-page-spotlight-strength': 0.75 })
+  );
+  await page.getByRole('button', { name: 'Save Theme Overrides' }).click();
+  await expect(page.getByText('Theme overrides saved.')).toBeVisible();
+  expect(overrides).toEqual({ '--theme-page-spotlight-strength': 0.75 });
 });
