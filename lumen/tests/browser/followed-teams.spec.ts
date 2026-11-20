@@ -72,7 +72,7 @@ test('team follows are reachable from sports and added and removed by exact iden
   ).toBeVisible();
   const picker = page.getByRole('combobox', { name: 'Team', exact: true });
   await picker.selectOption({ label: 'Fixture | Owls (NHL)' });
-  const follow = page.getByRole('button', { name: 'Follow Team', exact: true });
+  const follow = page.getByRole('button', { name: 'Follow', exact: true });
   await follow.click();
   await expect(page.getByRole('alert')).toHaveText('Team follow rejected.');
   await expect(follow).toBeEnabled();
@@ -90,7 +90,9 @@ test('team follows are reachable from sports and added and removed by exact iden
     fullPage: true,
   });
   await unfollow.click();
-  await expect(page.getByText('You are following no teams.')).toBeVisible();
+  await expect(
+    page.getByText('You are not following any teams.')
+  ).toBeVisible();
   await expect(
     picker.locator('option', { hasText: 'Fixture | Owls' })
   ).toHaveCount(1);

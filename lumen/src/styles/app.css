@@ -1754,6 +1754,13 @@ a.person:hover {
   box-shadow: 0 0 0 1px var(--line);
   overflow: hidden;
 }
+.setlist.recommendation-feed-form {
+  display: flex;
+  flex-direction: column;
+}
+.recommendation-form {
+  margin: 0;
+}
 .set {
   display: flex;
   flex-wrap: wrap;
@@ -1765,6 +1772,12 @@ a.person:hover {
 }
 .set + .set {
   border-top: 1px solid var(--line);
+}
+/* Keep the form action tappable above the final setting row on narrow screens. */
+.recommendation-feed-form > .btn {
+  position: relative;
+  z-index: 1;
+  margin: 10px 14px 14px;
 }
 .set b,
 .set small {

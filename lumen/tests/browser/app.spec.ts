@@ -6041,12 +6041,42 @@ test('book recommendations open a newly created feed', async ({ page }) => {
     ).toBe(true);
   }
   await lessPopular.check();
-  await create.click();
+  await create.scrollIntoViewIfNeeded();
+  const settingBox = await lessPopular.boundingBox();
+  const createBox = await create.boundingBox();
+  expect(settingBox).not.toBeNull();
+  expect(createBox).not.toBeNull();
+  expect(createBox!.y).toBeGreaterThanOrEqual(
+    settingBox!.y + settingBox!.height
+  );
+  expect(
+    await create.evaluate((button) => {
+      const box = button.getBoundingClientRect();
+      return (
+        document.elementFromPoint(
+          box.x + box.width / 2,
+          box.y + box.height / 2
+        ) === button
+      );
+    })
+  ).toBe(true);
+  // The phone viewport has a fixed tab bar; tap the checked visible target so
+  // Playwright doesn't run a second scroll while resolving the click.
+  await page.mouse.click(
+    createBox!.x + createBox!.width / 2,
+    createBox!.y + createBox!.height / 2
+  );
   await expect(page.getByRole('alert')).toHaveText(
     'Hardcover rejected your API token.'
   );
   await expect(title).toHaveValue('Personal Picks');
-  await create.click();
+  await create.scrollIntoViewIfNeeded();
+  const retryBox = await create.boundingBox();
+  expect(retryBox).not.toBeNull();
+  await page.mouse.click(
+    retryBox!.x + retryBox!.width / 2,
+    retryBox!.y + retryBox!.height / 2
+  );
   await expect(page).toHaveURL(/format=audiobook&feed=18$/);
   await expect(
     page.getByText('Recommended Book', { exact: true })
