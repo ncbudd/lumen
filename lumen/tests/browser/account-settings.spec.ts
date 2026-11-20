@@ -678,3 +678,269 @@ test('account theme colors preserve stored overrides for other controls', async 
   ).toBeVisible();
   expect(overrides).toEqual({ '--theme-page-spotlight-strength': 0.75 });
 });
+
+test('account theme override controls follow the selected Lumen locale', async ({
+  page,
+}) => {
+  let locale = 'fr';
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const { pathname } = new URL(route.request().url());
+    const responses: Record<string, object> = {
+      '/api/v1/auth/me': {
+        id: 2,
+        displayName: 'Viewer',
+        permissions: 32,
+        userType: 2,
+        settings: { advancedThemeOverrides: {} },
+      },
+      '/api/v1/user/2/settings/main': { username: 'Viewer', locale },
+      '/api/v1/user/2/settings/password': { hasPassword: true },
+      '/api/v1/languages': [],
+    };
+    return route.fulfill({ json: responses[pathname] ?? {} });
+  });
+
+  await page.goto(appPath('./me/account#advanced-theme'));
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await page.locator('#advanced-theme').scrollIntoViewIfNeeded();
+  if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/theme-overrides-fr-${page.viewportSize()?.width}.png`,
+    });
+  for (const label of [
+    'Arrière-plan de la page',
+    'Surface',
+    'Surface surélevée',
+    'Bordure',
+    'Arrière-plan des menus et des boîtes de dialogue',
+    'Début du dégradé d’arrière-plan de la barre latérale',
+    'Fin du dégradé d’arrière-plan de la barre latérale',
+    'Bordure de la barre latérale',
+    'Arrière-plan au survol de la barre latérale',
+    'En-tête de recherche après défilement',
+    'Texte principal',
+    'Couleur d’accentuation',
+  ]) {
+    await expect(page.getByLabel(label, { exact: true })).toBeVisible();
+  }
+  await expect(
+    page.getByRole('button', { name: 'Enregistrer les couleurs du thème' })
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
+    )
+    .toBe(true);
+
+  locale = 'ar';
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await page.locator('#advanced-theme').scrollIntoViewIfNeeded();
+  if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/theme-overrides-ar-${page.viewportSize()?.width}.png`,
+    });
+  for (const label of [
+    'خلفية الصفحة',
+    'السطح',
+    'السطح المرتفع',
+    'الحد',
+    'خلفية القوائم ومربعات الحوار',
+    'بداية تدرج خلفية الشريط الجانبي',
+    'نهاية تدرج خلفية الشريط الجانبي',
+    'حد الشريط الجانبي',
+    'خلفية الشريط الجانبي عند التمرير',
+    'ترويسة البحث بعد التمرير',
+    'النص الأساسي',
+    'لون التمييز',
+  ]) {
+    await expect(page.getByLabel(label, { exact: true })).toBeVisible();
+  }
+  await expect(
+    page.getByRole('button', { name: 'حفظ ألوان المظهر' })
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
+    )
+    .toBe(true);
+});
+
+test('password form uses the selected locale for its save action and failure', async ({
+  page,
+}) => {
+  let locale = 'fr';
+  let hasPassword = true;
+  let passwordResponseStatus = 403;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const { pathname } = new URL(request.url());
+    if (pathname === '/api/v1/auth/me')
+      return route.fulfill({
+        json: { id: 2, displayName: 'Viewer', permissions: 32, userType: 2 },
+      });
+    if (pathname === '/api/v1/user/2/settings/main')
+      return route.fulfill({ json: { username: 'Viewer', locale } });
+    if (pathname === '/api/v1/user/2/settings/password')
+      return request.method() === 'POST'
+        ? route.fulfill({ status: passwordResponseStatus, json: {} })
+        : route.fulfill({ json: { hasPassword } });
+    return route.fulfill({ json: {} });
+  });
+
+  async function submitInvalidCredentials() {
+    const fields = page.locator('#password input[type="password"]');
+    await fields.nth(0).fill('old-pass');
+    await fields.nth(1).fill('new-password-123');
+    await fields.nth(2).fill('new-password-123');
+    const saveLabel =
+      locale === 'fr'
+        ? 'Enregistrer le mot de passe'
+        : locale === 'ar'
+          ? 'حفظ كلمة المرور'
+          : 'Save Password';
+    await page.getByRole('button', { name: saveLabel }).click();
+    await expect(page.getByRole('alert')).toBeVisible();
+  }
+
+  await page.goto(appPath('./me/account#password'));
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await page.locator('#password').scrollIntoViewIfNeeded();
+  await submitInvalidCredentials();
+  if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/password-fr-${page.viewportSize()?.width}.png`,
+    });
+  await expect(
+    page.getByRole('button', { name: 'Enregistrer le mot de passe' })
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      'Vérifiez votre mot de passe actuel et les autorisations de votre compte.'
+    )
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
+    )
+    .toBe(true);
+
+  locale = 'ar';
+  passwordResponseStatus = 503;
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await page.locator('#password').scrollIntoViewIfNeeded();
+  await submitInvalidCredentials();
+  if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/password-ar-${page.viewportSize()?.width}.png`,
+    });
+  await expect(
+    page.getByRole('button', { name: 'حفظ كلمة المرور' })
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      'تعذر تأكيد تغيير كلمة المرور. تحقق من بيانات اعتمادك قبل إعادة المحاولة.'
+    )
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
+    )
+    .toBe(true);
+
+  locale = 'fr';
+  hasPassword = false;
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await page.locator('#password').scrollIntoViewIfNeeded();
+  if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/password-no-local-fr-${page.viewportSize()?.width}.png`,
+    });
+  await expect(
+    page.getByText('Ce compte ne possède pas de mot de passe local.')
+  ).toBeVisible();
+  await expect(page.locator('#password input[type="password"]')).toHaveCount(2);
+  await expect(
+    page.getByRole('button', { name: 'Enregistrer le mot de passe' })
+  ).toBeVisible();
+});
+
+test('account permission names follow the selected Lumen locale', async ({
+  page,
+}) => {
+  let locale = 'fr';
+  const permissions = 4 + 16 + 32 + 64 + 2199023255552;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const { pathname } = new URL(route.request().url());
+    const responses: Record<string, object> = {
+      '/api/v1/auth/me': {
+        id: 2,
+        displayName: 'Viewer',
+        permissions,
+        userType: 2,
+      },
+      '/api/v1/user/2/settings/main': { username: 'Viewer', locale },
+      '/api/v1/user/2/settings/password': { hasPassword: true },
+    };
+    return route.fulfill({ json: responses[pathname] ?? {} });
+  });
+
+  await page.goto(appPath('./me/account#account-permissions'));
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await page.locator('#account-permissions').scrollIntoViewIfNeeded();
+  if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/account-permissions-fr-${page.viewportSize()?.width}.png`,
+    });
+  for (const label of [
+    'Gérer les paramètres',
+    'Gérer les demandes',
+    'Demander',
+    'Voter',
+    'Demander des magazines',
+  ]) {
+    await expect(
+      page.locator('#account-permissions').getByText(label, { exact: true })
+    ).toBeVisible();
+  }
+  expect(
+    await page.locator('body').evaluate((body) => {
+      const root = document.documentElement;
+      return Math.max(body.scrollWidth, root.scrollWidth) <= root.clientWidth;
+    })
+  ).toBe(true);
+
+  locale = 'ar';
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await page.locator('#account-permissions').scrollIntoViewIfNeeded();
+  if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/account-permissions-ar-${page.viewportSize()?.width}.png`,
+    });
+  for (const label of [
+    'إدارة الإعدادات',
+    'إدارة الطلبات',
+    'طلب',
+    'التصويت',
+    'طلب المجلات',
+  ]) {
+    await expect(
+      page.locator('#account-permissions').getByText(label, { exact: true })
+    ).toBeVisible();
+  }
+  expect(
+    await page.locator('body').evaluate((body) => {
+      const root = document.documentElement;
+      return Math.max(body.scrollWidth, root.scrollWidth) <= root.clientWidth;
+    })
+  ).toBe(true);
+});

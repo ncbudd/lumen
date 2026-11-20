@@ -63,6 +63,65 @@ test('TV request settings localize the policy and keep viewer controls read-only
   await captureSettings(page, info, 'fr');
 });
 
+test('Arabic TV request settings use RTL and native Arabic plural forms', async ({
+  page,
+}, info) => {
+  let locale = 'en';
+  let episodeCount = 2;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname.slice('/api/v1'.length);
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 2, displayName: 'Viewer', permissions: 0, userType: 2 },
+      });
+    if (path === '/user/2/settings/main')
+      return route.fulfill({ json: { locale } });
+    if (path === '/user/2/settings/tv-season-watch-gate')
+      return route.fulfill({ json: { status: 'off', globallyEnabled: false } });
+    if (path === '/user/2/settings/episode-queue')
+      return route.fulfill({ json: { defaultEpisodeCount: episodeCount } });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto('/me/account/tv-requests');
+  await expect(page.getByText('2 episodes ahead')).toBeVisible();
+  await captureSettings(page, info, 'ar-en-baseline');
+
+  locale = 'ar';
+  await page.reload();
+  await expect(
+    page.getByRole('heading', { name: 'إعدادات طلبات التلفاز', exact: true })
+  ).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.getByText('يتطلب موافقة', { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'طلب الموافقة' })
+  ).toBeVisible();
+  await expect(
+    page.getByText('الحلقتان القادمتان', { exact: true })
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'حفظ الافتراضي' })).toHaveCount(
+    0
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    )
+    .toBe(true);
+  await captureSettings(page, info, 'ar-candidate');
+
+  episodeCount = 3;
+  await page.reload();
+  await expect(page.getByText('3 حلقات قادمة', { exact: true })).toBeVisible();
+  episodeCount = 1;
+  await page.reload();
+  await expect(page.getByText('حلقة قادمة: 1', { exact: true })).toBeVisible();
+});
+
 test('user managers can review access and save the account Episode Queue default', async ({
   page,
 }, info) => {
@@ -138,4 +197,193 @@ test('user managers can review access and save the account Episode Queue default
       body: { defaultEpisodeCount: 4 },
     },
   ]);
+});
+
+test('TV request account controls follow the viewer permission matrix', async ({
+  page,
+}) => {
+  const roles = [
+    {
+      name: 'Viewer',
+      permissions: 0,
+      review: false,
+      manageQueue: false,
+      bypass: false,
+    },
+    {
+      name: 'User manager',
+      permissions: 8,
+      review: true,
+      manageQueue: true,
+      bypass: false,
+    },
+    {
+      name: 'Request manager',
+      permissions: 16,
+      review: false,
+      manageQueue: false,
+      bypass: true,
+    },
+    {
+      name: 'Administrator',
+      permissions: 2,
+      review: true,
+      manageQueue: true,
+      bypass: true,
+    },
+  ];
+  const reviewRequests: string[] = [];
+  let currentRole = roles[0];
+
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname.slice('/api/v1'.length);
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 2,
+          displayName: currentRole.name,
+          permissions: currentRole.permissions,
+          userType: 2,
+        },
+      });
+    if (path === '/user/2/settings/main')
+      return route.fulfill({ json: { locale: 'en' } });
+    if (path === '/user/2/settings/tv-season-watch-gate')
+      return route.fulfill({ json: { status: 'off', globallyEnabled: false } });
+    if (path === '/user/2/settings/episode-queue')
+      return route.fulfill({ json: { defaultEpisodeCount: 2 } });
+    if (path === '/user/tv-season-watch-gate-requests') {
+      reviewRequests.push(currentRole.name);
+      return route.fulfill({
+        json: [{ id: 9, displayName: 'Member', requestedAt: null }],
+      });
+    }
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto('/me/account/tv-requests');
+  for (const role of roles) {
+    currentRole = role;
+    await page.reload();
+    await expect(
+      page.getByRole('heading', { name: 'TV Request Settings' })
+    ).toBeVisible();
+
+    const approvalButton = page.getByRole('button', {
+      name: 'Request Approval',
+    });
+    const bypassStatus = page.getByText('You can override this rule');
+    if (role.bypass) {
+      await expect(bypassStatus).toBeVisible();
+      await expect(approvalButton).toHaveCount(0);
+    } else {
+      await expect(approvalButton).toBeVisible();
+      await expect(bypassStatus).toHaveCount(0);
+    }
+
+    const reviewHeading = page.getByRole('heading', {
+      name: 'Previous-season watch requests',
+    });
+    if (role.review) {
+      await expect(reviewHeading).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Approve' })).toBeVisible();
+    } else {
+      await expect(reviewHeading).toHaveCount(0);
+    }
+
+    const queueSelect = page.getByRole('combobox', {
+      name: 'Episodes to keep requested',
+    });
+    if (role.manageQueue) {
+      await expect(queueSelect).toBeVisible();
+      await expect(queueSelect).toHaveValue('2');
+      await expect(
+        page.getByRole('button', { name: 'Save default' })
+      ).toBeVisible();
+    } else {
+      await expect(page.getByText('2 episodes ahead')).toBeVisible();
+      await expect(queueSelect).toHaveCount(0);
+      await expect(
+        page.getByRole('button', { name: 'Save default' })
+      ).toHaveCount(0);
+    }
+  }
+
+  expect(reviewRequests).toEqual(['User manager', 'Administrator']);
+});
+
+test('Episode Queue options use Arabic and French plural forms', async ({
+  page,
+}, info) => {
+  let locale = 'en';
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const path = new URL(route.request().url()).pathname.slice(
+      '/api/v1'.length
+    );
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 2, displayName: 'Manager', permissions: 8, userType: 2 },
+      });
+    if (path === '/user/2/settings/main')
+      return route.fulfill({ json: { locale } });
+    if (path === '/user/2/settings/tv-season-watch-gate')
+      return route.fulfill({ json: { status: 'off', globallyEnabled: false } });
+    if (path === '/user/2/settings/episode-queue')
+      return route.fulfill({ json: { defaultEpisodeCount: 2 } });
+    if (path === '/user/tv-season-watch-gate-requests')
+      return route.fulfill({ json: [] });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto('/me/account/tv-requests');
+  const queueSelect = page.getByRole('combobox', {
+    name: 'Episodes to keep requested',
+  });
+  await expect(queueSelect).toHaveValue('2');
+  await captureSettings(page, info, 'en-manager-options-baseline');
+
+  for (const [language, direction, heading, labels] of [
+    [
+      'ar',
+      'rtl',
+      'إعدادات طلبات التلفاز',
+      ['1 حلقة', '2 حلقتين', '3 حلقات', '4 حلقات', '5 حلقات'],
+    ],
+    [
+      'fr',
+      'ltr',
+      'Paramètres des demandes TV',
+      ['1 épisode', '2 épisodes', '3 épisodes', '4 épisodes', '5 épisodes'],
+    ],
+  ] as const) {
+    locale = language;
+    await page.reload();
+    await expect(
+      page.getByRole('heading', { name: heading, exact: true })
+    ).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('dir', direction);
+    const localizedSelect = page.getByRole('combobox', {
+      name:
+        language === 'ar'
+          ? 'عدد الحلقات المطلوب الاحتفاظ بها'
+          : 'Épisodes à maintenir en demande',
+    });
+    await expect(localizedSelect).toHaveValue('2');
+    for (const [index, label] of labels.entries()) {
+      await expect(
+        localizedSelect.locator(`option[value="${index + 1}"]`)
+      ).toHaveText(label);
+    }
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth
+        )
+      )
+      .toBe(true);
+    await captureSettings(page, info, `${language}-manager-options-candidate`);
+  }
 });
