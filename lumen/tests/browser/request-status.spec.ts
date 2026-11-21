@@ -466,7 +466,7 @@ test('available request history finds download copies on demand and links the se
     });
   });
   await page.goto(appPath('/requests?requestId=614'));
-  const history = page.getByRole('dialog', { name: 'Request history' });
+  const history = page.getByRole('dialog', { name: 'History' });
   const find = history.getByRole('button', { name: 'Find Download Files' });
   await expect(find).toBeVisible();
   expect(lookups).toBe(0);
@@ -506,7 +506,7 @@ test('a bookmarked TV request shows its season and episode selection', async ({
     });
   });
   await page.goto(appPath('/requests?requestId=615'));
-  const history = page.getByRole('dialog', { name: 'Request history' });
+  const history = page.getByRole('dialog', { name: 'History' });
   await expect(
     history.getByText('Invalid request history response.')
   ).toBeVisible();
@@ -524,8 +524,68 @@ test('a bookmarked TV request shows its season and episode selection', async ({
   await expect(seasons.getByRole('listitem')).toHaveText([
     /Specials.*Episodes 2 · Declined/,
     /Season 2.*Episodes 3, 5 · Approved/,
-    /Season 4.*All episodes · Waiting for approval/,
+    /Season 4.*All Episodes · Waiting for approval/,
   ]);
+});
+
+test('request history remains contained and scrollable at the 620px dialog width', async ({
+  page,
+}) => {
+  await fixture(page, undefined);
+  await page.setViewportSize({ width: 620, height: 803 });
+  const historyMessage =
+    'The request is still being processed by the selected media service. '.repeat(
+      8
+    );
+  await page.route('**/api/v1/request/status/618', (route) =>
+    route.fulfill({
+      json: {
+        request: {
+          id: 618,
+          type: 'tv',
+          status: 2,
+          is4k: false,
+          requestedBy: { id: 1, displayName: 'Reader' },
+          media: { mediaType: 'tv', tmdbId: 22, status: 2 },
+          seasons: [{ seasonNumber: 1, episodeNumbers: [1, 2, 3], status: 2 }],
+        },
+        current: { stage: 'downloading', attempt: 2, message: historyMessage },
+        history: {
+          total: 8,
+          results: Array.from({ length: 8 }, (_, index) => ({
+            id: index + 1,
+            stage: 'downloading',
+            attempt: index + 1,
+            createdAt: '2026-11-20T12:00:00Z',
+            message: historyMessage,
+          })),
+        },
+      },
+    })
+  );
+  await page.goto(appPath('/requests?requestId=618'));
+  const history = page.getByRole('dialog', { name: 'History' });
+  await expect(history.getByRole('heading', { name: 'History' })).toBeVisible();
+  await expect(history.getByText('Season 1')).toBeVisible();
+  await expect(history.locator('.set')).toHaveCount(9);
+
+  const geometry = await page.evaluate(() => {
+    const sheet = document.querySelector<HTMLElement>('.sheet')!;
+    return {
+      viewportWidth: window.innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+      sheetLeft: sheet.getBoundingClientRect().left,
+      sheetRight: sheet.getBoundingClientRect().right,
+      clientHeight: sheet.clientHeight,
+      scrollHeight: sheet.scrollHeight,
+    };
+  });
+  expect(geometry.documentWidth).toBeLessThanOrEqual(geometry.viewportWidth);
+  expect(geometry.sheetLeft).toBeGreaterThanOrEqual(0);
+  expect(geometry.sheetRight).toBeLessThanOrEqual(geometry.viewportWidth);
+  expect(geometry.scrollHeight).toBeGreaterThan(geometry.clientHeight);
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: process.env.LUMEN_VISUAL_EVIDENCE });
 });
 
 test('a focused request link keeps its resolved title in the owner cancel confirmation', async ({
@@ -562,7 +622,7 @@ test('a focused request link keeps its resolved title in the owner cancel confir
   });
 
   await page.goto(appPath('/requests?requestId=616'));
-  const history = page.getByRole('dialog', { name: 'Request history' });
+  const history = page.getByRole('dialog', { name: 'History' });
   await history.getByRole('button', { name: 'Cancel', exact: true }).click();
   await expect(
     page.getByText(/Requested audio won’t be fetched/)
@@ -620,14 +680,14 @@ test('a request manager can approve a focused request missing from the list', as
   });
 
   await page.goto(appPath('/requests?requestId=617'));
-  const history = page.getByRole('dialog', { name: 'Request history' });
+  const history = page.getByRole('dialog', { name: 'History' });
   await expect(history.getByRole('button', { name: 'Approve' })).toBeVisible();
   await expect(history.getByRole('button', { name: 'Decline' })).toBeVisible();
   await history.getByRole('button', { name: 'Approve' }).click();
   await expect(page.getByText('Request approved')).toBeVisible();
   await expect.poll(() => approvals).toEqual(['/request/617/approve']);
   await expect(
-    page.getByRole('dialog', { name: 'Request history' }).getByRole('button', {
+    page.getByRole('dialog', { name: 'History' }).getByRole('button', {
       name: 'Approve',
     })
   ).toHaveCount(0);

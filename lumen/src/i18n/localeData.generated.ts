@@ -336,6 +336,397 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': 'رؤية ماتم إضافته مؤخراً',
       'components.PermissionEdit.viewrequests': 'الإطلاع على الطلبات',
       'components.PermissionEdit.viewwatchlists': 'عرض قوائم المشاهدة',
+      'components.RequestModal.RequestTree.seasonNumber': 'موسم {number}',
+      'components.RequestModal.RequestTree.specials': 'الحلقات الخاصة',
+      'components.Requests.episodeQueue': 'قائمة انتظار الحلقات',
+      'components.Requests.retry': 'إعادة المحاولة',
+      'components.Requests.approve': 'اعتمد',
+      'components.Requests.decline': 'رفض',
+      'components.Requests.requested': 'تم طلبه',
+      'components.Requests.approved': 'تمت الموافقة عليه',
+      'components.Requests.searching': 'جارٍ البحث',
+      'components.Requests.downloading': 'قيد التنزيل',
+      'components.Requests.importing': 'قيد الاستيراد',
+      'components.Requests.library': 'جارٍ الإضافة إلى المكتبة',
+      'components.Requests.available': 'متاح',
+      'components.Requests.unavailable': 'غير متاح',
+      'components.Requests.failed': 'فشل',
+      'components.Requests.declined': 'تم رفضه',
+      'components.Requests.cancelled': 'ملغى',
+      'components.Requests.pending': 'قيد الانتظار',
+      'components.Requests.completed': 'مكتمل',
+      'components.Requests.statusUpdated': 'تم تحديث الحالة',
+      'i18n.unknown': 'غير معروف',
+      'components.Requests.history': 'التاريخ',
+      'components.RequestStatus.SoftwareRequests.approve': 'موافقة',
+      'components.RequestStatus.SoftwareRequests.approved': 'تمت الموافقة عليه',
+      'components.RequestStatus.SoftwareRequests.available': 'متاح',
+      'components.RequestStatus.SoftwareRequests.cancel': 'إلغاء',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'ملغى',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'حذف الطلب الملغى',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        'هل تريد حذف هذا الطلب الملغى؟',
+      'components.RequestStatus.SoftwareRequests.decline': 'رفض',
+      'components.RequestStatus.SoftwareRequests.declined': 'تم رفضه',
+      'components.RequestStatus.SoftwareRequests.downloadCopies': 'تنزيل النسخ',
+      'components.RequestStatus.SoftwareRequests.downloading': 'جارٍ التنزيل',
+      'components.RequestStatus.SoftwareRequests.failed': 'فشل',
+      'components.RequestStatus.SoftwareRequests.history': 'سجل الحالة',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'جارٍ تحميل سجل الحالة…',
+      'components.RequestStatus.SoftwareRequests.importing':
+        'جارٍ التحقق من الاستيراد',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'تعذر تحديث طلب البرنامج هذا.',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        'لا تتوفر تحديثات حالة محفوظة.',
+      'components.RequestStatus.SoftwareRequests.pending': 'في انتظار الموافقة',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'إزالة من الطلبات',
+      'components.RequestStatus.SoftwareRequests.retry': 'إعادة المحاولة',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'لا يمكن للمزوّد تأكيد ما إذا كان التنزيل السابق قد بدأ. تحقّق من قائمة الانتظار والسجل في عميل التنزيل. لا تتابع إلا إذا لم يوجد تنزيل مطابق.',
+      'components.RequestStatus.SoftwareRequests.searching': 'جارٍ البحث',
+      'components.RequestStatus.SoftwareRequests.title': 'طلبات البرامج',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'سحب الطلب',
+      'i18n.back': 'عودة',
+      'downloads.actions': 'تاريخ العمل',
+      'downloads.active': 'تحذيرات نشطة',
+      'downloads.activeState': 'الحاجة إلى الاهتمام',
+      'downloads.actor': 'مستعمل {id}',
+      'downloads.blocked': 'أُدرج يدويًا في قائمة الحظر',
+      'downloads.blocklist': 'احظر هذا الإصدار لتجنّب تنزيله مرة أخرى',
+      'downloads.blocklisted': 'تم طلب إدراج الإصدار في قائمة الحظر',
+      'downloads.cancel': 'إلغاء',
+      'downloads.changed': 'تغيير تشكيلة الخدمات',
+      'downloads.clientKept': 'ملفات العملاء',
+      'downloads.clientRemoved': 'طلب نقل العملاء',
+      'downloads.confirm': 'الرفض',
+      'downloads.copy': 'نسخ أو وصلة صلبة (ملفات مصدر كاب)',
+      'downloads.denied': 'يتطلب الأمر الحصول على إذن',
+      'downloads.description':
+        'راجع تحذيرات الاستحواذ، وحدد الملفات للاستيراد اليدوي، ورفض التنزيلات غير المرغوب فيها.',
+      'downloads.disappeared': 'لم يعد في الصف',
+      'downloads.empty': 'لا يوجد تحذيرات في هذا المنظر',
+      'downloads.failed': 'لا يمكن تحميل العلبة',
+      'downloads.failedState': 'استعراض الاحتياجات',
+      'downloads.history': 'التاريخ',
+      'downloads.import': 'ملفات مختارة',
+      'downloads.importFailed': 'الواردات فشلت',
+      'downloads.importMode': 'طريقة الاستيراد',
+      'downloads.importReview': 'استيراد مكتمل بدون استيراد ملف مؤكد',
+      'downloads.importWarning':
+        'تأكيد الهدف واستعراض جميع أسباب الرفض. ودائرة الاقتناء تحدد نوعية الملفات ومطابقة الأحداث',
+      'downloads.imported': 'مستوردة يدويا',
+      'downloads.importingState': 'الواردات المعلقة',
+      'downloads.ineligible': 'لا يوجد تطابق مؤكد لا يمكن استيراده',
+      'downloads.loading': 'تحميل تحذيرات',
+      'downloads.move': 'نقل (نقل ملفات المصادر)',
+      'downloads.next': 'الصفحة التالية',
+      'downloads.noFiles': 'لم يتم العثور على ملفات مع هدف مؤكد للمكتبة',
+      'downloads.notBlocklisted': 'الإصدار غير مدرج في قائمة الحظر',
+      'downloads.outcome':
+        'ولا يمكن تأكيد الإجراء. التجديد والاستعراض قبل إعادة التجريب',
+      'downloads.partial':
+        'ولا يمكن التحقق من بعض خدمات الاقتناء. تحذيراتهم قد تكون مفقودة أو خارج الموعد',
+      'downloads.pending': 'الإجراء مقبول. نكرر التحقق من النتيجة الخلفية',
+      'downloads.preview': 'ملفات ما قبل الاستعراض',
+      'downloads.previous': 'الصفحة السابقة',
+      'downloads.recovered': 'مستردة',
+      'downloads.refresh': 'التجديد',
+      'downloads.reject': 'التحميل',
+      'downloads.rejected': 'رُفضت يدوياً',
+      'downloads.rejectingState': 'الرفض معلق',
+      'downloads.rejection':
+        'والرفض يزيل هذا البند من قائمة الاقتناء. استعراض الخيارات قبل التأكيد.',
+      'downloads.remove': 'إزالة الحمولة والملفات من عميلها',
+      'downloads.resolvedState': 'تم الحل',
+      'downloads.search': 'بحث',
+      'downloads.select': 'مختارة {name}',
+      'downloads.targetChoose': 'اختر مباراة المكتبة',
+      'downloads.targetHelp':
+        'عنوان البحث في خدمة الاقتناء هذه اختيار المباراة لا يضيف لقب جديد',
+      'downloads.targetLabel': 'مباريات المكتبة',
+      'downloads.targetNoResults':
+        'لم يعثر على ألقاب مطابقة في مكتبة الخدمات هذه',
+      'downloads.targetQuery': 'فيلم أو سلسلة أو ألبوم أو كتاب',
+      'downloads.targetRequired': 'اختر تطابق المكتبة قبل استيراد الملفات',
+      'downloads.targetSelected': 'مباراة مختارة: {title}{subtitle}',
+      'downloads.title': 'تحميل',
+      'downloads.truncated':
+        'ولم يتم التحقق إلا من خدمات الاقتناء العشرين الأولى.',
+      'downloads.unknownImport': 'النتيجة غير المعروفة',
+      'downloads.unknownReject': 'النتيجة غير معروفة',
+      'components.IndexerSearch.accessDenied':
+        'تحتاج إلى صلاحية إدارة الطلبات للبحث في مواقع الفهرسة.',
+      'components.IndexerSearch.categories': 'فئات مواقع الفهرسة',
+      'components.IndexerSearch.category': 'فئة وسائط الإعلام',
+      'components.IndexerSearch.categoryAdult': 'للبالغين',
+      'components.IndexerSearch.categoryAudiobook': 'الكتب السمعية',
+      'components.IndexerSearch.categoryComic': 'قصص مصورة',
+      'components.IndexerSearch.categoryEbook': 'كتب',
+      'components.IndexerSearch.categoryGame': 'ألعاب PC',
+      'components.IndexerSearch.categoryMagazine': 'مجلات',
+      'components.IndexerSearch.categoryModern': 'ألعاب ROM الحديثة',
+      'components.IndexerSearch.categoryMovie': 'أفلام',
+      'components.IndexerSearch.categoryMusic': 'الموسيقى',
+      'components.IndexerSearch.categoryRetro': 'ROMs الرجعية',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'افتح إعدادات Prowlarr',
+      'components.IndexerSearch.downloaderFailed':
+        'تعذر على Prowlarr إرسال هذا الإصدار. شغّل بحثًا جديدًا وحاول مرة أخرى.',
+      'components.IndexerSearch.grabs': 'عدد التنزيلات',
+      'components.IndexerSearch.intro':
+        'ابحث عن إصدارات في مواقع الفهرسة لديك على Prowlarr ضمن جميع فئات الوسائط في SeerrNG.',
+      'components.IndexerSearch.leechers': 'المستخدمون الذين ينزّلون',
+      'components.IndexerSearch.loadFailed': 'تعذر تحميل تكوين بحث Prowlarr.',
+      'components.IndexerSearch.loadMore': 'تحميل مزيد من النتائج',
+      'components.IndexerSearch.loadingMore': 'جاري التحميل…',
+      'components.IndexerSearch.manualMode':
+        'نتائج البحث منفصلة عن طلبات SeerrNG. يمكنك إرسال نتيجة إلى عميل تنزيل مُعدّ في Prowlarr.',
+      'components.IndexerSearch.noConnection': 'Prowlarr غير متصل.',
+      'components.IndexerSearch.noConnectionHelp':
+        'اطلب من مسؤول ربط Prowlarr ضمن الإعدادات > الخدمات.',
+      'components.IndexerSearch.noResults': 'لم تتطابق الإطلاقات مع هذا البحث',
+      'components.IndexerSearch.noResultsHelp':
+        'تحقق من مرشحات الفئات والمفهرسات المفعّلة في Prowlarr. نتائج البحث لا تضمن أن التطبيق يستطيع استيراد إصدار.',
+      'components.IndexerSearch.openResult': 'افتح تفاصيل المفهرس',
+      'components.IndexerSearch.protocol': 'البروتوكول',
+      'components.IndexerSearch.published': 'تاريخ النشر',
+      'components.IndexerSearch.query': 'مصطلحات البحث',
+      'components.IndexerSearch.queryPlaceholder':
+        'العنوان أو المؤلف أو الألبوم أو العدد أو اسم اللعبة',
+      'components.IndexerSearch.requestStillUsesManager':
+        'إرسال نتيجة لا يغيّر طلب SeerrNG. يتولى Prowlarr إرسال النتيجة إلى عميل التنزيل المُعدّ لديه.',
+      'components.IndexerSearch.resultCount':
+        'أعاد Prowlarr عدد {count} من الإصدارات.',
+      'components.IndexerSearch.search': 'ابحث في مواقع الفهرسة',
+      'components.IndexerSearch.searchFailed':
+        'فشل البحث في Prowlarr. تحقق من الاتصال وحاول مرة أخرى.',
+      'components.IndexerSearch.searching': 'جارٍ البحث في مواقع الفهرسة…',
+      'components.IndexerSearch.seeders': 'عدد الموزعين',
+      'components.IndexerSearch.sendToDownloader': 'إرسال إلى المُحمِّل',
+      'components.IndexerSearch.sendingToDownloader': 'جارٍ الإرسال…',
+      'components.IndexerSearch.sentToDownloader':
+        'تم الإرسال إلى عميل التحميل المُهيأ لدى Prowlarr.',
+      'components.IndexerSearch.size': 'الحجم',
+      'components.IndexerSearch.title': 'البحث عن المفهرسات',
+      'components.IndexerSearch.tooManySearches':
+        'حد البحث وصل انتظر دقيقة قبل البحث مرة أخرى.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'ولا توجد فهرس قابلة للتفتيش. يمكن الحصول على مؤشر في Prowlarr أو تعديل مرشحات الفئة.',
+      'components.SettingsProwlarr.addDetectedMatches': 'تطابق مكتشف{count})',
+      'components.SettingsProwlarr.address': 'اسم المضيف',
+      'components.SettingsProwlarr.adult': 'للبالغين',
+      'components.SettingsProwlarr.apiKey': 'مفتاح API',
+      'components.SettingsProwlarr.apiKeySaved':
+        'تم توفير المفتاح دع هذا فارغاً ليستمر باستخدامه',
+      'components.SettingsProwlarr.audiobook': 'الكتب السمعية',
+      'components.SettingsProwlarr.basePath': 'طريق القاعدة',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'اختر فئات Prowlarr المرسلة مع كل بحث. تستخدم الإعدادات الافتراضية فئات Newznab/Torznab القياسية؛ اختبر الاتصال لرؤية الفئات المخصصة المعلن عنها بواسطة المفهرسين الممكّنين.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'اختيار فئة واحدة على الأقل.',
+      'components.SettingsProwlarr.categoryMappingTitle': 'مرشحات الفئة',
+      'components.SettingsProwlarr.clearApiKey': 'إزالة مفتاح API المحفوظ',
+      'components.SettingsProwlarr.comic': 'قصص مصورة',
+      'components.SettingsProwlarr.connected': 'متصل Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'وتشمل العدات فهرسات مُمكَّنة وقابلة للبحث تُعلن عن تقديم الدعم لفئة مختارة على الأقل. وهي تظهر التغطية البحثية، وليس الامتصاصات أو الواردات الناجحة.',
+      'components.SettingsProwlarr.coverageTitle': 'التغطية بالأرقام القياسية',
+      'components.SettingsProwlarr.description':
+        'تماسك Prowlarr على سبيل المثال مرة واحدة لإجراء بحث يدوي مدرك للفئة عبر المؤشرات التي تديرها هناك',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        'تُطابَق الفئات المخصّصة المقترحة استنادًا إلى الأسماء التي يعلنها مزودو الخدمة. راجعها قبل الحفظ؛ فهذا لا يغيّر Prowlarr ولا يرسل أوامر تنزيل.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'قبلت Prowlarr اتصال API للإدارة. تختبر هذه النتائج كل مفهرس قابل للبحث بشكل منفصل؛ معطل - حتى تأتي التواريخ من Prowlarr.',
+      'components.SettingsProwlarr.diagnosticFailed': 'فشل',
+      'components.SettingsProwlarr.diagnosticOk': 'متصل',
+      'components.SettingsProwlarr.diagnosticTitle':
+        'نتائج الربط بالأرقام القياسية',
+      'components.SettingsProwlarr.disabledUntil': 'المعاقون حتى {date}',
+      'components.SettingsProwlarr.ebook': 'كتب',
+      'components.SettingsProwlarr.game': 'ألعاب PC',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'اختر فهارس Prowlarr المفعّلة التي يجري البحث فيها لكل نوع من الوسائط. استخدم Ctrl مع النقر على Windows/Linux أو Command مع النقر على macOS لتحديد عدة فهارس. يؤدي ترك الاختيار فارغًا إلى تعطيل البحث لهذا النوع.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        'الفهارس الخاصة بـ {category}',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'تعيينات الفهارس حسب نوع الوسائط',
+      'components.SettingsProwlarr.indexerCount': 'المفهرسات: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'يمكن للمستخدمين فتح تفاصيل الفهرس من نتائج البحث.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'أسماء الفهارس وروابط التفاصيل مخفية عن المستخدمين.',
+      'components.SettingsProwlarr.indexerNotSearchable': '(غير قابل للبحث)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'حدود البحث',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'حدد عدد عمليات البحث لكل مستخدم في الدقيقة إجمالاً ولكل فهرس مختار.',
+      'components.SettingsProwlarr.inventoryFailed':
+        'تم حفظ Prowlarr، لكن مخزون المفهرس الخاص به غير متوفر.',
+      'components.SettingsProwlarr.keepApiKey': 'الحفاظ على حفظ مفتاح API',
+      'components.SettingsProwlarr.loadFailed': 'تعذّر تحميل إعدادات Prowlarr.',
+      'components.SettingsProwlarr.magazine': 'مجلات',
+      'components.SettingsProwlarr.modern': 'ألعاب ROM الحديثة',
+      'components.SettingsProwlarr.movie': 'أفلام',
+      'components.SettingsProwlarr.music': 'الموسيقى',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'لم يتم تكوين أي مفهرسات Prowlarr حتى الآن.',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'اختبر اتصال Prowlarr لتحميل فهارسه وتعيينها حسب الفئة.',
+      'components.SettingsProwlarr.port': 'المنفذ',
+      'components.SettingsProwlarr.recentFailure': 'الفشل الأخير: {date}',
+      'components.SettingsProwlarr.retro': 'ROMs الرجعية',
+      'components.SettingsProwlarr.save': 'احفظ إعدادات Prowlarr',
+      'components.SettingsProwlarr.saveFailed': 'تعذّر حفظ إعدادات Prowlarr.',
+      'components.SettingsProwlarr.saved': 'تم حفظ إعدادات Prowlarr.',
+      'components.SettingsProwlarr.saving': 'جاري الحفظ…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        'أدخل عدداً صحيحاً من 1 إلى 60.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        'الحد الأقصى لعمليات البحث لكل مستخدم في الدقيقة على {indexer}',
+      'components.SettingsProwlarr.searchesPerUser':
+        'الحد الأقصى لعمليات البحث لكل مستخدم في الدقيقة',
+      'components.SettingsProwlarr.selectedCategories': '{count} فئات مختارة',
+      'components.SettingsProwlarr.selectedIndexers': 'تم اختيار {count} فهارس',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'السماح بعرض أسماء الفهارس وتفاصيلها في نتائج البحث',
+      'components.SettingsProwlarr.sports': 'الرياضة',
+      'components.SettingsProwlarr.supportNote':
+        'يرتبط هذا الإعداد بـ Prowlarr فقط. NZBHydra2 غير مدعوم حالياً هنا.',
+      'components.SettingsProwlarr.test': 'الاتصال بالاختبارات وتغطية التفتيش',
+      'components.SettingsProwlarr.testFailed':
+        'فشل اتصال Prowlarr. تحقق من العنوان ومفتاح API.',
+      'components.SettingsProwlarr.testHint':
+        'بدأت عمليات البحث من استعلام SeerrNG Prowlarr مباشرة. لا تزال الطلبات التي تمت الموافقة عليها تمر عبر مدير الوسائط أو موفر البرامج الذي تم تكوينه، والذي يمتلك عملية الاستحواذ والتتبع.',
+      'components.SettingsProwlarr.testing': 'جارٍ التحقق من Prowlarr...',
+      'components.SettingsProwlarr.title': 'مفهارس Prowlarr',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} البحث والتمكين {total} تم تشكيلها',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'الاستخدام SSL',
+      'components.Settings.SettingsLogs.logs': 'السجلات',
+      'components.Settings.SettingsLogs.searchLogs': 'البحث في السجلات',
+      'components.Settings.SettingsLogs.level': 'الحدة',
+      'components.Settings.SettingsLogs.filterDebug': 'متابعة عميقة " Debug "',
+      'components.Settings.SettingsLogs.filterInfo': 'معلومات',
+      'components.Settings.SettingsLogs.filterWarn': 'تحذير',
+      'components.Settings.SettingsLogs.filterError': 'خطأ',
+      'components.Settings.SettingsLogs.logDetails': 'تفاصيل السجلات',
+      'components.Settings.SettingsLogs.copyToClipboard': 'نسخ',
+      'components.Settings.SettingsLogs.copiedLogMessage': 'نسخ رسائل السجل.',
+      'components.Settings.SettingsJobsCache.runnow': 'تنفيذ " الآن "',
+      'components.Settings.SettingsJobsCache.canceljob': 'الغاء الطلب',
+      'components.Settings.SettingsJobsCache.process': 'تنفيذ',
+      'components.Settings.SettingsJobsCache.command': 'أمر',
+      'components.Settings.SettingsJobsCache.enabled': 'تم التمكين',
+      'components.Settings.SettingsJobsCache.disabled': 'معطّل',
+      'components.Settings.SettingsJobsCache.cachehits':
+        'إصابات ذاكرة التخزين المؤقت',
+      'components.Settings.SettingsJobsCache.cachekeys': 'مفاتيح',
+      'components.Settings.SettingsJobsCache.cachemisses':
+        'تفويتات ذاكرة التخزين المؤقت',
+      'components.Settings.SettingsJobsCache.dnsCache':
+        'ذاكرة تخزين DNS المؤقتة',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'إصابات DNS',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'تفويتات DNS',
+      'components.Settings.SettingsJobsCache.failures': 'الإخفاقات',
+      'components.Settings.SettingsJobsCache.flushcache': 'محو الملفات المؤقتة',
+      'components.Settings.SettingsJobsCache.hitRate': 'معدّل الإصابة',
+      'components.Settings.SettingsJobsCache.imagecachecount': 'صور مخزنة',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'استرجاعات IPv4',
+      'components.Settings.SettingsAbout.Releases.installedversion': 'مثبّت',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'الأحدث',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'بيانات الاصدار غير متوفرة حاليا.',
+      'components.Settings.SettingsAbout.Releases.releases': 'إصدارات',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'رؤية المحتوى على GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'حول SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': 'مكان تخزين البيانات',
+      'components.Settings.SettingsAbout.documentation': 'الوثائق',
+      'components.Settings.SettingsAbout.githubdiscussions': 'نقاشات GitHub',
+      'components.Settings.SettingsAbout.legalUse':
+        'تم تصميم SeerrNG لإدارة الوسائط الشخصية بشكل قانوني. لا يتغاضى المشروع عن القرصنة أو انتهاك حقوق النشر. يتحمل المستخدمون مسؤولية الالتزام بالقوانين والتراخيص وشروط الخدمة المعمول بها في منطقتهم.',
+      'components.Settings.SettingsAbout.legalUseTitle': 'الاستخدام القانوني',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'نَسب البيانات الوصفية',
+      'components.Settings.SettingsAbout.supportdevelopment': 'الدعم الإنمائي',
+      'components.Settings.SettingsAbout.timezone': 'المنطقة الزمنية',
+      'components.Settings.SettingsAbout.totalmedia': 'المجموع الكلي للمحتوى',
+      'components.Settings.SettingsAbout.totalrequests': 'مجموع الطلبات',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'يستخدم هذا المنتج TMDB وواجهات TMDB البرمجية، لكن TMDB لا يؤيده ولا يصدّقه ولا يوافق عليه بأي شكل آخر. <ApiTermsLink>شروط استخدام واجهة TMDB البرمجية</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'تعذّر التحقق من التحديثات',
+      'components.Settings.SettingsAbout.uptodate': 'مُحدّث',
+      'components.Settings.SettingsAbout.version': 'النسخة',
+      'components.Settings.SettingsCategories.title': 'فئات الوسائط',
+      'components.Settings.SettingsCategories.description':
+        'اختر الفئات التي يمكن للجميع استعراضها وطلبها. تُخفى الفئات المعطّلة من التنقل والاكتشاف، وتُمنع الطلبات الجديدة. تظل الطلبات الحالية وسجل تنزيلاتها متاحين في حالة الطلب.',
+      'components.Settings.SettingsCategories.groupTitle': 'الفئات المتاحة',
+      'components.Settings.SettingsCategories.groupDescription':
+        'تحدد مفاتيح التبديل هذه الفئات المتاحة في SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'أفلام',
+      'components.Settings.SettingsCategories.tv': 'مسلسلات',
+      'components.Settings.SettingsCategories.music': 'الموسيقى',
+      'components.Settings.SettingsCategories.ebook': 'كتب',
+      'components.Settings.SettingsCategories.audiobook': 'الكتب السمعية',
+      'components.Settings.SettingsCategories.comic': 'قصص مصورة',
+      'components.Settings.SettingsCategories.magazine': 'مجلات',
+      'components.Settings.SettingsCategories.adult': 'للبالغين',
+      'components.Settings.SettingsCategories.retro': 'برامج المحاكاة القديمة',
+      'components.Settings.SettingsCategories.modern': 'برامج المحاكاة الحديثة',
+      'components.Settings.SettingsCategories.game': 'ألعاب الكمبيوتر',
+      'components.Settings.SettingsCategories.movieDescription':
+        'السماح باستكشاف الأفلام وطلبها.',
+      'components.Settings.SettingsCategories.tvDescription':
+        'السماح باستكشاف المسلسلات وطلبها.',
+      'components.Settings.SettingsCategories.musicDescription':
+        'السماح باستكشاف الموسيقى وطلبها.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'السماح باستكشاف الكتب وطلبها.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'السماح باستكشاف الكتب الصوتية وطلبها.',
+      'components.Settings.SettingsCategories.comicDescription':
+        'السماح باستكشاف القصص المصورة وطلبها.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'السماح باستكشاف المجلات وطلبها.',
+      'components.Settings.SettingsCategories.adultDescription':
+        'السماح باستكشاف محتوى البالغين وطلبه. يتطلب ذلك إعداد خدمة Whisparr v3 ومنح الإذن الخاص بالبالغين للحساب.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'السماح باستكشاف ألعاب المحاكاة القديمة وملفات ROM وطلبها.',
+      'components.Settings.SettingsCategories.modernDescription':
+        'السماح باستكشاف ألعاب المحاكاة الحديثة وملفات ROM وطلبها.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'السماح باستكشاف ألعاب الكمبيوتر وطلبها.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'المحتوى البالغ مرئي للجميع الذين لديهم وصول',
+      'components.Settings.SettingsCategories.adultWarning':
+        'إذا شاركت هذه النسخة مع العائلة أو عرّضتها عبر وكيل عكسي، يمكن لأي شخص ممنوح صلاحية طلب البالغين رؤية ما تتصفحه وتطلبه. علّم حسابات العائلة كمقيّدة أدناه، أو تحت صلاحيات كل مستخدم، حتى لا يروا محتوى البالغين أبداً.',
+      'components.Settings.SettingsCategories.ageGateTitle': 'بوابة العمر',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'لا يمكن للحسابات المقيّدة استعراض محتوى البالغين أو طلبه. وتُخفى على مستوى الخادم الأفلام والمسلسلات والموسيقى والكتب والقصص المصوّرة والعناوين المصنّفة للبالغين. يعتمد التصفية على التصنيفات والوسوم التي يوفّرها مزودو البيانات، وقد تقل فعاليتها عند غياب البيانات الوصفية.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'تقييد الحسابات افتراضيًا',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'الحسابات التي لا تحتوي على إعداد صريح تكون مقيدة. المسؤولون معفون من ذلك.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'أعلى تقييم للأفلام',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'لا يمكن للحسابات المقيدة رؤية الأفلام التي تتجاوز تقييمها هذا الحد.',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'أعلى تقييم للمسلسلات',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'لا يمكن للحسابات المقيدة رؤية المسلسلات التي تتجاوز تقييمها هذا الحد.',
+      'components.Settings.SettingsCategories.ageGateCountry': 'بلد التصنيف',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'رمز الدولة المكون من حرفين الذي تُستخدم تصنيفاته، على سبيل المثال US.',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'أُنقذت أوضاع الفئة',
+      'components.Settings.SettingsCategories.saveFailure':
+        'تعذّر حفظ إعدادات الفئات.',
       'components.Layout.Sidebar.comingSoon': 'قريبًا',
       'components.Layout.Sidebar.you': 'أنت',
       'components.Layout.Sidebar.watchSessions': 'جلسات المشاهدة',
@@ -375,6 +766,41 @@ export const localeData = [
         'تحقق من كلمة المرور الحالية وصلاحيات الحساب.',
       'lumen.account.passwordChangeUnconfirmed':
         'تعذر تأكيد تغيير كلمة المرور. تحقق من بيانات اعتمادك قبل إعادة المحاولة.',
+      'lumen.account.profileSaveMismatch':
+        'حفظ SeerrNG قيماً مختلفة. راجع الملف الشخصي المحدّث.',
+      'lumen.account.profileConfirmFailure':
+        'قبل SeerrNG الحفظ، لكن تعذّر تحميل الملف الشخصي المحدّث.',
+      'lumen.account.profileSaveForbidden':
+        'ليست لديك صلاحية لتغيير هذه الإعدادات.',
+      'lumen.account.profileSaveFailure':
+        'تعذّر حفظ الملف الشخصي. تحقق من القيم وحاول مجدداً.',
+      'lumen.account.managedByPlex': 'تدير Plex هذا الإعداد.',
+      'lumen.account.loadMediaLanguagesFailure': 'تعذّر تحميل لغات الوسائط',
+      'lumen.account.plexWatchlistTip':
+        'اطلب تلقائياً العناوين المضافة إلى قائمة متابعة Plex.',
+      'lumen.account.loadProfileFailure': 'تعذّر تحميل إعدادات الملف الشخصي',
+      'lumen.account.loadingProfileSettings':
+        'جارٍ تحميل إعدادات الملف الشخصي…',
+      'lumen.account.loadPasswordFailure': 'تعذّر تحميل إعدادات كلمة المرور',
+      'lumen.account.loadingPasswordSettings':
+        'جارٍ تحميل إعدادات كلمة المرور…',
+      'lumen.account.administratorAccess': 'يملك هذا الحساب صلاحيات المسؤول.',
+      'lumen.account.noAdditionalPermissions':
+        'لم تُمنح لهذا الحساب صلاحيات إضافية.',
+      'lumen.account.retry': 'إعادة المحاولة',
+      'lumen.account.loadSessionExpired': 'انتهت جلستك. سجّل الدخول مجدداً.',
+      'lumen.account.loadForbidden': 'ليست لديك صلاحية لعرض هذه المعلومات.',
+      'lumen.account.loadTimeout':
+        'استغرق الخادم وقتاً طويلاً للرد. حاول مجدداً.',
+      'lumen.account.loadRateLimited':
+        'عدد الطلبات كبير جداً. انتظر دقيقة ثم حاول مجدداً.',
+      'lumen.account.loadServerFailure':
+        'واجه الخادم مشكلة. حاول مجدداً بعد قليل.',
+      'lumen.account.loadNetworkFailure':
+        'تعذّر الاتصال بالخادم. تحقق من اتصالك وحاول مجدداً.',
+      'lumen.account.loadOffline':
+        'أنت غير متصل بالإنترنت. تحقق من اتصالك وحاول مجدداً.',
+      'lumen.account.loadUnknownFailure': 'تعذّر تحميل هذه المعلومات.',
       'lumen.account.saveThemeColors': 'حفظ ألوان المظهر',
       'lumen.account.themeOverrideConfirmFailure':
         'قبل الخادم الحفظ، لكن تعذر على Lumen تأكيد الألوان المحدّثة.',
@@ -983,6 +1409,376 @@ export const localeData = [
       'lumen.recordings.maxFollowedTeams': 'يمكنك متابعة 20 فريقًا كحد أقصى.',
       'lumen.permission.manageSettings': 'إدارة الإعدادات',
       'lumen.permission.vote': 'التصويت',
+      'lumen.clientTokens.title': 'رموز العميل',
+      'lumen.clientTokens.description':
+        'اربط تطبيقاً باستخدام صلاحية الاستكشاف أو الطلب في حسابك. يُسمح بعشرة رموز غير منتهية كحد أقصى. تغيير كلمة المرور يبطلها.',
+      'lumen.clientTokens.retry': 'إعادة المحاولة',
+      'lumen.clientTokens.loadFailureTitle': 'تعذّر تحميل رموز العميل',
+      'lumen.clientTokens.loading': 'جارٍ تحميل رموز العميل…',
+      'lumen.clientTokens.loadSessionExpired':
+        'انتهت جلستك. سجّل الدخول مجدداً.',
+      'lumen.clientTokens.loadForbidden': 'ليست لديك صلاحية لتنفيذ ذلك.',
+      'lumen.clientTokens.loadTimeout':
+        'استغرق الخادم وقتاً طويلاً للرد. حاول مجدداً.',
+      'lumen.clientTokens.loadRateLimited':
+        'طلبات كثيرة جداً. انتظر دقيقة ثم حاول مجدداً.',
+      'lumen.clientTokens.loadServerFailure':
+        'واجه الخادم مشكلة. حاول مجدداً بعد قليل.',
+      'lumen.clientTokens.loadNetworkFailure':
+        'تعذّر الاتصال بالخادم. تحقق من اتصالك وحاول مجدداً.',
+      'lumen.clientTokens.loadOffline':
+        'أنت غير متصل بالإنترنت. تحقق من اتصالك وحاول مجدداً.',
+      'lumen.clientTokens.loadUnknownFailure': 'تعذّر تحميل رموز العميل.',
+      'lumen.clientTokens.newToken': 'رمز جديد',
+      'lumen.clientTokens.secretShownOnce':
+        'انسخ هذا الرمز الآن. لن يعرضه SeerrNG إلا مرة واحدة.',
+      'lumen.clientTokens.newTokenLabel': 'رمز عميل جديد',
+      'lumen.clientTokens.copyToken': 'نسخ الرمز',
+      'lumen.clientTokens.dismissToken': 'إخفاء الرمز',
+      'lumen.clientTokens.createToken': 'إنشاء رمز',
+      'lumen.clientTokens.tokenName': 'اسم الرمز',
+      'lumen.clientTokens.access': 'الصلاحية',
+      'lumen.clientTokens.discoverAndRequest': 'الاستكشاف والطلب',
+      'lumen.clientTokens.discoverOnly': 'الاستكشاف فقط',
+      'lumen.clientTokens.requestOnly': 'الطلب فقط',
+      'lumen.clientTokens.expiresAfter': 'تنتهي صلاحيته بعد',
+      'lumen.clientTokens.day': '{count} يوم',
+      'lumen.clientTokens.days': '{count} أيام',
+      'lumen.clientTokens.yourTokens': 'رموزك',
+      'lumen.clientTokens.empty': 'لا توجد رموز عميل بعد.',
+      'lumen.clientTokens.discover': 'استكشاف',
+      'lumen.clientTokens.request': 'طلب',
+      'lumen.clientTokens.expired': 'منتهي الصلاحية',
+      'lumen.clientTokens.expires': 'تنتهي صلاحيته',
+      'lumen.clientTokens.revokeNamed': 'إبطال الرمز {name}',
+      'lumen.clientTokens.revoke': 'إبطال',
+      'lumen.clientTokens.revokeTitle': 'إبطال هذا الرمز؟',
+      'lumen.clientTokens.revokeBody': 'سيفقد «{name}» إمكانية الوصول فوراً.',
+      'lumen.clientTokens.revokeToken': 'إبطال الرمز',
+      'lumen.clientTokens.keepToken': 'الاحتفاظ بالرمز',
+      'lumen.clientTokens.revoked': 'تم إبطال الرمز.',
+      'lumen.clientTokens.revokeFailure':
+        'تعذّر تأكيد إبطال الرمز. حدّث القائمة قبل المحاولة مجدداً.',
+      'lumen.clientTokens.limitReached':
+        'أبطل رمز عميل موجوداً قبل إنشاء رمز آخر.',
+      'lumen.clientTokens.createFailure':
+        'تعذّر تأكيد إنشاء الرمز. تحقق من قائمتك قبل المحاولة مجدداً.',
+      'lumen.clientTokens.copied': 'تم نسخ الرمز.',
+      'lumen.clientTokens.copyFailure': 'انسخ الرمز يدوياً من الحقل.',
+      'lumen.resetPassword.passwordsMustMatch': 'يجب أن تتطابق كلمتا المرور.',
+      'lumen.resetPassword.tooManyAttempts':
+        'محاولات كثيرة جدًا. انتظر قليلًا ثم حاول مرة أخرى.',
+      'lumen.resetPassword.emailUnavailable':
+        'بريد استعادة كلمة المرور غير متاح. اتصل بالمسؤول.',
+      'lumen.resetPassword.resetFailure':
+        'تعذرت إعادة تعيين كلمة المرور. حاول مرة أخرى أو اطلب رابطًا جديدًا.',
+      'lumen.resetPassword.requestFailure':
+        'تعذر طلب رابط إعادة التعيين. يُرجى المحاولة مرة أخرى.',
+      'lumen.resetPassword.title': 'إعادة تعيين كلمة المرور',
+      'lumen.resetPassword.passwordReset': 'تمت إعادة تعيين كلمة المرور.',
+      'lumen.resetPassword.requested':
+        'إذا كان هذا العنوان مرتبطًا بحساب، فستتلقى رابطًا لإعادة تعيين كلمة المرور.',
+      'lumen.resetPassword.newPassword': 'كلمة مرور جديدة',
+      'lumen.resetPassword.confirmPassword': 'تأكيد كلمة المرور',
+      'lumen.resetPassword.email': 'البريد الإلكتروني',
+      'lumen.resetPassword.resetAction': 'إعادة تعيين كلمة المرور',
+      'lumen.resetPassword.requestAction': 'إرسال رابط الاستعادة',
+      'lumen.resetPassword.requestNewLink': 'طلب رابط جديد',
+      'lumen.resetPassword.backToSignIn': 'العودة إلى تسجيل الدخول',
+      'lumen.login.back': 'رجوع',
+      'lumen.login.cancel': 'إلغاء',
+      'lumen.login.companion': 'رفيق Lumen',
+      'lumen.login.continueLink': 'المتابعة باستخدام رابط تسجيل الدخول',
+      'lumen.login.continueServer': 'المتابعة باستخدام {serverName}',
+      'lumen.login.disabled': 'تسجيل الدخول معطّل. اتصل بالمسؤول.',
+      'lumen.login.email': 'البريد الإلكتروني',
+      'lumen.login.errorConnection':
+        'تعذر الاتصال بـ {serverName}. حاول مرة أخرى بعد قليل.',
+      'lumen.login.errorCredentials': 'اسم المستخدم أو كلمة المرور غير صحيحة.',
+      'lumen.login.errorEmail': 'أدخل عنوان بريد إلكتروني صالحًا.',
+      'lumen.login.errorNoAccess':
+        'لا يملك هذا الحساب صلاحية الوصول بعد. اطلب من مسؤول الخادم إضافته.',
+      'lumen.login.errorTooMany':
+        'محاولات تسجيل دخول كثيرة جدًا. انتظر بضع دقائق ثم حاول مجددًا.',
+      'lumen.login.errorUnknown': 'حدث خطأ أثناء تسجيل الدخول. حاول مرة أخرى.',
+      'lumen.login.familySubtitle':
+        'استخدم اسم المستخدم وكلمة المرور اللذين تستخدمهما للمشاهدة.',
+      'lumen.login.forgotPassword': 'هل نسيت كلمة المرور؟',
+      'lumen.login.included': 'Lumen مضمّن مع SeerrNG',
+      'lumen.login.moreOptions': 'خيارات تسجيل دخول إضافية',
+      'lumen.login.oidcCallbackFailure':
+        'تعذر إكمال تسجيل الدخول عبر OpenID Connect. ابدأ من جديد.',
+      'lumen.login.oidcStartFailure':
+        'تعذر بدء تسجيل الدخول عبر OpenID Connect. تحقق من إعداد المزوّد وعنوان SeerrNG.',
+      'lumen.login.openFullSeerr': 'فتح SeerrNG الكامل',
+      'lumen.login.password': 'كلمة المرور',
+      'lumen.login.quickGettingCode': 'جارٍ الحصول على رمز…',
+      'lumen.login.quickInstructions':
+        'في {serverName}، افتح الإعدادات ← Quick Connect وأدخل هذا الرمز.',
+      'lumen.login.quickWaiting': 'بانتظار الموافقة…',
+      'lumen.login.serverSubtitle':
+        'استخدم الحساب نفسه الذي تستخدمه مع {serverName}.',
+      'lumen.login.serverUsername': 'اسم مستخدم {serverName}',
+      'lumen.login.signIn': 'تسجيل الدخول',
+      'lumen.login.signInProvider': 'تسجيل الدخول باستخدام {providerName}',
+      'lumen.login.signInServer': 'تسجيل الدخول باستخدام {serverName}',
+      'lumen.login.signInWithCode': 'تسجيل الدخول باستخدام رمز',
+      'lumen.login.titleBooks': 'سجّل الدخول لطلب الأفلام والمسلسلات والكتب',
+      'lumen.login.titleVideo': 'سجّل الدخول لطلب الأفلام والمسلسلات',
+      'lumen.login.useEmailInstead': 'استخدام البريد الإلكتروني وكلمة المرور',
+      'lumen.login.useQuickConnect': 'استخدام Quick Connect',
+      'lumen.login.useServerInstead': 'استخدام حساب {serverName}',
+      'lumen.login.username': 'اسم المستخدم',
+      'lumen.login.retry': 'إعادة المحاولة',
+      'lumen.login.serverUnreachable':
+        'تعذر الاتصال بالخادم. تحقق من اتصالك ثم حاول مرة أخرى.',
+      'lumen.requestHistory.openTitle': 'فتح العنوان',
+      'lumen.requestHistory.item': 'سجل الطلب',
+      'lumen.requestHistory.invalid': 'استجابة سجل الطلب غير صالحة.',
+      'lumen.requestHistory.loading': 'جارٍ تحميل سجل الطلب…',
+      'lumen.requestHistory.requestNumber': 'الطلب رقم {id}',
+      'lumen.requestHistory.currentStatus': 'الحالة الحالية: {status}',
+      'lumen.requestHistory.unknown': 'غير معروف',
+      'lumen.requestHistory.episodes': 'الحلقات {episodes}',
+      'lumen.requestHistory.overQuota': 'تجاوز الحصة',
+      'lumen.requestHistory.findDownloadFiles': 'البحث عن ملفات التنزيل',
+      'lumen.requestHistory.noHistory': 'لم يُسجّل أي سجل لهذا الطلب.',
+      'lumen.requestHistory.showingLatest':
+        'عرض أحدث {shown} من أصل {total} أحداث.',
+      'lumen.requestHistory.refresh': 'تحديث الحالة',
+      'lumen.requestHistory.downloadedSize':
+        'تم تنزيل {complete} من أصل {total}',
+      'lumen.requestHistory.downloadCount': 'عدد التنزيلات: {count}',
+      'lumen.requestHistory.estimatedCompletion': 'الاكتمال المتوقع',
+      'lumen.requestHistory.ebook': 'كتاب إلكتروني',
+      'lumen.requestHistory.audiobook': 'كتاب صوتي',
+      'lumen.requestHistory.importPending': 'الاستيراد معلّق',
+      'lumen.requestHistory.attempt': 'المحاولة {count}',
+      'lumen.requestHistory.ofAttempts': 'من {count}',
+      'lumen.requestHistory.nextAttempt': 'المحاولة التالية',
+      'lumen.requestHistory.requestedSeasons': 'المواسم المطلوبة',
+      'lumen.requestHistory.changeRequest': 'تغيير',
+      'lumen.requestHistory.removeRequest': 'إزالة الطلب',
+      'lumen.softwareHistory.confirmDecline': 'هل تريد رفض طلب البرنامج هذا؟',
+      'lumen.softwareHistory.confirmWithdraw':
+        'هل تريد سحب طلب البرنامج المعلّق هذا؟',
+      'lumen.softwareHistory.confirmCancel': 'هل تريد إلغاء طلب البرنامج هذا؟',
+      'lumen.softwareHistory.confirmStopTracking':
+        'هل تريد إزالة هذا الطلب وسجله من SeerrNG؟ سيستمر التنزيل لدى المزوّد.',
+      'lumen.softwareHistory.confirmAction': 'تأكيد: {action}',
+      'lumen.softwareHistory.confirmAfterNoDownload':
+        'لم يُعثر على تنزيل — {action}',
+      'lumen.softwareHistory.selectionEdition': 'الإصدار الكامل',
+      'lumen.softwareHistory.selectionOneAddon': 'إضافة واحدة',
+      'lumen.softwareHistory.selectionManyAddons': '{count} إضافات',
+      'lumen.softwareHistory.selectionAddons': 'الإضافات المحددة',
+      'lumen.softwareHistory.openPatchVersion': 'فتح إصدار التصحيح المطلوب',
+      'lumen.softwareHistory.openPatchProject': 'فتح مشروع التصحيح',
+      'lumen.softwareHistory.keepOriginal': 'الاحتفاظ بالأصل',
+      'lumen.softwareHistory.replaceOriginal': 'استبدال الأصل',
+      'lumen.downloads.page': 'الصفحة {page}',
+      'lumen.downloads.previewFailed': 'تعذّر معاينة هذه الملفات.',
+      'lumen.downloads.searchFailed': 'تعذّر البحث في مكتبة هذه الخدمة.',
+      'lumen.downloads.actionFailed':
+        'تعذّر تأكيد الإجراء: {message} راجع التحذير الحالي قبل إعادة المحاولة.',
+      'lumen.downloads.previewLoading': 'جارٍ تحميل معاينة الملفات…',
+      'lumen.indexerSearch.noCategories':
+        'لا تتوفر لهذا الحساب فئات وسائط مفعّلة.',
+      'lumen.indexerSearch.resultsFound':
+        'النتائج التي أعادها Prowlarr: {count}.',
+      'lumen.indexerSearch.handoffUnconfirmed':
+        'تعذّر التأكد من إرسال النتيجة. تحقّق من عميل التنزيل قبل البحث أو إعادة المحاولة.',
+      'lumen.adminProwlarr.connectionHeading': 'الاتصال',
+      'lumen.adminProwlarr.availableCategories': 'فئات Prowlarr المتاحة',
+      'lumen.adminProwlarr.categoryIdsLabel': 'معرّفات فئات {category}',
+      'lumen.adminProwlarr.assignedCount': '{category} · {count} مُعيّن',
+      'lumen.adminProwlarr.searchLimitLabel': 'حدّ البحث لـ {indexer}',
+      'lumen.adminProwlarr.coverageSummary':
+        'عدد المفهرسات القابلة للبحث والمفعّلة {enabled} من {total}.',
+      'lumen.adminProwlarr.version': 'الإصدار {version}.',
+      'lumen.adminProwlarr.disabled': 'معطّل',
+      'lumen.adminProwlarr.searchEnabled': 'البحث مفعّل',
+      'lumen.adminProwlarr.searchUnavailable': 'البحث غير متاح',
+      'lumen.adminProwlarr.indexer': 'المفهرس {id}',
+      'lumen.adminProwlarr.connectionTested': 'تم اختبار اتصال Prowlarr.',
+      'lumen.adminProwlarr.invalidSettings':
+        'تحقّق من المنفذ وحدود البحث ومعرّفات الفئات وتعيينات المفهرسات.',
+      'lumen.adminProwlarr.loadingIndexers': 'جارٍ تحميل المفهرسات…',
+      'lumen.adminProwlarr.backToYou': 'العودة إلى أنت',
+      'lumen.adminProwlarr.loadingSettings': 'جارٍ تحميل إعدادات Prowlarr…',
+      'lumen.adminProwlarr.indexerCount': 'عدد المفهرسات: {count}',
+      'lumen.adminProwlarr.savedApiKeyPlaceholder': 'مفتاح محفوظ',
+      'lumen.adminLogs.title': 'سجلات النظام',
+      'lumen.adminLogs.backToAccount': 'العودة إلى الحساب',
+      'lumen.adminLogs.refresh': 'تحديث',
+      'lumen.adminLogs.liveRefresh': 'تحديث مباشر',
+      'lumen.adminLogs.search': 'بحث',
+      'lumen.adminLogs.pageSize': 'حجم الصفحة',
+      'lumen.adminLogs.level.debug': 'التصحيح وما فوق',
+      'lumen.adminLogs.level.info': 'المعلومات وما فوق',
+      'lumen.adminLogs.level.warn': 'التحذيرات والأخطاء',
+      'lumen.adminLogs.level.error': 'الأخطاء فقط',
+      'lumen.adminLogs.copyFailure': 'تعذّر نسخ إدخال السجل.',
+      'lumen.adminLogs.loading': 'جارٍ تحميل سجلات النظام…',
+      'lumen.adminLogs.noResults': 'لا توجد سجلات تطابق عوامل التصفية.',
+      'lumen.adminLogs.systemLogs': 'سجلات النظام',
+      'lumen.adminLogs.page': 'الصفحة {page}',
+      'lumen.adminLogs.previousPage': 'الصفحة السابقة',
+      'lumen.adminLogs.nextPage': 'الصفحة التالية',
+      'lumen.adminJobs.title': 'المهام المجدولة',
+      'lumen.adminJobs.backToAccount': 'العودة إلى الحساب',
+      'lumen.adminJobs.systemCaches': 'ذاكرات النظام المؤقتة',
+      'lumen.adminJobs.refresh': 'تحديث',
+      'lumen.adminJobs.scheduledJobs': 'المهام المجدولة',
+      'lumen.adminJobs.loading': 'جارٍ تحميل المهام المجدولة…',
+      'lumen.adminJobs.empty': 'لا توجد مهام مجدولة.',
+      'lumen.adminJobs.running': 'قيد التشغيل',
+      'lumen.adminJobs.idle': 'خاملة',
+      'lumen.adminJobs.nextRun': 'التشغيل التالي: {date}',
+      'lumen.adminJobs.cronSchedule': 'جدول Cron',
+      'lumen.adminJobs.saveSchedule': 'حفظ الجدول',
+      'lumen.adminJobs.cancelEditing': 'إلغاء التحرير',
+      'lumen.adminJobs.editSchedule': 'تحرير الجدول',
+      'lumen.adminJobs.disableSchedule': 'تعطيل الجدول',
+      'lumen.adminJobs.enableSchedule': 'تمكين الجدول',
+      'lumen.adminJobs.cancellationUnavailable': 'الإلغاء غير متاح',
+      'lumen.adminJobs.goBack': 'رجوع',
+      'lumen.adminJobs.updateFailure': 'تعذّر تحديث المهمة.',
+      'lumen.adminJobs.frequency.label': 'التكرار',
+      'lumen.adminJobs.frequency.custom': 'جدول مخصص',
+      'lumen.adminJobs.frequency.daily': 'يوميًا عند 01:00',
+      'lumen.adminJobs.frequency.atSeconds': 'عند الثانية 0 و45 من كل دقيقة',
+      'lumen.adminJobs.frequency.days.one': 'كل {count} يوم من الشهر',
+      'lumen.adminJobs.frequency.days.two': 'كل {count} يومين من الشهر',
+      'lumen.adminJobs.frequency.days.few': 'كل {count} أيام من الشهر',
+      'lumen.adminJobs.frequency.days.many': 'كل {count} يومًا من الشهر',
+      'lumen.adminJobs.frequency.days.other': 'كل {count} يوم من الشهر',
+      'lumen.adminJobs.frequency.seconds.one': 'كل {count} ثانية',
+      'lumen.adminJobs.frequency.seconds.two': 'كل {count} ثانيتين',
+      'lumen.adminJobs.frequency.seconds.few': 'كل {count} ثوانٍ',
+      'lumen.adminJobs.frequency.seconds.many': 'كل {count} ثانية',
+      'lumen.adminJobs.frequency.seconds.other': 'كل {count} ثانية',
+      'lumen.adminJobs.frequency.minutes.one': 'كل {count} دقيقة',
+      'lumen.adminJobs.frequency.minutes.two': 'كل {count} دقيقتين',
+      'lumen.adminJobs.frequency.minutes.few': 'كل {count} دقائق',
+      'lumen.adminJobs.frequency.minutes.many': 'كل {count} دقيقة',
+      'lumen.adminJobs.frequency.minutes.other': 'كل {count} دقيقة',
+      'lumen.adminJobs.frequency.hours.one': 'كل {count} ساعة',
+      'lumen.adminJobs.frequency.hours.two': 'كل {count} ساعتين',
+      'lumen.adminJobs.frequency.hours.few': 'كل {count} ساعات',
+      'lumen.adminJobs.frequency.hours.many': 'كل {count} ساعة',
+      'lumen.adminJobs.frequency.hours.other': 'كل {count} ساعة',
+      'lumen.adminCaches.title': 'ذاكرات النظام المؤقتة',
+      'lumen.adminCaches.scheduledJobs': 'المهام المجدولة',
+      'lumen.adminCaches.refresh': 'تحديث',
+      'lumen.adminCaches.systemCaches': 'ذاكرات النظام المؤقتة',
+      'lumen.adminCaches.loading': 'جارٍ تحميل ذاكرات النظام المؤقتة…',
+      'lumen.adminCaches.apiCaches': 'ذاكرات API المؤقتة',
+      'lumen.adminCaches.noApiCaches': 'لا توجد ذاكرات API مؤقتة.',
+      'lumen.adminCaches.keyBytes': 'بايتات المفاتيح',
+      'lumen.adminCaches.valueBytes': 'بايتات القيم',
+      'lumen.adminCaches.flush': 'مسح',
+      'lumen.adminCaches.imageCaches': 'ذاكرات الصور المؤقتة',
+      'lumen.adminCaches.diskLocation': 'موقع ذاكرة القرص المؤقتة',
+      'lumen.adminCaches.tmdbImages': 'صور TMDB',
+      'lumen.adminCaches.avatars': 'الصور الرمزية',
+      'lumen.adminCaches.bytes': 'بايت',
+      'lumen.adminCaches.dnsUnavailable': 'بيانات ذاكرة DNS المؤقتة غير متاحة.',
+      'lumen.adminCaches.noDnsEntries': 'لا توجد إدخالات DNS مخزنة مؤقتًا.',
+      'lumen.adminCaches.secondsOld': 'منذ {count} ث',
+      'lumen.adminCaches.flushDnsEntry': 'مسح إدخال DNS',
+      'lumen.adminCaches.confirmFlush': 'مسح الذاكرة المؤقتة؟',
+      'lumen.adminCaches.flushFailure': 'تعذّر مسح هذه الذاكرة المؤقتة.',
+      'lumen.adminCaches.cacheFlushed': 'تم مسح {name}.',
+      'lumen.adminCaches.dnsFlushed': 'تم مسح إدخال DNS ‏{name}.',
+      'lumen.adminCaches.metric.size': 'الحجم',
+      'lumen.adminAbout.backToAccount': 'العودة إلى الحساب',
+      'lumen.adminAbout.serverInformation': 'معلومات الخادم',
+      'lumen.adminAbout.serverInformationTitle': 'معلومات الخادم',
+      'lumen.adminAbout.loadingServerInformation': 'جارٍ تحميل معلومات الخادم…',
+      'lumen.adminAbout.unavailable': 'غير متاح',
+      'lumen.adminAbout.versionCheckDisabled': 'التحقق من الإصدار معطّل',
+      'lumen.adminAbout.updateAvailable': 'يتوفر تحديث',
+      'lumen.adminAbout.supportAndReleases': 'الدعم والإصدارات',
+      'lumen.adminAbout.releaseNotes': 'ملاحظات الإصدار',
+      'lumen.adminAbout.discord': 'Discord',
+      'lumen.adminAbout.releaseHistory.title': 'سجل الإصدارات',
+      'lumen.adminAbout.releaseHistory.show': 'عرض الإصدارات',
+      'lumen.adminAbout.releaseHistory.hide': 'إخفاء الإصدارات',
+      'lumen.adminAbout.releaseHistory.loadingNotes':
+        'جارٍ تحميل ملاحظات الإصدار…',
+      'lumen.adminAbout.releaseHistory.failure': 'تعذّر تحميل سجل الإصدارات.',
+      'lumen.adminAbout.releaseHistory.retry': 'إعادة المحاولة',
+      'lumen.adminAbout.releaseHistory.loading': 'جارٍ تحميل الإصدارات…',
+      'lumen.adminAbout.developmentBuild':
+        'يعمل هذا الخادم بإصدار مخصص للتطوير.',
+      'lumen.adminCategories.backToAccount': 'العودة إلى الحساب',
+      'lumen.adminCategories.categoriesWhat': 'فئات الوسائط',
+      'lumen.adminCategories.loading': 'جارٍ تحميل فئات الوسائط…',
+      'lumen.adminCategories.unavailable': 'إعدادات الفئات غير متاحة.',
+      'lumen.adminCategories.saveCategories': 'حفظ الفئات',
+      'lumen.adminCategories.saveDefaultCategories': 'حفظ الفئات الافتراضية',
+      'lumen.adminCategories.defaultUserCategories':
+        'الفئات الافتراضية للمستخدمين',
+      'lumen.adminCategories.defaultsDescription':
+        'تُطبّق هذه الاختيارات على الحسابات التي ترث الإعدادات الافتراضية. وتظل قيود الفئات على مستوى الخادم سارية.',
+      'lumen.adminCategories.defaultCategoriesSaved':
+        'تم حفظ الفئات الافتراضية.',
+      'lumen.adminCategories.confirmFailure': 'لم يؤكد الخادم حفظ الفئات.',
+      'lumen.adminCategories.ageGateConfirmFailure':
+        'لم يؤكد الخادم حفظ إعدادات بوابة العمر.',
+      'lumen.adminCategories.ageGateSaved': 'تم حفظ إعدادات بوابة العمر.',
+      'lumen.adminCategories.ageGateSaveFailure':
+        'تعذر حفظ إعدادات بوابة العمر.',
+      'lumen.adminCategories.saveAgeGate': 'حفظ بوابة العمر',
+      'lumen.adminCategories.adultEnabledNote':
+        'يتطلب استكشاف محتوى البالغين إعداد خدمة Whisparr v3 ومنح الحساب الإذن المناسب. لا يمكن للحسابات المقيّدة الوصول إليه.',
+      'lumen.mediaCategory.sports': 'الرياضة',
+      'lumen.error.sessionEnded': 'انتهت جلستك. سجّل الدخول مجددًا.',
+      'lumen.error.noPermission': 'ليس لديك إذن لتنفيذ هذا الإجراء.',
+      'lumen.error.timeout': 'استغرق الخادم وقتًا طويلًا في الرد. حاول مجددًا.',
+      'lumen.error.rateLimited':
+        'عدد الطلبات كبير جدًا. انتظر دقيقة ثم حاول مجددًا.',
+      'lumen.error.serverProblem':
+        'حدثت مشكلة في الخادم. حاول مجددًا بعد قليل.',
+      'lumen.error.offline':
+        'أنت غير متصل بالإنترنت. تحقق من اتصالك ثم حاول مجددًا.',
+      'lumen.error.serverUnreachable':
+        'تعذر الوصول إلى الخادم. تحقق من اتصالك ثم حاول مجددًا.',
+      'lumen.adminConnectionHosts.title': 'مضيفو الاتصال',
+      'lumen.adminConnectionHosts.backToAccount': 'العودة إلى الحساب',
+      'lumen.adminConnectionHosts.sectionTitle': 'المضيفون المحفوظون',
+      'lumen.adminConnectionHosts.description':
+        'احفظ أسماء المضيفين أو عناوين IP لإعادة استخدامها في إعدادات الخدمات. لا يغيّر استخدام عنوان محفوظ سوى اسم المضيف أو عنوان IP، من دون مخطط أو منفذ. لا يختبر الاتصال بالمضيف ولا يتصل به.',
+      'lumen.adminConnectionHosts.empty': 'لا توجد مضيفات اتصال محفوظة.',
+      'lumen.adminConnectionHosts.name': 'الاسم',
+      'lumen.adminConnectionHosts.hostname': 'اسم المضيف',
+      'lumen.adminConnectionHosts.removeHost': 'إزالة المضيف {index}',
+      'lumen.adminConnectionHosts.remove': 'إزالة',
+      'lumen.adminConnectionHosts.add': 'إضافة',
+      'lumen.adminConnectionHosts.save': 'حفظ',
+      'lumen.adminConnectionHosts.discard': 'تراجع',
+      'lumen.adminConnectionHosts.saved': 'تم حفظ مضيفات الاتصال.',
+      'lumen.adminConnectionHosts.saveFailure': 'تعذّر حفظ مضيفات الاتصال.',
+      'lumen.adminConnectionHosts.what': 'مضيفات الاتصال',
+      'lumen.adminConnectionHosts.loadFailureTitle':
+        'تعذّر تحميل مضيفات الاتصال',
+      'lumen.adminConnectionHosts.retry': 'إعادة المحاولة',
+      'lumen.adminConnectionHosts.loading': 'جارٍ تحميل مضيفات الاتصال…',
+      'lumen.adminConnectionHosts.invalidPayload':
+        'المضيفات المحفوظة غير صالحة.',
+      'lumen.adminConnectionHosts.maximumHosts':
+        'يمكنك حفظ 16 مضيف اتصال كحد أقصى.',
+      'lumen.adminConnectionHosts.requiredFields':
+        'يجب أن يتضمن كل مضيف محفوظ اسمًا واسم مضيف.',
+      'lumen.adminConnectionHosts.invalidHost':
+        'أدخل اسمًا للمضيف لا يتجاوز 64 حرفًا واسم مضيف أو عنوان IP من دون مخطط أو منفذ.',
+      'lumen.adminConnectionHosts.portIncluded':
+        'يجب ألا تتضمن أسماء المضيفين المحفوظة منفذًا.',
+      'lumen.adminConnectionHosts.invalidAddress':
+        'أدخل اسم مضيف أو عنوان IP صالحًا.',
+      'lumen.adminConnectionHosts.duplicateName':
+        'يجب أن تكون أسماء المضيفين المحفوظة فريدة.',
     },
   },
   {
@@ -1101,6 +1897,52 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Преглед на проблемите',
       'components.PermissionEdit.viewrecent': 'Преглед на наскоро добавените',
       'components.PermissionEdit.viewrequests': 'Преглед на заявките',
+      'components.IssueDetails.allepisodes': 'Всички епизоди',
+      'i18n.back': 'Назад',
+      'components.Settings.SettingsLogs.logs': 'Лог файлове',
+      'components.Settings.SettingsLogs.level': 'Тежест',
+      'components.Settings.SettingsLogs.filterDebug': 'Дебъг',
+      'components.Settings.SettingsLogs.filterInfo': 'Информация',
+      'components.Settings.SettingsLogs.filterWarn': 'Предупреждение',
+      'components.Settings.SettingsLogs.filterError': 'Грешка',
+      'components.Settings.SettingsLogs.logDetails': 'Подробности за лога',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Копиране в клипборда',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Съобщението от лог файла е копирано в клипборда.',
+      'components.Settings.SettingsJobsCache.runnow': 'Изпълни сега',
+      'components.Settings.SettingsJobsCache.canceljob': 'Отмяна на задачата',
+      'components.Settings.SettingsJobsCache.process': 'Процес',
+      'components.Settings.SettingsJobsCache.command': 'Команда',
+      'components.Settings.SettingsJobsCache.cachehits': 'Попадения',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Общо ключове',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Пропуски',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS кеш',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Попадения',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Пропуски',
+      'components.Settings.SettingsJobsCache.failures': 'Грешки',
+      'components.Settings.SettingsJobsCache.flushcache': 'Изчистване на кеша',
+      'components.Settings.SettingsJobsCache.hitRate': 'Процент попадения',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Кеширани изображения',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks':
+        'Резервни IPv4 адреси',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Най-нова',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Понастоящем няма налични данни за изданието.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Издания',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Преглед в GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'За Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Директория за данни',
+      'components.Settings.SettingsAbout.documentation': 'Документация',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Дискусии в GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Часова зона',
+      'components.Settings.SettingsAbout.totalmedia': 'Общо медия',
+      'components.Settings.SettingsAbout.totalrequests': 'Общо заявки',
+      'components.Settings.SettingsAbout.uptodate': 'Актуална версия',
+      'components.Settings.SettingsAbout.version': 'Версия',
     },
   },
   {
@@ -1205,6 +2047,54 @@ export const localeData = [
       'components.PermissionEdit.viewrequests': 'Veure sol·licituds',
       'components.PermissionEdit.viewwatchlists':
         'Veure les llistes de seguiment de Plex',
+      'components.IssueDetails.allepisodes': 'Tots els episodis',
+      'i18n.back': 'Torna',
+      'components.Settings.SettingsLogs.logs': 'Registres',
+      'components.Settings.SettingsLogs.level': 'Gravetat',
+      'components.Settings.SettingsLogs.filterDebug': 'Depuració',
+      'components.Settings.SettingsLogs.filterInfo': 'Info',
+      'components.Settings.SettingsLogs.filterWarn': 'Avís',
+      'components.Settings.SettingsLogs.filterError': 'Error',
+      'components.Settings.SettingsLogs.logDetails': 'Detalls del registre',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Copia al porta-retalls',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        "S'ha copiat el missatge de registre al porta-retalls.",
+      'components.Settings.SettingsJobsCache.runnow': 'Executa-ho ara',
+      'components.Settings.SettingsJobsCache.canceljob':
+        'Cancel·la la tasca programada',
+      'components.Settings.SettingsJobsCache.process': 'Procés',
+      'components.Settings.SettingsJobsCache.command': 'Ordre',
+      'components.Settings.SettingsJobsCache.cachehits': 'Consultes',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Claus totals',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Errades',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Memòria cau DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Consultes',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Fallades',
+      'components.Settings.SettingsJobsCache.failures': 'Errors',
+      'components.Settings.SettingsJobsCache.flushcache':
+        'Buida la memòria cau',
+      'components.Settings.SettingsJobsCache.hitRate': 'Taxa de consultes',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Imatges a la memòria cau',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks':
+        "Alternatives d'IPv4",
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Última versió',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'La informació de la versió no està disponible.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Versions',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Visualitza a GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Quant a Seer',
+      'components.Settings.SettingsAbout.appDataPath': 'Directori de dades',
+      'components.Settings.SettingsAbout.documentation': 'Documentació',
+      'components.Settings.SettingsAbout.githubdiscussions': 'Debats de GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Zona horària',
+      'components.Settings.SettingsAbout.totalmedia': 'Total de contingut',
+      'components.Settings.SettingsAbout.totalrequests': 'Sol·licituds totals',
+      'components.Settings.SettingsAbout.uptodate': 'Actualitzat',
+      'components.Settings.SettingsAbout.version': 'Versió',
     },
   },
   {
@@ -1321,6 +2211,52 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Zobrazit problémy',
       'components.PermissionEdit.viewrecent': 'Zobrazit naposledy přidané',
       'components.PermissionEdit.viewrequests': 'Zobrazit žádosti',
+      'components.IssueDetails.allepisodes': 'Všechny epizody',
+      'i18n.back': 'Zpět',
+      'components.Settings.SettingsLogs.logs': 'Záznamy',
+      'components.Settings.SettingsLogs.level': 'Závažnost',
+      'components.Settings.SettingsLogs.filterDebug': 'Ladění',
+      'components.Settings.SettingsLogs.filterInfo': 'Informace',
+      'components.Settings.SettingsLogs.filterWarn': 'Varování',
+      'components.Settings.SettingsLogs.filterError': 'Chyba',
+      'components.Settings.SettingsLogs.logDetails': 'Podrobnosti o záznamu',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Zkopírovat do schránky',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Zkopírování zprávy protokolu do schránky.',
+      'components.Settings.SettingsJobsCache.runnow': 'Spustit nyní',
+      'components.Settings.SettingsJobsCache.canceljob': 'Zrušit úlohu',
+      'components.Settings.SettingsJobsCache.process': 'Zpracování',
+      'components.Settings.SettingsJobsCache.command': 'Příkaz',
+      'components.Settings.SettingsJobsCache.cachehits': 'Úspěchy',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Celkem klíčů',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Neúspěchy',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Mezipaměť DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Úspěchy',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Neúspěchy',
+      'components.Settings.SettingsJobsCache.failures': 'Selhání',
+      'components.Settings.SettingsJobsCache.flushcache':
+        'Vyprázdnit mezipaměť',
+      'components.Settings.SettingsJobsCache.hitRate': 'Míra úspěšnosti',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Obrázky v mezipaměti',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Záložní IPv4',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Nejnovější',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Údaje o vydání jsou aktuálně nedostupné.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Vydání',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Zobrazit na GitHubu',
+      'components.Settings.SettingsAbout.aboutseerr': 'A aplikaci Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Adresář dat',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentace',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Diskuze na GitHubu',
+      'components.Settings.SettingsAbout.timezone': 'Časové pásmo',
+      'components.Settings.SettingsAbout.totalmedia': 'Celkem médií',
+      'components.Settings.SettingsAbout.totalrequests': 'Celkem žádostí',
+      'components.Settings.SettingsAbout.uptodate': 'Aktuální',
+      'components.Settings.SettingsAbout.version': 'Verze',
     },
   },
   {
@@ -1430,6 +2366,52 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Vis problemer',
       'components.PermissionEdit.viewrecent': 'Se senest tilføjede',
       'components.PermissionEdit.viewrequests': 'Se anmodninger',
+      'components.IssueDetails.allepisodes': 'Alle episoder',
+      'i18n.back': 'Tilbage',
+      'components.Settings.SettingsLogs.logs': 'Logfiler',
+      'components.Settings.SettingsLogs.level': 'Alvorlighed',
+      'components.Settings.SettingsLogs.filterDebug': 'Fejlfinding',
+      'components.Settings.SettingsLogs.filterInfo': 'Info',
+      'components.Settings.SettingsLogs.filterWarn': 'Advarsel',
+      'components.Settings.SettingsLogs.filterError': 'Fejl',
+      'components.Settings.SettingsLogs.logDetails': 'Logoplysninger',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Kopiér til udklipsholder',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Kopierede logmeddelelse til udklipsholder.',
+      'components.Settings.SettingsJobsCache.runnow': 'Kør nu',
+      'components.Settings.SettingsJobsCache.canceljob': 'Annullér job',
+      'components.Settings.SettingsJobsCache.process': 'Proces',
+      'components.Settings.SettingsJobsCache.command': 'Kommando',
+      'components.Settings.SettingsJobsCache.cachehits': 'Træffere',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Samlet antal nøgler',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Missere',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS-cache',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Træffere',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Missere',
+      'components.Settings.SettingsJobsCache.failures': 'Fejl',
+      'components.Settings.SettingsJobsCache.flushcache': 'Tøm cache',
+      'components.Settings.SettingsJobsCache.hitRate': 'Træfferate',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Cachelagrede billeder',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4-reserver',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Nyeste',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Udgivelsesdata er i øjeblikket ikke tilgængelige.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Udgivelser',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Vis på GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Om Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Datamappe',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentation',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'GitHub-diskussioner',
+      'components.Settings.SettingsAbout.timezone': 'Tidszone',
+      'components.Settings.SettingsAbout.totalmedia': 'Samlet antal medier',
+      'components.Settings.SettingsAbout.totalrequests':
+        'Samlet antal anmodninger',
+      'components.Settings.SettingsAbout.uptodate': 'Opdateret',
+      'components.Settings.SettingsAbout.version': 'Version',
     },
   },
   {
@@ -1787,6 +2769,429 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': 'Kürzlich hinzugefügt anzeigen',
       'components.PermissionEdit.viewrequests': 'Anfragen anzeigen',
       'components.PermissionEdit.viewwatchlists': 'Watchlists anzeigen',
+      'components.RequestModal.RequestTree.seasonNumber': 'Staffel {number}',
+      'components.RequestModal.RequestTree.specials': 'Sonderfolgen',
+      'components.Requests.episodeQueue': 'Episodenwarteschlange',
+      'components.Requests.retry': 'Erneut versuchen',
+      'components.Requests.approve': 'Genehmigen',
+      'components.Requests.decline': 'Ablehnen',
+      'components.Requests.requested': 'Angefragt',
+      'components.Requests.approved': 'Genehmigt',
+      'components.Requests.searching': 'Suche läuft',
+      'components.Requests.downloading': 'Wird heruntergeladen',
+      'components.Requests.importing': 'Import läuft…',
+      'components.Requests.library': 'Wird zur Bibliothek hinzugefügt',
+      'components.Requests.available': 'Verfügbar',
+      'components.Requests.unavailable': 'Nicht verfügbar',
+      'components.Requests.failed': 'Fehlgeschlagen',
+      'components.Requests.declined': 'Abgelehnt',
+      'components.Requests.cancelled': 'Storniert',
+      'components.Requests.pending': 'Ausstehend',
+      'components.Requests.completed': 'Abgeschlossen',
+      'components.Requests.statusUpdated': 'Status aktualisiert',
+      'i18n.unknown': 'Unbekannt',
+      'components.Requests.history': 'Geschichte',
+      'components.RequestStatus.SoftwareRequests.approve': 'Genehmigen',
+      'components.RequestStatus.SoftwareRequests.approved': 'Genehmigt',
+      'components.RequestStatus.SoftwareRequests.available': 'Verfügbar',
+      'components.RequestStatus.SoftwareRequests.cancel': 'Abbrechen',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'Storniert',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'Stornierte Anfrage entfernen',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        'Diese stornierte Anfrage entfernen?',
+      'components.RequestStatus.SoftwareRequests.decline': 'Ablehnen',
+      'components.RequestStatus.SoftwareRequests.declined': 'Abgelehnt',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'Kopien herunterladen',
+      'components.RequestStatus.SoftwareRequests.downloading':
+        'Wird heruntergeladen',
+      'components.RequestStatus.SoftwareRequests.failed': 'Fehlgeschlagen',
+      'components.RequestStatus.SoftwareRequests.history': 'Verlauf',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'Statusverlauf wird geladen…',
+      'components.RequestStatus.SoftwareRequests.importing':
+        'Import wird überprüft…',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'Diese Softwareanfrage konnte nicht aktualisiert werden.',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        'Es sind keine gespeicherten Status-Updates verfügbar.',
+      'components.RequestStatus.SoftwareRequests.pending':
+        'Ausstehende Genehmigung',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'Aus Anfragen entfernen',
+      'components.RequestStatus.SoftwareRequests.retry': 'Erneut versuchen',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'Der Anbieter kann nicht bestätigen, ob der vorherige Download begonnen hat. Überprüfen Sie die Warteschlange und den Verlauf des Download-Clients. Fahren Sie nur fort, wenn kein passender Download vorhanden ist.',
+      'components.RequestStatus.SoftwareRequests.searching': 'Suche läuft',
+      'components.RequestStatus.SoftwareRequests.title': 'Softwareanfragen',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'Zurückziehen',
+      'i18n.back': 'Zurück',
+      'downloads.actions': 'Aktionsgeschichte',
+      'downloads.active': 'Aktive Warnungen',
+      'downloads.activeState': 'Benötigt Aufmerksamkeit',
+      'downloads.actor': 'Nutzer {id}',
+      'downloads.blocked': 'Manuell blockiert',
+      'downloads.blocklist':
+        'Diese Version blockieren, damit sie nicht erneut heruntergeladen wird',
+      'downloads.blocklisted': 'Sperrung angefordert',
+      'downloads.cancel': 'Abbrechen',
+      'downloads.changed': 'Dienstkonfiguration geändert',
+      'downloads.clientKept': 'Client-Dateien aufbewahrt',
+      'downloads.clientRemoved': 'Entfernung des Clients angefordert',
+      'downloads.confirm': 'Ablehnung bestätigen',
+      'downloads.copy': 'Kopieren oder Hardlink (Quelldateien behalten)',
+      'downloads.denied':
+        'Die Berechtigung „Downloads verwalten“ ist erforderlich.',
+      'downloads.description':
+        'Überprüfen Sie Akquisitionswarnungen, wählen Sie Dateien für den manuellen Import aus und lehnen Sie unerwünschte Downloads ab.',
+      'downloads.disappeared': 'Nicht mehr in der Warteschlange',
+      'downloads.empty': 'Keine Download-Warnungen in dieser Ansicht.',
+      'downloads.failed': 'Der Posteingang konnte nicht geladen werden.',
+      'downloads.failedState': 'Prüfung erforderlich',
+      'downloads.history': 'Verlauf',
+      'downloads.import': 'Ausgewählte Dateien importieren',
+      'downloads.importFailed': 'Import fehlgeschlagen',
+      'downloads.importMode': 'Importmodus',
+      'downloads.importReview':
+        'Import ohne bestätigten Dateiimport abgeschlossen',
+      'downloads.importWarning':
+        'Bestätigen Sie das Ziel und überprüfen Sie alle Ablehnungsgründe. Der Erfassungsdienst bestimmt die Dateiqualität und den Abgleich der Episoden.',
+      'downloads.imported': 'Manuell importiert',
+      'downloads.importingState': 'Import ausstehend',
+      'downloads.ineligible':
+        'Keine bestätigte Übereinstimmung — Import nicht möglich',
+      'downloads.loading': 'Download-Warnungen laden...',
+      'downloads.move': 'Verschieben (Quelldateien entfernen)',
+      'downloads.next': 'Nächste Seite',
+      'downloads.noFiles':
+        'Es wurden keine Dateien mit einem bestätigten Bibliotheksziel gefunden.',
+      'downloads.notBlocklisted': 'Release steht nicht auf der Blockliste',
+      'downloads.outcome':
+        'Die Aktion konnte nicht bestätigt werden. Aktualisieren Sie die Seite und prüfen Sie den Status, bevor Sie es erneut versuchen.',
+      'downloads.partial':
+        'Einige Akquisitionsdienste konnten nicht überprüft werden. Ihre Warnungen können fehlen oder veraltet sein.',
+      'downloads.pending':
+        'Aktion angenommen. Aktualisieren, um das Backend-Ergebnis zu überprüfen.',
+      'downloads.preview': 'Dateien in der Vorschau anzeigen',
+      'downloads.previous': 'Vorherige Seite',
+      'downloads.recovered': 'Wiederhergestellt',
+      'downloads.refresh': 'Aktualisieren',
+      'downloads.reject': 'Download ablehnen',
+      'downloads.rejected': 'Manuell abgelehnt',
+      'downloads.rejectingState': 'Ablehnung ausstehend',
+      'downloads.rejection':
+        'Durch Ablehnen wird dieses Element aus der Akquisitionswarteschlange entfernt. Überprüfen Sie die Optionen, bevor Sie bestätigen.',
+      'downloads.remove':
+        'Entfernen Sie den Download und die Dateien von seinem Download-Client',
+      'downloads.resolvedState': 'Gelöst',
+      'downloads.search': 'Suche',
+      'downloads.select': '{name} auswählen',
+      'downloads.targetChoose': 'Bibliothekszuordnung auswählen',
+      'downloads.targetHelp':
+        'Suchen Sie nach Titeln, die bereits in diesem Akquisitionsdienst vorhanden sind. Die Auswahl eines Treffers fügt keinen neuen Titel hinzu.',
+      'downloads.targetLabel': 'Bibliotheksmatch',
+      'downloads.targetNoResults':
+        'In dieser Servicebibliothek wurden keine passenden Titel gefunden.',
+      'downloads.targetQuery': 'Film, Serie, Album oder Buch',
+      'downloads.targetRequired':
+        'Wählen Sie vor dem Importieren der Dateien eine Bibliothekszuordnung aus.',
+      'downloads.targetSelected': 'Ausgewähltes Match: {title}{subtitle}',
+      'downloads.title': 'Download-Posteingang',
+      'downloads.truncated':
+        'Nur die ersten 20 Akquisitionsleistungen wurden überprüft.',
+      'downloads.unknownImport': 'Einfuhrergebnis unbekannt',
+      'downloads.unknownReject': 'Ablehnungsergebnis unbekannt',
+      'components.IndexerSearch.accessDenied':
+        'Sie benötigen die Berechtigung zum Verwalten von Anfragen, um Indexer zu durchsuchen.',
+      'components.IndexerSearch.categories': 'Indexer-Kategorien',
+      'components.IndexerSearch.category': 'Medienkategorie',
+      'components.IndexerSearch.categoryAdult': 'Erwachsene',
+      'components.IndexerSearch.categoryAudiobook': 'Hörbücher',
+      'components.IndexerSearch.categoryComic': 'Comics',
+      'components.IndexerSearch.categoryEbook': 'Bücher',
+      'components.IndexerSearch.categoryGame': 'PC-Spiele',
+      'components.IndexerSearch.categoryMagazine': 'Magazine',
+      'components.IndexerSearch.categoryModern': 'Moderne ROM',
+      'components.IndexerSearch.categoryMovie': 'Filme',
+      'components.IndexerSearch.categoryMusic': 'Musik',
+      'components.IndexerSearch.categoryRetro': 'Retro-ROMs',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Prowlarr-Einstellungen öffnen',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr konnte dieses Release nicht senden. Starten Sie eine neue Suche und versuchen Sie es erneut.',
+      'components.IndexerSearch.grabs': 'Downloads',
+      'components.IndexerSearch.intro':
+        'Suchen Sie mit Ihren Prowlarr-Indexern nach Releases aus allen SeerrNG-Medienkategorien.',
+      'components.IndexerSearch.leechers': 'Leecher',
+      'components.IndexerSearch.loadFailed':
+        'Prowlarr Suchkonfiguration konnte nicht geladen werden.',
+      'components.IndexerSearch.loadMore': 'Mehr Ergebnisse laden',
+      'components.IndexerSearch.loadingMore': 'Lade…',
+      'components.IndexerSearch.manualMode':
+        'Suchergebnisse stehen unabhängig von SeerrNG-Anfragen zur Verfügung. Sie können ein Ergebnis an einen in Prowlarr eingerichteten Download-Client senden.',
+      'components.IndexerSearch.noConnection': 'Prowlarr ist nicht verbunden.',
+      'components.IndexerSearch.noConnectionHelp':
+        'Bitten Sie einen Administrator, Prowlarr unter Einstellungen > Dienste zu verbinden.',
+      'components.IndexerSearch.noResults':
+        'Keine Releases passten zu dieser Suche.',
+      'components.IndexerSearch.noResultsHelp':
+        'Überprüfen Sie die Kategoriefilter und aktivierten Indexer in Prowlarr. Die Suchergebnisse bestätigen nicht, dass eine App ein Release importieren kann.',
+      'components.IndexerSearch.openResult': 'Indexer-Details öffnen',
+      'components.IndexerSearch.protocol': 'Protokoll',
+      'components.IndexerSearch.published': 'Veröffentlicht',
+      'components.IndexerSearch.query': 'Suchbegriffe',
+      'components.IndexerSearch.queryPlaceholder':
+        'Titel, Autor, Album, Ausgabe oder Spielname',
+      'components.IndexerSearch.requestStillUsesManager':
+        'Das Senden eines Ergebnisses ändert keine SeerrNG-Anfrage. Prowlarr übergibt das Ergebnis an den dort konfigurierten Download-Client.',
+      'components.IndexerSearch.resultCount':
+        'Prowlarr hat {count} Releases zurückgegeben.',
+      'components.IndexerSearch.search': 'Indexer durchsuchen',
+      'components.IndexerSearch.searchFailed':
+        'Die Prowlarr-Suche ist fehlgeschlagen. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      'components.IndexerSearch.searching': 'Suche in Indexern…',
+      'components.IndexerSearch.seeders': 'Seeder',
+      'components.IndexerSearch.sendToDownloader': 'An Downloader senden',
+      'components.IndexerSearch.sendingToDownloader': 'Wird gesendet…',
+      'components.IndexerSearch.sentToDownloader':
+        'An den konfigurierten Download-Client von Prowlarr gesendet.',
+      'components.IndexerSearch.size': 'Größe',
+      'components.IndexerSearch.title': 'Indexer-Suche',
+      'components.IndexerSearch.tooManySearches':
+        'Suchlimit erreicht. Warten Sie eine Minute, bevor Sie erneut suchen.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'Es sind keine aktivierten durchsuchbaren Indexer verfügbar. Aktivieren Sie einen Indexer in Prowlarr oder passen Sie die Kategoriefilter an.',
+      'components.SettingsProwlarr.addDetectedMatches':
+        'Erkannte Übereinstimmungen ({count}) hinzufügen',
+      'components.SettingsProwlarr.address': 'Hostname',
+      'components.SettingsProwlarr.adult': 'Erwachsene',
+      'components.SettingsProwlarr.apiKey': 'API-Schlüssel',
+      'components.SettingsProwlarr.apiKeySaved':
+        'Ein Schlüssel ist gespeichert. Lassen Sie dieses Feld leer, um ihn weiter zu verwenden.',
+      'components.SettingsProwlarr.audiobook': 'Hörbücher',
+      'components.SettingsProwlarr.basePath': 'Basispfad',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'Wählen Sie die Prowlarr-Kategorien aus, die mit jeder Suche gesendet werden. Standardmäßig werden Newznab-/Torznab-Kategorien verwendet. Testen Sie die Verbindung, um benutzerdefinierte Kategorien zu sehen, die von aktivierten Indexern gemeldet werden.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'Wählen Sie mindestens eine Kategorie aus.',
+      'components.SettingsProwlarr.categoryMappingTitle': 'Kategoriefilter',
+      'components.SettingsProwlarr.clearApiKey':
+        'Gespeicherten API-Schlüssel entfernen',
+      'components.SettingsProwlarr.comic': 'Comics',
+      'components.SettingsProwlarr.connected':
+        'Verbunden mit Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'Die Anzahl umfasst aktivierte, durchsuchbare Indexer, die mindestens eine ausgewählte Kategorie unterstützen. Sie zeigt die Suchabdeckung, nicht erfolgreiche Downloads oder Importe.',
+      'components.SettingsProwlarr.coverageTitle':
+        'Indexer-Abdeckung nach Medium',
+      'components.SettingsProwlarr.description':
+        'Optional können Sie Prowlarr verbinden, um kategoriebewusste manuelle Suchen direkt in SeerrNG auszuführen. Genehmigte Anfragen laufen weiterhin über Ihre konfigurierten Medienmanager und Softwareanbieter, die Erwerb und Nachverfolgung übernehmen.',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        'Vorgeschlagene benutzerdefinierte Kategorien werden anhand der von den Indexern gemeldeten Namen zugeordnet. Prüfen Sie sie vor dem Speichern. Dadurch wird Prowlarr nicht geändert und es werden keine Downloads gestartet.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr hat die Management-API-Verbindung akzeptiert. Diese Ergebnisse testen jeden aktivierten, durchsuchbaren Indexer einzeln. Die Angaben „Deaktiviert bis“ stammen von Prowlarr.',
+      'components.SettingsProwlarr.diagnosticFailed': 'Fehlgeschlagen',
+      'components.SettingsProwlarr.diagnosticOk': 'Verbunden',
+      'components.SettingsProwlarr.diagnosticTitle':
+        'Indexer-Verbindungsergebnisse',
+      'components.SettingsProwlarr.disabledUntil': 'Deaktiviert bis {date}',
+      'components.SettingsProwlarr.ebook': 'Bücher',
+      'components.SettingsProwlarr.game': 'PC-Spiele',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'Wählen Sie aus, welche aktiven Prowlarr-Indexer für jeden Medientyp durchsucht werden. Verwenden Sie Strg-Klick unter Windows/Linux oder Befehls-Klick unter macOS, um mehrere Indexer auszuwählen. Eine leere Auswahl deaktiviert die Suche für diesen Typ.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        'Indexer für {category}',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'Indexer-Zuweisungen nach Medientyp',
+      'components.SettingsProwlarr.indexerCount': 'Indexer: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'Benutzer können Indexer-Details aus den Suchergebnissen öffnen.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'Indexernamen und Detaillinks werden vor Benutzern verborgen.',
+      'components.SettingsProwlarr.indexerNotSearchable':
+        '(nicht durchsuchbar)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'Suchlimits',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'Beschränken Sie die Suchanfragen pro Benutzer pro Minute insgesamt und für jeden ausgewählten Indexer.',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr wurde gespeichert, aber sein Indexer-Inventar ist nicht verfügbar.',
+      'components.SettingsProwlarr.keepApiKey':
+        'Gespeicherten API-Schlüssel beibehalten',
+      'components.SettingsProwlarr.loadFailed':
+        'Prowlarr-Einstellungen konnten nicht geladen werden.',
+      'components.SettingsProwlarr.magazine': 'Magazine',
+      'components.SettingsProwlarr.modern': 'Moderne ROMs',
+      'components.SettingsProwlarr.movie': 'Filme',
+      'components.SettingsProwlarr.music': 'Musik',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'Es sind noch keine Prowlarr-Indexer konfiguriert.',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Testen Sie die Prowlarr-Verbindung, um deren Indexer zu laden und sie nach Kategorie zuzuweisen.',
+      'components.SettingsProwlarr.port': 'Port',
+      'components.SettingsProwlarr.recentFailure':
+        'Zuletzt gescheitert: {date}',
+      'components.SettingsProwlarr.retro': 'Retro-ROMs',
+      'components.SettingsProwlarr.save': 'Prowlarr Einstellungen speichern',
+      'components.SettingsProwlarr.saveFailed':
+        'Prowlarr-Einstellungen konnten nicht gespeichert werden.',
+      'components.SettingsProwlarr.saved':
+        'Prowlarr-Einstellungen gespeichert.',
+      'components.SettingsProwlarr.saving': 'Speichern…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        'Geben Sie eine ganze Zahl von 1 bis 60 ein.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        'Maximale Suchanfragen pro Benutzer pro Minute auf {indexer}',
+      'components.SettingsProwlarr.searchesPerUser':
+        'Maximale Suchanfragen pro Benutzer pro Minute',
+      'components.SettingsProwlarr.selectedCategories':
+        '{count} Kategorien ausgewählt',
+      'components.SettingsProwlarr.selectedIndexers':
+        '{count} Indexer ausgewählt',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'Indexernamen und Details in Suchergebnissen zulassen',
+      'components.SettingsProwlarr.sports': 'Sport',
+      'components.SettingsProwlarr.supportNote':
+        'Diese Einstellung verbindet sich nur mit Prowlarr. NZBHydra2 wird hier derzeit nicht unterstützt.',
+      'components.SettingsProwlarr.test':
+        'Verbindung testen und Abdeckung prüfen',
+      'components.SettingsProwlarr.testFailed':
+        'Prowlarr-Verbindung fehlgeschlagen. Überprüfen Sie die Adresse und den API-Schlüssel.',
+      'components.SettingsProwlarr.testHint':
+        'Suchanfragen aus SeerrNG werden direkt an Prowlarr gesendet. Genehmigte Anfragen laufen weiterhin über den konfigurierten Medienmanager oder Softwareanbieter, der Erwerb und Nachverfolgung übernimmt.',
+      'components.SettingsProwlarr.testing': 'Prowlarr überprüfen...',
+      'components.SettingsProwlarr.title': 'Prowlarr-Indexer',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} von {total} konfigurierten Indexern sind aktiviert und durchsuchbar',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'SSL verwenden',
+      'components.Settings.SettingsLogs.logs': 'Protokolle',
+      'components.Settings.SettingsLogs.searchLogs': 'Protokolle durchsuchen',
+      'components.Settings.SettingsLogs.level': 'Schweregrad',
+      'components.Settings.SettingsLogs.filterDebug': 'Debuggen',
+      'components.Settings.SettingsLogs.filterInfo': 'Infos',
+      'components.Settings.SettingsLogs.filterWarn': 'Warnung',
+      'components.Settings.SettingsLogs.filterError': 'Fehler',
+      'components.Settings.SettingsLogs.logDetails': 'Protokolldetails',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'In Zwischenablage kopieren',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Protokollnachricht in die Zwischenablage kopiert.',
+      'components.Settings.SettingsJobsCache.runnow': 'Jetzt ausführen',
+      'components.Settings.SettingsJobsCache.canceljob': 'Aufgabe abbrechen',
+      'components.Settings.SettingsJobsCache.process': 'Prozess',
+      'components.Settings.SettingsJobsCache.command': 'Befehl',
+      'components.Settings.SettingsJobsCache.enabled': 'Aktiviert',
+      'components.Settings.SettingsJobsCache.disabled': 'Deaktiviert',
+      'components.Settings.SettingsJobsCache.cachehits': 'Cache-Treffer',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Schlüssel insgesamt',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Cache-Fehlzugriff',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS-Cache',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Zugriffe',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Fehlschläge',
+      'components.Settings.SettingsJobsCache.failures': 'Fehlschläge',
+      'components.Settings.SettingsJobsCache.flushcache': 'Cache leeren',
+      'components.Settings.SettingsJobsCache.hitRate': 'Trefferquote',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Bilder im Cache',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4-Fallbacks',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'Installiert',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Neueste',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Informationen der Version nicht verfügbar.',
+      'components.Settings.SettingsAbout.Releases.releases':
+        'Veröffentlichungen',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Auf GitHub anzeigen',
+      'components.Settings.SettingsAbout.aboutseerr': 'Über SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': 'Datenverzeichnis',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentation',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'GitHub-Diskussionen',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG ist für rechtmäßiges persönliches Medienmanagement gedacht. Das Projekt duldet keine Piraterie oder Urheberrechtsverletzungen. Die Benutzer sind für die Einhaltung der geltenden Gesetze, Lizenzen und Servicebedingungen in ihrer Region verantwortlich.',
+      'components.Settings.SettingsAbout.legalUseTitle': 'Rechtmäßige Nutzung',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'Metadatenzuordnung',
+      'components.Settings.SettingsAbout.supportdevelopment':
+        'Entwicklung unterstützen',
+      'components.Settings.SettingsAbout.timezone': 'Zeitzone',
+      'components.Settings.SettingsAbout.totalmedia': 'Medien insgesamt',
+      'components.Settings.SettingsAbout.totalrequests': 'Anfragen insgesamt',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'Dieses Produkt verwendet TMDB und die TMDB-APIs, wird jedoch von TMDB weder unterstützt noch zertifiziert oder anderweitig genehmigt. <ApiTermsLink>Nutzungsbedingungen der TMDB API</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'Updates konnten nicht geprüft werden',
+      'components.Settings.SettingsAbout.uptodate': 'Auf dem neuesten Stand',
+      'components.Settings.SettingsAbout.version': 'Version',
+      'components.Settings.SettingsCategories.title': 'Medienkategorien',
+      'components.Settings.SettingsCategories.description':
+        'Wählen Sie aus, welche Kategorien jeder durchsuchen und anfordern kann. Deaktivierte Kategorien verschwinden aus Navigation und Entdeckung, und neue Anfragen werden blockiert. Bestehende Anfragen und Download-Historie bleiben im Request Status verfügbar.',
+      'components.Settings.SettingsCategories.groupTitle':
+        'Verfügbare Kategorien',
+      'components.Settings.SettingsCategories.groupDescription':
+        'Diese Switches kontrollieren die Verfügbarkeit der Kategorie in SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'Filme',
+      'components.Settings.SettingsCategories.tv': 'Serien',
+      'components.Settings.SettingsCategories.music': 'Musik',
+      'components.Settings.SettingsCategories.ebook': 'Bücher',
+      'components.Settings.SettingsCategories.audiobook': 'Hörbücher',
+      'components.Settings.SettingsCategories.comic': 'Comics',
+      'components.Settings.SettingsCategories.magazine': 'Magazine',
+      'components.Settings.SettingsCategories.adult': 'Erwachsene',
+      'components.Settings.SettingsCategories.retro': 'Retro-Emulation',
+      'components.Settings.SettingsCategories.modern': 'Emulation (modern)',
+      'components.Settings.SettingsCategories.game': 'PC-Spiele',
+      'components.Settings.SettingsCategories.movieDescription':
+        'Ermöglichen Sie die Entdeckung von Filmen und Anfragen.',
+      'components.Settings.SettingsCategories.tvDescription':
+        'Ermöglichen Sie Serienentdeckung und Anfragen.',
+      'components.Settings.SettingsCategories.musicDescription':
+        'Erlauben Sie Musik Entdeckung und Anfragen.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'Ermöglichen Sie Buchentdeckung und Anfragen.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'Ermöglichen Sie die Suche und Anfragen von Hörbüchern.',
+      'components.Settings.SettingsCategories.comicDescription':
+        'Erlauben Sie Comic-Entdeckung und Anfragen.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'Ermöglichen Sie die Entdeckung von Zeitschriften und Anfragen.',
+      'components.Settings.SettingsCategories.adultDescription':
+        'Erlaube die Entdeckung und Anfrage von Inhalten für Erwachsene. Erfordert einen konfigurierten Whisparr v3-Dienst und eine benutzerbezogene Berechtigung für Erwachsene.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'Ermöglichen Sie Retro-ROM-Erkennung und -Anfragen.',
+      'components.Settings.SettingsCategories.modernDescription':
+        'Erlauben Sie moderne Emulation ROM Entdeckung und Anfragen.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'Ermöglichen Sie PC-Spiel Entdeckung und Anfragen.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'Erwachseneninhalte sind für alle mit Zugriff sichtbar',
+      'components.Settings.SettingsCategories.adultWarning':
+        'Wenn du diese Instanz mit der Familie teilst oder sie über einen Reverse Proxy zugänglich machst, kann jeder, dem die Berechtigung „Erwachsene anfordern“ erteilt wurde, sehen, was du durchsuchst und anforderst. Markiere Familienkonten unten oder in den Berechtigungen jedes Benutzers als eingeschränkt, damit sie keine Inhalte für Erwachsene sehen.',
+      'components.Settings.SettingsCategories.ageGateTitle': 'Alterskontrolle',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'Eingeschränkte Konten können keine Erwachseneninhalte sehen oder anfordern; reife Filme, Serien, Musik, Bücher, Comics und getaggte Titel werden serverseitig ausgeblendet. Die Filterung verwendet Einstufungen und Tags der Anbieter und ist bei Titeln ohne Metadaten best-effort.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'Konten standardmäßig einschränken',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'Konten ohne explizite Einstellung werden eingeschränkt. Administratoren sind ausgenommen.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'Höchste Filmeinstufung',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'Eingeschränkte Konten können keine Filme sehen, die über dieser Einstufung liegen.',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'Höchste Serieneinstufung',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'Eingeschränkte Konten können keine Serien sehen, die über dieser Einstufung liegen.',
+      'components.Settings.SettingsCategories.ageGateCountry':
+        'Land der Einstufung',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'Zweibuchstaben-Ländercode, dessen Einstufungen verwendet werden, z. B. US.',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'Kategorieeinstellungen gespeichert.',
+      'components.Settings.SettingsCategories.saveFailure':
+        'Kategorieeinstellungen konnten nicht gespeichert werden.',
     },
   },
   {
@@ -2134,6 +3539,414 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': 'View Recently Added',
       'components.PermissionEdit.viewrequests': 'View Requests',
       'components.PermissionEdit.viewwatchlists': 'View Watchlists',
+      'components.RequestModal.RequestTree.seasonNumber': 'Season {number}',
+      'components.RequestModal.RequestTree.specials': 'Specials',
+      'components.IssueDetails.allepisodes': 'All Episodes',
+      'components.Requests.episodeQueue': 'Episode Queue',
+      'components.Requests.retry': 'Retry',
+      'components.Requests.approve': 'Approve',
+      'components.Requests.decline': 'Decline',
+      'components.Requests.requested': 'Requested',
+      'components.Requests.approved': 'Approved',
+      'components.Requests.searching': 'Searching',
+      'components.Requests.downloading': 'Downloading',
+      'components.Requests.importing': 'Importing',
+      'components.Requests.library': 'Adding to Library',
+      'components.Requests.available': 'Available',
+      'components.Requests.unavailable': 'Unavailable',
+      'components.Requests.failed': 'Failed',
+      'components.Requests.declined': 'Declined',
+      'components.Requests.cancelled': 'Cancelled',
+      'components.Requests.pending': 'Pending',
+      'components.Requests.completed': 'Completed',
+      'components.Requests.statusUpdated': 'Status Updated',
+      'i18n.unknown': 'Unknown',
+      'components.Requests.history': 'History',
+      'components.RequestStatus.SoftwareRequests.approve': 'Approve',
+      'components.RequestStatus.SoftwareRequests.approved': 'Approved',
+      'components.RequestStatus.SoftwareRequests.available': 'Available',
+      'components.RequestStatus.SoftwareRequests.cancel': 'Cancel',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'Cancelled',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'Clear cancelled request',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        'Clear This Cancelled Request?',
+      'components.RequestStatus.SoftwareRequests.decline': 'Decline',
+      'components.RequestStatus.SoftwareRequests.declined': 'Declined',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'Download copies',
+      'components.RequestStatus.SoftwareRequests.downloading': 'Downloading',
+      'components.RequestStatus.SoftwareRequests.failed': 'Failed',
+      'components.RequestStatus.SoftwareRequests.history': 'History',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'Loading status history…',
+      'components.RequestStatus.SoftwareRequests.importing': 'Verifying Import',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'This software request could not be updated.',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        'No saved status updates are available.',
+      'components.RequestStatus.SoftwareRequests.pending': 'Pending Approval',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'Remove from Requests',
+      'components.RequestStatus.SoftwareRequests.retry': 'Retry',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'The provider cannot confirm whether the previous download started. Check the download client’s queue and history. Continue only if no matching download exists.',
+      'components.RequestStatus.SoftwareRequests.searching': 'Searching',
+      'components.RequestStatus.SoftwareRequests.title': 'Software Requests',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'Withdraw',
+      'i18n.back': 'Back',
+      'downloads.actions': 'Action history',
+      'downloads.active': 'Active warnings',
+      'downloads.activeState': 'Needs attention',
+      'downloads.actor': 'User {id}',
+      'downloads.blocked': 'Manually blocklisted',
+      'downloads.blocklist':
+        'Blocklist this release to avoid downloading it again',
+      'downloads.blocklisted': 'Blocklist requested',
+      'downloads.cancel': 'Cancel',
+      'downloads.changed': 'Service configuration changed',
+      'downloads.clientKept': 'Client files kept',
+      'downloads.clientRemoved': 'Client removal requested',
+      'downloads.confirm': 'Confirm rejection',
+      'downloads.copy': 'Copy or hardlink (keep source files)',
+      'downloads.denied': 'Manage Downloads permission is required.',
+      'downloads.description':
+        'Review acquisition warnings, select files for manual import, and reject unwanted downloads.',
+      'downloads.disappeared': 'No longer in the queue',
+      'downloads.empty': 'No download warnings in this view.',
+      'downloads.failed': 'The inbox could not be loaded.',
+      'downloads.failedState': 'Needs review',
+      'downloads.history': 'History',
+      'downloads.import': 'Import selected files',
+      'downloads.importFailed': 'Import failed',
+      'downloads.importMode': 'Import mode',
+      'downloads.importReview':
+        'Import completed without a confirmed file import',
+      'downloads.importWarning':
+        'Confirm the target and review all rejection reasons. The acquisition service determines file quality and episode matching.',
+      'downloads.imported': 'Manually imported',
+      'downloads.importingState': 'Import pending',
+      'downloads.ineligible': 'No confirmed match — cannot import',
+      'downloads.loading': 'Loading download warnings…',
+      'downloads.move': 'Move (remove source files)',
+      'downloads.next': 'Next page',
+      'downloads.noFiles':
+        'No files with a confirmed library target were found.',
+      'downloads.notBlocklisted': 'Release not blocklisted',
+      'downloads.outcome':
+        'Action could not be confirmed. Refresh and review before retrying.',
+      'downloads.partial':
+        'Some acquisition services could not be checked. Their warnings may be missing or out of date.',
+      'downloads.pending':
+        'Action accepted. Refresh to check the backend outcome.',
+      'downloads.preview': 'Preview files',
+      'downloads.previous': 'Previous page',
+      'downloads.recovered': 'Recovered',
+      'downloads.refresh': 'Refresh',
+      'downloads.reject': 'Reject download',
+      'downloads.rejected': 'Manually rejected',
+      'downloads.rejectingState': 'Rejection pending',
+      'downloads.rejection':
+        'Rejecting removes this item from the acquisition queue. Review the options before confirming.',
+      'downloads.remove':
+        'Remove the download and files from its download client',
+      'downloads.resolvedState': 'Resolved',
+      'downloads.search': 'Search',
+      'downloads.select': 'Select {name}',
+      'downloads.targetChoose': 'Choose a library match',
+      'downloads.targetHelp':
+        'Search titles already in this acquisition service. Choosing a match does not add a new title.',
+      'downloads.targetLabel': 'Library match',
+      'downloads.targetNoResults':
+        'No matching titles were found in this service library.',
+      'downloads.targetQuery': 'Movie, series, album, or book',
+      'downloads.targetRequired':
+        'Choose a library match before importing files.',
+      'downloads.targetSelected': 'Selected match: {title}{subtitle}',
+      'downloads.title': 'Download Inbox',
+      'downloads.truncated':
+        'Only the first 20 acquisition services were checked.',
+      'downloads.unknownImport': 'Import outcome unknown',
+      'downloads.unknownReject': 'Rejection outcome unknown',
+      'components.IndexerSearch.accessDenied':
+        'You need Manage Requests permission to search indexers.',
+      'components.IndexerSearch.categories': 'Indexer categories',
+      'components.IndexerSearch.category': 'Media category',
+      'components.IndexerSearch.categoryAdult': 'Adult',
+      'components.IndexerSearch.categoryAudiobook': 'Audiobooks',
+      'components.IndexerSearch.categoryComic': 'Comics',
+      'components.IndexerSearch.categoryEbook': 'Books',
+      'components.IndexerSearch.categoryGame': 'PC games',
+      'components.IndexerSearch.categoryMagazine': 'Magazines',
+      'components.IndexerSearch.categoryModern': 'Modern ROMs',
+      'components.IndexerSearch.categoryMovie': 'Movies',
+      'components.IndexerSearch.categoryMusic': 'Music',
+      'components.IndexerSearch.categoryRetro': 'Retro ROMs',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Open Prowlarr settings',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr could not send this release. Run a new search and try again.',
+      'components.IndexerSearch.grabs': 'Grabs',
+      'components.IndexerSearch.intro':
+        'Search releases in your Prowlarr indexers across every SeerrNG media category.',
+      'components.IndexerSearch.leechers': 'Leechers',
+      'components.IndexerSearch.loadFailed':
+        'Prowlarr search configuration could not be loaded.',
+      'components.IndexerSearch.loadMore': 'Load more results',
+      'components.IndexerSearch.loadingMore': 'Loading…',
+      'components.IndexerSearch.manualMode':
+        'Search results are separate from SeerrNG requests. You can send a result to a download client configured in Prowlarr.',
+      'components.IndexerSearch.noConnection': 'Prowlarr is not connected.',
+      'components.IndexerSearch.noConnectionHelp':
+        'Ask an administrator to connect Prowlarr under Settings > Services.',
+      'components.IndexerSearch.noResults': 'No releases matched this search.',
+      'components.IndexerSearch.noResultsHelp':
+        'Check the category filters and enabled indexers in Prowlarr. Search results do not confirm that an app can import a release.',
+      'components.IndexerSearch.openResult': 'Open indexer details',
+      'components.IndexerSearch.protocol': 'Protocol',
+      'components.IndexerSearch.published': 'Published',
+      'components.IndexerSearch.query': 'Search terms',
+      'components.IndexerSearch.queryPlaceholder':
+        'Title, author, album, issue, or game name',
+      'components.IndexerSearch.requestStillUsesManager':
+        'Sending a result does not change a SeerrNG request. Prowlarr handles the handoff to its configured download client.',
+      'components.IndexerSearch.resultCount':
+        '{count} releases returned by Prowlarr.',
+      'components.IndexerSearch.search': 'Search indexers',
+      'components.IndexerSearch.searchFailed':
+        'Prowlarr search failed. Check the connection and try again.',
+      'components.IndexerSearch.searching': 'Searching indexers…',
+      'components.IndexerSearch.seeders': 'Seeders',
+      'components.IndexerSearch.sendToDownloader': 'Send to downloader',
+      'components.IndexerSearch.sendingToDownloader': 'Sending…',
+      'components.IndexerSearch.sentToDownloader':
+        'Sent to Prowlarr’s configured download client.',
+      'components.IndexerSearch.size': 'Size',
+      'components.IndexerSearch.title': 'Indexer Search',
+      'components.IndexerSearch.tooManySearches':
+        'Search limit reached. Wait a minute before searching again.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'No enabled searchable indexers are available. Enable an indexer in Prowlarr or adjust the category filters.',
+      'components.SettingsProwlarr.addDetectedMatches':
+        'Add detected matches ({count})',
+      'components.SettingsProwlarr.address': 'Hostname',
+      'components.SettingsProwlarr.adult': 'Adult',
+      'components.SettingsProwlarr.apiKey': 'API key',
+      'components.SettingsProwlarr.apiKeySaved':
+        'A key is saved. Leave this blank to keep using it.',
+      'components.SettingsProwlarr.audiobook': 'Audiobooks',
+      'components.SettingsProwlarr.basePath': 'Base path',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'Choose the Prowlarr categories sent with each search. Defaults use standard Newznab/Torznab categories; test the connection to see custom categories advertised by enabled indexers.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'Select at least one category.',
+      'components.SettingsProwlarr.categoryMappingTitle': 'Category filters',
+      'components.SettingsProwlarr.clearApiKey': 'Remove saved API key',
+      'components.SettingsProwlarr.comic': 'Comics',
+      'components.SettingsProwlarr.connected':
+        'Connected to Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'Counts include enabled, searchable indexers that advertise support for at least one selected category. They show search coverage, not successful grabs or imports.',
+      'components.SettingsProwlarr.coverageTitle': 'Indexer coverage by medium',
+      'components.SettingsProwlarr.description':
+        'Optional: connect Prowlarr to run category-aware manual searches from SeerrNG. Approved requests continue through your configured media managers and software providers.',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        'Suggested custom categories are matched by their advertised names. Review them before saving; this does not change Prowlarr or send downloads.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr accepted the management API connection. These results test each enabled searchable indexer separately; disabled-until dates come from Prowlarr.',
+      'components.SettingsProwlarr.diagnosticFailed': 'Failed',
+      'components.SettingsProwlarr.diagnosticOk': 'Connected',
+      'components.SettingsProwlarr.diagnosticTitle':
+        'Indexer connection results',
+      'components.SettingsProwlarr.disabledUntil': 'Disabled until {date}',
+      'components.SettingsProwlarr.ebook': 'Books',
+      'components.SettingsProwlarr.game': 'PC games',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'Choose which enabled Prowlarr indexers are searched for each media type. Use Ctrl-click on Windows/Linux or Command-click on macOS to select multiple indexers. An empty selection disables search for that type.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        'Indexers for {category}',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'Indexer Assignments by Media Type',
+      'components.SettingsProwlarr.indexerCount': 'Indexers: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'Users can open indexer details from search results.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'Indexer names and detail links are hidden from users.',
+      'components.SettingsProwlarr.indexerNotSearchable': '(not searchable)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'Search limits',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'Limit each user’s searches per minute overall and for each selected indexer.',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr is saved, but its indexer inventory is unavailable.',
+      'components.SettingsProwlarr.keepApiKey': 'Keep saved API key',
+      'components.SettingsProwlarr.loadFailed':
+        'Prowlarr settings could not be loaded.',
+      'components.SettingsProwlarr.magazine': 'Magazines',
+      'components.SettingsProwlarr.modern': 'Modern ROMs',
+      'components.SettingsProwlarr.movie': 'Movies',
+      'components.SettingsProwlarr.music': 'Music',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'No Prowlarr indexers are configured yet.',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Test the Prowlarr connection to load its indexers and assign them by category.',
+      'components.SettingsProwlarr.port': 'Port',
+      'components.SettingsProwlarr.recentFailure': 'Recent failure: {date}',
+      'components.SettingsProwlarr.retro': 'Retro ROMs',
+      'components.SettingsProwlarr.save': 'Save Prowlarr settings',
+      'components.SettingsProwlarr.saveFailed':
+        'Prowlarr settings could not be saved.',
+      'components.SettingsProwlarr.saved': 'Prowlarr settings saved.',
+      'components.SettingsProwlarr.saving': 'Saving…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        'Enter a whole number from 1 to 60.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        'Maximum searches per user per minute on {indexer}',
+      'components.SettingsProwlarr.searchesPerUser':
+        'Maximum searches per user per minute',
+      'components.SettingsProwlarr.selectedCategories':
+        '{count} categories selected',
+      'components.SettingsProwlarr.selectedIndexers':
+        '{count} indexers selected',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'Allow indexer names and details in search results',
+      'components.SettingsProwlarr.sports': 'Sports',
+      'components.SettingsProwlarr.supportNote':
+        'This setting connects to Prowlarr only. NZBHydra2 is not currently supported here.',
+      'components.SettingsProwlarr.test':
+        'Test connection and inspect coverage',
+      'components.SettingsProwlarr.testFailed':
+        'Prowlarr connection failed. Check the address and API key.',
+      'components.SettingsProwlarr.testHint':
+        'Searches started from SeerrNG query Prowlarr directly. Approved requests still go through their configured media manager or software provider, which owns acquisition and tracking.',
+      'components.SettingsProwlarr.testing': 'Checking Prowlarr…',
+      'components.SettingsProwlarr.title': 'Prowlarr indexers',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} searchable and enabled of {total} configured',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'Use SSL',
+      'components.Settings.SettingsLogs.logs': 'Logs',
+      'components.Settings.SettingsLogs.searchLogs': 'Search logs',
+      'components.Settings.SettingsLogs.level': 'Severity',
+      'components.Settings.SettingsLogs.filterDebug': 'Debug',
+      'components.Settings.SettingsLogs.filterInfo': 'Info',
+      'components.Settings.SettingsLogs.filterWarn': 'Warning',
+      'components.Settings.SettingsLogs.filterError': 'Error',
+      'components.Settings.SettingsLogs.logDetails': 'Log Details',
+      'components.Settings.SettingsLogs.copyToClipboard': 'Copy to Clipboard',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Copied log message to clipboard.',
+      'components.Settings.SettingsJobsCache.runnow': 'Run Now',
+      'components.Settings.SettingsJobsCache.canceljob': 'Cancel Job',
+      'components.Settings.SettingsJobsCache.process': 'Process',
+      'components.Settings.SettingsJobsCache.command': 'Command',
+      'components.Settings.SettingsJobsCache.enabled': 'Enabled',
+      'components.Settings.SettingsJobsCache.disabled': 'Disabled',
+      'components.Settings.SettingsJobsCache.cachehits': 'Hits',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Total Keys',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Misses',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS Cache',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Hits',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Misses',
+      'components.Settings.SettingsJobsCache.failures': 'Failures',
+      'components.Settings.SettingsJobsCache.flushcache': 'Flush Cache',
+      'components.Settings.SettingsJobsCache.hitRate': 'Hit Rate',
+      'components.Settings.SettingsJobsCache.imagecachecount': 'Images Cached',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 Fallbacks',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'Installed',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Latest',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Release data is currently unavailable.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Releases',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'View on GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'About SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': 'Data Directory',
+      'components.Settings.SettingsAbout.documentation': 'Documentation',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'GitHub Discussions',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG is intended for lawful personal media management. The project does not condone piracy or copyright infringement. Users are responsible for complying with applicable laws, licenses, and service terms in their region.',
+      'components.Settings.SettingsAbout.legalUseTitle': 'Legal Use',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'Metadata attribution',
+      'components.Settings.SettingsAbout.supportdevelopment':
+        'Support Development',
+      'components.Settings.SettingsAbout.timezone': 'Time Zone',
+      'components.Settings.SettingsAbout.totalmedia': 'Total Media',
+      'components.Settings.SettingsAbout.totalrequests': 'Total Requests',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB. <ApiTermsLink>TMDB API terms</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'Could not check for updates',
+      'components.Settings.SettingsAbout.uptodate': 'Up to Date',
+      'components.Settings.SettingsAbout.version': 'Version',
+      'components.Settings.SettingsCategories.title': 'Media Categories',
+      'components.Settings.SettingsCategories.description':
+        'Choose which categories everyone can browse and request. Disabled categories disappear from navigation and discovery, and new requests are blocked. Existing requests and download history stay available in Request Status.',
+      'components.Settings.SettingsCategories.groupTitle':
+        'Available Categories',
+      'components.Settings.SettingsCategories.groupDescription':
+        'These switches control category availability across SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'Movies',
+      'components.Settings.SettingsCategories.tv': 'Series',
+      'components.Settings.SettingsCategories.music': 'Music',
+      'components.Settings.SettingsCategories.ebook': 'Books',
+      'components.Settings.SettingsCategories.audiobook': 'Audiobooks',
+      'components.Settings.SettingsCategories.comic': 'Comics',
+      'components.Settings.SettingsCategories.magazine': 'Magazines',
+      'components.Settings.SettingsCategories.adult': 'Adult',
+      'components.Settings.SettingsCategories.retro': 'Emulation (Retro)',
+      'components.Settings.SettingsCategories.modern': 'Emulation (Modern)',
+      'components.Settings.SettingsCategories.game': 'PC Games',
+      'components.Settings.SettingsCategories.movieDescription':
+        'Allow movie discovery and requests.',
+      'components.Settings.SettingsCategories.tvDescription':
+        'Allow series discovery and requests.',
+      'components.Settings.SettingsCategories.musicDescription':
+        'Allow music discovery and requests.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'Allow book discovery and requests.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'Allow audiobook discovery and requests.',
+      'components.Settings.SettingsCategories.comicDescription':
+        'Allow comic discovery and requests.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'Allow magazine discovery and requests.',
+      'components.Settings.SettingsCategories.adultDescription':
+        'Allow adult-scene discovery and requests. Requires a configured Whisparr v3 service and adult-specific user permission.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'Allow retro ROM discovery and requests.',
+      'components.Settings.SettingsCategories.modernDescription':
+        'Allow modern emulation ROM discovery and requests.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'Allow PC game discovery and requests.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'Adult content is visible to everyone with access',
+      'components.Settings.SettingsCategories.adultWarning':
+        'If you share this instance with family or expose it through a reverse proxy, anyone granted Request Adult can see what you browse and request. Flag family accounts as restricted below, or under each user’s Permissions, so they never see Adult content.',
+      'components.Settings.SettingsCategories.ageGateTitle': 'Age Gate',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'Restricted accounts cannot see or request Adult content, and mature movies, series, music, books, comics, and tagged titles are hidden server-side. Filtering uses provider ratings and tags and is best-effort for titles without metadata.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'Restrict accounts by default',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'Accounts without an explicit setting are restricted. Administrators are exempt.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'Highest movie rating',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'Restricted accounts cannot see movies rated above this.',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'Highest series rating',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'Restricted accounts cannot see series rated above this.',
+      'components.Settings.SettingsCategories.ageGateCountry': 'Rating country',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'Two-letter country code whose ratings are used, for example US.',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'Category settings saved.',
+      'components.Settings.SettingsCategories.saveFailure':
+        'Category settings could not be saved.',
       'lumen.nav.administration': 'Administration',
       'lumen.nav.lumenSettings': 'Lumen Settings',
       'lumen.nav.seerrAdministration': 'SeerrNG Administration',
@@ -2173,6 +3986,42 @@ export const localeData = [
         'Check your current password and account permissions.',
       'lumen.account.passwordChangeUnconfirmed':
         'Could not confirm the password change. Check your credentials before trying again.',
+      'lumen.account.profileSaveMismatch':
+        'SeerrNG saved different values. Review the updated profile.',
+      'lumen.account.profileConfirmFailure':
+        'SeerrNG accepted the save, but the updated profile could not be loaded.',
+      'lumen.account.profileSaveForbidden':
+        'You do not have permission to change these settings.',
+      'lumen.account.profileSaveFailure':
+        'Could not save the profile. Check the values and try again.',
+      'lumen.account.managedByPlex': 'Managed by Plex.',
+      'lumen.account.loadMediaLanguagesFailure':
+        'Could not load media languages',
+      'lumen.account.plexWatchlistTip':
+        'Automatically request titles added to the Plex Watchlist.',
+      'lumen.account.loadProfileFailure': 'Could not load profile settings',
+      'lumen.account.loadingProfileSettings': 'Loading profile settings…',
+      'lumen.account.loadPasswordFailure': 'Could not load password settings',
+      'lumen.account.loadingPasswordSettings': 'Loading password settings…',
+      'lumen.account.administratorAccess':
+        'This account has administrator access.',
+      'lumen.account.noAdditionalPermissions':
+        'No additional permissions are assigned to this account.',
+      'lumen.account.retry': 'Retry',
+      'lumen.account.loadSessionExpired': 'Your session ended. Sign in again.',
+      'lumen.account.loadForbidden':
+        'You do not have permission to view this information.',
+      'lumen.account.loadTimeout':
+        'The server took too long to answer. Try again.',
+      'lumen.account.loadRateLimited':
+        'Too many requests. Wait a minute and try again.',
+      'lumen.account.loadServerFailure':
+        'The server had a problem. Try again in a moment.',
+      'lumen.account.loadNetworkFailure':
+        'Couldn’t reach the server. Check your connection and try again.',
+      'lumen.account.loadOffline':
+        'You’re offline. Check your connection and try again.',
+      'lumen.account.loadUnknownFailure': 'Could not load this information.',
       'lumen.account.saveThemeColors': 'Save Theme Colors',
       'lumen.account.themeOverrideConfirmFailure':
         'The server accepted the save, but Lumen could not confirm the updated colors.',
@@ -2727,6 +4576,382 @@ export const localeData = [
       'lumen.recordings.maxFollowedTeams': 'You can follow up to 20 teams.',
       'lumen.permission.manageSettings': 'Manage Settings',
       'lumen.permission.vote': 'Vote',
+      'lumen.clientTokens.title': 'Client Tokens',
+      'lumen.clientTokens.description':
+        'Connect a client with your account’s Discover or Request access. Up to ten unexpired tokens are allowed. Changing your password invalidates them.',
+      'lumen.clientTokens.retry': 'Retry',
+      'lumen.clientTokens.loadFailureTitle': 'Could not load client tokens',
+      'lumen.clientTokens.loading': 'Loading client tokens…',
+      'lumen.clientTokens.loadSessionExpired':
+        'Your session ended. Sign in again.',
+      'lumen.clientTokens.loadForbidden':
+        'You don’t have permission to do that.',
+      'lumen.clientTokens.loadTimeout':
+        'The server took too long to answer. Try again.',
+      'lumen.clientTokens.loadRateLimited':
+        'Too many requests. Wait a minute and try again.',
+      'lumen.clientTokens.loadServerFailure':
+        'The server had a problem. Try again in a moment.',
+      'lumen.clientTokens.loadNetworkFailure':
+        'Couldn’t reach the server. Check your connection and try again.',
+      'lumen.clientTokens.loadOffline':
+        'You’re offline. Check your connection and try again.',
+      'lumen.clientTokens.loadUnknownFailure': 'Failed to load',
+      'lumen.clientTokens.newToken': 'New Token',
+      'lumen.clientTokens.secretShownOnce':
+        'Copy this token now. SeerrNG shows it only once.',
+      'lumen.clientTokens.newTokenLabel': 'New Client Token',
+      'lumen.clientTokens.copyToken': 'Copy Token',
+      'lumen.clientTokens.dismissToken': 'Dismiss Token',
+      'lumen.clientTokens.createToken': 'Create Token',
+      'lumen.clientTokens.tokenName': 'Token Name',
+      'lumen.clientTokens.access': 'Access',
+      'lumen.clientTokens.discoverAndRequest': 'Discover and Request',
+      'lumen.clientTokens.discoverOnly': 'Discover Only',
+      'lumen.clientTokens.requestOnly': 'Request Only',
+      'lumen.clientTokens.expiresAfter': 'Expires After',
+      'lumen.clientTokens.day': '{count} day',
+      'lumen.clientTokens.days': '{count} days',
+      'lumen.clientTokens.yourTokens': 'Your Tokens',
+      'lumen.clientTokens.empty': 'No client tokens yet.',
+      'lumen.clientTokens.discover': 'Discover',
+      'lumen.clientTokens.request': 'Request',
+      'lumen.clientTokens.expired': 'Expired',
+      'lumen.clientTokens.expires': 'Expires',
+      'lumen.clientTokens.revokeNamed': 'Revoke token {name}',
+      'lumen.clientTokens.revoke': 'Revoke',
+      'lumen.clientTokens.revokeTitle': 'Revoke this token?',
+      'lumen.clientTokens.revokeBody': '“{name}” will lose access immediately.',
+      'lumen.clientTokens.revokeToken': 'Revoke Token',
+      'lumen.clientTokens.keepToken': 'Keep Token',
+      'lumen.clientTokens.revoked': 'Token revoked.',
+      'lumen.clientTokens.revokeFailure':
+        'Could not confirm revocation. Refresh the list before trying again.',
+      'lumen.clientTokens.limitReached':
+        'Revoke an existing client token before creating another.',
+      'lumen.clientTokens.createFailure':
+        'Could not confirm token creation. Check your token list before trying again.',
+      'lumen.clientTokens.copied': 'Token copied.',
+      'lumen.clientTokens.copyFailure':
+        'Copy the token manually from the field.',
+      'lumen.resetPassword.passwordsMustMatch': 'The passwords must match.',
+      'lumen.resetPassword.tooManyAttempts':
+        'Too many attempts. Wait a moment and try again.',
+      'lumen.resetPassword.emailUnavailable':
+        'Password recovery email is unavailable. Contact your administrator.',
+      'lumen.resetPassword.resetFailure':
+        'Could not reset your password. Try again or request a new link.',
+      'lumen.resetPassword.requestFailure':
+        'Could not request a reset link. Please try again.',
+      'lumen.resetPassword.title': 'Reset Your Password',
+      'lumen.resetPassword.passwordReset': 'Your password has been reset.',
+      'lumen.resetPassword.requested':
+        'If that address is associated with an account, you’ll receive a password reset link.',
+      'lumen.resetPassword.newPassword': 'New Password',
+      'lumen.resetPassword.confirmPassword': 'Confirm Password',
+      'lumen.resetPassword.email': 'Email',
+      'lumen.resetPassword.resetAction': 'Reset Password',
+      'lumen.resetPassword.requestAction': 'Email Recovery Link',
+      'lumen.resetPassword.requestNewLink': 'Request a New Link',
+      'lumen.resetPassword.backToSignIn': 'Back to Sign In',
+      'lumen.login.back': 'Back',
+      'lumen.login.cancel': 'Cancel',
+      'lumen.login.companion': 'Lumen Companion',
+      'lumen.login.continueLink': 'Continue with Sign-In Link',
+      'lumen.login.continueServer': 'Continue with {serverName}',
+      'lumen.login.disabled':
+        'Sign-in is disabled. Contact your administrator.',
+      'lumen.login.email': 'Email',
+      'lumen.login.errorConnection':
+        'Couldn’t reach {serverName}. Try again in a moment.',
+      'lumen.login.errorCredentials': 'That username or password isn’t right.',
+      'lumen.login.errorEmail': 'Enter a valid email address.',
+      'lumen.login.errorNoAccess':
+        'This account doesn’t have access yet. Ask whoever runs this server to add you.',
+      'lumen.login.errorTooMany':
+        'Too many sign-in attempts. Wait a few minutes and try again.',
+      'lumen.login.errorUnknown': 'Something went wrong signing in. Try again.',
+      'lumen.login.familySubtitle':
+        'Use the username and password you watch with.',
+      'lumen.login.forgotPassword': 'Forgot Password?',
+      'lumen.login.included': 'Lumen Included with SeerrNG',
+      'lumen.login.moreOptions': 'More Sign-In Options',
+      'lumen.login.oidcCallbackFailure':
+        'OpenID Connect sign-in could not be completed. Start again.',
+      'lumen.login.oidcStartFailure':
+        'Could not start OpenID Connect sign-in. Check the provider configuration and SeerrNG application URL.',
+      'lumen.login.openFullSeerr': 'Open Full SeerrNG',
+      'lumen.login.password': 'Password',
+      'lumen.login.quickGettingCode': 'Getting a Code…',
+      'lumen.login.quickInstructions':
+        'On {serverName}, open Settings → Quick Connect and enter this code.',
+      'lumen.login.quickWaiting': 'Waiting for Approval…',
+      'lumen.login.serverSubtitle':
+        'Use the same account you use for {serverName}.',
+      'lumen.login.serverUsername': '{serverName} Username',
+      'lumen.login.signIn': 'Sign In',
+      'lumen.login.signInProvider': 'Sign In with {providerName}',
+      'lumen.login.signInServer': 'Sign In with {serverName}',
+      'lumen.login.signInWithCode': 'Sign In with a Code',
+      'lumen.login.titleBooks': 'Sign In to Request Movies, Series and Books',
+      'lumen.login.titleVideo': 'Sign In to Request Movies and Series',
+      'lumen.login.useEmailInstead': 'Use an Email and Password Instead',
+      'lumen.login.useQuickConnect': 'Use Quick Connect Instead',
+      'lumen.login.useServerInstead': 'Use Your {serverName} Account Instead',
+      'lumen.login.username': 'Username',
+      'lumen.login.retry': 'Retry',
+      'lumen.login.serverUnreachable':
+        'Can’t reach the server. Check your connection and try again.',
+      'lumen.requestHistory.openTitle': 'Open Title',
+      'lumen.requestHistory.item': 'request history',
+      'lumen.requestHistory.invalid': 'Invalid request history response.',
+      'lumen.requestHistory.loading': 'Loading request history…',
+      'lumen.requestHistory.requestNumber': 'Request #{id}',
+      'lumen.requestHistory.currentStatus': 'Current status: {status}',
+      'lumen.requestHistory.unknown': 'Unknown',
+      'lumen.requestHistory.episodes': 'Episodes {episodes}',
+      'lumen.requestHistory.overQuota': 'Over Quota',
+      'lumen.requestHistory.findDownloadFiles': 'Find Download Files',
+      'lumen.requestHistory.noHistory':
+        'No history has been recorded for this request.',
+      'lumen.requestHistory.showingLatest':
+        'Showing the latest {shown} of {total} events.',
+      'lumen.requestHistory.refresh': 'Refresh Status',
+      'lumen.requestHistory.downloadedSize': '{complete} of {total} downloaded',
+      'lumen.requestHistory.downloadCount': '{count} downloads',
+      'lumen.requestHistory.estimatedCompletion': 'Estimated completion',
+      'lumen.requestHistory.ebook': 'Ebook',
+      'lumen.requestHistory.audiobook': 'Audiobook',
+      'lumen.requestHistory.importPending': 'import pending',
+      'lumen.requestHistory.attempt': 'Attempt {count}',
+      'lumen.requestHistory.ofAttempts': 'of {count}',
+      'lumen.requestHistory.nextAttempt': 'Next attempt',
+      'lumen.requestHistory.requestedSeasons': 'Requested seasons',
+      'lumen.requestHistory.changeRequest': 'Change',
+      'lumen.requestHistory.removeRequest': 'Remove',
+      'lumen.softwareHistory.confirmDecline': 'Decline this software request?',
+      'lumen.softwareHistory.confirmWithdraw':
+        'Withdraw this pending software request?',
+      'lumen.softwareHistory.confirmCancel': 'Cancel this software request?',
+      'lumen.softwareHistory.confirmStopTracking':
+        'Remove this request and its history from SeerrNG? The provider download will continue.',
+      'lumen.softwareHistory.confirmAction': 'Confirm {action}',
+      'lumen.softwareHistory.confirmAfterNoDownload':
+        'No Download Found — {action}',
+      'lumen.softwareHistory.selectionEdition': 'Complete Edition',
+      'lumen.softwareHistory.selectionOneAddon': '1 Add-on',
+      'lumen.softwareHistory.selectionManyAddons': '{count} Add-ons',
+      'lumen.softwareHistory.selectionAddons': 'Selected Add-ons',
+      'lumen.softwareHistory.openPatchVersion': 'Open Requested Patch Version',
+      'lumen.softwareHistory.openPatchProject': 'Open Patch Project',
+      'lumen.softwareHistory.keepOriginal': 'Keep original',
+      'lumen.softwareHistory.replaceOriginal': 'Replace original',
+      'lumen.downloads.page': 'Page {page}',
+      'lumen.downloads.previewFailed': 'Could not preview these files.',
+      'lumen.downloads.searchFailed': 'Could not search this service library.',
+      'lumen.downloads.actionFailed':
+        'Could not confirm the action: {message} Check the current warning before retrying.',
+      'lumen.downloads.previewLoading': 'Loading file preview…',
+      'lumen.indexerSearch.noCategories':
+        'No enabled media categories are available to this account.',
+      'lumen.indexerSearch.resultsFound':
+        'Results returned by Prowlarr: {count}.',
+      'lumen.indexerSearch.handoffUnconfirmed':
+        'Handoff could not be confirmed. Check the client before searching and trying again.',
+      'lumen.adminProwlarr.connectionHeading': 'Connection',
+      'lumen.adminProwlarr.availableCategories':
+        'Available Prowlarr Categories',
+      'lumen.adminProwlarr.categoryIdsLabel': '{category} Category IDs',
+      'lumen.adminProwlarr.assignedCount': '{category} · {count} assigned',
+      'lumen.adminProwlarr.searchLimitLabel': '{indexer} Search Limit',
+      'lumen.adminProwlarr.coverageSummary':
+        '{enabled} searchable indexers of {total}.',
+      'lumen.adminProwlarr.version': 'Version {version}.',
+      'lumen.adminProwlarr.disabled': 'Disabled',
+      'lumen.adminProwlarr.searchEnabled': 'Search Enabled',
+      'lumen.adminProwlarr.searchUnavailable': 'Search Unavailable',
+      'lumen.adminProwlarr.indexer': 'Indexer {id}',
+      'lumen.adminProwlarr.connectionTested': 'Prowlarr connection tested.',
+      'lumen.adminProwlarr.invalidSettings':
+        'Check the port, search limits, category IDs and indexer assignments.',
+      'lumen.adminProwlarr.loadingIndexers': 'Loading indexers…',
+      'lumen.adminProwlarr.backToYou': 'Back to Account',
+      'lumen.adminProwlarr.loadingSettings': 'Loading Prowlarr settings…',
+      'lumen.adminProwlarr.indexerCount': '{count} indexers',
+      'lumen.adminProwlarr.savedApiKeyPlaceholder': 'Saved key',
+      'lumen.adminLogs.title': 'System Logs',
+      'lumen.adminLogs.backToAccount': 'Back to Account',
+      'lumen.adminLogs.refresh': 'Refresh',
+      'lumen.adminLogs.liveRefresh': 'Live Refresh',
+      'lumen.adminLogs.search': 'Search',
+      'lumen.adminLogs.pageSize': 'Page Size',
+      'lumen.adminLogs.level.debug': 'Debug and above',
+      'lumen.adminLogs.level.info': 'Info and above',
+      'lumen.adminLogs.level.warn': 'Warnings and errors',
+      'lumen.adminLogs.level.error': 'Errors only',
+      'lumen.adminLogs.copyFailure': 'Could not copy the log entry.',
+      'lumen.adminLogs.loading': 'Loading system logs…',
+      'lumen.adminLogs.noResults': 'No logs match these filters.',
+      'lumen.adminLogs.systemLogs': 'system logs',
+      'lumen.adminLogs.page': 'Page {page}',
+      'lumen.adminLogs.previousPage': 'Previous Page',
+      'lumen.adminLogs.nextPage': 'Next Page',
+      'lumen.adminJobs.title': 'Scheduled Jobs',
+      'lumen.adminJobs.backToAccount': 'Back to Account',
+      'lumen.adminJobs.systemCaches': 'System Caches',
+      'lumen.adminJobs.refresh': 'Refresh',
+      'lumen.adminJobs.scheduledJobs': 'scheduled jobs',
+      'lumen.adminJobs.loading': 'Loading scheduled jobs…',
+      'lumen.adminJobs.empty': 'No scheduled jobs.',
+      'lumen.adminJobs.running': 'Running',
+      'lumen.adminJobs.idle': 'Idle',
+      'lumen.adminJobs.nextRun': 'Next run {date}',
+      'lumen.adminJobs.cronSchedule': 'Cron Schedule',
+      'lumen.adminJobs.saveSchedule': 'Save Schedule',
+      'lumen.adminJobs.cancelEditing': 'Cancel Editing',
+      'lumen.adminJobs.editSchedule': 'Edit Schedule',
+      'lumen.adminJobs.disableSchedule': 'Disable Schedule',
+      'lumen.adminJobs.enableSchedule': 'Enable Schedule',
+      'lumen.adminJobs.cancellationUnavailable': 'Cancellation Unavailable',
+      'lumen.adminJobs.goBack': 'Go Back',
+      'lumen.adminJobs.updateFailure': 'The job could not be updated.',
+      'lumen.adminJobs.frequency.label': 'Frequency',
+      'lumen.adminJobs.frequency.custom': 'Custom Schedule',
+      'lumen.adminJobs.frequency.daily': 'Daily at 01:00',
+      'lumen.adminJobs.frequency.atSeconds': 'At Seconds 0 and 45 Each Minute',
+      'lumen.adminJobs.frequency.days.one': 'Every {count} Day of the Month',
+      'lumen.adminJobs.frequency.days.two': 'Every {count} Days of the Month',
+      'lumen.adminJobs.frequency.days.few': 'Every {count} Days of the Month',
+      'lumen.adminJobs.frequency.days.many': 'Every {count} Days of the Month',
+      'lumen.adminJobs.frequency.days.other': 'Every {count} Days of the Month',
+      'lumen.adminJobs.frequency.seconds.one': 'Every {count} second',
+      'lumen.adminJobs.frequency.seconds.two': 'Every {count} seconds',
+      'lumen.adminJobs.frequency.seconds.few': 'Every {count} seconds',
+      'lumen.adminJobs.frequency.seconds.many': 'Every {count} seconds',
+      'lumen.adminJobs.frequency.seconds.other': 'Every {count} seconds',
+      'lumen.adminJobs.frequency.minutes.one': 'Every {count} minute',
+      'lumen.adminJobs.frequency.minutes.two': 'Every {count} minutes',
+      'lumen.adminJobs.frequency.minutes.few': 'Every {count} minutes',
+      'lumen.adminJobs.frequency.minutes.many': 'Every {count} minutes',
+      'lumen.adminJobs.frequency.minutes.other': 'Every {count} minutes',
+      'lumen.adminJobs.frequency.hours.one': 'Every {count} hour',
+      'lumen.adminJobs.frequency.hours.two': 'Every {count} hours',
+      'lumen.adminJobs.frequency.hours.few': 'Every {count} hours',
+      'lumen.adminJobs.frequency.hours.many': 'Every {count} hours',
+      'lumen.adminJobs.frequency.hours.other': 'Every {count} hours',
+      'lumen.adminCaches.title': 'System Caches',
+      'lumen.adminCaches.scheduledJobs': 'Scheduled Jobs',
+      'lumen.adminCaches.refresh': 'Refresh',
+      'lumen.adminCaches.systemCaches': 'system caches',
+      'lumen.adminCaches.loading': 'Loading system caches…',
+      'lumen.adminCaches.apiCaches': 'API Caches',
+      'lumen.adminCaches.noApiCaches': 'No API caches.',
+      'lumen.adminCaches.keyBytes': 'key bytes',
+      'lumen.adminCaches.valueBytes': 'value bytes',
+      'lumen.adminCaches.flush': 'Flush',
+      'lumen.adminCaches.imageCaches': 'Image Caches',
+      'lumen.adminCaches.diskLocation': 'Disk cache location',
+      'lumen.adminCaches.tmdbImages': 'TMDB Images',
+      'lumen.adminCaches.avatars': 'Avatars',
+      'lumen.adminCaches.bytes': 'bytes',
+      'lumen.adminCaches.dnsUnavailable': 'DNS cache data is unavailable.',
+      'lumen.adminCaches.noDnsEntries': 'No DNS cache entries.',
+      'lumen.adminCaches.secondsOld': '{count}s old',
+      'lumen.adminCaches.flushDnsEntry': 'Flush DNS Entry',
+      'lumen.adminCaches.confirmFlush': 'Flush Cache?',
+      'lumen.adminCaches.flushFailure': 'Could not flush this cache.',
+      'lumen.adminCaches.cacheFlushed': 'Flushed {name}.',
+      'lumen.adminCaches.dnsFlushed': 'Flushed {name}.',
+      'lumen.adminCaches.metric.size': 'Size',
+      'lumen.adminAbout.backToAccount': 'Back to Account',
+      'lumen.adminAbout.serverInformation': 'server information',
+      'lumen.adminAbout.serverInformationTitle': 'Server Information',
+      'lumen.adminAbout.loadingServerInformation':
+        'Loading server information…',
+      'lumen.adminAbout.unavailable': 'Unavailable',
+      'lumen.adminAbout.versionCheckDisabled': 'Version check disabled',
+      'lumen.adminAbout.updateAvailable': 'Update available',
+      'lumen.adminAbout.supportAndReleases': 'Support and Releases',
+      'lumen.adminAbout.releaseNotes': 'Release Notes',
+      'lumen.adminAbout.discord': 'Discord',
+      'lumen.adminAbout.releaseHistory.title': 'Release History',
+      'lumen.adminAbout.releaseHistory.show': 'Show Releases',
+      'lumen.adminAbout.releaseHistory.hide': 'Hide Releases',
+      'lumen.adminAbout.releaseHistory.loadingNotes': 'Loading release notes…',
+      'lumen.adminAbout.releaseHistory.failure':
+        'Release history could not be loaded.',
+      'lumen.adminAbout.releaseHistory.retry': 'Retry',
+      'lumen.adminAbout.releaseHistory.loading': 'Loading releases…',
+      'lumen.adminAbout.developmentBuild':
+        'This server is running a development build.',
+      'lumen.adminCategories.backToAccount': 'Back to Account',
+      'lumen.adminCategories.categoriesWhat': 'media categories',
+      'lumen.adminCategories.loading': 'Loading media categories…',
+      'lumen.adminCategories.unavailable': 'Category settings are unavailable.',
+      'lumen.adminCategories.saveCategories': 'Save Categories',
+      'lumen.adminCategories.saveDefaultCategories': 'Save Default Categories',
+      'lumen.adminCategories.defaultUserCategories': 'Default User Categories',
+      'lumen.adminCategories.defaultsDescription':
+        'These choices apply to accounts that inherit the defaults. Instance-wide category restrictions still apply.',
+      'lumen.adminCategories.defaultCategoriesSaved':
+        'Default categories saved.',
+      'lumen.adminCategories.confirmFailure':
+        'The server did not confirm the saved categories.',
+      'lumen.adminCategories.ageGateConfirmFailure':
+        'The server did not confirm the saved Age Gate settings.',
+      'lumen.adminCategories.ageGateSaved': 'Age Gate settings saved.',
+      'lumen.adminCategories.ageGateSaveFailure':
+        'Could not save Age Gate settings.',
+      'lumen.adminCategories.saveAgeGate': 'Save Age Gate',
+      'lumen.adminCategories.adultEnabledNote':
+        'Adult discovery requires a configured Whisparr v3 service and account permission. Restricted accounts cannot access it.',
+      'lumen.mediaCategory.sports': 'Sports',
+      'lumen.error.sessionEnded': 'Your session ended. Sign in again.',
+      'lumen.error.noPermission': 'You don’t have permission to do that.',
+      'lumen.error.timeout': 'The server took too long to answer. Try again.',
+      'lumen.error.rateLimited':
+        'Too many requests. Wait a minute and try again.',
+      'lumen.error.serverProblem':
+        'The server had a problem. Try again in a moment.',
+      'lumen.error.offline':
+        'You’re offline. Check your connection and try again.',
+      'lumen.error.serverUnreachable':
+        'Couldn’t reach the server. Check your connection and try again.',
+      'lumen.adminConnectionHosts.title': 'Connection Hosts',
+      'lumen.adminConnectionHosts.backToAccount': 'Back to Account',
+      'lumen.adminConnectionHosts.sectionTitle': 'Saved Hosts',
+      'lumen.adminConnectionHosts.description':
+        'Save hostnames or IP addresses to reuse in service settings. Reusing a saved address changes only the hostname or IP, without a scheme or port. It does not test or connect to the host.',
+      'lumen.adminConnectionHosts.empty': 'No connection hosts saved.',
+      'lumen.adminConnectionHosts.name': 'Name',
+      'lumen.adminConnectionHosts.hostname': 'Hostname',
+      'lumen.adminConnectionHosts.removeHost': 'Remove host {index}',
+      'lumen.adminConnectionHosts.remove': 'Remove Host',
+      'lumen.adminConnectionHosts.add': 'Add Host',
+      'lumen.adminConnectionHosts.save': 'Save Changes',
+      'lumen.adminConnectionHosts.discard': 'Discard Changes',
+      'lumen.adminConnectionHosts.saved': 'Connection hosts saved.',
+      'lumen.adminConnectionHosts.saveFailure':
+        'Could not save connection hosts.',
+      'lumen.adminConnectionHosts.what': 'connection hosts',
+      'lumen.adminConnectionHosts.loadFailureTitle':
+        'Could not load connection hosts',
+      'lumen.adminConnectionHosts.retry': 'Retry',
+      'lumen.adminConnectionHosts.loading': 'Loading connection hosts…',
+      'lumen.adminConnectionHosts.invalidPayload':
+        'The saved hosts are invalid.',
+      'lumen.adminConnectionHosts.maximumHosts':
+        'Save at most 16 connection hosts.',
+      'lumen.adminConnectionHosts.requiredFields':
+        'Each saved host needs a name and hostname.',
+      'lumen.adminConnectionHosts.invalidHost':
+        'Enter a host name up to 64 characters and a hostname or IP address without a scheme or port.',
+      'lumen.adminConnectionHosts.portIncluded':
+        'Saved hostnames must not include a port.',
+      'lumen.adminConnectionHosts.invalidAddress':
+        'Enter a valid saved hostname or IP address.',
+      'lumen.adminConnectionHosts.duplicateName':
+        'Saved host names must be unique.',
     },
   },
   {
@@ -2818,6 +5043,47 @@ export const localeData = [
       'components.PermissionEdit.viewrequests': 'Προβολή Αιτημάτων',
       'components.PermissionEdit.viewwatchlists':
         'Προβολή λιστών παρακολούθησης Plex',
+      'components.IssueDetails.allepisodes': 'Όλα τα επεισόδια',
+      'i18n.back': 'Πίσω',
+      'components.Settings.SettingsLogs.logs': 'Αρχεία καταγραφής',
+      'components.Settings.SettingsLogs.level': 'Σοβαρότητα',
+      'components.Settings.SettingsLogs.filterDebug': 'Εντοπισμός σφαλμάτων',
+      'components.Settings.SettingsLogs.filterInfo': 'Πληροφορίες',
+      'components.Settings.SettingsLogs.filterWarn': 'Προσοχή',
+      'components.Settings.SettingsLogs.filterError': 'Σφάλμα',
+      'components.Settings.SettingsLogs.logDetails':
+        'Λεπτομέρειες αρχείου καταγραφής',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Αντιγραφή στο Πρόχειρο',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Αντιγράφηκε το μήνυμα καταγραφής στο πρόχειρο.',
+      'components.Settings.SettingsJobsCache.runnow': 'Τρέξε τώρα',
+      'components.Settings.SettingsJobsCache.canceljob': 'Ακύρωση Εργασίας',
+      'components.Settings.SettingsJobsCache.process': 'Διεργασία',
+      'components.Settings.SettingsJobsCache.command': 'Εντολή',
+      'components.Settings.SettingsJobsCache.cachehits': 'Κλήσεις',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Σύνολο κλειδιών',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Χαμένες',
+      'components.Settings.SettingsJobsCache.flushcache':
+        'Εκκαθάριση κρυφής μνήμης',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Οι εικόνες έγιναν cache',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Πιο πρόσφατη',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Τα δεδομένα έκδοσης δεν είναι διαθέσιμα αυτή τη στιγμή.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Εκδόσεις',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Προβολή στο GitHub',
+      'components.Settings.SettingsAbout.appDataPath': 'Κατάλογος Δεδομένων',
+      'components.Settings.SettingsAbout.documentation': 'Εγχειρίδιο',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Συζητήσεις στο GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Ζώνη ώρας',
+      'components.Settings.SettingsAbout.totalmedia': 'Σύνολο μέσων',
+      'components.Settings.SettingsAbout.totalrequests': 'Σύνολο αιτημάτων',
+      'components.Settings.SettingsAbout.uptodate': 'Ενημερωμένο',
+      'components.Settings.SettingsAbout.version': 'Έκδοση',
     },
   },
   {
@@ -3170,6 +5436,431 @@ export const localeData = [
         'Ver contenido añadido recientemente',
       'components.PermissionEdit.viewrequests': 'Ver Solicitudes',
       'components.PermissionEdit.viewwatchlists': 'Ver listas de seguimiento',
+      'components.RequestModal.RequestTree.seasonNumber': 'Temporada {number}',
+      'components.RequestModal.RequestTree.specials': 'Especiales',
+      'components.Requests.episodeQueue': 'Cola de episodios',
+      'components.Requests.retry': 'Reintentar',
+      'components.Requests.approve': 'Aprobar',
+      'components.Requests.decline': 'Rechazar',
+      'components.Requests.requested': 'Solicitado',
+      'components.Requests.approved': 'Aprobado',
+      'components.Requests.searching': 'Buscando',
+      'components.Requests.downloading': 'Descargando',
+      'components.Requests.importing': 'Importando',
+      'components.Requests.library': 'Añadiendo a la biblioteca',
+      'components.Requests.available': 'Disponible',
+      'components.Requests.unavailable': 'No disponible',
+      'components.Requests.failed': 'Fallido',
+      'components.Requests.declined': 'Rechazada',
+      'components.Requests.cancelled': 'Cancelada',
+      'components.Requests.pending': 'Pendiente',
+      'components.Requests.completed': 'Completado',
+      'components.Requests.statusUpdated': 'Estado actualizado',
+      'i18n.unknown': 'Desconocido',
+      'components.Requests.history': 'Historia',
+      'components.RequestStatus.SoftwareRequests.approve': 'Aprobar',
+      'components.RequestStatus.SoftwareRequests.approved': 'Aprobado',
+      'components.RequestStatus.SoftwareRequests.available': 'Disponible',
+      'components.RequestStatus.SoftwareRequests.cancel': 'Cancelar',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'Cancelada',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'Eliminar solicitud cancelada',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        '¿Eliminar esta solicitud cancelada?',
+      'components.RequestStatus.SoftwareRequests.decline': 'Rechazar',
+      'components.RequestStatus.SoftwareRequests.declined': 'Rechazada',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'Descargar copias',
+      'components.RequestStatus.SoftwareRequests.downloading': 'Descargando',
+      'components.RequestStatus.SoftwareRequests.failed': 'Fallido',
+      'components.RequestStatus.SoftwareRequests.history': 'Historial',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'Cargando el historial de estados…',
+      'components.RequestStatus.SoftwareRequests.importing':
+        'Verificando importación',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'No se pudo actualizar esta solicitud de software.',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        'No hay actualizaciones de estado guardadas disponibles.',
+      'components.RequestStatus.SoftwareRequests.pending':
+        'Aprobación pendiente',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'Quitar de solicitudes',
+      'components.RequestStatus.SoftwareRequests.retry': 'Reintentar',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'El proveedor no puede confirmar si la descarga anterior se inició. Compruebe la cola y el historial del cliente de descargas. Continúe solo si no hay ninguna descarga coincidente.',
+      'components.RequestStatus.SoftwareRequests.searching': 'Buscando',
+      'components.RequestStatus.SoftwareRequests.title':
+        'Solicitudes de software',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'Retirar',
+      'i18n.back': 'Atrás',
+      'downloads.actions': 'Historia de la acción',
+      'downloads.active': 'Advertencias activas',
+      'downloads.activeState': 'Necesita atención',
+      'downloads.actor': 'Usuario {id}',
+      'downloads.blocked': 'Manualmente bloqueado',
+      'downloads.blocklist':
+        'Bloquear esta versión para evitar descargarla de nuevo',
+      'downloads.blocklisted': 'Bloqueo solicitado',
+      'downloads.cancel': 'Cancelar',
+      'downloads.changed': 'Modificación de la configuración de servicio',
+      'downloads.clientKept': 'Archivos de cliente guardados',
+      'downloads.clientRemoved': 'Retiración del cliente solicitada',
+      'downloads.confirm': 'Confirmación de rechazo',
+      'downloads.copy': 'Copiar o enlace duro (mantener archivos fuente)',
+      'downloads.denied': 'Administrar el permiso de descargas es necesario.',
+      'downloads.description':
+        'Revisa advertencias de adquisición, selecciona archivos para importación manual y rechaza descargas no deseadas.',
+      'downloads.disappeared': 'Ya no en la cola',
+      'downloads.empty': 'No hay advertencias de descarga en esta vista.',
+      'downloads.failed': 'La bandeja de entrada no se puede cargar.',
+      'downloads.failedState': 'Examen de las necesidades',
+      'downloads.history': 'Historia',
+      'downloads.import': 'Importar archivos seleccionados',
+      'downloads.importFailed': 'La importación falló',
+      'downloads.importMode': 'Modo de importación',
+      'downloads.importReview':
+        'Importación completada sin una importación de archivo confirmada',
+      'downloads.importWarning':
+        'Confirme el objetivo y revise todas las razones de rechazo. El servicio de adquisición determina la calidad de archivo y la coincidencia de episodios.',
+      'downloads.imported': 'Importación manual',
+      'downloads.importingState': 'Importación pendiente',
+      'downloads.ineligible':
+        'No hay coincidencia confirmada - no puede importar',
+      'downloads.loading': 'Cargando advertencias de descarga...',
+      'downloads.move': 'Mover (remover archivos fuente)',
+      'downloads.next': 'Página siguiente',
+      'downloads.noFiles':
+        'No se encontraron archivos con un objetivo de biblioteca confirmado.',
+      'downloads.notBlocklisted': 'Lanzamiento no bloqueado',
+      'downloads.outcome':
+        'No se puede confirmar la acción. Refresca y revisa antes de volver a intentarlo.',
+      'downloads.partial':
+        'No se pueden revisar algunos servicios de adquisición. Sus advertencias pueden faltar o salir de la fecha.',
+      'downloads.pending':
+        'Acción aceptada. Refrésquese para comprobar el resultado del backend.',
+      'downloads.preview': 'Previsualizar archivos',
+      'downloads.previous': 'Página anterior',
+      'downloads.recovered': 'Recuperado',
+      'downloads.refresh': 'Actualizar',
+      'downloads.reject': 'Rechazar descarga',
+      'downloads.rejected': 'Rechazado manualmente',
+      'downloads.rejectingState': 'Resolución pendiente',
+      'downloads.rejection':
+        'Rechazar elimina este artículo de la cola de adquisición. Revisa las opciones antes de confirmar.',
+      'downloads.remove':
+        'Eliminar la descarga y los archivos de su cliente de descarga',
+      'downloads.resolvedState': 'Resuelto',
+      'downloads.search': 'Buscar',
+      'downloads.select': 'Seleccione {name}',
+      'downloads.targetChoose': 'Elija un partido de biblioteca',
+      'downloads.targetHelp':
+        'Títulos de búsqueda ya en este servicio de adquisición. Elegir un partido no añade un nuevo título.',
+      'downloads.targetLabel': 'Partido de la biblioteca',
+      'downloads.targetNoResults':
+        'No se encontraron títulos iguales en esta biblioteca de servicios.',
+      'downloads.targetQuery': 'Películas, series, álbumes o libros',
+      'downloads.targetRequired':
+        'Elija un partido de biblioteca antes de importar archivos.',
+      'downloads.targetSelected': 'Selección: {title}{subtitle}',
+      'downloads.title': 'Descargar Inbox',
+      'downloads.truncated':
+        'Sólo se revisaron los primeros 20 servicios de adquisición.',
+      'downloads.unknownImport': 'Resultado de la importación desconocido',
+      'downloads.unknownReject': 'Resultado desconocido',
+      'components.IndexerSearch.accessDenied':
+        'Necesitas el permiso para administrar solicitudes para buscar indexadores.',
+      'components.IndexerSearch.categories': 'Categorías de indexadores',
+      'components.IndexerSearch.category': 'Categoría multimedia',
+      'components.IndexerSearch.categoryAdult': 'Adulto',
+      'components.IndexerSearch.categoryAudiobook': 'Audiolibros',
+      'components.IndexerSearch.categoryComic': 'Cómics',
+      'components.IndexerSearch.categoryEbook': 'Libros',
+      'components.IndexerSearch.categoryGame': 'Juegos de PC',
+      'components.IndexerSearch.categoryMagazine': 'Revistas',
+      'components.IndexerSearch.categoryModern': 'ROM modernas',
+      'components.IndexerSearch.categoryMovie': 'Películas',
+      'components.IndexerSearch.categoryMusic': 'Música',
+      'components.IndexerSearch.categoryRetro': 'ROMs retro',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure':
+        'Abrir la configuración de Prowlarr',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr no pudo enviar esta liberación. Ejecuta una nueva búsqueda e inténtalo de nuevo.',
+      'components.IndexerSearch.grabs': 'Descargas',
+      'components.IndexerSearch.intro':
+        'Busca lanzamientos en tus indexadores de Prowlarr para todas las categorías de contenido de SeerrNG.',
+      'components.IndexerSearch.leechers': 'Leechers',
+      'components.IndexerSearch.loadFailed':
+        'No se pudo cargar la configuración de búsqueda de Prowlarr.',
+      'components.IndexerSearch.loadMore': 'Cargar más resultados',
+      'components.IndexerSearch.loadingMore': 'Cargando…',
+      'components.IndexerSearch.manualMode':
+        'Los resultados de búsqueda son independientes de las solicitudes de SeerrNG. Puedes enviar un resultado a un cliente de descargas configurado en Prowlarr.',
+      'components.IndexerSearch.noConnection': 'Prowlarr no está conectado.',
+      'components.IndexerSearch.noConnectionHelp':
+        'Pídele a un administrador que conecte Prowlarr en Ajustes > Servicios.',
+      'components.IndexerSearch.noResults':
+        'No hay lanzamientos que coincidan con esta búsqueda.',
+      'components.IndexerSearch.noResultsHelp':
+        'Compruebe los filtros de categoría e indexadores habilitados en Prowlarr. Los resultados de la búsqueda no confirman que una aplicación puede importar una liberación.',
+      'components.IndexerSearch.openResult': 'Abrir detalles del indexador',
+      'components.IndexerSearch.protocol': 'Protocolo',
+      'components.IndexerSearch.published': 'Fecha de publicación',
+      'components.IndexerSearch.query': 'Términos de búsqueda',
+      'components.IndexerSearch.queryPlaceholder':
+        'Título, autor, álbum, edición o nombre del juego',
+      'components.IndexerSearch.requestStillUsesManager':
+        'Enviar un resultado no cambia la solicitud de SeerrNG. Prowlarr gestiona la transferencia a su cliente de descargas configurado.',
+      'components.IndexerSearch.resultCount':
+        'Prowlarr devolvió {count} lanzamientos.',
+      'components.IndexerSearch.search': 'Buscar en indexadores',
+      'components.IndexerSearch.searchFailed':
+        'La búsqueda en Prowlarr falló. Revisa la conexión e inténtalo de nuevo.',
+      'components.IndexerSearch.searching': 'Buscando indexadores...',
+      'components.IndexerSearch.seeders': 'Seeders',
+      'components.IndexerSearch.sendToDownloader': 'Enviar al descargador',
+      'components.IndexerSearch.sendingToDownloader': 'Enviando…',
+      'components.IndexerSearch.sentToDownloader':
+        'Enviado al cliente de descarga configurado de Prowlarr.',
+      'components.IndexerSearch.size': 'Tamaño',
+      'components.IndexerSearch.title': 'Búsqueda de indexadores',
+      'components.IndexerSearch.tooManySearches':
+        'Se alcanzó el límite de búsquedas. Espera un minuto antes de volver a buscar.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'No se dispone de indexadores de búsqueda habilitados. Activar un indexador en Prowlarr o ajustar los filtros de categoría.',
+      'components.SettingsProwlarr.addDetectedMatches':
+        'Agregar coincidencias detectadas ({count})',
+      'components.SettingsProwlarr.address': 'Nombre de host',
+      'components.SettingsProwlarr.adult': 'Adulto',
+      'components.SettingsProwlarr.apiKey': 'Clave de API',
+      'components.SettingsProwlarr.apiKeySaved':
+        'Se salva una llave. Deja esto en blanco para seguir usándolo.',
+      'components.SettingsProwlarr.audiobook': 'Audiolibros',
+      'components.SettingsProwlarr.basePath': 'Vía base',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'Elige las categorías Prowlarr enviadas con cada búsqueda. Los defectos usan las categorías estándar Newznab/Torznab; prueba la conexión para ver las categorías personalizadas anunciadas por los indexadores habilitados.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'Seleccione al menos una categoría.',
+      'components.SettingsProwlarr.categoryMappingTitle':
+        'Filtros de categoría',
+      'components.SettingsProwlarr.clearApiKey':
+        'Quitar la clave de API guardada',
+      'components.SettingsProwlarr.comic': 'Cómics',
+      'components.SettingsProwlarr.connected':
+        'Conectado a Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'Los condes incluyen indexadores habilitados y de búsqueda que anuncian soporte para al menos una categoría seleccionada. Muestran cobertura de búsqueda, no tomas exitosas o importaciones.',
+      'components.SettingsProwlarr.coverageTitle':
+        'Cobertura de índice por medio',
+      'components.SettingsProwlarr.description':
+        'Conecte su instancia Prowlarr una vez para ejecutar búsquedas manuales de categoría-conozca a través de los indexadores que ya maneja allí.',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        'Las categorías personalizadas sugeridas se ajustan a sus nombres anunciados. Revise antes de guardar; esto no cambia Prowlarr o envía descargas.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr aceptó la conexión API de gestión. Estos resultados prueban cada indexador permitido de búsqueda por separado; las fechas inhabilitables provienen de Prowlarr.',
+      'components.SettingsProwlarr.diagnosticFailed': 'Fallido',
+      'components.SettingsProwlarr.diagnosticOk': 'Conectado',
+      'components.SettingsProwlarr.diagnosticTitle':
+        'Resultados de conexión de indexador',
+      'components.SettingsProwlarr.disabledUntil': 'Discapacitados {date}',
+      'components.SettingsProwlarr.ebook': 'Libros',
+      'components.SettingsProwlarr.game': 'PC juegos',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'Selecciona qué indexadores de Prowlarr habilitados se buscarán para cada tipo de medio. Usa Ctrl+clic en Windows/Linux o Command+clic en macOS para seleccionar varios indexadores. Una selección vacía deshabilita la búsqueda para ese tipo.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        'Indexadores para {category}',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'Asignación de indexadores por tipo de medio',
+      'components.SettingsProwlarr.indexerCount':
+        'Indexadores: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'Los usuarios pueden abrir los detalles del indexador desde los resultados de búsqueda.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'Los nombres de los indexadores y los enlaces de detalles están ocultos para los usuarios.',
+      'components.SettingsProwlarr.indexerNotSearchable':
+        '(no se puede buscar)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'Límites de búsqueda',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'Limita las búsquedas por minuto de cada usuario en total y para cada indexador seleccionado.',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr se guarda, pero su inventario de indexadores no está disponible.',
+      'components.SettingsProwlarr.keepApiKey':
+        'Mantenga la clave de API guardada',
+      'components.SettingsProwlarr.loadFailed':
+        'No se pudo cargar la configuración de Prowlarr.',
+      'components.SettingsProwlarr.magazine': 'Revistas',
+      'components.SettingsProwlarr.modern': 'Modernos ROMs',
+      'components.SettingsProwlarr.movie': 'Películas',
+      'components.SettingsProwlarr.music': 'Música',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'Aún no se configuran índices Prowlarr.',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Prueba la conexión de Prowlarr para cargar sus indexadores y asignarlos por categoría.',
+      'components.SettingsProwlarr.port': 'Puerto',
+      'components.SettingsProwlarr.recentFailure': 'Fallo reciente: {date}',
+      'components.SettingsProwlarr.retro': 'ROMs retro',
+      'components.SettingsProwlarr.save': 'Guardar configuración de Prowlarr',
+      'components.SettingsProwlarr.saveFailed':
+        'No se pudo guardar la configuración de Prowlarr.',
+      'components.SettingsProwlarr.saved':
+        'Configuración de Prowlarr guardada.',
+      'components.SettingsProwlarr.saving': 'Guardando…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        'Introduce un número entero de 1 a 60.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        'Búsquedas máximas por usuario y minuto en {indexer}',
+      'components.SettingsProwlarr.searchesPerUser':
+        'Búsquedas máximas por usuario y minuto',
+      'components.SettingsProwlarr.selectedCategories':
+        '{count} categorías seleccionadas',
+      'components.SettingsProwlarr.selectedIndexers':
+        '{count} indexadores seleccionados',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'Permitir nombres y detalles de indexadores en los resultados de búsqueda',
+      'components.SettingsProwlarr.sports': 'Deportes',
+      'components.SettingsProwlarr.supportNote':
+        'Esta configuración se conecta solo a Prowlarr. NZBHydra2 no se admite actualmente aquí.',
+      'components.SettingsProwlarr.test':
+        'Prueba de conexión e inspección de cobertura',
+      'components.SettingsProwlarr.testFailed':
+        'Prowlarr La conexión falló. Compruebe la dirección y API llave.',
+      'components.SettingsProwlarr.testHint':
+        'Las búsquedas comenzaron desde la consulta SeerrNG Prowlarr directamente. Las solicitudes aprobadas todavía pasan por su gestor de medios configurado o proveedor de software, que posee adquisición y seguimiento.',
+      'components.SettingsProwlarr.testing': 'Revisando Prowlarr...',
+      'components.SettingsProwlarr.title': 'Prowlarr indexadores',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} búsqueda y habilitación de {total} configurado',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'Uso SSL',
+      'components.Settings.SettingsLogs.logs': 'Registros',
+      'components.Settings.SettingsLogs.searchLogs': 'Buscar registros',
+      'components.Settings.SettingsLogs.level': 'Severidad',
+      'components.Settings.SettingsLogs.filterDebug': 'Depuración',
+      'components.Settings.SettingsLogs.filterInfo': 'Información',
+      'components.Settings.SettingsLogs.filterWarn': 'Advertencia',
+      'components.Settings.SettingsLogs.filterError': 'Error',
+      'components.Settings.SettingsLogs.logDetails': 'Detalles del Log',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Copiar al Portapapeles',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Copiar log al portapapeles.',
+      'components.Settings.SettingsJobsCache.runnow': 'Ejecutar Ahora',
+      'components.Settings.SettingsJobsCache.canceljob':
+        'Cancelar Tarea Programada',
+      'components.Settings.SettingsJobsCache.process': 'Procesamiento',
+      'components.Settings.SettingsJobsCache.command': 'Comando',
+      'components.Settings.SettingsJobsCache.enabled': 'Activado',
+      'components.Settings.SettingsJobsCache.disabled': 'Desactivado',
+      'components.Settings.SettingsJobsCache.cachehits': 'Consultas',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Claves Totales',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Fallos',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Caché DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Aciertos',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Fallos',
+      'components.Settings.SettingsJobsCache.failures': 'Fallos',
+      'components.Settings.SettingsJobsCache.flushcache': 'Vaciar Caché',
+      'components.Settings.SettingsJobsCache.hitRate': 'Tasa de aciertos',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Imágenes en caché',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Fallbacks IPv4',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'Instalado',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Última Versión',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'La fecha de lanzamiento no está actualmente disponible.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Versiones',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Ver en GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Acerca de SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': 'Directorio de datos',
+      'components.Settings.SettingsAbout.documentation': 'Documentación',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Discursiones en GitHub',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG está destinado a la gestión legal de los medios personales. El proyecto no tolera la piratería ni la violación de derechos de autor. Los usuarios son responsables de cumplir con las leyes, licencias y términos de servicio aplicables en su región.',
+      'components.Settings.SettingsAbout.legalUseTitle': 'Uso legal',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'Atribución de metadatos',
+      'components.Settings.SettingsAbout.supportdevelopment':
+        'Apoyo al desarrollo',
+      'components.Settings.SettingsAbout.timezone': 'Zona horaria',
+      'components.Settings.SettingsAbout.totalmedia': 'Contenido Total',
+      'components.Settings.SettingsAbout.totalrequests': 'Peticiones Totales',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'Este producto usa TMDB y sus API, pero TMDB no lo respalda, certifica ni aprueba de ninguna otra forma. <ApiTermsLink>Términos de la API de TMDB</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'No se pudo verificar actualizaciones',
+      'components.Settings.SettingsAbout.uptodate': 'Actualizado',
+      'components.Settings.SettingsAbout.version': 'Versión',
+      'components.Settings.SettingsCategories.title': 'Categorías de Medios',
+      'components.Settings.SettingsCategories.description':
+        'Elija qué categorías todos pueden navegar y solicitar. Las categorías de personas discapacitadas desaparecen de la navegación y el descubrimiento, y se bloquean nuevas solicitudes. Existing requests and download history stay available in Request Status.',
+      'components.Settings.SettingsCategories.groupTitle':
+        'Categorías disponibles',
+      'components.Settings.SettingsCategories.groupDescription':
+        'Estos interruptores controlan la disponibilidad de la categoría en SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'Películas',
+      'components.Settings.SettingsCategories.tv': 'Serie',
+      'components.Settings.SettingsCategories.music': 'Música',
+      'components.Settings.SettingsCategories.ebook': 'Libros',
+      'components.Settings.SettingsCategories.audiobook': 'Audiolibros',
+      'components.Settings.SettingsCategories.comic': 'Cómics',
+      'components.Settings.SettingsCategories.magazine': 'Revistas',
+      'components.Settings.SettingsCategories.adult': 'Adulto',
+      'components.Settings.SettingsCategories.retro': 'Emulación (Retro)',
+      'components.Settings.SettingsCategories.modern': 'Emulación (Modern)',
+      'components.Settings.SettingsCategories.game': 'Juegos de PC',
+      'components.Settings.SettingsCategories.movieDescription':
+        'Permitir descubrimiento de películas y peticiones.',
+      'components.Settings.SettingsCategories.tvDescription':
+        'Permitir el descubrimiento de series y solicitudes.',
+      'components.Settings.SettingsCategories.musicDescription':
+        'Permitir el descubrimiento y las peticiones de música.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'Permitir el descubrimiento de libros y solicitudes.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'Permitir el descubrimiento y las solicitudes de audiolibros.',
+      'components.Settings.SettingsCategories.comicDescription':
+        'Permitir el descubrimiento cómico y las peticiones.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'Permitir el descubrimiento de revistas y solicitudes.',
+      'components.Settings.SettingsCategories.adultDescription':
+        'Permite el descubrimiento y las solicitudes de escenas para adultos. Requiere un servicio Whisparr v3 configurado y un permiso de usuario específico para adultos.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'Permitir retro ROM descubrimiento y solicitudes.',
+      'components.Settings.SettingsCategories.modernDescription':
+        'Permitir la emulación moderna ROM descubrimiento y peticiones.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'Permitir el descubrimiento y las solicitudes de PC juego.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'El contenido para adultos es visible para todos los que tengan acceso',
+      'components.Settings.SettingsCategories.adultWarning':
+        'Si compartes esta instancia con la familia o la expones a través de un proxy inverso, cualquier persona con el permiso Solicitar Adulto puede ver lo que exploras y solicitas. Marca las cuentas familiares como restringidas a continuación, o en los Permisos de cada usuario, para que nunca vean contenido para adultos.',
+      'components.Settings.SettingsCategories.ageGateTitle': 'Control de edad',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'Las cuentas restringidas no pueden ver ni solicitar contenido para adultos, y las películas, series, música, libros, cómics y títulos etiquetados maduros se ocultan a nivel de servidor. La filtración utiliza clasificaciones y etiquetas de proveedores y es de mejor esfuerzo para títulos sin metadatos.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'Restringir cuentas por defecto',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'Las cuentas sin una configuración explícita están restringidas. Los administradores están exentos.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'Clasificación máxima de películas',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'Las cuentas restringidas no pueden ver películas con una clasificación superior a esta.',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'Clasificación máxima de series',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'Las cuentas restringidas no pueden ver series con una clasificación superior a esta.',
+      'components.Settings.SettingsCategories.ageGateCountry':
+        'País de clasificación',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'Código de país de dos letras cuyas clasificaciones se utilizan, por ejemplo US.',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'Ajustes de categoría guardados.',
+      'components.Settings.SettingsCategories.saveFailure':
+        'No se puede guardar la configuración de la categoría.',
     },
   },
   {
@@ -3515,6 +6206,430 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': 'Ver recientemente añadido',
       'components.PermissionEdit.viewrequests': 'Ver Solicitudes',
       'components.PermissionEdit.viewwatchlists': 'Ver listas de seguimiento',
+      'components.RequestModal.RequestTree.seasonNumber': 'Temporada {number}',
+      'components.RequestModal.RequestTree.specials': 'Especiales',
+      'components.Requests.episodeQueue': 'Cola de episodios',
+      'components.Requests.retry': 'Reintentar',
+      'components.Requests.approve': 'Aprobar',
+      'components.Requests.decline': 'Rechazar',
+      'components.Requests.requested': 'Solicitudes',
+      'components.Requests.approved': 'Aprobado',
+      'components.Requests.searching': 'Búsqueda',
+      'components.Requests.downloading': 'Descarga',
+      'components.Requests.importing': 'Importación',
+      'components.Requests.library': 'Añadir a la Biblioteca',
+      'components.Requests.available': 'Disponible',
+      'components.Requests.unavailable': 'No Disponible',
+      'components.Requests.failed': 'Fallido',
+      'components.Requests.declined': 'Rechazado',
+      'components.Requests.cancelled': 'Cancelada',
+      'components.Requests.pending': 'Pendiente',
+      'components.Requests.completed': 'Completado',
+      'components.Requests.statusUpdated': 'Estado actualizado',
+      'i18n.unknown': 'Desconocido',
+      'components.Requests.history': 'Historia',
+      'components.RequestStatus.SoftwareRequests.approve': 'Aprobar',
+      'components.RequestStatus.SoftwareRequests.approved': 'Aprobado',
+      'components.RequestStatus.SoftwareRequests.available': 'Disponible',
+      'components.RequestStatus.SoftwareRequests.cancel': 'Cancelar',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'Cancelada',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'Solicitud cancelada',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        '¿Despejar esta solicitud cancelada?',
+      'components.RequestStatus.SoftwareRequests.decline': 'Rechazar',
+      'components.RequestStatus.SoftwareRequests.declined': 'Rechazado',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'Descargar copias',
+      'components.RequestStatus.SoftwareRequests.downloading': 'Descarga',
+      'components.RequestStatus.SoftwareRequests.failed': 'Fallido',
+      'components.RequestStatus.SoftwareRequests.history': 'Historia',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'Historial de estado de carga...',
+      'components.RequestStatus.SoftwareRequests.importing':
+        'Importación verificadora',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'Esta solicitud de software no podría actualizarse.',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        'No hay actualizaciones de estado guardadas disponibles.',
+      'components.RequestStatus.SoftwareRequests.pending':
+        'Aprobación pendiente',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'Quitar de las solicitudes',
+      'components.RequestStatus.SoftwareRequests.retry': 'Reintentar',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'El proveedor no puede confirmar si la descarga anterior comenzó. Compruebe la cola e historia del cliente de descarga. Continúe sólo si no existe ninguna descarga coincidente.',
+      'components.RequestStatus.SoftwareRequests.searching': 'Búsqueda',
+      'components.RequestStatus.SoftwareRequests.title':
+        'Solicitudes de software',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'Retirada',
+      'i18n.back': 'Atrás',
+      'downloads.actions': 'Historia de la acción',
+      'downloads.active': 'Advertencias activas',
+      'downloads.activeState': 'Necesita atención',
+      'downloads.actor': 'Usuario {id}',
+      'downloads.blocked': 'Manualmente bloqueado',
+      'downloads.blocklist':
+        'Bloquear esta versión para evitar descargarla de nuevo',
+      'downloads.blocklisted': 'Bloqueo solicitado',
+      'downloads.cancel': 'Cancelar',
+      'downloads.changed': 'Modificación de la configuración de servicio',
+      'downloads.clientKept': 'Archivos de cliente guardados',
+      'downloads.clientRemoved': 'Retiración del cliente solicitada',
+      'downloads.confirm': 'Confirmación de rechazo',
+      'downloads.copy': 'Copiar o enlace duro (mantener archivos fuente)',
+      'downloads.denied': 'Administrar el permiso de descargas es necesario.',
+      'downloads.description':
+        'Revisa advertencias de adquisición, selecciona archivos para importación manual y rechaza descargas no deseadas.',
+      'downloads.disappeared': 'Ya no en la cola',
+      'downloads.empty': 'No hay advertencias de descarga en esta vista.',
+      'downloads.failed': 'La bandeja de entrada no se puede cargar.',
+      'downloads.failedState': 'Examen de las necesidades',
+      'downloads.history': 'Historia',
+      'downloads.import': 'Importar archivos seleccionados',
+      'downloads.importFailed': 'La importación falló',
+      'downloads.importMode': 'Modo de importación',
+      'downloads.importReview':
+        'Importación completada sin una importación de archivo confirmada',
+      'downloads.importWarning':
+        'Confirme el objetivo y revise todas las razones de rechazo. El servicio de adquisición determina la calidad de archivo y la coincidencia de episodios.',
+      'downloads.imported': 'Importación manual',
+      'downloads.importingState': 'Importación pendiente',
+      'downloads.ineligible':
+        'No hay coincidencia confirmada - no puede importar',
+      'downloads.loading': 'Cargando advertencias de descarga...',
+      'downloads.move': 'Mover (remover archivos fuente)',
+      'downloads.next': 'Página siguiente',
+      'downloads.noFiles':
+        'No se encontraron archivos con un objetivo de biblioteca confirmado.',
+      'downloads.notBlocklisted': 'Lanzamiento no bloqueado',
+      'downloads.outcome':
+        'No se puede confirmar la acción. Refresca y revisa antes de volver a intentarlo.',
+      'downloads.partial':
+        'No se pueden revisar algunos servicios de adquisición. Sus advertencias pueden faltar o salir de la fecha.',
+      'downloads.pending':
+        'Acción aceptada. Refrésquese para comprobar el resultado del backend.',
+      'downloads.preview': 'Previsualizar archivos',
+      'downloads.previous': 'Página anterior',
+      'downloads.recovered': 'Recuperado',
+      'downloads.refresh': 'Refrescar',
+      'downloads.reject': 'Rechazar descarga',
+      'downloads.rejected': 'Rechazado manualmente',
+      'downloads.rejectingState': 'Resolución pendiente',
+      'downloads.rejection':
+        'Rechazar elimina este artículo de la cola de adquisición. Revisa las opciones antes de confirmar.',
+      'downloads.remove':
+        'Eliminar la descarga y los archivos de su cliente de descarga',
+      'downloads.resolvedState': 'Resuelto',
+      'downloads.search': 'Buscar',
+      'downloads.select': 'Seleccione {name}',
+      'downloads.targetChoose': 'Elija un partido de biblioteca',
+      'downloads.targetHelp':
+        'Títulos de búsqueda ya en este servicio de adquisición. Elegir un partido no añade un nuevo título.',
+      'downloads.targetLabel': 'Partido de la biblioteca',
+      'downloads.targetNoResults':
+        'No se encontraron títulos iguales en esta biblioteca de servicios.',
+      'downloads.targetQuery': 'Películas, series, álbumes o libros',
+      'downloads.targetRequired':
+        'Elija un partido de biblioteca antes de importar archivos.',
+      'downloads.targetSelected': 'Selección: {title}{subtitle}',
+      'downloads.title': 'Descargar Inbox',
+      'downloads.truncated':
+        'Sólo se revisaron los primeros 20 servicios de adquisición.',
+      'downloads.unknownImport': 'Resultado de la importación desconocido',
+      'downloads.unknownReject': 'Resultado desconocido',
+      'components.IndexerSearch.accessDenied':
+        'Necesita administrar solicitudes de permiso para buscar indexadores.',
+      'components.IndexerSearch.categories': 'Categorías del índice',
+      'components.IndexerSearch.category': 'Categoría multimedia',
+      'components.IndexerSearch.categoryAdult': 'Adulto',
+      'components.IndexerSearch.categoryAudiobook': 'Audiolibros',
+      'components.IndexerSearch.categoryComic': 'Cómics',
+      'components.IndexerSearch.categoryEbook': 'Libros',
+      'components.IndexerSearch.categoryGame': 'PC juegos',
+      'components.IndexerSearch.categoryMagazine': 'Revistas',
+      'components.IndexerSearch.categoryModern': 'Modernos ROMs',
+      'components.IndexerSearch.categoryMovie': 'Películas',
+      'components.IndexerSearch.categoryMusic': 'Música',
+      'components.IndexerSearch.categoryRetro': 'ROM retro',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Configuración Open Prowlarr',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr no pudo enviar esta liberación. Ejecuta una nueva búsqueda e inténtalo de nuevo.',
+      'components.IndexerSearch.grabs': 'Tomas',
+      'components.IndexerSearch.intro':
+        'Las versiones de búsqueda en sus índices Prowlarr en cada categoría de medios SeerrNG.',
+      'components.IndexerSearch.leechers': 'sanguijuelas',
+      'components.IndexerSearch.loadFailed':
+        'Prowlarr no se puede cargar la configuración de búsqueda.',
+      'components.IndexerSearch.loadMore': 'Cargar más resultados',
+      'components.IndexerSearch.loadingMore': 'Cargando…',
+      'components.IndexerSearch.manualMode':
+        'Esta es una búsqueda directa de Prowlarr para la inspección. SeerrNG no toma estos resultados aquí; solicitudes aprobadas y seguimiento de adquisiciones permanecen con el administrador de medios configurado o proveedor de software.',
+      'components.IndexerSearch.noConnection': 'Prowlarr no está conectado.',
+      'components.IndexerSearch.noConnectionHelp':
+        'Pídale a un administrador que conecte Prowlarr bajo Configuración Servicios.',
+      'components.IndexerSearch.noResults':
+        'No hay versiones que coincidan con esta búsqueda.',
+      'components.IndexerSearch.noResultsHelp':
+        'Compruebe los filtros de categoría e indexadores habilitados en Prowlarr. Los resultados de la búsqueda no confirman que una aplicación puede importar una liberación.',
+      'components.IndexerSearch.openResult': 'Datos de índice abierto',
+      'components.IndexerSearch.protocol': 'Protocolo',
+      'components.IndexerSearch.published': 'Publicado',
+      'components.IndexerSearch.query': 'Términos de búsqueda',
+      'components.IndexerSearch.queryPlaceholder':
+        'Título, autor, álbum, edición o nombre del juego',
+      'components.IndexerSearch.requestStillUsesManager':
+        'Esta búsqueda no cambia su solicitud ni envía una descarga a un cliente.',
+      'components.IndexerSearch.resultCount':
+        '{count} comunicados devueltos por Prowlarr.',
+      'components.IndexerSearch.search': 'Índices de búsqueda',
+      'components.IndexerSearch.searchFailed':
+        'Prowlarr la búsqueda falló. Revise la conexión e intente de nuevo.',
+      'components.IndexerSearch.searching': 'Buscando indexadores...',
+      'components.IndexerSearch.seeders': 'Sembradoras',
+      'components.IndexerSearch.sendToDownloader': 'Enviar al descargador',
+      'components.IndexerSearch.sendingToDownloader': 'Enviando…',
+      'components.IndexerSearch.sentToDownloader':
+        'Enviado al cliente de descarga configurado de Prowlarr.',
+      'components.IndexerSearch.size': 'Tamaño',
+      'components.IndexerSearch.title': 'Búsqueda de indexadores',
+      'components.IndexerSearch.tooManySearches':
+        'Plazo de búsqueda alcanzado. Espera un minuto antes de volver a buscar.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'No se dispone de indexadores de búsqueda habilitados. Activar un indexador en Prowlarr o ajustar los filtros de categoría.',
+      'components.SettingsProwlarr.addDetectedMatches':
+        'Agregar coincidencias detectadas ({count})',
+      'components.SettingsProwlarr.address': 'Nombre de host',
+      'components.SettingsProwlarr.adult': 'Adulto',
+      'components.SettingsProwlarr.apiKey': 'Clave de API',
+      'components.SettingsProwlarr.apiKeySaved':
+        'Se salva una llave. Deja esto en blanco para seguir usándolo.',
+      'components.SettingsProwlarr.audiobook': 'Audiolibros',
+      'components.SettingsProwlarr.basePath': 'Vía base',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'Elige las categorías Prowlarr enviadas con cada búsqueda. Los defectos usan las categorías estándar Newznab/Torznab; prueba la conexión para ver las categorías personalizadas anunciadas por los indexadores habilitados.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'Seleccione al menos una categoría.',
+      'components.SettingsProwlarr.categoryMappingTitle':
+        'Filtros de categoría',
+      'components.SettingsProwlarr.clearApiKey':
+        'Quitar la clave de API guardada',
+      'components.SettingsProwlarr.comic': 'Cómics',
+      'components.SettingsProwlarr.connected':
+        'Conectado a Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'Los condes incluyen indexadores habilitados y de búsqueda que anuncian soporte para al menos una categoría seleccionada. Muestran cobertura de búsqueda, no tomas exitosas o importaciones.',
+      'components.SettingsProwlarr.coverageTitle':
+        'Cobertura de índice por medio',
+      'components.SettingsProwlarr.description':
+        'Conecte su instancia Prowlarr una vez para ejecutar búsquedas manuales de categoría-conozca a través de los indexadores que ya maneja allí.',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        'Las categorías personalizadas sugeridas se ajustan a sus nombres anunciados. Revise antes de guardar; esto no cambia Prowlarr o envía descargas.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr aceptó la conexión API de gestión. Estos resultados prueban cada indexador permitido de búsqueda por separado; las fechas inhabilitables provienen de Prowlarr.',
+      'components.SettingsProwlarr.diagnosticFailed': 'Fallido',
+      'components.SettingsProwlarr.diagnosticOk': 'Conectado',
+      'components.SettingsProwlarr.diagnosticTitle':
+        'Resultados de conexión de indexador',
+      'components.SettingsProwlarr.disabledUntil': 'Discapacitados {date}',
+      'components.SettingsProwlarr.ebook': 'Libros',
+      'components.SettingsProwlarr.game': 'PC juegos',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'Selecciona qué indexadores de Prowlarr habilitados se buscarán para cada tipo de medio. Usa Ctrl+clic en Windows/Linux o Command+clic en macOS para seleccionar varios indexadores. Una selección vacía deshabilita la búsqueda para ese tipo.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        'Indexadores para {category}',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'Asignación de indexadores por tipo de medio',
+      'components.SettingsProwlarr.indexerCount':
+        'Indexadores: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'Los usuarios pueden abrir los detalles del indexador desde los resultados de búsqueda.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'Los nombres de los indexadores y los enlaces de detalles están ocultos para los usuarios.',
+      'components.SettingsProwlarr.indexerNotSearchable':
+        '(no se puede buscar)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'Límites de búsqueda',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'Limita las búsquedas por minuto de cada usuario en total y para cada indexador seleccionado.',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr se guarda, pero su inventario de indexadores no está disponible.',
+      'components.SettingsProwlarr.keepApiKey':
+        'Mantenga la clave de API guardada',
+      'components.SettingsProwlarr.loadFailed':
+        'No se pudo cargar la configuración de Prowlarr.',
+      'components.SettingsProwlarr.magazine': 'Revistas',
+      'components.SettingsProwlarr.modern': 'Modernos ROMs',
+      'components.SettingsProwlarr.movie': 'Películas',
+      'components.SettingsProwlarr.music': 'Música',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'Aún no se configuran índices Prowlarr.',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Prueba la conexión de Prowlarr para cargar sus indexadores y asignarlos por categoría.',
+      'components.SettingsProwlarr.port': 'Puerto',
+      'components.SettingsProwlarr.recentFailure': 'Fallo reciente: {date}',
+      'components.SettingsProwlarr.retro': 'ROM retro',
+      'components.SettingsProwlarr.save': 'Guardar configuración de Prowlarr',
+      'components.SettingsProwlarr.saveFailed':
+        'No se pudo guardar la configuración de Prowlarr.',
+      'components.SettingsProwlarr.saved':
+        'Configuración de Prowlarr guardada.',
+      'components.SettingsProwlarr.saving': 'Guardando…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        'Introduce un número entero de 1 a 60.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        'Búsquedas máximas por usuario y minuto en {indexer}',
+      'components.SettingsProwlarr.searchesPerUser':
+        'Búsquedas máximas por usuario y minuto',
+      'components.SettingsProwlarr.selectedCategories':
+        '{count} categorías seleccionadas',
+      'components.SettingsProwlarr.selectedIndexers':
+        '{count} indexadores seleccionados',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'Permitir nombres y detalles de indexadores en los resultados de búsqueda',
+      'components.SettingsProwlarr.sports': 'Deportes',
+      'components.SettingsProwlarr.supportNote':
+        'Esta configuración se conecta solo a Prowlarr. NZBHydra2 no se admite actualmente aquí.',
+      'components.SettingsProwlarr.test':
+        'Prueba de conexión e inspección de cobertura',
+      'components.SettingsProwlarr.testFailed':
+        'Prowlarr La conexión falló. Compruebe la dirección y API llave.',
+      'components.SettingsProwlarr.testHint':
+        'Las búsquedas comenzaron desde la consulta SeerrNG Prowlarr directamente. Las solicitudes aprobadas todavía pasan por su gestor de medios configurado o proveedor de software, que posee adquisición y seguimiento.',
+      'components.SettingsProwlarr.testing': 'Revisando Prowlarr...',
+      'components.SettingsProwlarr.title': 'Prowlarr indexadores',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} búsqueda y habilitación de {total} configurado',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'Usar SSL',
+      'components.Settings.SettingsLogs.logs': 'Registros',
+      'components.Settings.SettingsLogs.searchLogs': 'Buscar registros',
+      'components.Settings.SettingsLogs.level': 'Severidad',
+      'components.Settings.SettingsLogs.filterDebug': 'Depuración',
+      'components.Settings.SettingsLogs.filterInfo': 'Información',
+      'components.Settings.SettingsLogs.filterWarn': 'Advertencia',
+      'components.Settings.SettingsLogs.filterError': 'Error',
+      'components.Settings.SettingsLogs.logDetails': 'Detalles del Log',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Copiar al Portapapeles',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Copiar log al portapapeles.',
+      'components.Settings.SettingsJobsCache.runnow': 'Ejecutar Ahora',
+      'components.Settings.SettingsJobsCache.canceljob':
+        'Cancelar Tarea Programada',
+      'components.Settings.SettingsJobsCache.process': 'Procesamiento',
+      'components.Settings.SettingsJobsCache.command': 'Comando',
+      'components.Settings.SettingsJobsCache.enabled': 'Activado',
+      'components.Settings.SettingsJobsCache.disabled': 'Desactivado',
+      'components.Settings.SettingsJobsCache.cachehits': 'Consultas',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Claves Totales',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Fallos',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Caché DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Golpes',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'falla',
+      'components.Settings.SettingsJobsCache.failures': 'Fallos',
+      'components.Settings.SettingsJobsCache.flushcache': 'Vaciar Caché',
+      'components.Settings.SettingsJobsCache.hitRate': 'Tasa de crecimiento',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Imágenes en caché',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Reservas de IPv4',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'Instalado',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Última Versión',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'La fecha de lanzamiento no está actualmente disponible.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Versiones',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Ver en GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Acerca de SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': 'Directorio de datos',
+      'components.Settings.SettingsAbout.documentation': 'Documentación',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Discursiones en GitHub',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG está destinado a la gestión legal de los medios personales. El proyecto no tolera la piratería ni la violación de derechos de autor. Los usuarios son responsables de cumplir con las leyes, licencias y términos de servicio aplicables en su región.',
+      'components.Settings.SettingsAbout.legalUseTitle': 'Uso legal',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'Atribución de metadatos',
+      'components.Settings.SettingsAbout.supportdevelopment':
+        'Apoyo al desarrollo',
+      'components.Settings.SettingsAbout.timezone': 'Zona horaria',
+      'components.Settings.SettingsAbout.totalmedia': 'Contenido Total',
+      'components.Settings.SettingsAbout.totalrequests': 'Peticiones Totales',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'Este producto usa TMDB y sus API, pero TMDB no lo respalda, certifica ni aprueba de ninguna otra forma. <ApiTermsLink>Términos de la API de TMDB</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'No se pudo verificar actualizaciones',
+      'components.Settings.SettingsAbout.uptodate': 'Actualizado',
+      'components.Settings.SettingsAbout.version': 'Versión',
+      'components.Settings.SettingsCategories.title': 'Categorías de Medios',
+      'components.Settings.SettingsCategories.description':
+        'Elija qué categorías todos pueden navegar y solicitar. Las categorías de personas discapacitadas desaparecen de la navegación y el descubrimiento, y se bloquean nuevas solicitudes. Existing requests and download history stay available in Request Status.',
+      'components.Settings.SettingsCategories.groupTitle':
+        'Categorías disponibles',
+      'components.Settings.SettingsCategories.groupDescription':
+        'Estos interruptores controlan la disponibilidad de la categoría en SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'Películas',
+      'components.Settings.SettingsCategories.tv': 'Serie',
+      'components.Settings.SettingsCategories.music': 'Música',
+      'components.Settings.SettingsCategories.ebook': 'Libros',
+      'components.Settings.SettingsCategories.audiobook': 'Audiolibros',
+      'components.Settings.SettingsCategories.comic': 'Cómics',
+      'components.Settings.SettingsCategories.magazine': 'Revistas',
+      'components.Settings.SettingsCategories.adult': 'Adulto',
+      'components.Settings.SettingsCategories.retro': 'Emulación (Retro)',
+      'components.Settings.SettingsCategories.modern': 'Emulación (Modern)',
+      'components.Settings.SettingsCategories.game': 'Juegos de PC',
+      'components.Settings.SettingsCategories.movieDescription':
+        'Permitir descubrimiento de películas y peticiones.',
+      'components.Settings.SettingsCategories.tvDescription':
+        'Permitir el descubrimiento de series y solicitudes.',
+      'components.Settings.SettingsCategories.musicDescription':
+        'Permitir el descubrimiento y las peticiones de música.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'Permitir el descubrimiento de libros y solicitudes.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'Permitir el descubrimiento y las solicitudes de audiolibros.',
+      'components.Settings.SettingsCategories.comicDescription':
+        'Permitir el descubrimiento cómico y las peticiones.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'Permitir el descubrimiento de revistas y solicitudes.',
+      'components.Settings.SettingsCategories.adultDescription':
+        'Permite el descubrimiento y las solicitudes de escenas para adultos. Requiere un servicio Whisparr v3 configurado y un permiso de usuario específico para adultos.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'Permitir retro ROM descubrimiento y solicitudes.',
+      'components.Settings.SettingsCategories.modernDescription':
+        'Permitir la emulación moderna ROM descubrimiento y peticiones.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'Permitir el descubrimiento y las solicitudes de PC juego.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'El contenido para adultos es visible para todos los que tengan acceso',
+      'components.Settings.SettingsCategories.adultWarning':
+        'Si compartes esta instancia con la familia o la expones a través de un proxy inverso, cualquier persona con el permiso Solicitar Adulto puede ver lo que exploras y solicitas. Marca las cuentas familiares como restringidas a continuación, o en los Permisos de cada usuario, para que nunca vean contenido para adultos.',
+      'components.Settings.SettingsCategories.ageGateTitle': 'Control de edad',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'Las cuentas restringidas no pueden ver ni solicitar contenido para adultos, y las películas, series, música, libros, cómics y títulos etiquetados maduros se ocultan a nivel de servidor. La filtración utiliza clasificaciones y etiquetas de proveedores y es de mejor esfuerzo para títulos sin metadatos.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'Restringir cuentas por defecto',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'Las cuentas sin una configuración explícita están restringidas. Los administradores están exentos.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'Clasificación máxima de películas',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'Las cuentas restringidas no pueden ver películas con una clasificación superior a esta.',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'Clasificación máxima de series',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'Las cuentas restringidas no pueden ver series con una clasificación superior a esta.',
+      'components.Settings.SettingsCategories.ageGateCountry':
+        'País de clasificación',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'Código de país de dos letras cuyas clasificaciones se utilizan, por ejemplo US.',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'Ajustes de categoría guardados.',
+      'components.Settings.SettingsCategories.saveFailure':
+        'No se puede guardar la configuración de la categoría.',
     },
   },
   {
@@ -3630,6 +6745,50 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Probleemide vaatamine',
       'components.PermissionEdit.viewrecent': 'Viimati lisatute vaatamine',
       'components.PermissionEdit.viewrequests': 'Taotluste vaatamine',
+      'components.IssueDetails.allepisodes': 'Kõik osad',
+      'i18n.back': 'Tagasi',
+      'components.Settings.SettingsLogs.logs': 'Logid',
+      'components.Settings.SettingsLogs.level': 'Raskusaste',
+      'components.Settings.SettingsLogs.filterDebug': 'Silumine (Debug)',
+      'components.Settings.SettingsLogs.filterInfo': 'Info',
+      'components.Settings.SettingsLogs.filterWarn': 'Hoiatus',
+      'components.Settings.SettingsLogs.filterError': 'Viga',
+      'components.Settings.SettingsLogs.logDetails': 'Logi üksikasjad',
+      'components.Settings.SettingsLogs.copyToClipboard': 'Kopeeri lõikelauale',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Logiteade on kopeeritud lõikelauale.',
+      'components.Settings.SettingsJobsCache.runnow': 'Käivita kohe',
+      'components.Settings.SettingsJobsCache.canceljob': 'Tühista töö',
+      'components.Settings.SettingsJobsCache.process': 'Protsess',
+      'components.Settings.SettingsJobsCache.command': 'Käsk',
+      'components.Settings.SettingsJobsCache.cachehits': 'Tabamused',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Võtmeid kokku',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Möödalasud',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS-puhver',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Tabamused',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Möödalasud',
+      'components.Settings.SettingsJobsCache.failures': 'Ebaõnnestumised',
+      'components.Settings.SettingsJobsCache.flushcache': 'Tühjenda puhver',
+      'components.Settings.SettingsJobsCache.hitRate': 'Tabamuste määr',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Puhverdatud pilte',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks':
+        'IPv4-varulahendused',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Uusim',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Väljalaskeandmed pole hetkel saadaval.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Väljalasked',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Vaata GitHubis',
+      'components.Settings.SettingsAbout.aboutseerr': 'Lähemalt Seerrist',
+      'components.Settings.SettingsAbout.appDataPath': 'Andmete kataloog',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentatsioon',
+      'components.Settings.SettingsAbout.githubdiscussions': 'GitHubi arutelud',
+      'components.Settings.SettingsAbout.timezone': 'Ajavöönd',
+      'components.Settings.SettingsAbout.totalmedia': 'Meediat kokku',
+      'components.Settings.SettingsAbout.totalrequests': 'Taotlusi kokku',
+      'components.Settings.SettingsAbout.uptodate': 'Ajakohane',
+      'components.Settings.SettingsAbout.version': 'Versioon',
     },
   },
   {
@@ -3717,6 +6876,43 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Näytä ongelmat',
       'components.PermissionEdit.viewrecent': 'Näytä viimeksi lisätyt',
       'components.PermissionEdit.viewrequests': 'Näytä pyynnöt',
+      'components.IssueDetails.allepisodes': 'Kaikki jaksot',
+      'i18n.back': 'Takaisin',
+      'components.Settings.SettingsLogs.logs': 'Lokit',
+      'components.Settings.SettingsLogs.level': 'Vakavuus',
+      'components.Settings.SettingsLogs.filterDebug': 'Vianhaku',
+      'components.Settings.SettingsLogs.filterInfo': 'Tiedoksi',
+      'components.Settings.SettingsLogs.filterWarn': 'Varoitus',
+      'components.Settings.SettingsLogs.filterError': 'Virhe',
+      'components.Settings.SettingsJobsCache.runnow': 'Käynnistä',
+      'components.Settings.SettingsJobsCache.canceljob': 'Peruuta tehtävä',
+      'components.Settings.SettingsJobsCache.command': 'Komento',
+      'components.Settings.SettingsJobsCache.cachehits': 'Osumia',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Huteja',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS välimuisti',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Osumia',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Huteja',
+      'components.Settings.SettingsJobsCache.failures': 'Virheitä',
+      'components.Settings.SettingsJobsCache.flushcache': 'Tyhjennä välimuisti',
+      'components.Settings.SettingsJobsCache.hitRate': 'Osumisprosentti',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Kuvia välimuistissa',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Viimeisin',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Julkaisupäivämäärää ei tiedossa.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Julkaisut',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Näytä GitHub:issa',
+      'components.Settings.SettingsAbout.aboutseerr': 'Tietoa Seerr:istä',
+      'components.Settings.SettingsAbout.appDataPath': 'Datakansio',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentaatio',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'GitHub keskustelut',
+      'components.Settings.SettingsAbout.timezone': 'Aikavyöhyke',
+      'components.Settings.SettingsAbout.totalmedia': 'Mediaa yhteensä',
+      'components.Settings.SettingsAbout.totalrequests': 'Pyyntöjä yhteensä',
+      'components.Settings.SettingsAbout.uptodate': 'Ajan tasalla',
+      'components.Settings.SettingsAbout.version': 'Versio',
     },
   },
   {
@@ -4072,6 +7268,434 @@ export const localeData = [
       'components.PermissionEdit.viewrequests': 'Voir les demandes',
       'components.PermissionEdit.viewwatchlists':
         'Afficher les listes de surveillance',
+      'components.RequestModal.RequestTree.seasonNumber': 'Saison {number}',
+      'components.RequestModal.RequestTree.specials': 'Hors-série',
+      'components.Requests.episodeQueue': 'File d’attente des épisodes',
+      'components.Requests.retry': 'Réessayer',
+      'components.Requests.approve': 'Approuver',
+      'components.Requests.decline': 'Refuser',
+      'components.Requests.requested': 'Demandé',
+      'components.Requests.approved': 'Approuvée',
+      'components.Requests.searching': 'Recherche en cours',
+      'components.Requests.downloading': 'Téléchargement en cours',
+      'components.Requests.importing': 'Importation en cours',
+      'components.Requests.library': 'Ajout à la bibliothèque en cours',
+      'components.Requests.available': 'Disponible',
+      'components.Requests.unavailable': 'Indisponible',
+      'components.Requests.failed': 'Échec',
+      'components.Requests.declined': 'Refusée',
+      'components.Requests.cancelled': 'Annulée',
+      'components.Requests.pending': 'En attente',
+      'components.Requests.completed': 'Terminé',
+      'components.Requests.statusUpdated': 'État mis à jour',
+      'i18n.unknown': 'Inconnu',
+      'components.Requests.history': 'Historique',
+      'components.RequestStatus.SoftwareRequests.approve': 'Approuver',
+      'components.RequestStatus.SoftwareRequests.approved': 'Validé',
+      'components.RequestStatus.SoftwareRequests.available': 'Disponible',
+      'components.RequestStatus.SoftwareRequests.cancel': 'Annuler',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'Annulée',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'Effacer la demande annulée',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        'Supprimer cette demande annulée ?',
+      'components.RequestStatus.SoftwareRequests.decline': 'Refuser',
+      'components.RequestStatus.SoftwareRequests.declined': 'Refusée',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'Télécharger des copies',
+      'components.RequestStatus.SoftwareRequests.downloading':
+        'Téléchargement en cours',
+      'components.RequestStatus.SoftwareRequests.failed': 'Échec',
+      'components.RequestStatus.SoftwareRequests.history': 'Historique',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        "Chargement de l'historique du statut...",
+      'components.RequestStatus.SoftwareRequests.importing':
+        "Vérification de l'importation",
+      'components.RequestStatus.SoftwareRequests.manageError':
+        "Cette demande de logiciel n'a pas pu être mise à jour.",
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        "Aucune mise à jour d'état enregistrée n'est disponible.",
+      'components.RequestStatus.SoftwareRequests.pending':
+        'En attente d’approbation',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'Retirer des demandes',
+      'components.RequestStatus.SoftwareRequests.retry': 'Réessayer',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'Le fournisseur ne peut pas confirmer si le téléchargement précédent a commencé. Vérifiez la file d’attente et l’historique du client de téléchargement. Ne continuez que si aucun téléchargement correspondant n’existe.',
+      'components.RequestStatus.SoftwareRequests.searching':
+        'Recherche en cours',
+      'components.RequestStatus.SoftwareRequests.title':
+        'Demandes de logiciels',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'Retirer',
+      'i18n.back': 'Retour',
+      'downloads.actions': "Historique de l'action",
+      'downloads.active': 'Mises en garde actives',
+      'downloads.activeState': "Besoin d'attention",
+      'downloads.actor': 'Utilisateur {id}',
+      'downloads.blocked': 'Bloqué manuellement',
+      'downloads.blocklist':
+        'Bloquer cette version pour éviter de la télécharger à nouveau',
+      'downloads.blocklisted': 'Blocage demandé',
+      'downloads.cancel': 'Annuler',
+      'downloads.changed': 'Modification de la configuration du service',
+      'downloads.clientKept': 'Dossiers clients conservés',
+      'downloads.clientRemoved': 'Retrait du client demandé',
+      'downloads.confirm': 'Confirmer le rejet',
+      'downloads.copy': 'Copie ou lien dur (conserver les fichiers source)',
+      'downloads.denied':
+        'La permission de gérer les téléchargements est requise.',
+      'downloads.description':
+        "Examiner les avertissements d'acquisition, sélectionner des fichiers pour l'importation manuelle et rejeter les téléchargements indésirables.",
+      'downloads.disappeared': "Plus dans la file d'attente",
+      'downloads.empty':
+        'Aucun avertissement de téléchargement dans cette vue.',
+      'downloads.failed': 'La boîte de réception ne pouvait pas être chargée.',
+      'downloads.failedState': 'Examen des besoins',
+      'downloads.history': 'Historique',
+      'downloads.import': 'Importer les fichiers sélectionnés',
+      'downloads.importFailed': "L'importation a échoué",
+      'downloads.importMode': "Mode d'importation",
+      'downloads.importReview':
+        'Importation effectuée sans importation de fichier confirmée',
+      'downloads.importWarning':
+        "Confirmer la cible et examiner toutes les raisons de rejet. Le service d'acquisition détermine la qualité des fichiers et la correspondance des épisodes.",
+      'downloads.imported': 'Importé manuellement',
+      'downloads.importingState': 'Importation en attente',
+      'downloads.ineligible':
+        'Aucune correspondance confirmée — ne peut pas importer',
+      'downloads.loading': 'Chargement des avertissements de téléchargement...',
+      'downloads.move': 'Déplacer (supprimer les fichiers source)',
+      'downloads.next': 'Page suivante',
+      'downloads.noFiles':
+        "Aucun fichier avec une cible de bibliothèque confirmée n'a été trouvé.",
+      'downloads.notBlocklisted':
+        'Version non inscrite sur la liste de blocage',
+      'downloads.outcome':
+        "L'action n'a pas pu être confirmée. Rafraîchir et examiner avant de réessayer.",
+      'downloads.partial':
+        "Certains services d'acquisition n'ont pas pu être vérifiés. Leurs avertissements peuvent être manquants ou périmés.",
+      'downloads.pending':
+        'Mesure acceptée. Rafraîchir pour vérifier le résultat du moteur.',
+      'downloads.preview': 'Aperçu des fichiers',
+      'downloads.previous': 'Page précédente',
+      'downloads.recovered': 'Récupéré',
+      'downloads.refresh': 'Actualiser',
+      'downloads.reject': 'Rejeter le téléchargement',
+      'downloads.rejected': 'Rejeté manuellement',
+      'downloads.rejectingState': 'Rejet en cours',
+      'downloads.rejection':
+        "Rejeter supprime cet article de la file d'attente d'acquisition. Examiner les options avant de confirmer.",
+      'downloads.remove':
+        'Supprimer le téléchargement et les fichiers de son client de téléchargement',
+      'downloads.resolvedState': 'Résolu',
+      'downloads.search': 'Rechercher',
+      'downloads.select': 'Sélectionner {name}',
+      'downloads.targetChoose': 'Choisissez une bibliothèque correspondante',
+      'downloads.targetHelp':
+        "Rechercher des titres déjà dans ce service d'acquisition. Choisir un match n'ajoute pas de nouveau titre.",
+      'downloads.targetLabel': 'Correspondance bibliothèque',
+      'downloads.targetNoResults':
+        "Aucun titre correspondant n'a été trouvé dans cette bibliothèque de services.",
+      'downloads.targetQuery': 'Film, série, album ou livre',
+      'downloads.targetRequired':
+        "Choisissez une bibliothèque avant d'importer des fichiers.",
+      'downloads.targetSelected': 'Match sélectionné  : {title}{subtitle}',
+      'downloads.title': 'Télécharger la boîte de réception',
+      'downloads.truncated':
+        "Seuls les 20 premiers services d'acquisition ont été vérifiés.",
+      'downloads.unknownImport': "Résultat d'importation inconnu",
+      'downloads.unknownReject': 'Résultat du rejet inconnu',
+      'components.IndexerSearch.accessDenied':
+        'Vous avez besoin de la permission de gérer les demandes pour rechercher des indexeurs.',
+      'components.IndexerSearch.categories': "Catégories d'indexeurs",
+      'components.IndexerSearch.category': 'Catégorie médias',
+      'components.IndexerSearch.categoryAdult': 'Adulte',
+      'components.IndexerSearch.categoryAudiobook': 'Livres audio',
+      'components.IndexerSearch.categoryComic': 'BD',
+      'components.IndexerSearch.categoryEbook': 'Livres',
+      'components.IndexerSearch.categoryGame': 'Jeux PC',
+      'components.IndexerSearch.categoryMagazine': 'Revues',
+      'components.IndexerSearch.categoryModern': 'ROM modernes',
+      'components.IndexerSearch.categoryMovie': 'Films',
+      'components.IndexerSearch.categoryMusic': 'Musique',
+      'components.IndexerSearch.categoryRetro': 'ROM rétrospectifs',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Ouvrir les paramètres Prowlarr',
+      'components.IndexerSearch.downloaderFailed':
+        "Prowlarr n'a pas pu envoyer cette sortie. Lancez une nouvelle recherche et réessayez.",
+      'components.IndexerSearch.grabs': 'Téléchargements',
+      'components.IndexerSearch.intro':
+        'Recherchez des sorties dans vos indexeurs Prowlarr, dans toutes les catégories de médias de SeerrNG.',
+      'components.IndexerSearch.leechers': 'Lechers',
+      'components.IndexerSearch.loadFailed':
+        'La configuration de recherche Prowlarr ne pouvait pas être chargée.',
+      'components.IndexerSearch.loadMore': 'Charger plus de résultats',
+      'components.IndexerSearch.loadingMore': 'Chargement…',
+      'components.IndexerSearch.manualMode':
+        'Les résultats de recherche sont indépendants des demandes SeerrNG. Vous pouvez envoyer un résultat à un client de téléchargement configuré dans Prowlarr.',
+      'components.IndexerSearch.noConnection': "Prowlarr n'est pas connecté.",
+      'components.IndexerSearch.noConnectionHelp':
+        'Demandez à un administrateur de connecter Prowlarr sous Paramètres > Services.',
+      'components.IndexerSearch.noResults':
+        'Aucune sortie ne correspond à cette recherche.',
+      'components.IndexerSearch.noResultsHelp':
+        'Vérifiez les filtres de catégorie et les indexeurs activés dans Prowlarr. Les résultats de recherche ne garantissent pas qu’une application puisse importer une sortie.',
+      'components.IndexerSearch.openResult': "Ouvrir les détails de l'indexeur",
+      'components.IndexerSearch.protocol': 'Protocole',
+      'components.IndexerSearch.published': 'Date de publication',
+      'components.IndexerSearch.query': 'Termes de recherche',
+      'components.IndexerSearch.queryPlaceholder':
+        'Titre, auteur, album, numéro ou nom du jeu',
+      'components.IndexerSearch.requestStillUsesManager':
+        'L’envoi d’un résultat ne modifie pas une demande SeerrNG. Prowlarr le transmet au client de téléchargement configuré.',
+      'components.IndexerSearch.resultCount':
+        '{count} les sorties retournées par Prowlarr.',
+      'components.IndexerSearch.search': 'Rechercher dans les indexeurs',
+      'components.IndexerSearch.searchFailed':
+        'La recherche Prowlarr a échoué. Vérifiez la connexion et réessayez.',
+      'components.IndexerSearch.searching':
+        'Recherche en cours dans les indexeurs…',
+      'components.IndexerSearch.seeders': 'Sources',
+      'components.IndexerSearch.sendToDownloader':
+        'Envoyer vers le téléchargeur',
+      'components.IndexerSearch.sendingToDownloader': 'Envoi en cours…',
+      'components.IndexerSearch.sentToDownloader':
+        'Envoyé au client de téléchargement configuré par Prowlarr.',
+      'components.IndexerSearch.size': 'Taille',
+      'components.IndexerSearch.title': 'Recherche d’indexeurs',
+      'components.IndexerSearch.tooManySearches':
+        'Limite de recherche atteinte. Attendez une minute avant de chercher à nouveau.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        "Aucun indexable de recherche activé n'est disponible. Activer un indexeur dans Prowlarr ou ajuster les filtres de catégorie.",
+      'components.SettingsProwlarr.addDetectedMatches':
+        'Ajouter les correspondances détectées ({count})',
+      'components.SettingsProwlarr.address': "Nom d'hôte",
+      'components.SettingsProwlarr.adult': 'Adulte',
+      'components.SettingsProwlarr.apiKey': 'Clé API',
+      'components.SettingsProwlarr.apiKeySaved':
+        "Une clé est sauvée. Laissez ce blanc pour continuer à l'utiliser.",
+      'components.SettingsProwlarr.audiobook': 'Livres audio',
+      'components.SettingsProwlarr.basePath': 'Emplacement de base',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'Choisissez les catégories Prowlarr envoyées à chaque recherche. Les par défaut utilisent les catégories standard Newznab/Torznab; testez la connexion pour voir les catégories personnalisées annoncées par les indexeurs activés.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'Sélectionnez au moins une catégorie.',
+      'components.SettingsProwlarr.categoryMappingTitle':
+        'Filtres de catégorie',
+      'components.SettingsProwlarr.clearApiKey':
+        "Supprimer la clé d'API enregistrée",
+      'components.SettingsProwlarr.comic': 'BD',
+      'components.SettingsProwlarr.connected': 'Connecté à Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'Les chiffres comprennent les indexeurs consultables et activés qui annoncent le support pour au moins une catégorie sélectionnée. Ils montrent la couverture de la recherche, pas réussi prises ou importations.',
+      'components.SettingsProwlarr.coverageTitle':
+        'Couverture des indexeurs par moyenne',
+      'components.SettingsProwlarr.description':
+        'Connectez votre instance Prowlarr une fois pour lancer des recherches manuelles de catégorie à travers les indexeurs que vous y gérez déjà.',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        "Les catégories personnalisées suggérées sont assorties de leurs noms annoncés. Consultez-les avant d'enregistrer; cela ne change pas Prowlarr ou d'envoyer des téléchargements.",
+      'components.SettingsProwlarr.diagnosticDescription':
+        "Prowlarr a accepté la connexion API de gestion. Ces résultats testent séparément chaque indexeur consultable activé; les dates désactivées jusqu'à ce que les dates viennent de Prowlarr.",
+      'components.SettingsProwlarr.diagnosticFailed': 'Échec',
+      'components.SettingsProwlarr.diagnosticOk': 'Connecté',
+      'components.SettingsProwlarr.diagnosticTitle':
+        "Résultats de la connexion de l'indexeur",
+      'components.SettingsProwlarr.disabledUntil': "Handicapé jusqu'à {date}",
+      'components.SettingsProwlarr.ebook': 'Livres',
+      'components.SettingsProwlarr.game': 'Jeux PC',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'Choisissez les indexeurs Prowlarr activés à interroger pour chaque type de média. Utilisez Ctrl-clic sur Windows/Linux ou Command-clic sur macOS pour sélectionner plusieurs indexeurs. Une sélection vide désactive la recherche pour ce type.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        'Indexeurs pour {category}',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        "Assignations d'indexeurs par type de média",
+      'components.SettingsProwlarr.indexerCount': 'Indexeurs : {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'Les utilisateurs peuvent ouvrir les détails des indexeurs depuis les résultats de recherche.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        "Les noms d'indexeurs et les liens de détails sont masqués aux utilisateurs.",
+      'components.SettingsProwlarr.indexerNotSearchable': '(non interrogeable)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'Limites de recherche',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'Limitez les recherches par utilisateur par minute, au total et pour chaque indexeur sélectionné.',
+      'components.SettingsProwlarr.inventoryFailed':
+        "Prowlarr est enregistré, mais son inventaire d'indexeur n'est pas disponible.",
+      'components.SettingsProwlarr.keepApiKey':
+        "Conserver la clé d'API enregistrée",
+      'components.SettingsProwlarr.loadFailed':
+        'Impossible de charger les paramètres de Prowlarr.',
+      'components.SettingsProwlarr.magazine': 'Revues',
+      'components.SettingsProwlarr.modern': 'ROM modernes',
+      'components.SettingsProwlarr.movie': 'Films',
+      'components.SettingsProwlarr.music': 'Musique',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        "Aucun indexeur Prowlarr n'est encore configuré.",
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Testez la connexion Prowlarr pour charger ses indexeurs et les assigner par catégorie.',
+      'components.SettingsProwlarr.port': 'Port',
+      'components.SettingsProwlarr.recentFailure': 'Récent échec: {date}',
+      'components.SettingsProwlarr.retro': 'ROM rétrospectifs',
+      'components.SettingsProwlarr.save': 'Enregistrer les paramètres Prowlarr',
+      'components.SettingsProwlarr.saveFailed':
+        'Impossible d’enregistrer les paramètres de Prowlarr.',
+      'components.SettingsProwlarr.saved': 'Paramètres Prowlarr enregistrés.',
+      'components.SettingsProwlarr.saving': 'Sauver...',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        'Saisissez un nombre entier compris entre 1 et 60.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        'Nombre maximum de recherches par utilisateur et par minute sur {indexer}',
+      'components.SettingsProwlarr.searchesPerUser':
+        'Nombre maximum de recherches par utilisateur et par minute',
+      'components.SettingsProwlarr.selectedCategories':
+        '{count} catégories sélectionnées',
+      'components.SettingsProwlarr.selectedIndexers':
+        '{count} indexeurs sélectionnés',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'Autoriser les noms et détails des indexeurs dans les résultats de recherche',
+      'components.SettingsProwlarr.sports': 'Sports',
+      'components.SettingsProwlarr.supportNote':
+        "Ce paramètre se connecte uniquement à Prowlarr. NZBHydra2 n'est pas actuellement pris en charge ici.",
+      'components.SettingsProwlarr.test':
+        'Tester la connexion et inspecter la couverture',
+      'components.SettingsProwlarr.testFailed':
+        "La connexion Prowlarr a échoué. Vérifiez l'adresse et la clé API.",
+      'components.SettingsProwlarr.testHint':
+        "Les recherches ont commencé directement depuis la requête SeerrNG Prowlarr. Les demandes approuvées passent toujours par leur gestionnaire multimédia ou fournisseur de logiciels configurés, qui possède l'acquisition et le suivi.",
+      'components.SettingsProwlarr.testing': 'Vérification Prowlarr...',
+      'components.SettingsProwlarr.title': 'Indexeurs Prowlarr',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} recherche et activé de {total} configuré',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'Utiliser SSL',
+      'components.Settings.SettingsLogs.logs': 'Journaux',
+      'components.Settings.SettingsLogs.searchLogs':
+        'Rechercher dans les journaux',
+      'components.Settings.SettingsLogs.level': 'Gravité',
+      'components.Settings.SettingsLogs.filterDebug': 'Débogage',
+      'components.Settings.SettingsLogs.filterInfo': 'Infos',
+      'components.Settings.SettingsLogs.filterWarn': 'Attention',
+      'components.Settings.SettingsLogs.filterError': 'Erreur',
+      'components.Settings.SettingsLogs.logDetails': 'Journal détaillé',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Copier dans le presse-papiers',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Message journal copié dans le presse-papiers.',
+      'components.Settings.SettingsJobsCache.runnow': 'Exécuter',
+      'components.Settings.SettingsJobsCache.canceljob': 'Annuler la tâche',
+      'components.Settings.SettingsJobsCache.process': 'Processus',
+      'components.Settings.SettingsJobsCache.command': 'Commande',
+      'components.Settings.SettingsJobsCache.enabled': 'Activé',
+      'components.Settings.SettingsJobsCache.disabled': 'Désactivé',
+      'components.Settings.SettingsJobsCache.cachehits': 'Succès',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Clés',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Manquées',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Succès',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Manquées',
+      'components.Settings.SettingsJobsCache.failures': 'Échecs',
+      'components.Settings.SettingsJobsCache.flushcache': 'Vider le cache',
+      'components.Settings.SettingsJobsCache.hitRate': 'Taux de succès',
+      'components.Settings.SettingsJobsCache.imagecachecount': 'images',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Recours à IPv4',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'Installée',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Dernière version',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Les données de version sont actuellement indisponibles.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Versions',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Voir sur GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'À propos de SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': 'Répertoire de données',
+      'components.Settings.SettingsAbout.documentation': 'Documentation',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Discussions GitHub',
+      'components.Settings.SettingsAbout.legalUse':
+        "SeerrNG est destiné à la gestion légale des médias personnels. Le projet ne tolère pas le piratage ou la violation du droit d'auteur. Les utilisateurs sont responsables de se conformer aux lois, licences et conditions de service applicables dans leur région.",
+      'components.Settings.SettingsAbout.legalUseTitle': 'Utilisation légale',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'Attribution des métadonnées',
+      'components.Settings.SettingsAbout.supportdevelopment':
+        'Appui au développement',
+      'components.Settings.SettingsAbout.timezone': 'Fuseau horaire',
+      'components.Settings.SettingsAbout.totalmedia': 'Total des médias',
+      'components.Settings.SettingsAbout.totalrequests': 'Total des demandes',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'Ce produit utilise TMDB et ses API, mais n’est ni soutenu, ni certifié, ni approuvé d’une autre manière par TMDB. <ApiTermsLink>Conditions d’utilisation de l’API TMDB</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'Impossible de vérifier les mises à jour',
+      'components.Settings.SettingsAbout.uptodate': 'À jour',
+      'components.Settings.SettingsAbout.version': 'Version',
+      'components.Settings.SettingsCategories.title': 'Catégories de médias',
+      'components.Settings.SettingsCategories.description':
+        'Choisissez les catégories que chacun peut découvrir et demander. Les catégories désactivées disparaissent de la navigation et de la découverte, et les nouvelles demandes sont bloquées. Les demandes existantes et leur historique de téléchargement restent accessibles dans le suivi des demandes.',
+      'components.Settings.SettingsCategories.groupTitle':
+        'Catégories disponibles',
+      'components.Settings.SettingsCategories.groupDescription':
+        'Ces interrupteurs définissent les catégories disponibles dans SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'Films',
+      'components.Settings.SettingsCategories.tv': 'Séries',
+      'components.Settings.SettingsCategories.music': 'Musique',
+      'components.Settings.SettingsCategories.ebook': 'Livres',
+      'components.Settings.SettingsCategories.audiobook': 'Livres audio',
+      'components.Settings.SettingsCategories.comic': 'BD',
+      'components.Settings.SettingsCategories.magazine': 'Revues',
+      'components.Settings.SettingsCategories.adult': 'Adulte',
+      'components.Settings.SettingsCategories.retro':
+        'Logiciels rétro (émulation)',
+      'components.Settings.SettingsCategories.modern':
+        'Logiciels modernes (émulation)',
+      'components.Settings.SettingsCategories.game': 'Jeux PC',
+      'components.Settings.SettingsCategories.movieDescription':
+        'Permettre la découverte et les demandes de films.',
+      'components.Settings.SettingsCategories.tvDescription':
+        'Permettre la découverte et les demandes de séries.',
+      'components.Settings.SettingsCategories.musicDescription':
+        'Permettre la découverte et les demandes de musique.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'Permettre la découverte et les demandes de livres numériques.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'Permettre la découverte et les demandes de livres audio.',
+      'components.Settings.SettingsCategories.comicDescription':
+        'Permettre la découverte et les demandes de bandes dessinées.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'Permettre la découverte et les demandes de magazines.',
+      'components.Settings.SettingsCategories.adultDescription':
+        'Autoriser la découverte et les demandes de contenus pour adultes. Nécessite un service Whisparr v3 configuré et l’autorisation spécifique du compte.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'Permettre la découverte et les demandes de jeux rétro et de ROMs.',
+      'components.Settings.SettingsCategories.modernDescription':
+        'Permettre la découverte et les demandes de jeux modernes et de ROMs.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'Permettre la découverte et les demandes de jeux PC.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'Les contenus pour adultes sont visibles par toute personne ayant accès',
+      'components.Settings.SettingsCategories.adultWarning':
+        "Si vous partagez cette instance avec votre famille ou l'exposez via un proxy inversé, toute personne autorisée à Demander Adulte peut voir ce que vous parcourez et demandez. Marquez les comptes familiaux comme restreints ci-dessous, ou dans les Autorisations de chaque utilisateur, pour qu'ils ne voient jamais de contenu pour adultes.",
+      'components.Settings.SettingsCategories.ageGateTitle': "Contrôle d'âge",
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'Les comptes restreints ne peuvent ni consulter ni demander de contenus pour adultes. Les films, séries, musiques, livres, bandes dessinées et titres étiquetés comme matures sont masqués côté serveur. Le filtrage s’appuie sur les classifications et les étiquettes des fournisseurs; son efficacité dépend des métadonnées disponibles.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'Restreindre les comptes par défaut',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'Les comptes sans paramètre explicite sont restreints. Les administrateurs sont exemptés.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'Classification maximale des films',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'Les comptes restreints ne peuvent pas voir les films classés au-dessus de ce seuil.',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'Classification maximale des séries',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'Les comptes restreints ne peuvent pas voir les séries classées au-dessus de ce seuil.',
+      'components.Settings.SettingsCategories.ageGateCountry':
+        'Pays de classification',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'Code pays à deux lettres dont les classifications sont utilisées, par exemple US.',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'Paramètres de catégorie enregistrés.',
+      'components.Settings.SettingsCategories.saveFailure':
+        'Les paramètres de catégorie ne peuvent pas être enregistrés.',
       'components.Layout.Sidebar.comingSoon': 'À venir',
       'components.Layout.Sidebar.you': 'Vous',
       'components.Layout.Sidebar.watchSessions': 'Séances de visionnage',
@@ -4121,6 +7745,48 @@ export const localeData = [
         'Vérifiez votre mot de passe actuel et les autorisations de votre compte.',
       'lumen.account.passwordChangeUnconfirmed':
         'Impossible de confirmer le changement de mot de passe. Vérifiez vos identifiants avant de réessayer.',
+      'lumen.account.profileSaveMismatch':
+        'SeerrNG a enregistré des valeurs différentes. Vérifiez le profil mis à jour.',
+      'lumen.account.profileConfirmFailure':
+        'SeerrNG a accepté l’enregistrement, mais le profil mis à jour n’a pas pu être chargé.',
+      'lumen.account.profileSaveForbidden':
+        'Vous n’avez pas l’autorisation de modifier ces paramètres.',
+      'lumen.account.profileSaveFailure':
+        'Impossible d’enregistrer le profil. Vérifiez les valeurs et réessayez.',
+      'lumen.account.managedByPlex': 'Géré par Plex.',
+      'lumen.account.loadMediaLanguagesFailure':
+        'Impossible de charger les langues des médias',
+      'lumen.account.plexWatchlistTip':
+        'Demander automatiquement les titres ajoutés à la liste de suivi Plex.',
+      'lumen.account.loadProfileFailure':
+        'Impossible de charger les paramètres du profil',
+      'lumen.account.loadingProfileSettings':
+        'Chargement des paramètres du profil…',
+      'lumen.account.loadPasswordFailure':
+        'Impossible de charger les paramètres du mot de passe',
+      'lumen.account.loadingPasswordSettings':
+        'Chargement des paramètres du mot de passe…',
+      'lumen.account.administratorAccess':
+        'Ce compte dispose des droits d’administration.',
+      'lumen.account.noAdditionalPermissions':
+        'Aucune autorisation supplémentaire n’est attribuée à ce compte.',
+      'lumen.account.retry': 'Réessayer',
+      'lumen.account.loadSessionExpired':
+        'Votre session a expiré. Reconnectez-vous.',
+      'lumen.account.loadForbidden':
+        'Vous n’avez pas l’autorisation de consulter ces informations.',
+      'lumen.account.loadTimeout':
+        'Le serveur a mis trop de temps à répondre. Réessayez.',
+      'lumen.account.loadRateLimited':
+        'Trop de requêtes. Attendez une minute, puis réessayez.',
+      'lumen.account.loadServerFailure':
+        'Le serveur a rencontré un problème. Réessayez dans un instant.',
+      'lumen.account.loadNetworkFailure':
+        'Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.',
+      'lumen.account.loadOffline':
+        'Vous êtes hors ligne. Vérifiez votre connexion et réessayez.',
+      'lumen.account.loadUnknownFailure':
+        'Impossible de charger ces informations.',
       'lumen.account.saveThemeColors': 'Enregistrer les couleurs du thème',
       'lumen.account.themeOverrideConfirmFailure':
         'Le serveur a accepté l’enregistrement, mais Lumen n’a pas pu confirmer les nouvelles couleurs.',
@@ -4775,6 +8441,415 @@ export const localeData = [
         'Vous pouvez suivre jusqu’à 20 équipes.',
       'lumen.permission.manageSettings': 'Gérer les paramètres',
       'lumen.permission.vote': 'Voter',
+      'lumen.clientTokens.title': 'Jetons client',
+      'lumen.clientTokens.description':
+        'Connectez une application avec les accès Découvrir ou Demander de votre compte. Vous pouvez avoir jusqu’à dix jetons non expirés. Un changement de mot de passe les invalide.',
+      'lumen.clientTokens.retry': 'Réessayer',
+      'lumen.clientTokens.loadFailureTitle':
+        'Impossible de charger les jetons client',
+      'lumen.clientTokens.loading': 'Chargement des jetons client…',
+      'lumen.clientTokens.loadSessionExpired':
+        'Votre session a expiré. Reconnectez-vous.',
+      'lumen.clientTokens.loadForbidden':
+        'Vous n’avez pas l’autorisation d’effectuer cette action.',
+      'lumen.clientTokens.loadTimeout':
+        'Le serveur tarde à répondre. Réessayez.',
+      'lumen.clientTokens.loadRateLimited':
+        'Trop de requêtes. Attendez une minute avant de réessayer.',
+      'lumen.clientTokens.loadServerFailure':
+        'Le serveur a rencontré un problème. Réessayez dans un instant.',
+      'lumen.clientTokens.loadNetworkFailure':
+        'Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.',
+      'lumen.clientTokens.loadOffline':
+        'Vous êtes hors ligne. Vérifiez votre connexion et réessayez.',
+      'lumen.clientTokens.loadUnknownFailure':
+        'Impossible de charger les jetons client.',
+      'lumen.clientTokens.newToken': 'Nouveau jeton',
+      'lumen.clientTokens.secretShownOnce':
+        'Copiez ce jeton maintenant. SeerrNG ne l’affichera qu’une seule fois.',
+      'lumen.clientTokens.newTokenLabel': 'Nouveau jeton client',
+      'lumen.clientTokens.copyToken': 'Copier le jeton',
+      'lumen.clientTokens.dismissToken': 'Masquer le jeton',
+      'lumen.clientTokens.createToken': 'Créer un jeton',
+      'lumen.clientTokens.tokenName': 'Nom du jeton',
+      'lumen.clientTokens.access': 'Accès',
+      'lumen.clientTokens.discoverAndRequest': 'Découvrir et demander',
+      'lumen.clientTokens.discoverOnly': 'Découvrir uniquement',
+      'lumen.clientTokens.requestOnly': 'Demander uniquement',
+      'lumen.clientTokens.expiresAfter': 'Expire après',
+      'lumen.clientTokens.day': '{count} jour',
+      'lumen.clientTokens.days': '{count} jours',
+      'lumen.clientTokens.yourTokens': 'Vos jetons',
+      'lumen.clientTokens.empty': 'Aucun jeton client pour le moment.',
+      'lumen.clientTokens.discover': 'Découvrir',
+      'lumen.clientTokens.request': 'Demander',
+      'lumen.clientTokens.expired': 'Expiré',
+      'lumen.clientTokens.expires': 'Expire le',
+      'lumen.clientTokens.revokeNamed': 'Révoquer le jeton {name}',
+      'lumen.clientTokens.revoke': 'Révoquer',
+      'lumen.clientTokens.revokeTitle': 'Révoquer ce jeton ?',
+      'lumen.clientTokens.revokeBody':
+        '« {name} » perdra immédiatement son accès.',
+      'lumen.clientTokens.revokeToken': 'Révoquer le jeton',
+      'lumen.clientTokens.keepToken': 'Conserver le jeton',
+      'lumen.clientTokens.revoked': 'Jeton révoqué.',
+      'lumen.clientTokens.revokeFailure':
+        'Impossible de confirmer la révocation. Actualisez la liste avant de réessayer.',
+      'lumen.clientTokens.limitReached':
+        'Révoquez un jeton client existant avant d’en créer un autre.',
+      'lumen.clientTokens.createFailure':
+        'Impossible de confirmer la création du jeton. Vérifiez votre liste avant de réessayer.',
+      'lumen.clientTokens.copied': 'Jeton copié.',
+      'lumen.clientTokens.copyFailure':
+        'Copiez manuellement le jeton depuis le champ.',
+      'lumen.resetPassword.passwordsMustMatch':
+        'Les mots de passe doivent correspondre.',
+      'lumen.resetPassword.tooManyAttempts':
+        'Trop de tentatives. Patientez un instant, puis réessayez.',
+      'lumen.resetPassword.emailUnavailable':
+        'Le courriel de récupération du mot de passe est indisponible. Contactez votre administrateur.',
+      'lumen.resetPassword.resetFailure':
+        'Impossible de réinitialiser votre mot de passe. Réessayez ou demandez un nouveau lien.',
+      'lumen.resetPassword.requestFailure':
+        'Impossible de demander un lien de réinitialisation. Veuillez réessayer.',
+      'lumen.resetPassword.title': 'Réinitialiser Votre Mot de Passe',
+      'lumen.resetPassword.passwordReset':
+        'Votre mot de passe a été réinitialisé.',
+      'lumen.resetPassword.requested':
+        'Si cette adresse est associée à un compte, vous recevrez un lien de réinitialisation du mot de passe.',
+      'lumen.resetPassword.newPassword': 'Nouveau Mot de Passe',
+      'lumen.resetPassword.confirmPassword': 'Confirmer le Mot de Passe',
+      'lumen.resetPassword.email': 'Courriel',
+      'lumen.resetPassword.resetAction': 'Réinitialiser le Mot de Passe',
+      'lumen.resetPassword.requestAction': 'Envoyer le Lien de Récupération',
+      'lumen.resetPassword.requestNewLink': 'Demander un Nouveau Lien',
+      'lumen.resetPassword.backToSignIn': 'Retour à la Connexion',
+      'lumen.login.back': 'Retour',
+      'lumen.login.cancel': 'Annuler',
+      'lumen.login.companion': 'Compagnon Lumen',
+      'lumen.login.continueLink': 'Continuer avec le lien de connexion',
+      'lumen.login.continueServer': 'Continuer avec {serverName}',
+      'lumen.login.disabled':
+        'La connexion est désactivée. Contactez votre administrateur.',
+      'lumen.login.email': 'Courriel',
+      'lumen.login.errorConnection':
+        'Impossible de joindre {serverName}. Réessayez dans un instant.',
+      'lumen.login.errorCredentials':
+        'Ce nom d’utilisateur ou ce mot de passe est incorrect.',
+      'lumen.login.errorEmail': 'Saisissez une adresse courriel valide.',
+      'lumen.login.errorNoAccess':
+        'Ce compte n’a pas encore accès au serveur. Demandez à son administrateur de vous ajouter.',
+      'lumen.login.errorTooMany':
+        'Trop de tentatives de connexion. Patientez quelques minutes, puis réessayez.',
+      'lumen.login.errorUnknown':
+        'Une erreur est survenue lors de la connexion. Réessayez.',
+      'lumen.login.familySubtitle':
+        'Utilisez le nom d’utilisateur et le mot de passe de votre compte de visionnement.',
+      'lumen.login.forgotPassword': 'Mot de passe oublié ?',
+      'lumen.login.included': 'Lumen inclus avec SeerrNG',
+      'lumen.login.moreOptions': 'Autres options de connexion',
+      'lumen.login.oidcCallbackFailure':
+        'La connexion OpenID Connect a échoué. Recommencez.',
+      'lumen.login.oidcStartFailure':
+        'Impossible de démarrer la connexion OpenID Connect. Vérifiez la configuration du fournisseur et l’URL de SeerrNG.',
+      'lumen.login.openFullSeerr': 'Ouvrir SeerrNG complet',
+      'lumen.login.password': 'Mot de passe',
+      'lumen.login.quickGettingCode': 'Obtention d’un code…',
+      'lumen.login.quickInstructions':
+        'Dans {serverName}, ouvrez Paramètres → Quick Connect et saisissez ce code.',
+      'lumen.login.quickWaiting': 'En attente de l’approbation…',
+      'lumen.login.serverSubtitle':
+        'Utilisez le même compte que pour {serverName}.',
+      'lumen.login.serverUsername': 'Nom d’utilisateur {serverName}',
+      'lumen.login.signIn': 'Se connecter',
+      'lumen.login.signInProvider': 'Se connecter avec {providerName}',
+      'lumen.login.signInServer': 'Se connecter avec {serverName}',
+      'lumen.login.signInWithCode': 'Se connecter avec un code',
+      'lumen.login.titleBooks':
+        'Connectez-vous pour demander des films, séries et livres',
+      'lumen.login.titleVideo':
+        'Connectez-vous pour demander des films et des séries',
+      'lumen.login.useEmailInstead': 'Avec courriel et mot de passe',
+      'lumen.login.useQuickConnect': 'Utiliser Quick Connect',
+      'lumen.login.useServerInstead': 'Utiliser votre compte {serverName}',
+      'lumen.login.username': 'Nom d’utilisateur',
+      'lumen.login.retry': 'Réessayer',
+      'lumen.login.serverUnreachable':
+        'Impossible de joindre le serveur. Vérifiez votre connexion, puis réessayez.',
+      'lumen.requestHistory.openTitle': 'Ouvrir le titre',
+      'lumen.requestHistory.item': 'historique de la demande',
+      'lumen.requestHistory.invalid':
+        'Réponse de l’historique de la demande invalide.',
+      'lumen.requestHistory.loading':
+        'Chargement de l’historique de la demande…',
+      'lumen.requestHistory.requestNumber': 'Demande n° {id}',
+      'lumen.requestHistory.currentStatus': 'État actuel : {status}',
+      'lumen.requestHistory.unknown': 'Inconnu',
+      'lumen.requestHistory.episodes': 'Épisodes {episodes}',
+      'lumen.requestHistory.overQuota': 'Quota dépassé',
+      'lumen.requestHistory.findDownloadFiles':
+        'Rechercher les fichiers téléchargés',
+      'lumen.requestHistory.noHistory':
+        'Aucun historique n’a été enregistré pour cette demande.',
+      'lumen.requestHistory.showingLatest':
+        'Affichage des {shown} derniers événements sur {total}.',
+      'lumen.requestHistory.refresh': 'Actualiser le statut',
+      'lumen.requestHistory.downloadedSize':
+        '{complete} sur {total} téléchargés',
+      'lumen.requestHistory.downloadCount': '{count} téléchargements',
+      'lumen.requestHistory.estimatedCompletion': 'Fin estimée',
+      'lumen.requestHistory.ebook': 'Livre numérique',
+      'lumen.requestHistory.audiobook': 'Livre audio',
+      'lumen.requestHistory.importPending': 'importation en attente',
+      'lumen.requestHistory.attempt': 'Tentative {count}',
+      'lumen.requestHistory.ofAttempts': 'sur {count}',
+      'lumen.requestHistory.nextAttempt': 'Prochaine tentative',
+      'lumen.requestHistory.requestedSeasons': 'Saisons demandées',
+      'lumen.requestHistory.changeRequest': 'Modifier',
+      'lumen.requestHistory.removeRequest': 'Retirer la demande',
+      'lumen.softwareHistory.confirmDecline':
+        'Refuser cette demande de logiciel ?',
+      'lumen.softwareHistory.confirmWithdraw':
+        'Retirer cette demande de logiciel en attente ?',
+      'lumen.softwareHistory.confirmCancel':
+        'Annuler cette demande de logiciel ?',
+      'lumen.softwareHistory.confirmStopTracking':
+        'Retirer cette demande et son historique de SeerrNG ? Le téléchargement chez le fournisseur continuera.',
+      'lumen.softwareHistory.confirmAction': 'Confirmer : {action}',
+      'lumen.softwareHistory.confirmAfterNoDownload':
+        'Aucun téléchargement trouvé — {action}',
+      'lumen.softwareHistory.selectionEdition': 'Édition complète',
+      'lumen.softwareHistory.selectionOneAddon': '1 extension',
+      'lumen.softwareHistory.selectionManyAddons': '{count} extensions',
+      'lumen.softwareHistory.selectionAddons': 'Extensions sélectionnées',
+      'lumen.softwareHistory.openPatchVersion':
+        'Ouvrir la version du correctif demandée',
+      'lumen.softwareHistory.openPatchProject': 'Ouvrir le projet du correctif',
+      'lumen.softwareHistory.keepOriginal': 'Conserver l’original',
+      'lumen.softwareHistory.replaceOriginal': 'Remplacer l’original',
+      'lumen.downloads.page': 'Page {page}',
+      'lumen.downloads.previewFailed':
+        'Impossible de prévisualiser ces fichiers.',
+      'lumen.downloads.searchFailed':
+        'Impossible de rechercher dans la bibliothèque de ce service.',
+      'lumen.downloads.actionFailed':
+        'Impossible de confirmer l’action : {message} Consultez l’avertissement actuel avant de réessayer.',
+      'lumen.downloads.previewLoading': 'Chargement de l’aperçu des fichiers…',
+      'lumen.indexerSearch.noCategories':
+        'Aucune catégorie de média activée n’est disponible pour ce compte.',
+      'lumen.indexerSearch.resultsFound':
+        'Résultats retournés par Prowlarr : {count}.',
+      'lumen.indexerSearch.handoffUnconfirmed':
+        'Le résultat a peut-être été envoyé. Vérifiez le client avant de rechercher ou de réessayer.',
+      'lumen.adminProwlarr.connectionHeading': 'Connexion',
+      'lumen.adminProwlarr.availableCategories':
+        'Catégories Prowlarr disponibles',
+      'lumen.adminProwlarr.categoryIdsLabel': 'ID de catégorie {category}',
+      'lumen.adminProwlarr.assignedCount': '{category} · {count} attribué(s)',
+      'lumen.adminProwlarr.searchLimitLabel':
+        'Limite de recherche pour {indexer}',
+      'lumen.adminProwlarr.coverageSummary':
+        '{enabled} indexeurs avec recherche activée sur {total}.',
+      'lumen.adminProwlarr.version': 'Version {version}.',
+      'lumen.adminProwlarr.disabled': 'Désactivé',
+      'lumen.adminProwlarr.searchEnabled': 'Recherche activée',
+      'lumen.adminProwlarr.searchUnavailable': 'Recherche indisponible',
+      'lumen.adminProwlarr.indexer': 'Indexeur {id}',
+      'lumen.adminProwlarr.connectionTested': 'Connexion Prowlarr testée.',
+      'lumen.adminProwlarr.invalidSettings':
+        'Vérifiez le port, les limites de recherche, les ID de catégorie et les attributions d’indexeurs.',
+      'lumen.adminProwlarr.loadingIndexers': 'Chargement des indexeurs…',
+      'lumen.adminProwlarr.backToYou': 'Retour à Vous',
+      'lumen.adminProwlarr.loadingSettings':
+        'Chargement des paramètres Prowlarr…',
+      'lumen.adminProwlarr.indexerCount': '{count} indexeurs',
+      'lumen.adminProwlarr.savedApiKeyPlaceholder': 'Clé enregistrée',
+      'lumen.adminLogs.title': 'Journaux système',
+      'lumen.adminLogs.backToAccount': 'Retour au compte',
+      'lumen.adminLogs.refresh': 'Actualiser',
+      'lumen.adminLogs.liveRefresh': 'Actualisation automatique',
+      'lumen.adminLogs.search': 'Rechercher',
+      'lumen.adminLogs.pageSize': 'Taille de page',
+      'lumen.adminLogs.level.debug': 'Débogage et supérieur',
+      'lumen.adminLogs.level.info': 'Informations et supérieur',
+      'lumen.adminLogs.level.warn': 'Avertissements et erreurs',
+      'lumen.adminLogs.level.error': 'Erreurs uniquement',
+      'lumen.adminLogs.copyFailure':
+        'Impossible de copier cette entrée de journal.',
+      'lumen.adminLogs.loading': 'Chargement des journaux système…',
+      'lumen.adminLogs.noResults': 'Aucun journal ne correspond à ces filtres.',
+      'lumen.adminLogs.systemLogs': 'journaux système',
+      'lumen.adminLogs.page': 'Page {page}',
+      'lumen.adminLogs.previousPage': 'Page précédente',
+      'lumen.adminLogs.nextPage': 'Page suivante',
+      'lumen.adminJobs.title': 'Tâches planifiées',
+      'lumen.adminJobs.backToAccount': 'Retour au compte',
+      'lumen.adminJobs.systemCaches': 'Caches système',
+      'lumen.adminJobs.refresh': 'Actualiser',
+      'lumen.adminJobs.scheduledJobs': 'tâches planifiées',
+      'lumen.adminJobs.loading': 'Chargement des tâches planifiées…',
+      'lumen.adminJobs.empty': 'Aucune tâche planifiée.',
+      'lumen.adminJobs.running': 'En cours',
+      'lumen.adminJobs.idle': 'Inactive',
+      'lumen.adminJobs.nextRun': 'Prochaine exécution : {date}',
+      'lumen.adminJobs.cronSchedule': 'Planning Cron',
+      'lumen.adminJobs.saveSchedule': 'Enregistrer le planning',
+      'lumen.adminJobs.cancelEditing': 'Annuler la modification',
+      'lumen.adminJobs.editSchedule': 'Modifier le planning',
+      'lumen.adminJobs.disableSchedule': 'Désactiver le planning',
+      'lumen.adminJobs.enableSchedule': 'Activer le planning',
+      'lumen.adminJobs.cancellationUnavailable': 'Annulation indisponible',
+      'lumen.adminJobs.goBack': 'Retour',
+      'lumen.adminJobs.updateFailure':
+        'Impossible de mettre à jour cette tâche.',
+      'lumen.adminJobs.frequency.label': 'Fréquence',
+      'lumen.adminJobs.frequency.custom': 'Planning personnalisé',
+      'lumen.adminJobs.frequency.daily': 'Tous les jours à 01:00',
+      'lumen.adminJobs.frequency.atSeconds':
+        'Aux secondes 0 et 45 de chaque minute',
+      'lumen.adminJobs.frequency.days.one': 'Tous les {count} jours du mois',
+      'lumen.adminJobs.frequency.days.two': 'Tous les {count} jours du mois',
+      'lumen.adminJobs.frequency.days.few': 'Tous les {count} jours du mois',
+      'lumen.adminJobs.frequency.days.many': 'Tous les {count} jours du mois',
+      'lumen.adminJobs.frequency.days.other': 'Tous les {count} jours du mois',
+      'lumen.adminJobs.frequency.seconds.one': 'Toutes les {count} seconde',
+      'lumen.adminJobs.frequency.seconds.two': 'Toutes les {count} secondes',
+      'lumen.adminJobs.frequency.seconds.few': 'Toutes les {count} secondes',
+      'lumen.adminJobs.frequency.seconds.many': 'Toutes les {count} secondes',
+      'lumen.adminJobs.frequency.seconds.other': 'Toutes les {count} secondes',
+      'lumen.adminJobs.frequency.minutes.one': 'Toutes les {count} minute',
+      'lumen.adminJobs.frequency.minutes.two': 'Toutes les {count} minutes',
+      'lumen.adminJobs.frequency.minutes.few': 'Toutes les {count} minutes',
+      'lumen.adminJobs.frequency.minutes.many': 'Toutes les {count} minutes',
+      'lumen.adminJobs.frequency.minutes.other': 'Toutes les {count} minutes',
+      'lumen.adminJobs.frequency.hours.one': 'Toutes les {count} heure',
+      'lumen.adminJobs.frequency.hours.two': 'Toutes les {count} heures',
+      'lumen.adminJobs.frequency.hours.few': 'Toutes les {count} heures',
+      'lumen.adminJobs.frequency.hours.many': 'Toutes les {count} heures',
+      'lumen.adminJobs.frequency.hours.other': 'Toutes les {count} heures',
+      'lumen.adminCaches.title': 'Caches système',
+      'lumen.adminCaches.scheduledJobs': 'Tâches planifiées',
+      'lumen.adminCaches.refresh': 'Actualiser',
+      'lumen.adminCaches.systemCaches': 'caches système',
+      'lumen.adminCaches.loading': 'Chargement des caches système…',
+      'lumen.adminCaches.apiCaches': 'Caches API',
+      'lumen.adminCaches.noApiCaches': 'Aucun cache API.',
+      'lumen.adminCaches.keyBytes': 'octets de clés',
+      'lumen.adminCaches.valueBytes': 'octets de valeurs',
+      'lumen.adminCaches.flush': 'Vider',
+      'lumen.adminCaches.imageCaches': 'Caches d’images',
+      'lumen.adminCaches.diskLocation': 'Emplacement du cache disque',
+      'lumen.adminCaches.tmdbImages': 'Images TMDB',
+      'lumen.adminCaches.avatars': 'Avatars',
+      'lumen.adminCaches.bytes': 'octets',
+      'lumen.adminCaches.dnsUnavailable':
+        'Les données du cache DNS sont indisponibles.',
+      'lumen.adminCaches.noDnsEntries': 'Aucune entrée DNS en cache.',
+      'lumen.adminCaches.secondsOld': 'il y a {count} s',
+      'lumen.adminCaches.flushDnsEntry': 'Vider l’entrée DNS',
+      'lumen.adminCaches.confirmFlush': 'Vider le cache ?',
+      'lumen.adminCaches.flushFailure': 'Impossible de vider ce cache.',
+      'lumen.adminCaches.cacheFlushed': 'Cache {name} vidé.',
+      'lumen.adminCaches.dnsFlushed': 'Entrée DNS {name} vidée.',
+      'lumen.adminCaches.metric.size': 'Taille',
+      'lumen.adminAbout.backToAccount': 'Retour au compte',
+      'lumen.adminAbout.serverInformation': 'informations du serveur',
+      'lumen.adminAbout.serverInformationTitle': 'Informations du serveur',
+      'lumen.adminAbout.loadingServerInformation':
+        'Chargement des informations du serveur…',
+      'lumen.adminAbout.unavailable': 'Indisponible',
+      'lumen.adminAbout.versionCheckDisabled':
+        'Vérification de la version désactivée',
+      'lumen.adminAbout.updateAvailable': 'Mise à jour disponible',
+      'lumen.adminAbout.supportAndReleases': 'Assistance et versions',
+      'lumen.adminAbout.releaseNotes': 'Notes de version',
+      'lumen.adminAbout.discord': 'Discord',
+      'lumen.adminAbout.releaseHistory.title': 'Historique des versions',
+      'lumen.adminAbout.releaseHistory.show': 'Afficher les versions',
+      'lumen.adminAbout.releaseHistory.hide': 'Masquer les versions',
+      'lumen.adminAbout.releaseHistory.loadingNotes':
+        'Chargement des notes de version…',
+      'lumen.adminAbout.releaseHistory.failure':
+        'Impossible de charger l’historique des versions.',
+      'lumen.adminAbout.releaseHistory.retry': 'Réessayer',
+      'lumen.adminAbout.releaseHistory.loading': 'Chargement des versions…',
+      'lumen.adminAbout.developmentBuild':
+        'Ce serveur utilise une version de développement.',
+      'lumen.adminCategories.backToAccount': 'Retour au compte',
+      'lumen.adminCategories.categoriesWhat': 'les catégories de médias',
+      'lumen.adminCategories.loading': 'Chargement des catégories de médias…',
+      'lumen.adminCategories.unavailable':
+        'Les paramètres des catégories ne sont pas disponibles.',
+      'lumen.adminCategories.saveCategories': 'Enregistrer les catégories',
+      'lumen.adminCategories.saveDefaultCategories':
+        'Enregistrer les catégories par défaut',
+      'lumen.adminCategories.defaultUserCategories':
+        'Catégories utilisateur par défaut',
+      'lumen.adminCategories.defaultsDescription':
+        'Ces choix s’appliquent aux comptes qui héritent des paramètres par défaut. Les restrictions de catégories de l’instance s’appliquent toujours.',
+      'lumen.adminCategories.defaultCategoriesSaved':
+        'Catégories par défaut enregistrées.',
+      'lumen.adminCategories.confirmFailure':
+        'Le serveur n’a pas confirmé l’enregistrement des catégories.',
+      'lumen.adminCategories.ageGateConfirmFailure':
+        'Le serveur n’a pas confirmé l’enregistrement des paramètres du contrôle d’âge.',
+      'lumen.adminCategories.ageGateSaved':
+        'Paramètres du contrôle d’âge enregistrés.',
+      'lumen.adminCategories.ageGateSaveFailure':
+        'Impossible d’enregistrer les paramètres du contrôle d’âge.',
+      'lumen.adminCategories.saveAgeGate': 'Enregistrer le contrôle d’âge',
+      'lumen.adminCategories.adultEnabledNote':
+        'La découverte de contenus pour adultes nécessite un service Whisparr v3 configuré et l’autorisation correspondante du compte. Les comptes restreints n’y ont pas accès.',
+      'lumen.mediaCategory.sports': 'Sports',
+      'lumen.error.sessionEnded': 'Votre session a expiré. Reconnectez-vous.',
+      'lumen.error.noPermission':
+        'Vous n’êtes pas autorisé à effectuer cette action.',
+      'lumen.error.timeout':
+        'Le serveur a mis trop de temps à répondre. Réessayez.',
+      'lumen.error.rateLimited':
+        'Trop de demandes. Attendez une minute, puis réessayez.',
+      'lumen.error.serverProblem':
+        'Le serveur a rencontré un problème. Réessayez dans un instant.',
+      'lumen.error.offline':
+        'Vous êtes hors ligne. Vérifiez votre connexion, puis réessayez.',
+      'lumen.error.serverUnreachable':
+        'Impossible de joindre le serveur. Vérifiez votre connexion, puis réessayez.',
+      'lumen.adminConnectionHosts.title': 'Hôtes de connexion',
+      'lumen.adminConnectionHosts.backToAccount': 'Retour au compte',
+      'lumen.adminConnectionHosts.sectionTitle': 'Hôtes enregistrés',
+      'lumen.adminConnectionHosts.description':
+        'Enregistrez des noms d’hôte ou des adresses IP pour les réutiliser dans les paramètres des services. Une adresse enregistrée ne remplace que le nom d’hôte ou l’adresse IP, sans schéma ni port. La connexion n’est ni testée ni établie.',
+      'lumen.adminConnectionHosts.empty': 'Aucun hôte de connexion enregistré.',
+      'lumen.adminConnectionHosts.name': 'Nom',
+      'lumen.adminConnectionHosts.hostname': 'Nom d’hôte',
+      'lumen.adminConnectionHosts.removeHost': 'Supprimer l’hôte {index}',
+      'lumen.adminConnectionHosts.remove': 'Supprimer',
+      'lumen.adminConnectionHosts.add': 'Ajouter',
+      'lumen.adminConnectionHosts.save': 'Enregistrer',
+      'lumen.adminConnectionHosts.discard': 'Annuler',
+      'lumen.adminConnectionHosts.saved': 'Hôtes de connexion enregistrés.',
+      'lumen.adminConnectionHosts.saveFailure':
+        'Impossible d’enregistrer les hôtes de connexion.',
+      'lumen.adminConnectionHosts.what': 'les hôtes de connexion',
+      'lumen.adminConnectionHosts.loadFailureTitle':
+        'Impossible de charger les hôtes de connexion',
+      'lumen.adminConnectionHosts.retry': 'Réessayer',
+      'lumen.adminConnectionHosts.loading':
+        'Chargement des hôtes de connexion…',
+      'lumen.adminConnectionHosts.invalidPayload':
+        'Les hôtes enregistrés ne sont pas valides.',
+      'lumen.adminConnectionHosts.maximumHosts':
+        'Enregistrez au maximum 16 hôtes de connexion.',
+      'lumen.adminConnectionHosts.requiredFields':
+        'Chaque hôte doit avoir un nom et un nom d’hôte.',
+      'lumen.adminConnectionHosts.invalidHost':
+        'Saisissez un nom d’hôte de 64 caractères maximum et un nom d’hôte ou une adresse IP sans schéma ni port.',
+      'lumen.adminConnectionHosts.portIncluded':
+        'Les noms d’hôte enregistrés ne doivent pas inclure de port.',
+      'lumen.adminConnectionHosts.invalidAddress':
+        'Saisissez un nom d’hôte ou une adresse IP valide.',
+      'lumen.adminConnectionHosts.duplicateName':
+        'Les noms des hôtes enregistrés doivent être uniques.',
     },
   },
   {
@@ -4872,6 +8947,45 @@ export const localeData = [
       'components.PermissionEdit.viewrequests': 'Prikaz zahtjeva',
       'components.PermissionEdit.viewwatchlists':
         'Prikaži Plex popise gledanja',
+      'components.IssueDetails.allepisodes': 'Sve Epizode',
+      'i18n.back': 'Natrag',
+      'components.Settings.SettingsLogs.logs': 'Zapisi',
+      'components.Settings.SettingsLogs.level': 'Važnost',
+      'components.Settings.SettingsLogs.filterDebug': 'Otklanjanje grešaka',
+      'components.Settings.SettingsLogs.filterInfo': 'Informacije',
+      'components.Settings.SettingsLogs.filterWarn': 'Upozorenje',
+      'components.Settings.SettingsLogs.filterError': 'Greška',
+      'components.Settings.SettingsLogs.logDetails': 'Detalji zapisa',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Kopiraj u međuspremnik',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Poruka zapisnika je kopirana u međuspremnik.',
+      'components.Settings.SettingsJobsCache.runnow': 'Pokreni sada',
+      'components.Settings.SettingsJobsCache.canceljob': 'Prekini zadatak',
+      'components.Settings.SettingsJobsCache.process': 'Obrada',
+      'components.Settings.SettingsJobsCache.command': 'Naredba',
+      'components.Settings.SettingsJobsCache.cachehits': 'Pogodci',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Ukupno ključeva',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Promašaji',
+      'components.Settings.SettingsJobsCache.flushcache':
+        'Isprazni predmemoriju',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Slike spremljene u predmemoriju',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Najnovije',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Podaci izdanja trenutačno nisu nedostupni.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Izdanja',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Prikaz na GitHubu',
+      'components.Settings.SettingsAbout.appDataPath': 'Mapa podataka',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentacija',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Rasprave na GitHubu',
+      'components.Settings.SettingsAbout.timezone': 'Vremenska zona',
+      'components.Settings.SettingsAbout.totalmedia': 'Ukupno medija',
+      'components.Settings.SettingsAbout.totalrequests': 'Ukupno zahtjeva',
+      'components.Settings.SettingsAbout.uptodate': 'Aktualno',
+      'components.Settings.SettingsAbout.version': 'Verzija',
     },
   },
   {
@@ -4911,6 +9025,7 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'צפייה בבעיות',
       'components.PermissionEdit.viewrecent': 'צפייה בנוסף לאחרונה',
       'components.PermissionEdit.viewrequests': 'צפייה בבקשות',
+      'components.IssueDetails.allepisodes': 'כל הפרקים',
     },
   },
   {
@@ -5254,6 +9369,407 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': 'हाल में जोड़ी गई सामग्री देखें',
       'components.PermissionEdit.viewrequests': 'अनुरोध देखें',
       'components.PermissionEdit.viewwatchlists': 'वॉचलिस्ट देखें',
+      'components.RequestModal.RequestTree.seasonNumber': 'सीज़न {number}',
+      'components.RequestModal.RequestTree.specials': 'विशेष एपिसोड',
+      'components.Requests.episodeQueue': 'एपिसोड कतार',
+      'components.Requests.retry': 'पुनः प्रयास करें',
+      'components.Requests.approve': 'मंज़ूर करें',
+      'components.Requests.decline': 'अस्वीकार करें',
+      'components.Requests.requested': 'अनुरोधित',
+      'components.Requests.approved': 'मंज़ूर',
+      'components.Requests.searching': 'खोज जारी है',
+      'components.Requests.downloading': 'डाउनलोड हो रहा है',
+      'components.Requests.importing': 'आयात जारी है',
+      'components.Requests.library': 'लाइब्रेरी में जोड़ा जा रहा है',
+      'components.Requests.available': 'उपलब्ध',
+      'components.Requests.unavailable': 'उपलब्ध नहीं',
+      'components.Requests.failed': 'विफल',
+      'components.Requests.declined': 'अस्वीकृत',
+      'components.Requests.cancelled': 'रद्द किया गया',
+      'components.Requests.pending': 'लंबित',
+      'components.Requests.completed': 'पूरा हुआ',
+      'components.Requests.statusUpdated': 'स्थिति अद्यतन',
+      'i18n.unknown': 'अज्ञात',
+      'components.Requests.history': 'इतिहास',
+      'components.RequestStatus.SoftwareRequests.approve': 'मंज़ूर करें',
+      'components.RequestStatus.SoftwareRequests.approved': 'मंज़ूर',
+      'components.RequestStatus.SoftwareRequests.available': 'उपलब्ध',
+      'components.RequestStatus.SoftwareRequests.cancel': 'रद्द करें',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'रद्द किया गया',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'रद्द किया गया अनुरोध हटाएँ',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        'क्या आप इस रद्द किए गए अनुरोध को हटाना चाहते हैं?',
+      'components.RequestStatus.SoftwareRequests.decline': 'अस्वीकार करें',
+      'components.RequestStatus.SoftwareRequests.declined': 'अस्वीकृत',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'प्रतिलिपियाँ डाउनलोड करें',
+      'components.RequestStatus.SoftwareRequests.downloading':
+        'डाउनलोड हो रहा है',
+      'components.RequestStatus.SoftwareRequests.failed': 'विफल',
+      'components.RequestStatus.SoftwareRequests.history': 'इतिहास',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'स्थिति इतिहास लोड हो रहा है...',
+      'components.RequestStatus.SoftwareRequests.importing':
+        'आयात का सत्यापन हो रहा है',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'यह सॉफ़्टवेयर अनुरोध अपडेट नहीं किया जा सका।',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        'स्थिति के कोई सहेजे गए अपडेट उपलब्ध नहीं हैं।',
+      'components.RequestStatus.SoftwareRequests.pending': 'लंबित स्वीकृति',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'अनुरोधों से हटाएँ',
+      'components.RequestStatus.SoftwareRequests.retry': 'पुनः प्रयास करें',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'प्रदाता यह पुष्टि नहीं कर सकता कि पिछला डाउनलोड शुरू हुआ था या नहीं। डाउनलोड क्लाइंट की कतार और इतिहास जाँचें। केवल तभी जारी रखें जब कोई मेल खाता डाउनलोड मौजूद न हो।',
+      'components.RequestStatus.SoftwareRequests.searching': 'खोज जारी है',
+      'components.RequestStatus.SoftwareRequests.title': 'सॉफ्टवेयर अनुरोध',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'वापस लें',
+      'i18n.back': 'वापस',
+      'downloads.actions': 'कार्य इतिहास',
+      'downloads.active': 'सक्रिय चेतावनी',
+      'downloads.activeState': 'ध्यान देना',
+      'downloads.actor': 'उपयोगकर्ता {id}',
+      'downloads.blocked': 'मैन्युअल रूप से ब्लॉकलिस्ट में जोड़ा गया',
+      'downloads.blocklist':
+        'इसे फिर से डाउनलोड करने से बचने के लिए इस रिलीज को ब्लॉक करें',
+      'downloads.blocklisted': 'ब्लॉक करने का अनुरोध',
+      'downloads.cancel': 'रद्द करें',
+      'downloads.changed': 'सेवा विन्यास बदल गया',
+      'downloads.clientKept': 'क्लाइंट फ़ाइलों को रखा',
+      'downloads.clientRemoved': 'ग्राहक को हटाने का अनुरोध',
+      'downloads.confirm': 'अस्वीकृति की पुष्टि',
+      'downloads.copy': 'प्रतिलिपि या हार्डलिंक (कीप स्रोत फ़ाइलें)',
+      'downloads.denied': 'प्रबंधित करने की अनुमति आवश्यक है।',
+      'downloads.description':
+        'अधिग्रहण चेतावनी की समीक्षा करें, मैनुअल आयात के लिए फ़ाइलों का चयन करें और अवांछित डाउनलोड को अस्वीकार करें।',
+      'downloads.disappeared': 'अब कतार में नहीं',
+      'downloads.empty': 'इस दृष्टिकोण में कोई डाउनलोड चेतावनी नहीं है।',
+      'downloads.failed': 'इनबॉक्स को लोड नहीं किया जा सकता है।',
+      'downloads.failedState': 'आवश्यकता समीक्षा',
+      'downloads.history': 'इतिहास',
+      'downloads.import': 'चयनित फ़ाइलों को आयात करें',
+      'downloads.importFailed': 'आयात विफल',
+      'downloads.importMode': 'आयात मोड',
+      'downloads.importReview': 'एक पुष्टि फ़ाइल आयात के बिना पूरा आयात करें',
+      'downloads.importWarning':
+        'लक्ष्य की पुष्टि करें और सभी अस्वीकृति कारणों की समीक्षा करें। अधिग्रहण सेवा फ़ाइल की गुणवत्ता और प्रकरण मिलान को निर्धारित करती है।',
+      'downloads.imported': 'मैन्युअल रूप से आयातित',
+      'downloads.importingState': 'आयात लंबित',
+      'downloads.ineligible': 'कोई पुष्टि मैच नहीं - आयात नहीं कर सकता',
+      'downloads.loading': 'डाउनलोड करने की चेतावनी...',
+      'downloads.move': 'ले जाएँ (स्रोत फ़ाइलों को हटा दें)',
+      'downloads.next': 'अगला पृष्ठ',
+      'downloads.noFiles':
+        'एक पुष्टि पुस्तकालय लक्ष्य के साथ कोई फाइल नहीं मिली थी।',
+      'downloads.notBlocklisted': 'रिलीज़ ब्लॉकलिस्ट में नहीं है',
+      'downloads.outcome':
+        'कार्रवाई की पुष्टि नहीं की जा सकती। Retrying से पहले ताज़ा और समीक्षा करें।',
+      'downloads.partial':
+        'कुछ अधिग्रहण सेवाओं की जांच नहीं की जा सकती है। उनकी चेतावनी तारीख से लापता या बाहर हो सकती है।',
+      'downloads.pending':
+        'कार्रवाई स्वीकार किया। बैकएंड परिणाम की जांच करने के लिए ताज़ा करें।',
+      'downloads.preview': 'फ़ाइलों का पूर्वावलोकन करें',
+      'downloads.previous': 'पिछला पृष्ठ',
+      'downloads.recovered': 'वसूली',
+      'downloads.refresh': 'रिफ्रेश',
+      'downloads.reject': 'डाउनलोड करें',
+      'downloads.rejected': 'मैन्युअल रूप से खारिज कर दिया',
+      'downloads.rejectingState': 'अस्वीकृति लंबित',
+      'downloads.rejection':
+        'Rejecting अधिग्रहण कतार से इस मद को हटा देता है। पुष्टि करने से पहले विकल्पों की समीक्षा करें।',
+      'downloads.remove':
+        'अपने डाउनलोड क्लाइंट से डाउनलोड और फ़ाइलों को निकालें',
+      'downloads.resolvedState': 'समाधान हुआ',
+      'downloads.search': 'खोजें',
+      'downloads.select': 'चयन {name}',
+      'downloads.targetChoose': 'लाइब्रेरी मैच चुनें',
+      'downloads.targetHelp':
+        'इस अधिग्रहण सेवा में पहले से ही शीर्षक खोजें। एक मैच चुनना एक नया खिताब नहीं जोड़ता है।',
+      'downloads.targetLabel': 'पुस्तकालय',
+      'downloads.targetNoResults':
+        'इस सेवा पुस्तकालय में कोई मेलिंग खिताब नहीं मिला।',
+      'downloads.targetQuery': 'मूवी, श्रृंखला, एल्बम, या पुस्तक',
+      'downloads.targetRequired':
+        'फ़ाइलों को आयात करने से पहले लाइब्रेरी मैच चुनें।',
+      'downloads.targetSelected': 'चयनित मैच: {title}{subtitle}',
+      'downloads.title': 'डाउनलोड इनबॉक्स',
+      'downloads.truncated': 'केवल पहले 20 अधिग्रहण सेवाओं की जांच की गई थी।',
+      'downloads.unknownImport': 'अज्ञात परिणाम आयात करें',
+      'downloads.unknownReject': 'अस्वीकृति परिणाम अज्ञात',
+      'components.IndexerSearch.accessDenied':
+        'इंडेक्सर खोजने के लिए आपके पास अनुरोध प्रबंधन की अनुमति होनी चाहिए।',
+      'components.IndexerSearch.categories': 'इंडेक्सर श्रेणियां',
+      'components.IndexerSearch.category': 'मीडिया श्रेणी',
+      'components.IndexerSearch.categoryAdult': 'वयस्क',
+      'components.IndexerSearch.categoryAudiobook': 'ऑडियोबुक',
+      'components.IndexerSearch.categoryComic': 'कॉमिक्स',
+      'components.IndexerSearch.categoryEbook': 'पुस्तकें',
+      'components.IndexerSearch.categoryGame': 'PC गेम्स',
+      'components.IndexerSearch.categoryMagazine': 'पत्रिकाएँ',
+      'components.IndexerSearch.categoryModern': 'आधुनिक रोम',
+      'components.IndexerSearch.categoryMovie': 'फ़िल्में',
+      'components.IndexerSearch.categoryMusic': 'संगीत',
+      'components.IndexerSearch.categoryRetro': 'रेट्रो रोम',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Prowlarr की सेटिंग खोलें',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr इस रिलीज़ को भेज नहीं सका। नई खोज चलाएँ और फिर कोशिश करें।',
+      'components.IndexerSearch.grabs': 'डाउनलोड संख्या',
+      'components.IndexerSearch.intro':
+        'SeerrNG की हर मीडिया श्रेणी में अपने Prowlarr इंडेक्सर पर रिलीज़ खोजें।',
+      'components.IndexerSearch.leechers': 'लीचर',
+      'components.IndexerSearch.loadFailed':
+        'Prowlarr खोज विन्यास लोड नहीं किया जा सकता है।',
+      'components.IndexerSearch.loadMore': 'अधिक परिणाम लोड करें',
+      'components.IndexerSearch.loadingMore': 'लोड हो रहा है…',
+      'components.IndexerSearch.manualMode':
+        'खोज परिणाम SeerrNG अनुरोधों से अलग हैं। आप किसी परिणाम को Prowlarr में कॉन्फ़िगर किए गए डाउनलोड क्लाइंट को भेज सकते हैं।',
+      'components.IndexerSearch.noConnection': 'Prowlarr कनेक्ट नहीं है।',
+      'components.IndexerSearch.noConnectionHelp':
+        'Prowlarr को सेटिंग्स> सेवाओं के तहत जोड़ने के लिए एक प्रशासक से पूछें।',
+      'components.IndexerSearch.noResults':
+        'इस खोज से मेल खाने वाली कोई रिलीज़ नहीं मिली।',
+      'components.IndexerSearch.noResultsHelp':
+        'Prowlarr में श्रेणी फ़िल्टर और चालू इंडेक्सर जाँचें। खोज परिणाम यह सुनिश्चित नहीं करते कि कोई ऐप रिलीज़ आयात कर सकता है।',
+      'components.IndexerSearch.openResult': 'इंडेक्सर का विवरण खोलें',
+      'components.IndexerSearch.protocol': 'प्रोटोकॉल',
+      'components.IndexerSearch.published': 'प्रकाशित',
+      'components.IndexerSearch.query': 'खोज शब्द',
+      'components.IndexerSearch.queryPlaceholder':
+        'शीर्षक, लेखक, एल्बम, अंक, या खेल का नाम',
+      'components.IndexerSearch.requestStillUsesManager':
+        'किसी परिणाम को भेजने से SeerrNG अनुरोध नहीं बदलता। Prowlarr उसे अपने कॉन्फ़िगर किए गए डाउनलोड क्लाइंट को भेजता है।',
+      'components.IndexerSearch.resultCount':
+        'Prowlarr ने {count} रिलीज़ लौटाईं।',
+      'components.IndexerSearch.search': 'इंडेक्सरों में खोजें',
+      'components.IndexerSearch.searchFailed':
+        'Prowlarr खोज विफल हो गया। कनेक्शन की जाँच करें और फिर से प्रयास करें।',
+      'components.IndexerSearch.searching': 'इंडेक्सरों में खोजा जा रहा है…',
+      'components.IndexerSearch.seeders': 'सीडर्स',
+      'components.IndexerSearch.sendToDownloader': 'डाउनलोडर में भेजें',
+      'components.IndexerSearch.sendingToDownloader': 'भेजा जा रहा है…',
+      'components.IndexerSearch.sentToDownloader':
+        'Prowlarr के कॉन्फ़िगर किए गए डाउनलोड क्लाइंट में भेज दिया गया।',
+      'components.IndexerSearch.size': 'आकार',
+      'components.IndexerSearch.title': 'इंडेक्सर खोज',
+      'components.IndexerSearch.tooManySearches':
+        'खोज सीमा तक पहुंच गई। फिर से खोज करने से पहले एक मिनट की प्रतीक्षा करें।',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'कोई सक्षम खोज अनुक्रमणिका उपलब्ध नहीं हैं। Prowlarr में एक इंडेक्सर को सक्षम करें या श्रेणी फिल्टर को समायोजित करें।',
+      'components.SettingsProwlarr.addDetectedMatches':
+        'मैचों का पता चला{count})',
+      'components.SettingsProwlarr.address': 'होस्टनाम',
+      'components.SettingsProwlarr.adult': 'अल्ड',
+      'components.SettingsProwlarr.apiKey': 'API कुंजी',
+      'components.SettingsProwlarr.apiKeySaved':
+        'एक कुंजी बचाई जाती है। इसका उपयोग करने के लिए इस खाली को छोड़ दें।',
+      'components.SettingsProwlarr.audiobook': 'ऑडियोबुक',
+      'components.SettingsProwlarr.basePath': 'बेस पथ',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'प्रत्येक खोज के साथ भेजे गए Prowlarr श्रेणियां चुनें। डिफ़ॉल्ट मानक Newznab/Torznab श्रेणियों का उपयोग करते हैं; सक्षम सूचकांकों द्वारा विज्ञापित कस्टम श्रेणियों को देखने के लिए कनेक्शन का परीक्षण करें।',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'कम से कम एक श्रेणी का चयन करें।',
+      'components.SettingsProwlarr.categoryMappingTitle': 'श्रेणी फिल्टर',
+      'components.SettingsProwlarr.clearApiKey': 'बचाया API कुंजी निकालें',
+      'components.SettingsProwlarr.comic': 'कॉमिक्स',
+      'components.SettingsProwlarr.connected': 'Prowlarr से कनेक्ट {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'गिनती में सक्षम, खोज योग्य इंडेक्सर शामिल हैं जो कम से कम एक चयनित श्रेणी के लिए समर्थन का विज्ञापन करते हैं। वे खोज कवरेज दिखाते हैं, सफल हड़प या आयात नहीं करते हैं।',
+      'components.SettingsProwlarr.coverageTitle': 'मध्यम से इंडेक्सर कवरेज',
+      'components.SettingsProwlarr.description':
+        'एक बार अपने Prowlarr उदाहरण को कनेक्ट करने के लिए, आप पहले से ही वहाँ प्रबंधन सूचकांकों भर में श्रेणी-aware मैनुअल खोजों को चलाने के लिए।',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        'सुझाए गए कस्टम श्रेणियां उनके विज्ञापित नामों से मेल खाती हैं। उन्हें बचाने से पहले की समीक्षा करें; यह नहीं बदलता है Prowlarr या डाउनलोड भेजना।',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr प्रबंधन स्वीकार किया API कनेक्शन। ये परिणाम प्रत्येक सक्षम खोज अनुक्रमक को अलग से परीक्षण करते हैं; विकलांग-उद्देश्य तिथियों से आती है Prowlarr.',
+      'components.SettingsProwlarr.diagnosticFailed': 'विफल',
+      'components.SettingsProwlarr.diagnosticOk': 'कनेक्ट',
+      'components.SettingsProwlarr.diagnosticTitle': 'इंडेक्सर कनेक्शन परिणाम',
+      'components.SettingsProwlarr.disabledUntil': 'जब तक अक्षम {date}',
+      'components.SettingsProwlarr.ebook': 'पुस्तकें',
+      'components.SettingsProwlarr.game': 'PC गेम्स',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'प्रत्येक मीडिया प्रकार के लिए किन सक्षम Prowlarr इंडेक्सर खोजे जाने चाहिए, यह चुनें। Windows/Linux पर Ctrl-क्लिक या macOS पर Command-क्लिक करके कई इंडेक्सर चुनें। खाली चयन उस प्रकार के लिए खोज को निष्क्रिय कर देता है।',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        '{category} के लिए इंडेक्सर',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'मीडिया प्रकार के अनुसार इंडेक्सर असाइनमेंट',
+      'components.SettingsProwlarr.indexerCount': 'इंडेक्सर: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'उपयोगकर्ता खोज परिणामों से इंडेक्सर विवरण खोल सकते हैं।',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'उपयोगकर्ताओं से इंडेक्सर नाम और विवरण लिंक छिपाए गए हैं।',
+      'components.SettingsProwlarr.indexerNotSearchable': '(खोज योग्य नहीं)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'खोज सीमाएँ',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'प्रत्येक उपयोगकर्ता की प्रति मिनट कुल खोजों और प्रत्येक चयनित इंडेक्सर के लिए खोजों को सीमित करें।',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr बचाया जाता है, लेकिन इसकी अनुक्रमणिका सूची अनुपलब्ध है।',
+      'components.SettingsProwlarr.keepApiKey': 'बचाना API कुंजी',
+      'components.SettingsProwlarr.loadFailed':
+        'Prowlarr सेटिंग लोड नहीं की जा सकीं।',
+      'components.SettingsProwlarr.magazine': 'पत्रिकाएँ',
+      'components.SettingsProwlarr.modern': 'आधुनिक रोम',
+      'components.SettingsProwlarr.movie': 'फ़िल्में',
+      'components.SettingsProwlarr.music': 'संगीत',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'अभी तक कोई Prowlarr इंडेक्सर्स कॉन्फ़िगर नहीं किया गया है।',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'इसके इंडेक्सर लोड करने और उन्हें श्रेणी के अनुसार असाइन करने के लिए Prowlarr कनेक्शन का परीक्षण करें।',
+      'components.SettingsProwlarr.port': 'पोर्ट',
+      'components.SettingsProwlarr.recentFailure': 'हाल की विफलता: {date}',
+      'components.SettingsProwlarr.retro': 'रेट्रो रोम',
+      'components.SettingsProwlarr.save': 'Prowlarr सेटिंग्स सहेजें',
+      'components.SettingsProwlarr.saveFailed':
+        'Prowlarr सेटिंग सेव नहीं की जा सकीं।',
+      'components.SettingsProwlarr.saved': 'Prowlarr सेटिंग सेव हो गईं।',
+      'components.SettingsProwlarr.saving': 'सहेजा जा रहा है…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        '1 से 60 तक एक पूर्ण संख्या दर्ज करें।',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        '{indexer} पर प्रति उपयोगकर्ता प्रति मिनट अधिकतम खोजें',
+      'components.SettingsProwlarr.searchesPerUser':
+        'प्रति उपयोगकर्ता प्रति मिनट अधिकतम खोजें',
+      'components.SettingsProwlarr.selectedCategories':
+        '{count} चयनित श्रेणियों',
+      'components.SettingsProwlarr.selectedIndexers': '{count} इंडेक्सर चयनित',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'खोज परिणामों में इंडेक्सर नाम और विवरण की अनुमति दें',
+      'components.SettingsProwlarr.sports': 'खेल',
+      'components.SettingsProwlarr.supportNote':
+        'यह सेटिंग केवल Prowlarr से कनेक्ट होती है। NZBHydra2 यहाँ वर्तमान में समर्थित नहीं है।',
+      'components.SettingsProwlarr.test': 'परीक्षण कनेक्शन और निरीक्षण कवरेज',
+      'components.SettingsProwlarr.testFailed':
+        'Prowlarr कनेक्शन विफल रहा। पता और API कुंजी की जाँच करें।',
+      'components.SettingsProwlarr.testHint':
+        'खोज सीधे SeerrNG क्वेरी Prowlarr से शुरू हुई। स्वीकृत अनुरोध अभी भी अपने विन्यस्त मीडिया मैनेजर या सॉफ्टवेयर प्रदाता के माध्यम से जाते हैं, जो अधिग्रहण और ट्रैकिंग का मालिक है।',
+      'components.SettingsProwlarr.testing': 'Prowlarr जाँच ...',
+      'components.SettingsProwlarr.title': 'Prowlarr सूचकांक',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} खोजे जाने योग्य और सक्षम {total} विन्यास',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'SSL का उपयोग करें',
+      'components.Settings.SettingsLogs.logs': 'लॉग',
+      'components.Settings.SettingsLogs.searchLogs': 'लॉग खोजें',
+      'components.Settings.SettingsLogs.level': 'गंभीरता',
+      'components.Settings.SettingsLogs.filterDebug': 'डेबग',
+      'components.Settings.SettingsLogs.filterInfo': 'जानकारी',
+      'components.Settings.SettingsLogs.filterWarn': 'चेतावनी',
+      'components.Settings.SettingsLogs.filterError': 'त्रुटि',
+      'components.Settings.SettingsLogs.logDetails': 'लॉग इन करें',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'क्लिपबोर्ड पर कॉपी करें',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Copied लॉग संदेश क्लिपबोर्ड करने के लिए।',
+      'components.Settings.SettingsJobsCache.runnow': 'अब चलायें',
+      'components.Settings.SettingsJobsCache.canceljob': 'नौकरी रद्द करना',
+      'components.Settings.SettingsJobsCache.process': 'प्रक्रिया',
+      'components.Settings.SettingsJobsCache.command': 'कमान',
+      'components.Settings.SettingsJobsCache.enabled': 'सक्षम',
+      'components.Settings.SettingsJobsCache.disabled': 'अक्षम',
+      'components.Settings.SettingsJobsCache.cachehits': 'हिट',
+      'components.Settings.SettingsJobsCache.cachekeys': 'कुल कुंजी',
+      'components.Settings.SettingsJobsCache.cachemisses': 'मिस',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS कैश',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'हिट',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'मिस',
+      'components.Settings.SettingsJobsCache.failures': 'विफलता',
+      'components.Settings.SettingsJobsCache.flushcache': 'फ्लश कैश',
+      'components.Settings.SettingsJobsCache.hitRate': 'हिट दर',
+      'components.Settings.SettingsJobsCache.imagecachecount': 'तस्वीरें',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 फ़ॉलबैक',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'इंस्टॉल किया गया',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'नवीनतम',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'वर्तमान में जारी डेटा अनुपलब्ध है।',
+      'components.Settings.SettingsAbout.Releases.releases': 'रिलीज',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'GitHub पर देखें',
+      'components.Settings.SettingsAbout.aboutseerr': 'SeerrNG के बारे में',
+      'components.Settings.SettingsAbout.appDataPath': 'डेटा निर्देशिका',
+      'components.Settings.SettingsAbout.documentation': 'दस्तावेज़ीकरण',
+      'components.Settings.SettingsAbout.githubdiscussions': 'GitHub चर्चा',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG वैध व्यक्तिगत मीडिया प्रबंधन के लिए है। परियोजना चोरी या कॉपीराइट उल्लंघन की अनुमति नहीं देती है। उपयोगकर्ता अपने क्षेत्र में लागू कानूनों, लाइसेंस और सेवा शर्तों का अनुपालन करने के लिए जिम्मेदार हैं।',
+      'components.Settings.SettingsAbout.legalUseTitle': 'कानूनी उपयोग',
+      'components.Settings.SettingsAbout.metadataAttribution': 'मेटाडेटा श्रेय',
+      'components.Settings.SettingsAbout.supportdevelopment': 'समर्थन विकास',
+      'components.Settings.SettingsAbout.timezone': 'समय क्षेत्र',
+      'components.Settings.SettingsAbout.totalmedia': 'कुल मीडिया',
+      'components.Settings.SettingsAbout.totalrequests': 'कुल अनुरोध',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'यह उत्पाद TMDB और TMDB API का उपयोग करता है, लेकिन TMDB इसका समर्थन, प्रमाणन या किसी अन्य रूप में अनुमोदन नहीं करता। <ApiTermsLink>TMDB API की शर्तें</ApiTermsLink>।',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'अपडेट की जांच नहीं की जा सकी',
+      'components.Settings.SettingsAbout.uptodate': 'तारीख तक',
+      'components.Settings.SettingsAbout.version': 'संस्करण',
+      'components.Settings.SettingsCategories.title': 'मीडिया श्रेणियाँ',
+      'components.Settings.SettingsCategories.description':
+        'किस श्रेणी में हर कोई ब्राउज़ और अनुरोध कर सकता है। विकलांग श्रेणियां नेविगेशन और खोज से गायब हो जाती हैं, और नए अनुरोध अवरुद्ध होते हैं। मौजूदा अनुरोध और डाउनलोड इतिहास अनुरोध स्थिति में उपलब्ध है।',
+      'components.Settings.SettingsCategories.groupTitle': 'उपलब्ध श्रेणियाँ',
+      'components.Settings.SettingsCategories.groupDescription':
+        'इन स्विचों में नियंत्रण श्रेणी की उपलब्धता SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'फ़िल्में',
+      'components.Settings.SettingsCategories.tv': 'श्रृंखला',
+      'components.Settings.SettingsCategories.music': 'संगीत',
+      'components.Settings.SettingsCategories.ebook': 'पुस्तकें',
+      'components.Settings.SettingsCategories.audiobook': 'ऑडियोबुक',
+      'components.Settings.SettingsCategories.comic': 'कॉमिक्स',
+      'components.Settings.SettingsCategories.magazine': 'पत्रिकाएँ',
+      'components.Settings.SettingsCategories.adult': 'वयस्क',
+      'components.Settings.SettingsCategories.retro': 'अनुकरण (रेट्रो)',
+      'components.Settings.SettingsCategories.modern': 'अनुकरण (आधुनिक)',
+      'components.Settings.SettingsCategories.game': 'पीसी गेम',
+      'components.Settings.SettingsCategories.movieDescription':
+        'फिल्म खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.tvDescription':
+        'श्रृंखला खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.musicDescription':
+        'संगीत खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'पुस्तक खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'ऑडियोबुक खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.comicDescription':
+        'कॉमिक खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'पत्रिका खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.adultDescription':
+        'वयस्क-सीन खोज और अनुरोधों की अनुमति दें। इसके लिए एक कॉन्फ़िगर किया गया Whisparr v3 सेवा और वयस्क-विशिष्ट उपयोगकर्ता अनुमति आवश्यक है।',
+      'components.Settings.SettingsCategories.retroDescription':
+        'रेट्रो रॉम खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.modernDescription':
+        'आधुनिक अनुकरण ROM खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.gameDescription':
+        'पीसी गेम खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'वयस्क सामग्री सभी को दिखाई देती है जिन्हें पहुंच है',
+      'components.Settings.SettingsCategories.adultWarning':
+        'यदि आप इस इंस्टेंस को परिवार के साथ साझा करते हैं या इसे रिवर्स प्रॉक्सी के माध्यम से प्रकट करते हैं, तो Request Adult की अनुमति प्राप्त किसी भी व्यक्ति को आपकी ब्राउज़िंग और अनुरोध देखने में सक्षम हो सकते हैं। नीचे या प्रत्येक उपयोगकर्ता की Permissions के तहत परिवार के खातों को restricted के रूप में चिह्नित करें, ताकि वे कभी भी वयस्क सामग्री न देखें।',
+      'components.Settings.SettingsCategories.ageGateTitle': 'आयु प्रवेश',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'प्रतिबंधित खाते वयस्क सामग्री, और परिपक्व फिल्मों, सीरीज़, संगीत, पुस्तकों, कॉमिक्स और टैग किए गए शीर्षकों को देख या अनुरोध नहीं कर सकते हैं, और ये सर्वर-साइड पर छिपाए जाते हैं। फ़िल्टरिंग प्रदाता रेटिंग और टैग का उपयोग करती है और मेटाडेटा के बिना शीर्षकों के लिए सर्वोत्तम प्रयास है।',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'डिफ़ॉल्ट रूप से खातों को प्रतिबंधित करें',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'जिन खातों में स्पष्ट सेटिंग नहीं है, उन्हें प्रतिबंधित किया जाता है। प्रशासकों को छूट दी जाती है।',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'उच्चतम फिल्म रेटिंग',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'प्रतिबंधित खाते इससे ऊपर रेटिंग वाली फिल्में नहीं देख सकते।',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'उच्चतम सीरीज़ रेटिंग',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'प्रतिबंधित खाते इससे ऊपर रेटिंग वाली सीरीज़ नहीं देख सकते।',
+      'components.Settings.SettingsCategories.ageGateCountry': 'रेटिंग देश',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'दो अक्षरों का देश कोड जिसकी रेटिंग का उपयोग किया जाता है, उदाहरण के लिए US।',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'श्रेणी सेटिंग्स बचाया।',
+      'components.Settings.SettingsCategories.saveFailure':
+        'श्रेणी सेटिंग्स को बचाया नहीं जा सकता।',
     },
   },
   {
@@ -5371,6 +9887,50 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Problémák Megtekintése',
       'components.PermissionEdit.viewrecent': 'Nemrég hozzáadott megtekintése',
       'components.PermissionEdit.viewrequests': 'Kérések megtekintése',
+      'components.IssueDetails.allepisodes': 'Minden epizód',
+      'i18n.back': 'Vissza',
+      'components.Settings.SettingsLogs.logs': 'Naplók',
+      'components.Settings.SettingsLogs.level': 'Súlyosság',
+      'components.Settings.SettingsLogs.filterDebug': 'Hibakeresés (Debug)',
+      'components.Settings.SettingsLogs.filterInfo': 'Infó',
+      'components.Settings.SettingsLogs.filterWarn': 'Figyelmeztetés',
+      'components.Settings.SettingsLogs.filterError': 'Hiba',
+      'components.Settings.SettingsLogs.logDetails': 'Napló részletei',
+      'components.Settings.SettingsLogs.copyToClipboard': 'Másolás a vágólapra',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Naplóüzenet másolása a vágólapra.',
+      'components.Settings.SettingsJobsCache.runnow': 'Futtatás most',
+      'components.Settings.SettingsJobsCache.canceljob': 'Feladat megszakítása',
+      'components.Settings.SettingsJobsCache.process': 'Folyamat',
+      'components.Settings.SettingsJobsCache.command': 'Parancs',
+      'components.Settings.SettingsJobsCache.cachehits': 'Találatok',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Összes "API lékérés"',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Hiányzók',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS-gyorsítótár',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Találatok',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Hiányzók',
+      'components.Settings.SettingsJobsCache.failures': 'Hibák',
+      'components.Settings.SettingsJobsCache.flushcache': 'Gyorsítótár ürítése',
+      'components.Settings.SettingsJobsCache.hitRate': 'Találati arány',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Képek gyorsítótárban',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 tartalék',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Legújabb',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Megjelenési adatok nem állnak rendelkezésre.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Kiadások',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Megtekintés a GitHubon',
+      'components.Settings.SettingsAbout.aboutseerr': 'A Seerr-ről',
+      'components.Settings.SettingsAbout.appDataPath': 'Adatkönyvtár',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentáció',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'GitHub‑beszélgetések',
+      'components.Settings.SettingsAbout.timezone': 'Időzóna',
+      'components.Settings.SettingsAbout.totalmedia': 'Teljes média',
+      'components.Settings.SettingsAbout.totalrequests': 'Összes kérés',
+      'components.Settings.SettingsAbout.uptodate': 'Naprakész',
+      'components.Settings.SettingsAbout.version': 'Verzió',
     },
   },
   {
@@ -5718,6 +10278,419 @@ export const localeData = [
         'Lihat Media yang Baru Ditambahkan',
       'components.PermissionEdit.viewrequests': 'Lihat Permintaan',
       'components.PermissionEdit.viewwatchlists': 'Lihat daftar tontonan',
+      'components.RequestModal.RequestTree.seasonNumber': 'Musim {number}',
+      'components.RequestModal.RequestTree.specials': 'Episode spesial',
+      'components.Requests.episodeQueue': 'Antrean Episode',
+      'components.Requests.retry': 'Coba lagi',
+      'components.Requests.approve': 'Setujui',
+      'components.Requests.decline': 'Tolak',
+      'components.Requests.requested': 'Diminta',
+      'components.Requests.approved': 'Disetujui',
+      'components.Requests.searching': 'Mencari',
+      'components.Requests.downloading': 'Mengunduh',
+      'components.Requests.importing': 'Mengimpor',
+      'components.Requests.library': 'Menambahkan ke Pustaka',
+      'components.Requests.available': 'Tersedia',
+      'components.Requests.unavailable': 'Tidak tersedia',
+      'components.Requests.failed': 'Gagal',
+      'components.Requests.declined': 'Ditolak',
+      'components.Requests.cancelled': 'Dibatalkan',
+      'components.Requests.pending': 'Menunggu',
+      'components.Requests.completed': 'Selesai',
+      'components.Requests.statusUpdated': 'Status Diperbarui',
+      'i18n.unknown': 'yang tidak diketahui',
+      'components.Requests.history': 'Riwayat',
+      'components.RequestStatus.SoftwareRequests.approve': 'Setujui',
+      'components.RequestStatus.SoftwareRequests.approved': 'Disetujui',
+      'components.RequestStatus.SoftwareRequests.available': 'Tersedia',
+      'components.RequestStatus.SoftwareRequests.cancel': 'Batal',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'Dibatalkan',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'Hapus permintaan yang dibatalkan',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        'Hapus permintaan yang sudah dibatalkan ini?',
+      'components.RequestStatus.SoftwareRequests.decline': 'Tolak',
+      'components.RequestStatus.SoftwareRequests.declined': 'Ditolak',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'Unduh salinan',
+      'components.RequestStatus.SoftwareRequests.downloading':
+        'Sedang mengunduh',
+      'components.RequestStatus.SoftwareRequests.failed': 'Gagal',
+      'components.RequestStatus.SoftwareRequests.history': 'Riwayat',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'Memuat riwayat status...',
+      'components.RequestStatus.SoftwareRequests.importing':
+        'Memverifikasi impor',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'Permintaan perangkat lunak ini tidak dapat diperbarui.',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        'Tidak ada pembaruan status tersimpan yang tersedia.',
+      'components.RequestStatus.SoftwareRequests.pending':
+        'Persetujuan Tertunda',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'Hapus dari Permintaan',
+      'components.RequestStatus.SoftwareRequests.retry': 'Coba lagi',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'Penyedia tidak dapat memastikan apakah unduhan sebelumnya sudah dimulai. Periksa antrean dan riwayat klien unduhan. Lanjutkan hanya jika tidak ada unduhan yang cocok.',
+      'components.RequestStatus.SoftwareRequests.searching': 'Mencari',
+      'components.RequestStatus.SoftwareRequests.title':
+        'Permintaan Perangkat Lunak',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'Tarik permintaan',
+      'i18n.back': 'Kembali',
+      'downloads.actions': 'Aksi riwayat',
+      'downloads.active': 'Peringatan aktif',
+      'downloads.activeState': 'Butuh perhatian',
+      'downloads.actor': 'Pengguna {id}',
+      'downloads.blocked': 'Terblok secara manual',
+      'downloads.blocklist': 'Blokir rilis ini agar tidak diunduh lagi',
+      'downloads.blocklisted': 'Pemblokiran diminta',
+      'downloads.cancel': 'Batal',
+      'downloads.changed': 'Konfigurasi layanan berubah',
+      'downloads.clientKept': 'Berkas klien disimpan',
+      'downloads.clientRemoved': 'Permintaan penghapusan klien',
+      'downloads.confirm': 'Konfirmasi penolakan',
+      'downloads.copy': 'Salin atau hardlink (simpan berkas sumber)',
+      'downloads.denied': 'Manage Unduhan izin diperlukan.',
+      'downloads.description':
+        'Tinjau peringatan akuisisi, pilih berkas untuk impor manual, dan tolak unduhan yang tidak diinginkan.',
+      'downloads.disappeared': 'Tidak lagi dalam antrian',
+      'downloads.empty': 'Tidak ada peringatan unduh dalam tampilan ini.',
+      'downloads.failed': 'Kotak masuk tidak bisa dimuat.',
+      'downloads.failedState': 'Butuh ulasan',
+      'downloads.history': 'Riwayat',
+      'downloads.import': 'Impor berkas yang dipilih',
+      'downloads.importFailed': 'Impor gagal',
+      'downloads.importMode': 'Mode impor',
+      'downloads.importReview': 'Impor selesai tanpa konfirmasi impor berkas',
+      'downloads.importWarning':
+        'Konfirmasi target dan meninjau semua alasan penolakan. Layanan akuisisi menentukan kualitas berkas dan kecocokan episode.',
+      'downloads.imported': 'Diimpor secara manual',
+      'downloads.importingState': 'Impor tertunda',
+      'downloads.ineligible':
+        'Tidak ada kecocokan yang dikonfirmasi - tidak dapat mengimpor',
+      'downloads.loading': 'Memuat peringatan unduh...',
+      'downloads.move': 'Pindahkan (hapus berkas sumber)',
+      'downloads.next': 'Halaman berikutnya',
+      'downloads.noFiles':
+        'Tak ada berkas dengan target pustaka yang dikonfirmasi ditemukan.',
+      'downloads.notBlocklisted': 'Rilis tidak diblok',
+      'downloads.outcome':
+        'Aksi tidak dapat dikonfirmasi. Segarkan dan tinjau sebelum mencoba kembali.',
+      'downloads.partial':
+        'Beberapa layanan akuisisi tidak bisa diperiksa. Peringatan mereka mungkin hilang atau ketinggalan jaman.',
+      'downloads.pending':
+        'Aksi diterima. Segarkan untuk memeriksa hasil backend.',
+      'downloads.preview': 'Pratilik berkas',
+      'downloads.previous': 'Halaman sebelumnya',
+      'downloads.recovered': 'Dipulihkan',
+      'downloads.refresh': 'Segarkan',
+      'downloads.reject': 'Tolak pengunduhan',
+      'downloads.rejected': 'Ditolak secara manual',
+      'downloads.rejectingState': 'Penolakan tertunda',
+      'downloads.rejection':
+        'Menolak menghapus item ini dari antrian akuisisi. Tinjau pilihan sebelum konfirmasi.',
+      'downloads.remove': 'Hapus pengunduhan dan berkas dari klien unduh',
+      'downloads.resolvedState': 'Selesai ditangani',
+      'downloads.search': 'Cari',
+      'downloads.select': 'Pilih {name}',
+      'downloads.targetChoose': 'Pilih pustaka yang cocok',
+      'downloads.targetHelp':
+        'Cari judul sudah dalam layanan akuisisi ini. Memilih kecocokan tidak menambahkan judul baru.',
+      'downloads.targetLabel': 'Pustaka cocok',
+      'downloads.targetNoResults':
+        'Tidak ada judul yang cocok ditemukan dalam pustaka layanan ini.',
+      'downloads.targetQuery': 'Film, seri, album, atau buku',
+      'downloads.targetRequired':
+        'Pilih pustaka yang cocok sebelum mengimpor berkas.',
+      'downloads.targetSelected': 'Cocok: {title}{subtitle}',
+      'downloads.title': 'Unduh Kotak Masuk',
+      'downloads.truncated':
+        'Hanya 20 pertama layanan akuisisi yang diperiksa.',
+      'downloads.unknownImport': 'Impor hasil tidak diketahui',
+      'downloads.unknownReject': 'Hasil penolakan tidak diketahui',
+      'components.IndexerSearch.accessDenied':
+        'Anda perlu izin Manage Requests untuk mencari indexers.',
+      'components.IndexerSearch.categories': 'Kategori pengindeks',
+      'components.IndexerSearch.category': 'Kategori media',
+      'components.IndexerSearch.categoryAdult': 'Dewasa',
+      'components.IndexerSearch.categoryAudiobook': 'Buku audio',
+      'components.IndexerSearch.categoryComic': 'Komik',
+      'components.IndexerSearch.categoryEbook': 'Buku',
+      'components.IndexerSearch.categoryGame': 'Permainan PC',
+      'components.IndexerSearch.categoryMagazine': 'Majalah',
+      'components.IndexerSearch.categoryModern': 'ROM Modern',
+      'components.IndexerSearch.categoryMovie': 'Film',
+      'components.IndexerSearch.categoryMusic': 'Musik',
+      'components.IndexerSearch.categoryRetro': 'Retro ROM',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Buka pengaturan Prowlarr',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr tidak dapat mengirim rilis ini. Jalankan pencarian baru dan coba lagi.',
+      'components.IndexerSearch.grabs': 'Unduhan',
+      'components.IndexerSearch.intro':
+        'Cari rilis di pengindeks Prowlarr Anda di setiap kategori media SeerrNG.',
+      'components.IndexerSearch.leechers': 'Pengunduh',
+      'components.IndexerSearch.loadFailed':
+        'Konfigurasi pencarian Prowlarr tidak dapat dimuat.',
+      'components.IndexerSearch.loadMore': 'Muat lebih banyak hasil',
+      'components.IndexerSearch.loadingMore': 'Memuat…',
+      'components.IndexerSearch.manualMode':
+        'Hasil pencarian terpisah dari permintaan SeerrNG. Anda dapat mengirim hasil ke klien unduhan yang dikonfigurasi di Prowlarr.',
+      'components.IndexerSearch.noConnection': 'Prowlarr tidak terhubung.',
+      'components.IndexerSearch.noConnectionHelp':
+        'Tanyakan administrator untuk menghubungkan Prowlarr di bawah Pengaturan > Services.',
+      'components.IndexerSearch.noResults':
+        'Tidak ada rilis yang cocok dengan pencarian ini.',
+      'components.IndexerSearch.noResultsHelp':
+        'Periksa filter kategori dan indexer yang diaktifkan di Prowlarr. Hasil pencarian tidak menjamin bahwa aplikasi dapat mengimpor rilis.',
+      'components.IndexerSearch.openResult': 'Buka rincian pengindeks',
+      'components.IndexerSearch.protocol': 'Protokol',
+      'components.IndexerSearch.published': 'Diterbitkan',
+      'components.IndexerSearch.query': 'Istilah pencarian',
+      'components.IndexerSearch.queryPlaceholder':
+        'Judul, penulis, album, edisi, atau nama game',
+      'components.IndexerSearch.requestStillUsesManager':
+        'Mengirim hasil tidak mengubah permintaan SeerrNG. Prowlarr meneruskan hasil tersebut ke klien unduhan yang dikonfigurasi.',
+      'components.IndexerSearch.resultCount':
+        'Prowlarr mengembalikan {count} rilis.',
+      'components.IndexerSearch.search': 'Cari pengindeks',
+      'components.IndexerSearch.searchFailed':
+        'Pencarian Prowlarr gagal. Periksa koneksi dan coba lagi.',
+      'components.IndexerSearch.searching': 'Mencari di indexer…',
+      'components.IndexerSearch.seeders': 'Seeder',
+      'components.IndexerSearch.sendToDownloader': 'Kirim ke downloader',
+      'components.IndexerSearch.sendingToDownloader': 'Mengirim…',
+      'components.IndexerSearch.sentToDownloader':
+        'Dikirim ke klien unduhan yang dikonfigurasi oleh Prowlarr.',
+      'components.IndexerSearch.size': 'Ukuran',
+      'components.IndexerSearch.title': 'Pencarian Indexer',
+      'components.IndexerSearch.tooManySearches':
+        'Batas pencarian tercapai. Tunggu sebentar sebelum mencari lagi.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'Tak tersedia indexers yang dapat dicari. Aktifkan pengindexer dalam Prowlarr atau atur penyaring kategori.',
+      'components.SettingsProwlarr.addDetectedMatches':
+        'Tambah kecocokan yang terdeteksi ({count})',
+      'components.SettingsProwlarr.address': 'Nama host',
+      'components.SettingsProwlarr.adult': 'Dewasa',
+      'components.SettingsProwlarr.apiKey': 'Kunci API',
+      'components.SettingsProwlarr.apiKeySaved':
+        'Sebuah kunci disimpan. Tinggalkan ini kosong untuk tetap menggunakannya.',
+      'components.SettingsProwlarr.audiobook': 'Buku audio',
+      'components.SettingsProwlarr.basePath': 'Lokasi dasar',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'Pilih kategori Prowlarr yang dikirim dengan setiap pencarian. Baku memakai kategori standar Newznab / Torznab; uji koneksi untuk melihat kategori gubahan yang diiklankan oleh pengindeksan aktif.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'Pilih paling tidak satu kategori.',
+      'components.SettingsProwlarr.categoryMappingTitle': 'Filter kategori',
+      'components.SettingsProwlarr.clearApiKey':
+        'Hapus kunci API yang disimpan',
+      'components.SettingsProwlarr.comic': 'Komik',
+      'components.SettingsProwlarr.connected':
+        'Terhubung ke Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'Menghitung termasuk difungsikan, indeks yang dapat dicari yang mengiklankan dukungan bagi paling tidak satu kategori yang dipilih. Mereka menunjukkan cakupan pencarian, tidak berhasil meraih atau mengimpor.',
+      'components.SettingsProwlarr.coverageTitle': 'Lipan indeks oleh medium',
+      'components.SettingsProwlarr.description':
+        'Hubungkan contoh Prowlarr Anda sekali untuk menjalankan pencarian manual-sadar di seluruh indexers Anda sudah mengelola sana.',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        'Disarankan kategori gubahan yang cocok dengan nama yang diiklankan. Ulas mereka sebelum menyimpan; ini tidak mengubah Prowlarr atau mengirim pengunduhan.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr menerima koneksi API manajemen. Hasil tes ini setiap difungsikan indexer yang dapat dicari secara terpisah; dinonaktifkan-sampai tanggal berasal dari Prowlarr.',
+      'components.SettingsProwlarr.diagnosticFailed': 'Gagal',
+      'components.SettingsProwlarr.diagnosticOk': 'Terhubung',
+      'components.SettingsProwlarr.diagnosticTitle':
+        'Hasil sambungan pengindeks',
+      'components.SettingsProwlarr.disabledUntil':
+        'Dinonaktifkan sampai {date}',
+      'components.SettingsProwlarr.ebook': 'Buku',
+      'components.SettingsProwlarr.game': 'Permainan PC',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'Pilih indexer Prowlarr yang diaktifkan untuk dicari untuk setiap jenis media. Gunakan Ctrl-klik di Windows/Linux atau Command-klik di macOS untuk memilih beberapa indexer. Pilihan kosong akan menonaktifkan pencarian untuk jenis tersebut.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        'Indexer untuk {category}',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'Penugasan Indexer per Jenis Media',
+      'components.SettingsProwlarr.indexerCount': 'Indikator: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'Pengguna dapat membuka detail indexer dari hasil pencarian.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'Nama indexer dan tautan detail disembunyikan dari pengguna.',
+      'components.SettingsProwlarr.indexerNotSearchable':
+        '(tidak dapat dicari)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'Batas pencarian',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'Batasi pencarian setiap pengguna per menit secara keseluruhan dan untuk setiap indexer yang dipilih.',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr disimpan, tetapi inventaris indexer tidak tersedia.',
+      'components.SettingsProwlarr.keepApiKey':
+        'Simpan kunci API yang disimpan',
+      'components.SettingsProwlarr.loadFailed':
+        'Pengaturan Prowlarr tidak dapat dimuat.',
+      'components.SettingsProwlarr.magazine': 'Majalah',
+      'components.SettingsProwlarr.modern': 'ROM Modern',
+      'components.SettingsProwlarr.movie': 'Film',
+      'components.SettingsProwlarr.music': 'Musik',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'Tidak ada indexers Prowlarr yang dikonfigurasi belum.',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Uji koneksi Prowlarr untuk memuat indexernya dan menugaskannya per kategori.',
+      'components.SettingsProwlarr.port': 'Port',
+      'components.SettingsProwlarr.recentFailure':
+        'Kegagalan baru-baru ini: {date}',
+      'components.SettingsProwlarr.retro': 'Retro ROM',
+      'components.SettingsProwlarr.save': 'Simpan pengaturan Prowlarr',
+      'components.SettingsProwlarr.saveFailed':
+        'Pengaturan Prowlarr tidak dapat disimpan.',
+      'components.SettingsProwlarr.saved':
+        'Pengaturan Prowlarr berhasil disimpan.',
+      'components.SettingsProwlarr.saving': 'Menyimpan…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        'Masukkan bilangan bulat dari 1 hingga 60.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        'Pencarian maksimum per pengguna per menit di {indexer}',
+      'components.SettingsProwlarr.searchesPerUser':
+        'Pencarian maksimum per pengguna per menit',
+      'components.SettingsProwlarr.selectedCategories':
+        '{count} kategori yang dipilih',
+      'components.SettingsProwlarr.selectedIndexers': '{count} indexer dipilih',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'Izinkan nama dan detail indexer dalam hasil pencarian',
+      'components.SettingsProwlarr.sports': 'Olahraga',
+      'components.SettingsProwlarr.supportNote':
+        'Pengaturan ini hanya terhubung ke Prowlarr. NZBHydra2 saat ini tidak didukung di sini.',
+      'components.SettingsProwlarr.test': 'Uji koneksi dan pemeriksaan cakupan',
+      'components.SettingsProwlarr.testFailed':
+        'Koneksi Prowlarr gagal. Periksa alamat dan tombol API.',
+      'components.SettingsProwlarr.testHint':
+        'Pencarian dimulai dari permintaan SeerrNG Prowlarr secara langsung. Permintaan yang disetujui masih melalui manajer media atau penyedia perangkat lunak yang dikonfigurasi, yang memiliki akuisisi dan pelacakan.',
+      'components.SettingsProwlarr.testing': 'Memeriksa Prowlarr...',
+      'components.SettingsProwlarr.title': 'Pengindeks Prowlarr',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} dapat dicari dan diaktifkan dari {total} dikonfigurasi',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'Gunakan SSL',
+      'components.Settings.SettingsLogs.logs': 'Log',
+      'components.Settings.SettingsLogs.searchLogs': 'Cari log',
+      'components.Settings.SettingsLogs.level': 'Kerasnya',
+      'components.Settings.SettingsLogs.filterDebug': 'Awakutu',
+      'components.Settings.SettingsLogs.filterInfo': 'Informasi',
+      'components.Settings.SettingsLogs.filterWarn': 'Peringatan',
+      'components.Settings.SettingsLogs.filterError': 'Kesalahan',
+      'components.Settings.SettingsLogs.logDetails': 'Rincian Log',
+      'components.Settings.SettingsLogs.copyToClipboard': 'Salin ke Papan Klip',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Salin pesan log ke papan klip.',
+      'components.Settings.SettingsJobsCache.runnow': 'Jalankan Sekarang',
+      'components.Settings.SettingsJobsCache.canceljob': 'Batalkan Tugas',
+      'components.Settings.SettingsJobsCache.process': 'Proses',
+      'components.Settings.SettingsJobsCache.command': 'Perintah',
+      'components.Settings.SettingsJobsCache.enabled': 'Diaktifkan',
+      'components.Settings.SettingsJobsCache.disabled': 'Dinonaktifkan',
+      'components.Settings.SettingsJobsCache.cachehits': 'Pukulan',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Total Kunci',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Hilang',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Pukulan',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Hilang',
+      'components.Settings.SettingsJobsCache.failures': 'Gagal',
+      'components.Settings.SettingsJobsCache.flushcache': 'Quush Cache',
+      'components.Settings.SettingsJobsCache.hitRate': 'Laju Tekan',
+      'components.Settings.SettingsJobsCache.imagecachecount': 'Cache Gambar',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Fallbacks IPv4',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'Terpasang',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Terbaru',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Data rilis saat ini tidak tersedia.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Berhenti',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Tilik di GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Tentang SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': 'Direktori Data',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentasi',
+      'components.Settings.SettingsAbout.githubdiscussions': 'Diskusi GitHub',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG ditujukan untuk manajemen media pribadi yang sah. Proyek ini tidak membenarkan pembajakan atau pelanggaran hak cipta. Pengguna bertanggung jawab untuk melayani dengan hukum yang berlaku, lisensi, dan persyaratan layanan di wilayah mereka.',
+      'components.Settings.SettingsAbout.legalUseTitle': 'Penggunaan yang sah',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'Atribusi metadata',
+      'components.Settings.SettingsAbout.supportdevelopment':
+        'Pengembangan Dukungan',
+      'components.Settings.SettingsAbout.timezone': 'Zona Waktu',
+      'components.Settings.SettingsAbout.totalmedia': 'Media Total',
+      'components.Settings.SettingsAbout.totalrequests': 'Permintaan Total',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'Produk ini menggunakan TMDB dan API TMDB, tetapi tidak didukung, disertifikasi, atau disetujui dengan cara lain oleh TMDB. <ApiTermsLink>Ketentuan API TMDB</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'Gagal memeriksa pembaruan',
+      'components.Settings.SettingsAbout.uptodate': 'Sampai Tanggal',
+      'components.Settings.SettingsAbout.version': 'Versi',
+      'components.Settings.SettingsCategories.title': 'Kategori Media',
+      'components.Settings.SettingsCategories.description':
+        'Pilih kategori mana yang dapat diramban dan permintaan setiap orang. Kategori dinonaktifkan menghilang dari navigasi dan penemuan, dan permintaan baru diblokir. Permintaan yang telah ada dan unduh riwayat tetap tersedia dalam Status Permintaan.',
+      'components.Settings.SettingsCategories.groupTitle': 'Kategori Tersedia',
+      'components.Settings.SettingsCategories.groupDescription':
+        'Sakelar ini mengontrol ketersediaan kategori di SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'Film',
+      'components.Settings.SettingsCategories.tv': 'Serial',
+      'components.Settings.SettingsCategories.music': 'Musik',
+      'components.Settings.SettingsCategories.ebook': 'Buku',
+      'components.Settings.SettingsCategories.audiobook': 'Buku audio',
+      'components.Settings.SettingsCategories.comic': 'Komik',
+      'components.Settings.SettingsCategories.magazine': 'Majalah',
+      'components.Settings.SettingsCategories.adult': 'Dewasa',
+      'components.Settings.SettingsCategories.retro': 'Emulasi (Retro)',
+      'components.Settings.SettingsCategories.modern': 'Emulasi (Modern)',
+      'components.Settings.SettingsCategories.game': 'Game PC',
+      'components.Settings.SettingsCategories.movieDescription':
+        'Izinkan penemuan film dan permintaan.',
+      'components.Settings.SettingsCategories.tvDescription':
+        'Ijinkan serangkaian penemuan dan permintaan.',
+      'components.Settings.SettingsCategories.musicDescription':
+        'Ijinkan penemuan musik dan permintaan.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'Izinkan penemuan buku dan permintaan.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'Izinkan audiobook penemuan dan permintaan.',
+      'components.Settings.SettingsCategories.comicDescription':
+        'Memungkinkan penemuan komik dan permintaan.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'Izinkan penemuan dan permintaan majalah.',
+      'components.Settings.SettingsCategories.adultDescription':
+        'Izinkan penemuan dan permintaan scene dewasa. Memerlukan layanan Whisparr v3 yang dikonfigurasi dan izin pengguna khusus dewasa.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'Ijinkan retro penemuan dan permintaan ROM.',
+      'components.Settings.SettingsCategories.modernDescription':
+        'Ijinkan penemuan dan permintaan ROM emulasi modern.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'Ijinkan PC game penemuan dan permintaan.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'Konten dewasa terlihat oleh semua orang yang memiliki akses',
+      'components.Settings.SettingsCategories.adultWarning':
+        'Jika Anda membagikan instans ini dengan keluarga atau memaparkannya melalui proxy terbalik, siapa pun yang diberi izin Permintaan Dewasa dapat melihat apa yang Anda jelajahi dan minta. Tandai akun keluarga sebagai terbatas di bawah, atau di bawah Izin masing-masing pengguna, agar mereka tidak pernah melihat konten Dewasa.',
+      'components.Settings.SettingsCategories.ageGateTitle': 'Pembatasan Usia',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'Akun yang dibatasi tidak dapat melihat atau meminta konten Dewasa, dan film, serial, musik, buku, komik, serta judul bertag yang matang disembunyikan di sisi server. Penyaringan menggunakan penilaian penyedia dan tag, dan bersifat terbaik untuk judul tanpa metadata.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'Batasi akun secara default',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'Akun tanpa pengaturan eksplisit akan dibatasi. Administrator dikecualikan.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'Penilaian film tertinggi',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'Akun yang dibatasi tidak dapat melihat film dengan penilaian di atas ini.',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'Penilaian serial tertinggi',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'Akun yang dibatasi tidak dapat melihat serial dengan penilaian di atas ini.',
+      'components.Settings.SettingsCategories.ageGateCountry':
+        'Negara penilaian',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'Kode negara dua huruf yang penilaiannya digunakan, misalnya US.',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'Pengaturan kategori disimpan.',
+      'components.Settings.SettingsCategories.saveFailure':
+        'Pengaturan kategori tidak dapat disimpan.',
     },
   },
   {
@@ -5834,6 +10807,53 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Guarda segnalazione',
       'components.PermissionEdit.viewrecent': 'Visualizza Aggiunti Recenti',
       'components.PermissionEdit.viewrequests': 'Visualizza le richieste',
+      'components.IssueDetails.allepisodes': 'Tutti gli episodi',
+      'i18n.back': 'Indietro',
+      'components.Settings.SettingsLogs.logs': 'Registri',
+      'components.Settings.SettingsLogs.level': 'Gravità',
+      'components.Settings.SettingsLogs.filterDebug': 'Debug',
+      'components.Settings.SettingsLogs.filterInfo': 'Info',
+      'components.Settings.SettingsLogs.filterWarn': 'Attenzione',
+      'components.Settings.SettingsLogs.filterError': 'Errore',
+      'components.Settings.SettingsLogs.logDetails': 'Dettagli registro',
+      'components.Settings.SettingsLogs.copyToClipboard': 'Copia negli appunti',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Messaggio di registro copiato negli appunti.',
+      'components.Settings.SettingsJobsCache.runnow': 'Esegui ora',
+      'components.Settings.SettingsJobsCache.canceljob': 'Annulla processo',
+      'components.Settings.SettingsJobsCache.process': 'Processo',
+      'components.Settings.SettingsJobsCache.command': 'Comando',
+      'components.Settings.SettingsJobsCache.cachehits': 'Chiamate',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Chiavi totali',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Mancanti',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits':
+        'Richieste dalla memoria',
+      'components.Settings.SettingsJobsCache.dnscachemisses':
+        'Richieste non in memoria',
+      'components.Settings.SettingsJobsCache.failures': 'Fallimenti',
+      'components.Settings.SettingsJobsCache.flushcache': 'Svuota cache',
+      'components.Settings.SettingsJobsCache.hitRate': 'Tasso di successo',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Immagini memorizzate nella cache',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Ripiega su IPv4',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Versione più recente',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Dati di versione non sono momentaneamente disponibili.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Versioni',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Visualizza su GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Informazioni su Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Cartella applicazione',
+      'components.Settings.SettingsAbout.documentation': 'Documentazione',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Discussioni su GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Fuso Orario',
+      'components.Settings.SettingsAbout.totalmedia': 'Media totali',
+      'components.Settings.SettingsAbout.totalrequests': 'Totale richieste',
+      'components.Settings.SettingsAbout.uptodate': 'Aggiornato',
+      'components.Settings.SettingsAbout.version': 'Versione',
     },
   },
   {
@@ -6174,6 +11194,421 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': '最近の追加を表示',
       'components.PermissionEdit.viewrequests': 'リクエストを見る',
       'components.PermissionEdit.viewwatchlists': 'ウォッチリストを見る',
+      'components.RequestModal.RequestTree.seasonNumber': 'シーズン {number}',
+      'components.RequestModal.RequestTree.specials': 'スペシャル',
+      'components.Requests.episodeQueue': 'エピソードキュー',
+      'components.Requests.retry': '再試行',
+      'components.Requests.approve': '承認',
+      'components.Requests.decline': '拒否',
+      'components.Requests.requested': 'リクエスト済み',
+      'components.Requests.approved': '承認済み',
+      'components.Requests.searching': '検索中',
+      'components.Requests.downloading': 'ダウンロード中',
+      'components.Requests.importing': 'インポート中',
+      'components.Requests.library': 'ライブラリに追加中',
+      'components.Requests.available': '利用可能',
+      'components.Requests.unavailable': '利用不可',
+      'components.Requests.failed': '失敗',
+      'components.Requests.declined': '拒否済み',
+      'components.Requests.cancelled': 'キャンセル済み',
+      'components.Requests.pending': 'リクエスト中',
+      'components.Requests.completed': '完了',
+      'components.Requests.statusUpdated': 'ステータス更新',
+      'i18n.unknown': '不明',
+      'components.Requests.history': '履歴',
+      'components.RequestStatus.SoftwareRequests.approve': '承認',
+      'components.RequestStatus.SoftwareRequests.approved': '承認済み',
+      'components.RequestStatus.SoftwareRequests.available': '利用可能',
+      'components.RequestStatus.SoftwareRequests.cancel': 'キャンセル',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'キャンセル済み',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'キャンセル済みのリクエストを削除',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        'キャンセル済みのリクエストを削除しますか？',
+      'components.RequestStatus.SoftwareRequests.decline': '拒否する',
+      'components.RequestStatus.SoftwareRequests.declined': '拒否済み',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'コピーをダウンロード',
+      'components.RequestStatus.SoftwareRequests.downloading': 'ダウンロード中',
+      'components.RequestStatus.SoftwareRequests.failed': '失敗',
+      'components.RequestStatus.SoftwareRequests.history': '履歴',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'ステータス履歴を読み込んでいます…',
+      'components.RequestStatus.SoftwareRequests.importing': 'インポートの検証',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'このソフトウェアリクエストを更新できませんでした。',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        '保存済みのステータス更新はありません。',
+      'components.RequestStatus.SoftwareRequests.pending': '承認待ち',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'リクエスト一覧から削除',
+      'components.RequestStatus.SoftwareRequests.retry': '再試行',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'プロバイダーは以前のダウンロードが開始されたか確認できません。ダウンロードクライアントのキューと履歴を確認してください。一致するダウンロードがない場合にのみ続行してください。',
+      'components.RequestStatus.SoftwareRequests.searching': '検索中',
+      'components.RequestStatus.SoftwareRequests.title':
+        'ソフトウェアのリクエスト',
+      'components.RequestStatus.SoftwareRequests.withdraw': '取り下げる',
+      'i18n.back': '戻る',
+      'downloads.actions': '行動履歴',
+      'downloads.active': 'アクティブ警告',
+      'downloads.activeState': '注意が必要',
+      'downloads.actor': 'ユーザー登録 {id}',
+      'downloads.blocked': '手動でブロックリストに登録',
+      'downloads.blocklist':
+        '再ダウンロードを防ぐため、このリリースをブロックリストに追加',
+      'downloads.blocklisted': 'ブロックリストへの登録をリクエスト済み',
+      'downloads.cancel': 'キャンセル',
+      'downloads.changed': 'サービス構成変更',
+      'downloads.clientKept': 'クライアントファイル保存',
+      'downloads.clientRemoved': '要求される顧客の取り外し',
+      'downloads.confirm': '拒絶確認',
+      'downloads.copy': 'コピーまたはハードリンク(ソースファイルをキープ)',
+      'downloads.denied': 'ダウンロード権限の管理が必要です。',
+      'downloads.description':
+        '買収警告の確認、マニュアルインポート用のファイルを選択し、不要なダウンロードを拒否します。',
+      'downloads.disappeared': 'キューに入れない',
+      'downloads.empty': 'このビューで警告をダウンロードしないでください。',
+      'downloads.failed': '受信トレイはロードできませんでした。',
+      'downloads.failedState': 'ニーズレビュー',
+      'downloads.history': '履歴',
+      'downloads.import': '選択したファイルをインポートする',
+      'downloads.importFailed': 'インポート失敗',
+      'downloads.importMode': 'インポートモード',
+      'downloads.importReview':
+        '確認されたファイルインポートなしで完了したインポート',
+      'downloads.importWarning':
+        'ターゲットを確認し、すべての拒絶理由を確認します。 取得サービスは、ファイルの品質とエピソードのマッチングを決定します。',
+      'downloads.imported': '手動で輸入される',
+      'downloads.importingState': 'インポート ペンディング',
+      'downloads.ineligible': '確認済みマッチなし — インポートできません',
+      'downloads.loading': 'ダウンロード警告を読み込む...',
+      'downloads.move': '移動(ソースファイルを削除)',
+      'downloads.next': '次のページ',
+      'downloads.noFiles':
+        '確認されたライブラリターゲットのファイルが見つかりませんでした。',
+      'downloads.notBlocklisted': 'ブロックリスト未登録のリリース',
+      'downloads.outcome':
+        'アクションは確認できません。 再試行の前に更新し、見直して下さい。',
+      'downloads.partial':
+        '取得サービスの一部がチェックできません。 警告が欠落したり、日付が切れる可能性があります。',
+      'downloads.pending': '活動内容 バックエンドの結果を確認できます。',
+      'downloads.preview': 'プレビューファイル',
+      'downloads.previous': '前のページ',
+      'downloads.recovered': '回復',
+      'downloads.refresh': 'リフレッシュ',
+      'downloads.reject': 'ダウンロードを注入する',
+      'downloads.rejected': '手動拒否',
+      'downloads.rejectingState': '拒絶の保留',
+      'downloads.rejection':
+        'この項目を取得キューから削除します。 確認する前にオプションを確認してください。',
+      'downloads.remove':
+        'ダウンロードクライアントからダウンロードとファイルを削除する',
+      'downloads.resolvedState': '解決済み',
+      'downloads.search': '検索',
+      'downloads.select': '選択する {name}',
+      'downloads.targetChoose': 'ライブラリのマッチを選択してください',
+      'downloads.targetHelp':
+        'この買収サービスで既にタイトルを検索します。 マッチを選択すると新しいタイトルは追加されません。',
+      'downloads.targetLabel': '図書館の試合',
+      'downloads.targetNoResults':
+        'このサービスライブラリに一致するタイトルが見つかりませんでした。',
+      'downloads.targetQuery': '映画、シリーズ、アルバム、書籍',
+      'downloads.targetRequired':
+        'ファイルをインポートする前にライブラリのマッチを選択します。',
+      'downloads.targetSelected': '選択されたマッチ: {title}{subtitle}',
+      'downloads.title': 'Inboxをダウンロード',
+      'downloads.truncated': '買収サービスが最初の20件のみチェックされました。',
+      'downloads.unknownImport': 'インポート結果 不明',
+      'downloads.unknownReject': '拒絶反応結果',
+      'components.IndexerSearch.accessDenied':
+        'インデクサーを検索するには、リクエスト管理権限が必要です。',
+      'components.IndexerSearch.categories': 'インデクサーカテゴリ',
+      'components.IndexerSearch.category': 'メディアカテゴリ',
+      'components.IndexerSearch.categoryAdult': 'アダルト',
+      'components.IndexerSearch.categoryAudiobook': 'オーディオブック',
+      'components.IndexerSearch.categoryComic': 'コミック',
+      'components.IndexerSearch.categoryEbook': '本',
+      'components.IndexerSearch.categoryGame': 'PCゲーム',
+      'components.IndexerSearch.categoryMagazine': '雑誌',
+      'components.IndexerSearch.categoryModern': '現代ROMs',
+      'components.IndexerSearch.categoryMovie': '映画',
+      'components.IndexerSearch.categoryMusic': 'ミュージック',
+      'components.IndexerSearch.categoryRetro': 'レトロROMs',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Prowlarr の設定を開く',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr はこのリリースを送信できませんでした。新しい検索を実行して再試行してください。',
+      'components.IndexerSearch.grabs': 'ダウンロード数',
+      'components.IndexerSearch.intro':
+        'すべてのSeerrNGメディアカテゴリで、Prowlarrのインデクサーからリリースを検索します。',
+      'components.IndexerSearch.leechers': 'リーチャーズ',
+      'components.IndexerSearch.loadFailed':
+        'Prowlarr検索設定はロードできませんでした。',
+      'components.IndexerSearch.loadMore': 'より多くの結果を読み込む',
+      'components.IndexerSearch.loadingMore': 'ロード中…',
+      'components.IndexerSearch.manualMode':
+        '検索結果はSeerrNGのリクエストとは別扱いです。結果をProwlarrで設定したダウンロードクライアントに送信できます。',
+      'components.IndexerSearch.noConnection':
+        'Prowlarr は接続されていません。',
+      'components.IndexerSearch.noConnectionHelp':
+        '[設定] > [サービス] で Prowlarr を接続する管理者に依頼します。',
+      'components.IndexerSearch.noResults':
+        'この検索に一致するリリースはありません。',
+      'components.IndexerSearch.noResultsHelp':
+        'Prowlarrでカテゴリフィルターと有効なインデクサーを確認してください。検索結果があっても、アプリがリリースをインポートできるとは限りません。',
+      'components.IndexerSearch.openResult': 'インデクサーの詳細を開く',
+      'components.IndexerSearch.protocol': 'プロトコル',
+      'components.IndexerSearch.published': '公開日',
+      'components.IndexerSearch.query': '検索語',
+      'components.IndexerSearch.queryPlaceholder':
+        'タイトル、著者、アルバム、号数、ゲーム名',
+      'components.IndexerSearch.requestStillUsesManager':
+        '結果を送信してもSeerrNGのリクエストは変更されません。Prowlarrが設定済みのダウンロードクライアントへ引き渡します。',
+      'components.IndexerSearch.resultCount':
+        'Prowlarrから{count}件のリリースが返されました。',
+      'components.IndexerSearch.search': 'インデクサーを検索',
+      'components.IndexerSearch.searchFailed':
+        'Prowlarr検索が失敗しました。 接続を確認してもう一度お試しください。',
+      'components.IndexerSearch.searching': 'インデクサーを検索中…',
+      'components.IndexerSearch.seeders': 'シーダー数',
+      'components.IndexerSearch.sendToDownloader': 'ダウンローダーに送信',
+      'components.IndexerSearch.sendingToDownloader': '送信中…',
+      'components.IndexerSearch.sentToDownloader':
+        'Prowlarrの構成済みダウンロードクライアントに送信しました。',
+      'components.IndexerSearch.size': 'サイズ',
+      'components.IndexerSearch.title': 'インデクサー検索',
+      'components.IndexerSearch.tooManySearches':
+        '検索上限に達しました。再検索する前に1分お待ちください。',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        '有効な検索インデックスは使用できません。 Prowlarr のインディケーターを有効にするか、カテゴリフィルタを調整します。',
+      'components.SettingsProwlarr.addDetectedMatches':
+        '検出されたマッチを追加 ({count})',
+      'components.SettingsProwlarr.address': 'ホスト名',
+      'components.SettingsProwlarr.adult': 'アダルト',
+      'components.SettingsProwlarr.apiKey': 'APIキー',
+      'components.SettingsProwlarr.apiKeySaved':
+        'キーは保存されます。 ご使用いただくためにこの空白のままにしてください。',
+      'components.SettingsProwlarr.audiobook': 'オーディオブック',
+      'components.SettingsProwlarr.basePath': 'ベースパス',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'それぞれの検索で送信されたProwlarrのカテゴリを選択します。 デフォルトでは、標準のNewznab/Torznabカテゴリを使用します。 接続をテストして、有効なインデックス作成者によって宣伝されたカスタムカテゴリを確認します。',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        '少なくとも1つのカテゴリを選択します。',
+      'components.SettingsProwlarr.categoryMappingTitle':
+        'カテゴリー フィルター',
+      'components.SettingsProwlarr.clearApiKey':
+        '保存された API キーを削除します。',
+      'components.SettingsProwlarr.comic': 'コミック',
+      'components.SettingsProwlarr.connected': 'Prowlarr に接続 {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'カウントには、少なくとも1つの選択したカテゴリのサポートを宣伝する有効で検索可能なインデックスが含まれます。 検索カバレッジを表示, 成功したつかみやインポートではなく、.',
+      'components.SettingsProwlarr.coverageTitle':
+        '媒体によるインデックスカバレッジ',
+      'components.SettingsProwlarr.description':
+        'Prowlarrインスタンスを一度接続して、既に管理しているインディケーターを横断してカテゴリのマニュアル検索を実行します。',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        '提案されたカスタムカテゴリは、宣伝された名前で一致しています。 保存する前にそれらを確認; これは、Prowlarrを変更したり、ダウンロードを送信しません。',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr は管理 API 接続を承諾しました。 これらの結果は、各有効な検索インデックスを別々にテストします。無効な期限は、Prowlarrから来ています。',
+      'components.SettingsProwlarr.diagnosticFailed': '失敗',
+      'components.SettingsProwlarr.diagnosticOk': 'コネクテッド',
+      'components.SettingsProwlarr.diagnosticTitle': 'インデックス接続結果',
+      'components.SettingsProwlarr.disabledUntil': '無効になるまで {date}',
+      'components.SettingsProwlarr.ebook': '本',
+      'components.SettingsProwlarr.game': 'PCゲーム',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        '各メディアタイプに対して、どの有効な Prowlarr インデクサーを検索対象にするかを選択します。複数のインデクサーを選択するには、Windows/Linux では Ctrl キー、macOS では Command キーを押しながらクリックしてください。選択が空の場合、そのタイプの検索は無効になります。',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        '{category} のインデクサー',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'メディアタイプ別のインデクサー割り当て',
+      'components.SettingsProwlarr.indexerCount':
+        'インデクサー: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'ユーザーは検索結果からインデクサーの詳細を開くことができます。',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'インデクサー名と詳細リンクはユーザーから非表示になります。',
+      'components.SettingsProwlarr.indexerNotSearchable': '（検索不可）',
+      'components.SettingsProwlarr.indexerSearchLimits': '検索制限',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'ユーザーごとの1分間の総検索数と、選択した各インデクサーごとの検索数を制限します。',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr は保存されますが、そのインデックスは使用できません。',
+      'components.SettingsProwlarr.keepApiKey': '保存された API キーを保持する',
+      'components.SettingsProwlarr.loadFailed':
+        'Prowlarr の設定を読み込めませんでした。',
+      'components.SettingsProwlarr.magazine': '雑誌',
+      'components.SettingsProwlarr.modern': '現代ROMs',
+      'components.SettingsProwlarr.movie': '映画',
+      'components.SettingsProwlarr.music': 'ミュージック',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'Prowlarr のインデックスがまだ設定されていない。',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Prowlarr の接続をテストしてインデクサーを読み込み、カテゴリ別に割り当ててください。',
+      'components.SettingsProwlarr.port': 'ポート',
+      'components.SettingsProwlarr.recentFailure': '最近の失敗: {date}',
+      'components.SettingsProwlarr.retro': 'レトロROMs',
+      'components.SettingsProwlarr.save': 'Prowlarrの設定を保存',
+      'components.SettingsProwlarr.saveFailed':
+        'Prowlarr の設定を保存できませんでした。',
+      'components.SettingsProwlarr.saved': 'Prowlarr の設定を保存しました。',
+      'components.SettingsProwlarr.saving': '保存中…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        '1から60までの整数を入力してください。',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        '{indexer} でのユーザーごとの1分間最大検索数',
+      'components.SettingsProwlarr.searchesPerUser':
+        'ユーザーごとの1分間最大検索数',
+      'components.SettingsProwlarr.selectedCategories':
+        '{count} 選択したカテゴリ',
+      'components.SettingsProwlarr.selectedIndexers':
+        '{count} 個のインデクサーを選択済み',
+      'components.SettingsProwlarr.showIndexerDetails':
+        '検索結果にインデクサー名と詳細を表示する',
+      'components.SettingsProwlarr.sports': 'スポーツ',
+      'components.SettingsProwlarr.supportNote':
+        'この設定は Prowlarr への接続のみに対応しています。NZBHydra2 は現在ここではサポートされていません。',
+      'components.SettingsProwlarr.test':
+        '接続をテストし、カバレッジを点検して下さい',
+      'components.SettingsProwlarr.testFailed':
+        'Prowlarr接続が失敗しました。 アドレスと API キーを確認します。',
+      'components.SettingsProwlarr.testHint':
+        '直接SeerrNGクエリProwlarrから検索が開始されました。 承認されたリクエストは、その構成されたメディアマネージャーまたはソフトウェアプロバイダーを経由して、取得と追跡を所有しています。',
+      'components.SettingsProwlarr.testing': 'Prowlarrをチェック...',
+      'components.SettingsProwlarr.title': 'Prowlarr インデックス',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} 検索可能で有効 {total} 仕様',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'SSLの利用',
+      'components.Settings.SettingsLogs.logs': 'ログ',
+      'components.Settings.SettingsLogs.searchLogs': 'ログを検索',
+      'components.Settings.SettingsLogs.level': '重大度',
+      'components.Settings.SettingsLogs.filterDebug': 'デバッグ',
+      'components.Settings.SettingsLogs.filterInfo': '情報',
+      'components.Settings.SettingsLogs.filterWarn': '警告',
+      'components.Settings.SettingsLogs.filterError': 'エラー',
+      'components.Settings.SettingsLogs.logDetails': 'ログの詳細',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'クリップボードにコピー',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'ログメッセージをクリップボードにコピーしました。',
+      'components.Settings.SettingsJobsCache.runnow': '今すぐ実行',
+      'components.Settings.SettingsJobsCache.canceljob': 'ジョブのキャンセル',
+      'components.Settings.SettingsJobsCache.process': 'プロセス',
+      'components.Settings.SettingsJobsCache.command': 'コマンド',
+      'components.Settings.SettingsJobsCache.enabled': '有効化',
+      'components.Settings.SettingsJobsCache.disabled': '無効',
+      'components.Settings.SettingsJobsCache.cachehits': 'ヒット数',
+      'components.Settings.SettingsJobsCache.cachekeys': 'キーの総数',
+      'components.Settings.SettingsJobsCache.cachemisses': 'ミス',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNSキャッシュ',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'ヒット数',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'ミス',
+      'components.Settings.SettingsJobsCache.failures': '失敗',
+      'components.Settings.SettingsJobsCache.flushcache': 'キャッシュクリア',
+      'components.Settings.SettingsJobsCache.hitRate': 'ヒット率',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'キャッシュされた画像',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks':
+        'IPv4フォールバック',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'インストール済み',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        '最新のバージョン',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'リリースデータがありません。',
+      'components.Settings.SettingsAbout.Releases.releases': 'リリース',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'GitHub で見る',
+      'components.Settings.SettingsAbout.aboutseerr': 'SeerrNG について',
+      'components.Settings.SettingsAbout.appDataPath': 'データディレクトリ',
+      'components.Settings.SettingsAbout.documentation': 'ドキュメント',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'GitHub ディスカッション',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNGは、適法な個人情報管理を目的としています。 プロジェクトは著作権侵害や著作権侵害を禁じません。 ユーザーは、その地域の適用される法律、ライセンス、およびサービス規約を遵守する責任を負います。',
+      'components.Settings.SettingsAbout.legalUseTitle': '法的使用について',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'メタデータの帰属表示',
+      'components.Settings.SettingsAbout.supportdevelopment': 'サポート開発',
+      'components.Settings.SettingsAbout.timezone': 'タイムゾーン',
+      'components.Settings.SettingsAbout.totalmedia': '総メディア数',
+      'components.Settings.SettingsAbout.totalrequests': '総リクエスト数',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        '本製品はTMDBおよびTMDB APIを使用していますが、TMDBによる推奨、認定、その他の承認を受けたものではありません。<ApiTermsLink>TMDB API利用規約</ApiTermsLink>。',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        '更新を確認できませんでした',
+      'components.Settings.SettingsAbout.uptodate': '最新',
+      'components.Settings.SettingsAbout.version': 'バージョン',
+      'components.Settings.SettingsCategories.title': 'メディアカテゴリ',
+      'components.Settings.SettingsCategories.description':
+        '誰もがリクエストを閲覧できるカテゴリを選択します。 無効なカテゴリはナビゲーションや発見から消え、新しいリクエストはブロックされます。 リクエストの送信とダウンロード履歴はリクエストステータスでご利用いただけます。',
+      'components.Settings.SettingsCategories.groupTitle': '利用可能なカテゴリ',
+      'components.Settings.SettingsCategories.groupDescription':
+        'これらのスイッチは、SeerrNG 間でのカテゴリの可用性を制御します。',
+      'components.Settings.SettingsCategories.movie': '映画',
+      'components.Settings.SettingsCategories.tv': 'シリーズ',
+      'components.Settings.SettingsCategories.music': 'ミュージック',
+      'components.Settings.SettingsCategories.ebook': '本',
+      'components.Settings.SettingsCategories.audiobook': 'オーディオブック',
+      'components.Settings.SettingsCategories.comic': 'コミック',
+      'components.Settings.SettingsCategories.magazine': '雑誌',
+      'components.Settings.SettingsCategories.adult': 'アダルト',
+      'components.Settings.SettingsCategories.retro':
+        'エミュレーション(リトロ)',
+      'components.Settings.SettingsCategories.modern':
+        'エミュレーション(モダン)',
+      'components.Settings.SettingsCategories.game': 'PCゲーム',
+      'components.Settings.SettingsCategories.movieDescription':
+        '映画の発見や要求を許可します。',
+      'components.Settings.SettingsCategories.tvDescription':
+        'シリーズの発見と要求を許可します。',
+      'components.Settings.SettingsCategories.musicDescription':
+        '音楽の発見と要求を許可します。',
+      'components.Settings.SettingsCategories.ebookDescription':
+        '書籍の発見と要求を許可します。',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'オーディオブックの発見と要求を許可します。',
+      'components.Settings.SettingsCategories.comicDescription':
+        '漫画の発見と要求を許可します。',
+      'components.Settings.SettingsCategories.magazineDescription':
+        '雑誌の発見や要求を許可します。',
+      'components.Settings.SettingsCategories.adultDescription':
+        'アダルトシーン（成人向けメディア）の発見とリクエストを許可します。設定済みの Whisparr v3 サービスと、アダルト専用のユーザー権限が必要です。',
+      'components.Settings.SettingsCategories.retroDescription':
+        'レトロROMの発見と要求を許可します。',
+      'components.Settings.SettingsCategories.modernDescription':
+        '現代のエミュレーションROMの発見と要求を許可します。',
+      'components.Settings.SettingsCategories.gameDescription':
+        'PCゲームの発見と要求を許可します。',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        '成人向けコンテンツはアクセス権限を持つすべてのユーザーに表示されます',
+      'components.Settings.SettingsCategories.adultWarning':
+        'このインスタンスを家族と共有したり、リバースプロキシ経由で公開したりする場合、「アダルトのリクエスト」が許可されたユーザーは、あなたが閲覧・リクエストした内容を確認できます。アダルトコンテンツが表示されないように、以下の設定または各ユーザーの権限で、家族アカウントを制限としてマークしてください。',
+      'components.Settings.SettingsCategories.ageGateTitle': '年齢制限',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        '制限されたアカウントは成人向けコンテンツや、成熟度の高い映画、シリーズ、音楽、書籍、コミック、タグ付けされたタイトルを表示・リクエストできません。サーバーサイドで非表示になります。フィルタリングはプロバイダーのレーティングとタグを使用し、メタデータのないタイトルについてはベストエフォートで適用されます。',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'デフォルトでアカウントを制限する',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        '明示的な設定がないアカウントは制限されます。管理者は対象外です。',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        '映画の最高レーティング',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        '制限されたアカウントは、このレーティングを超える映画を表示できません。',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'シリーズの最高レーティング',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        '制限されたアカウントは、このレーティングを超えるシリーズを表示できません。',
+      'components.Settings.SettingsCategories.ageGateCountry':
+        'レーティング対象国',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'レーティングに使用する2文字の国コード（例: US）。',
+      'components.Settings.SettingsCategories.saveSuccess':
+        '保存されたカテゴリ設定。',
+      'components.Settings.SettingsCategories.saveFailure':
+        'カテゴリーの設定は保存できません。',
     },
   },
   {
@@ -6502,6 +11937,399 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': '최근 추가된 항목 보기',
       'components.PermissionEdit.viewrequests': '요청 보기',
       'components.PermissionEdit.viewwatchlists': '관심 목록 보기',
+      'components.RequestModal.RequestTree.seasonNumber': '시즌 {number}',
+      'components.RequestModal.RequestTree.specials': '스페셜',
+      'components.Requests.episodeQueue': '에피소드 큐',
+      'components.Requests.retry': '다시 시도',
+      'components.Requests.approve': '승인',
+      'components.Requests.decline': '거절',
+      'components.Requests.requested': '요청됨',
+      'components.Requests.approved': '승인됨',
+      'components.Requests.searching': '검색 중',
+      'components.Requests.downloading': '다운로드 중',
+      'components.Requests.importing': '가져오는 중',
+      'components.Requests.library': '라이브러리에 추가 중',
+      'components.Requests.available': '사용 가능',
+      'components.Requests.unavailable': '사용할 수 없음',
+      'components.Requests.failed': '실패',
+      'components.Requests.declined': '거부됨',
+      'components.Requests.cancelled': '취소됨',
+      'components.Requests.pending': '대기 중',
+      'components.Requests.completed': '완료됨',
+      'components.Requests.statusUpdated': '상태 업데이트',
+      'i18n.unknown': '알려지지 않은',
+      'components.Requests.history': '기록',
+      'components.RequestStatus.SoftwareRequests.approve': '승인',
+      'components.RequestStatus.SoftwareRequests.approved': '승인됨',
+      'components.RequestStatus.SoftwareRequests.available': '사용 가능',
+      'components.RequestStatus.SoftwareRequests.cancel': '취소',
+      'components.RequestStatus.SoftwareRequests.cancelled': '취소됨',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        '취소된 요청 삭제',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        '취소된 요청을 삭제하시겠습니까?',
+      'components.RequestStatus.SoftwareRequests.decline': '거절',
+      'components.RequestStatus.SoftwareRequests.declined': '거부됨',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        '복사본 다운로드',
+      'components.RequestStatus.SoftwareRequests.downloading': '다운로드 중',
+      'components.RequestStatus.SoftwareRequests.failed': '실패',
+      'components.RequestStatus.SoftwareRequests.history': '이력',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        '상태 기록을 불러오는 중…',
+      'components.RequestStatus.SoftwareRequests.importing': '가져오기 검증 중',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        '이 소프트웨어 요청을 업데이트하지 못했습니다.',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        '저장된 상태 업데이트는 없습니다.',
+      'components.RequestStatus.SoftwareRequests.pending': '승인 대기 중',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        '요청 목록에서 제거',
+      'components.RequestStatus.SoftwareRequests.retry': '다시 시도',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        '공급자는 이전 다운로드가 시작됐는지 확인할 수 없습니다. 다운로드 클라이언트의 대기열과 기록을 확인하세요. 일치하는 다운로드가 없을 때만 계속하세요.',
+      'components.RequestStatus.SoftwareRequests.searching': '검색 중',
+      'components.RequestStatus.SoftwareRequests.title': '소프트웨어 요청',
+      'components.RequestStatus.SoftwareRequests.withdraw': '요청 철회',
+      'i18n.back': '뒤로',
+      'downloads.actions': '활동 내역',
+      'downloads.active': '활동 경고',
+      'downloads.activeState': '확인 필요',
+      'downloads.actor': '사용자 이름 {id}',
+      'downloads.blocked': '수동으로 차단',
+      'downloads.blocklist':
+        '이 릴리스를 차단하여 다시 다운로드되지 않도록 하세요',
+      'downloads.blocklisted': '차단 요청됨',
+      'downloads.cancel': '취소',
+      'downloads.changed': '서비스 구성 변경',
+      'downloads.clientKept': '고객 파일 유지',
+      'downloads.clientRemoved': '고객 제거 요청',
+      'downloads.confirm': '관련 상품',
+      'downloads.copy': '복사 또는 hardlink (keep 소스 파일)',
+      'downloads.denied': '다운로드 권한 관리가 필요합니다.',
+      'downloads.description':
+        '검토 취득 경고, 수동 수입 파일 선택, 및 원치 않는 다운로드 거부.',
+      'downloads.disappeared': '더 이상 큐에',
+      'downloads.empty': '이 전망에서 다운로드 경고 없음.',
+      'downloads.failed': 'inbox는 적재될 수 없습니다.',
+      'downloads.failedState': '검토 필요',
+      'downloads.history': '- 연혁',
+      'downloads.import': '선택한 파일',
+      'downloads.importFailed': '수입 실패',
+      'downloads.importMode': '수입 모드',
+      'downloads.importReview': '확인된 파일 가져 오기없이 완료',
+      'downloads.importWarning':
+        '대상을 확인하고 모든 거부 이유를 검토하십시오. 취득 서비스는 파일 품질과 에피소드 일치를 결정합니다.',
+      'downloads.imported': '수동으로 수입',
+      'downloads.importingState': '수입 pending',
+      'downloads.ineligible': '확인된 일치 없음 — 가져올 수 없습니다',
+      'downloads.loading': '로드 다운로드 경고 ...',
+      'downloads.move': '이동 (소스 파일 복구)',
+      'downloads.next': '다음 페이지',
+      'downloads.noFiles': '확인 된 라이브러리 대상이있는 파일이 없습니다.',
+      'downloads.notBlocklisted': '차단 목록에 등록되지 않은 릴리스',
+      'downloads.outcome':
+        '활동은 확인될 수 있었습니다. retrying 전에 새로 고침 및 검토.',
+      'downloads.partial':
+        '몇몇 취득 서비스는 검사될 수 없습니다. 그들의 경고는 누락되거나 날짜에서 일 수 있습니다.',
+      'downloads.pending': '작업 허용. backend outcome를 확인하십시오.',
+      'downloads.preview': '미리보기 파일',
+      'downloads.previous': '이전 페이지',
+      'downloads.recovered': '복구됨',
+      'downloads.refresh': '새로 고침',
+      'downloads.reject': 'Reject 다운로드',
+      'downloads.rejected': '수동으로 거부',
+      'downloads.rejectingState': '관련 상품',
+      'downloads.rejection':
+        '거부는 인수 큐에서이 항목을 제거합니다. 확인하기 전에 옵션을 검토합니다.',
+      'downloads.remove': '다운로드 클라이언트에서 다운로드 및 파일을 제거',
+      'downloads.resolvedState': '해결됨',
+      'downloads.search': '검색',
+      'downloads.select': '{name}를 선택하세요.',
+      'downloads.targetChoose': '도서관 일치 선택',
+      'downloads.targetHelp':
+        '이 취득 서비스에 이미 제목을 검색합니다. 일치를 선택하면 새로운 제목을 추가하지 않습니다.',
+      'downloads.targetLabel': '도서관 경기',
+      'downloads.targetNoResults':
+        '이 서비스 라이브러리에서 일치하는 제목이 없습니다.',
+      'downloads.targetQuery': '영화, 시리즈, 앨범, 또는 책',
+      'downloads.targetRequired':
+        '파일 가져오기 전에 라이브러리 일치를 선택합니다.',
+      'downloads.targetSelected': '선택된 일치: {title}{subtitle}',
+      'downloads.title': 'Inbox 다운로드',
+      'downloads.truncated': '첫 20개의 인수 서비스만 확인되었습니다.',
+      'downloads.unknownImport': '수입 outcome 알 수없는',
+      'downloads.unknownReject': '거절 outcome 알 수없는',
+      'components.IndexerSearch.accessDenied':
+        '인덱서를 검색하려면 요청 관리 권한이 필요합니다.',
+      'components.IndexerSearch.categories': 'Indexer 카테고리',
+      'components.IndexerSearch.category': '미디어 범주',
+      'components.IndexerSearch.categoryAdult': '성인',
+      'components.IndexerSearch.categoryAudiobook': '오디오북',
+      'components.IndexerSearch.categoryComic': '만화',
+      'components.IndexerSearch.categoryEbook': '책',
+      'components.IndexerSearch.categoryGame': 'PC 게임',
+      'components.IndexerSearch.categoryMagazine': '잡지',
+      'components.IndexerSearch.categoryModern': '현대 ROMs',
+      'components.IndexerSearch.categoryMovie': '영화',
+      'components.IndexerSearch.categoryMusic': '·',
+      'components.IndexerSearch.categoryRetro': '레트로 ROM',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Prowlarr 설정 열기',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr가 이 릴리스를 전송할 수 없습니다. 새 검색을 실행하고 다시 시도해 주세요.',
+      'components.IndexerSearch.grabs': '다운로드 수',
+      'components.IndexerSearch.intro':
+        '모든 SeerrNG 미디어 카테고리에서 Prowlarr Indexers의 릴리스를 검색합니다.',
+      'components.IndexerSearch.leechers': '다운로더 수',
+      'components.IndexerSearch.loadFailed':
+        'Prowlarr 검색 구성을로드 할 수 없습니다.',
+      'components.IndexerSearch.loadMore': '결과 더 불러오기',
+      'components.IndexerSearch.loadingMore': '불러오는 중…',
+      'components.IndexerSearch.manualMode':
+        '검색 결과는 SeerrNG 요청과 별개입니다. 결과를 Prowlarr에 설정된 다운로드 클라이언트로 보낼 수 있습니다.',
+      'components.IndexerSearch.noConnection':
+        'Prowlarr에 연결되어 있지 않습니다.',
+      'components.IndexerSearch.noConnectionHelp':
+        '관리자에게 설정 > 서비스에서 Prowlarr을 연결하십시오.',
+      'components.IndexerSearch.noResults':
+        '이 검색과 일치하는 릴리스가 없습니다.',
+      'components.IndexerSearch.noResultsHelp':
+        'Prowlarr에서 카테고리 필터와 활성 인덱서를 확인하세요. 검색 결과가 앱에서 릴리스를 가져올 수 있음을 보장하지는 않습니다.',
+      'components.IndexerSearch.openResult': '인덱서 세부 정보 열기',
+      'components.IndexerSearch.protocol': '프로토콜',
+      'components.IndexerSearch.published': '게시됨',
+      'components.IndexerSearch.query': '검색어',
+      'components.IndexerSearch.queryPlaceholder':
+        '제목, 저자, 앨범, 호, 또는 게임 이름',
+      'components.IndexerSearch.requestStillUsesManager':
+        '결과를 보내도 SeerrNG 요청은 변경되지 않습니다. Prowlarr가 설정된 다운로드 클라이언트로 결과를 전달합니다.',
+      'components.IndexerSearch.resultCount':
+        'Prowlarr에서 릴리스 {count}개를 반환했습니다.',
+      'components.IndexerSearch.search': '인덱서 검색',
+      'components.IndexerSearch.searchFailed':
+        'Prowlarr 검색에 실패했습니다. 연결을 확인하고 다시 시도하세요.',
+      'components.IndexerSearch.searching': '인덱서 검색 중…',
+      'components.IndexerSearch.seeders': '시더',
+      'components.IndexerSearch.sendToDownloader': '다운로더로 전송',
+      'components.IndexerSearch.sendingToDownloader': '전송 중…',
+      'components.IndexerSearch.sentToDownloader':
+        'Prowlarr의 설정된 다운로드 클라이언트로 전송되었습니다.',
+      'components.IndexerSearch.size': '크기',
+      'components.IndexerSearch.title': '인덱서 검색',
+      'components.IndexerSearch.tooManySearches':
+        '검색 횟수 제한에 도달했습니다. 다시 검색하기 전에 1분 기다려 주세요.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'Searchable Indexers를 사용할 수 없습니다. Prowlarr의 인덱스를 사용하거나 카테고리 필터를 조정할 수 있습니다.',
+      'components.SettingsProwlarr.addDetectedMatches':
+        '발견된 일치를 추가하십시오 ({count})',
+      'components.SettingsProwlarr.address': '호스트 이름',
+      'components.SettingsProwlarr.adult': '성인',
+      'components.SettingsProwlarr.apiKey': 'API 키',
+      'components.SettingsProwlarr.apiKeySaved':
+        '키가 저장됩니다. 그것을 사용 하 여 유지 하는이 빈을 남겨.',
+      'components.SettingsProwlarr.audiobook': '오디오북',
+      'components.SettingsProwlarr.basePath': '기본 경로',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        '각 검색으로 전송되는 Prowlarr 범주를 선택하십시오. 기본값은 표준 Newznab/Torznab 범주를 사용; 활성화 된 인덱스로 광고 된 사용자 정의 카테고리를 볼 수있는 연결을 테스트.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        '적어도 하나의 범주를 선택하십시오.',
+      'components.SettingsProwlarr.categoryMappingTitle': '범주 필터',
+      'components.SettingsProwlarr.clearApiKey': '저장된 API 키 제거',
+      'components.SettingsProwlarr.comic': '만화',
+      'components.SettingsProwlarr.connected': 'Prowlarr에 연결 {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        '카운트는 적어도 하나의 선택 카테고리에 대한 지원을 광고하는 활성화, 검색 가능한 인덱스를 포함합니다. 그들은 검색 범위를 보여, 성공적인 잡아 또는 수입.',
+      'components.SettingsProwlarr.coverageTitle': 'Indexer 적용',
+      'components.SettingsProwlarr.description':
+        'Prowlarr 인스턴스를 한 번 연결하여 인덱스를 통해 범주 인식 설명서를 검색합니다.',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        '제안 된 사용자 정의 카테고리는 광고 된 이름과 일치합니다. 저장하기 전에 그들을 검토; 이것은 Prowlarr을 변경하거나 다운로드를 보내지 않습니다.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr은 관리 API 연결을 허용했습니다. 이 결과 테스트 각 활성화 검색 가능한 인덱스 개별적으로; 장애인 날짜는 Prowlarr에서 온다.',
+      'components.SettingsProwlarr.diagnosticFailed': '실패',
+      'components.SettingsProwlarr.diagnosticOk': '연결하기',
+      'components.SettingsProwlarr.diagnosticTitle': 'Indexer 연결 결과',
+      'components.SettingsProwlarr.disabledUntil': '까지 {date}',
+      'components.SettingsProwlarr.ebook': '책',
+      'components.SettingsProwlarr.game': 'PC 게임',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        '각 미디어 유형에 대해 검색할 활성화된 Prowlarr 인덱서를 선택하세요. Windows/Linux에서는 Ctrl+클릭, macOS에서는 Command+클릭으로 여러 인덱서를 선택할 수 있습니다. 선택이 비어 있으면 해당 유형의 검색이 비활성화됩니다.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        '{category} 인덱서',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        '미디어 유형별 인덱서 할당',
+      'components.SettingsProwlarr.indexerCount': '인덱스: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        '사용자가 검색 결과에서 인덱서 세부 정보를 열 수 있습니다.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        '인덱서 이름과 세부 정보 링크가 사용자에게 숨겨집니다.',
+      'components.SettingsProwlarr.indexerNotSearchable': '(검색 불가)',
+      'components.SettingsProwlarr.indexerSearchLimits': '검색 제한',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        '사용자별 분당 전체 검색 횟수와 선택된 각 인덱서별 검색 횟수를 제한합니다.',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr은 저장되지만 인덱스 재고는 사용할 수 없습니다.',
+      'components.SettingsProwlarr.keepApiKey': '저장된 API 열쇠',
+      'components.SettingsProwlarr.loadFailed':
+        'Prowlarr 설정을 불러오지 못했습니다.',
+      'components.SettingsProwlarr.magazine': '잡지',
+      'components.SettingsProwlarr.modern': '현대 ROMs',
+      'components.SettingsProwlarr.movie': '영화',
+      'components.SettingsProwlarr.music': '·',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'Prowlarr 인덱서는 아직 구성되지 않습니다.',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Prowlarr 연결을 테스트하여 인덱서를 불러오고 범주별로 할당하세요.',
+      'components.SettingsProwlarr.port': '포트',
+      'components.SettingsProwlarr.recentFailure': '최근 실패: {date}',
+      'components.SettingsProwlarr.retro': '레트로 ROM',
+      'components.SettingsProwlarr.save': 'Prowlarr 설정 저장',
+      'components.SettingsProwlarr.saveFailed':
+        'Prowlarr 설정을 저장하지 못했습니다.',
+      'components.SettingsProwlarr.saved': 'Prowlarr 설정을 저장했습니다.',
+      'components.SettingsProwlarr.saving': '저장 중…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        '1에서 60 사이의 정수를 입력하세요.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        '{indexer}에서 사용자별 분당 최대 검색 횟수',
+      'components.SettingsProwlarr.searchesPerUser':
+        '사용자별 분당 최대 검색 횟수',
+      'components.SettingsProwlarr.selectedCategories': '{count} 카테고리 선택',
+      'components.SettingsProwlarr.selectedIndexers': '{count}개 인덱서 선택됨',
+      'components.SettingsProwlarr.showIndexerDetails':
+        '검색 결과에 인덱서 이름과 세부 정보 표시 허용',
+      'components.SettingsProwlarr.sports': '·',
+      'components.SettingsProwlarr.supportNote':
+        '이 설정은 Prowlarr에만 연결됩니다. NZBHydra2는 현재 여기서 지원되지 않습니다.',
+      'components.SettingsProwlarr.test': '시험 연결 및 검사 적용',
+      'components.SettingsProwlarr.testFailed':
+        'Prowlarr 연결 실패. 주소 및 API 키 확인.',
+      'components.SettingsProwlarr.testHint':
+        'Searches 시작 부터 SeerrNG query Prowlarr 직접. 승인 된 요청은 여전히 자신의 구성 된 미디어 관리자 또는 소프트웨어 공급자를 통해 이동, 이는 인수 및 추적을 소유.',
+      'components.SettingsProwlarr.testing': 'Prowlarr 확인 중…',
+      'components.SettingsProwlarr.title': 'Prowlarr 지수',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} 검색 및 활성화 {total} 설치하기',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'SSL 사용',
+      'components.Settings.SettingsLogs.logs': '로그',
+      'components.Settings.SettingsLogs.searchLogs': '로그 검색',
+      'components.Settings.SettingsLogs.level': '심각도',
+      'components.Settings.SettingsLogs.filterDebug': '디버그',
+      'components.Settings.SettingsLogs.filterInfo': '정보',
+      'components.Settings.SettingsLogs.filterWarn': '경고',
+      'components.Settings.SettingsLogs.filterError': '오류',
+      'components.Settings.SettingsLogs.logDetails': '로그 정보',
+      'components.Settings.SettingsLogs.copyToClipboard': '클립보드에 복사',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        '로그 메시지를 클립보드에 복사했습니다.',
+      'components.Settings.SettingsJobsCache.runnow': '지금 실행',
+      'components.Settings.SettingsJobsCache.canceljob': '작업 취소',
+      'components.Settings.SettingsJobsCache.process': '프로세스',
+      'components.Settings.SettingsJobsCache.command': '명령',
+      'components.Settings.SettingsJobsCache.enabled': '활성화됨',
+      'components.Settings.SettingsJobsCache.disabled': '비활성화됨',
+      'components.Settings.SettingsJobsCache.cachehits': '조회 수',
+      'components.Settings.SettingsJobsCache.cachekeys': '전체 키',
+      'components.Settings.SettingsJobsCache.cachemisses': '누락',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS 캐시',
+      'components.Settings.SettingsJobsCache.dnscachehits': '적중 수',
+      'components.Settings.SettingsJobsCache.dnscachemisses': '실패',
+      'components.Settings.SettingsJobsCache.failures': '실패',
+      'components.Settings.SettingsJobsCache.flushcache': '캐시 플러시',
+      'components.Settings.SettingsJobsCache.hitRate': '적중률',
+      'components.Settings.SettingsJobsCache.imagecachecount': '저장된 이미지',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 가을',
+      'components.Settings.SettingsAbout.Releases.installedversion': '설치됨',
+      'components.Settings.SettingsAbout.Releases.latestversion': '최신',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        '현재 출시 데이터를 사용할 수 없습니다.',
+      'components.Settings.SettingsAbout.Releases.releases': '출시',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'GitHub에서 보기',
+      'components.Settings.SettingsAbout.aboutseerr': 'SeerrNG 정보',
+      'components.Settings.SettingsAbout.appDataPath': '데이터 디렉토리',
+      'components.Settings.SettingsAbout.documentation': '문서',
+      'components.Settings.SettingsAbout.githubdiscussions': 'GitHub 토론',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG는 합법적인 개인 미디어 관리를 위한 것입니다. 프로젝트는 condone piracy 또는 저작권 침해가 아닙니다. 사용자는 해당 지역의 적용 가능한 법률, 라이센스 및 서비스 약관을 준수합니다.',
+      'components.Settings.SettingsAbout.legalUseTitle': '법적 사용',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        '메타데이터 출처 표시',
+      'components.Settings.SettingsAbout.supportdevelopment': '지원 개발',
+      'components.Settings.SettingsAbout.timezone': '시간대',
+      'components.Settings.SettingsAbout.totalmedia': '전체 미디어',
+      'components.Settings.SettingsAbout.totalrequests': '총 요청 수',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        '이 제품은 TMDB 및 TMDB API를 사용하지만 TMDB의 보증, 인증 또는 기타 승인을 받지 않았습니다. <ApiTermsLink>TMDB API 이용 약관</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        '업데이트를 확인할 수 없습니다',
+      'components.Settings.SettingsAbout.uptodate': '최신',
+      'components.Settings.SettingsAbout.version': '버전',
+      'components.Settings.SettingsCategories.title': '미디어 카테고리',
+      'components.Settings.SettingsCategories.description':
+        '모든 카테고리를 선택하여 검색 및 요청할 수 있습니다. 장애인 범주는 탐색 및 발견에서 사라지고, 새로운 요청은 차단됩니다. 사전 요청 및 다운로드 기록은 Request Status에서 확인할 수 있습니다.',
+      'components.Settings.SettingsCategories.groupTitle': '제품 분류',
+      'components.Settings.SettingsCategories.groupDescription':
+        '이 스위치 컨트롤 범주 사용 가능 SeerrNG.',
+      'components.Settings.SettingsCategories.movie': '영화',
+      'components.Settings.SettingsCategories.tv': '시리즈',
+      'components.Settings.SettingsCategories.music': '·',
+      'components.Settings.SettingsCategories.ebook': '책',
+      'components.Settings.SettingsCategories.audiobook': '오디오북',
+      'components.Settings.SettingsCategories.comic': '만화',
+      'components.Settings.SettingsCategories.magazine': '잡지',
+      'components.Settings.SettingsCategories.adult': '성인',
+      'components.Settings.SettingsCategories.retro': '에뮬레이션 (Retro)',
+      'components.Settings.SettingsCategories.modern': '에뮬레이션 (Modern)',
+      'components.Settings.SettingsCategories.game': 'PC 게임',
+      'components.Settings.SettingsCategories.movieDescription':
+        '영화 발견 및 요청을 허용하십시오.',
+      'components.Settings.SettingsCategories.tvDescription':
+        '시리즈 발견 및 요청을 허용하십시오.',
+      'components.Settings.SettingsCategories.musicDescription':
+        '음악 발견 및 요청을 허용하십시오.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        '책 발견 및 요청을 허용.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'audiobook discovery 및 요청을 허용하십시오.',
+      'components.Settings.SettingsCategories.comicDescription':
+        '만화 발견 및 요청을 허용.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        '잡지 발견 및 요청을 허용하십시오.',
+      'components.Settings.SettingsCategories.adultDescription':
+        '성인 장면 검색 및 요청을 허용합니다. 구성된 Whisparr v3 서비스 및 성인 전용 사용자 권한이 필요합니다.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'retro ROM 발견 및 요청을 허용하십시오.',
+      'components.Settings.SettingsCategories.modernDescription':
+        '현대 에뮬레이션 ROM 발견 및 요청을 허용.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'PC 게임 발견 및 요청을 허용하십시오.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        '성인 콘텐츠는 접근 권한이 있는 모든 사람에게 표시됩니다',
+      'components.Settings.SettingsCategories.adultWarning':
+        "이 인스턴스를 가족과 공유하거나 리버스 프록시를 통해 노출하는 경우, '성인 요청' 권한이 부여된 사람은 사용자가 검색하고 요청하는 내용을 볼 수 있습니다. 성인 콘텐츠가 표시되지 않도록 아래에서 또는 각 사용자의 권한에서 가족 계정을 제한된 상태로 표시하세요.",
+      'components.Settings.SettingsCategories.ageGateTitle': '연령 제한',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        '제한된 계정은 성인 콘텐츠, 성인 영화, 시리즈, 음악, 책, 만화 및 태그가 지정된 제목을 볼 수 없으며 요청할 수도 없습니다. 필터링은 제공자 등급과 태그를 사용하며, 메타데이터가 없는 제목의 경우 최선의 노력을 다합니다.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        '기본적으로 계정 제한',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        '명시적인 설정이 없는 계정은 제한됩니다. 관리자는 예외입니다.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        '최고 영화 등급',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        '제한된 계정은 이 등급보다 높은 영화를 볼 수 없습니다.',
+      'components.Settings.SettingsCategories.ageGateTvMax': '최고 시리즈 등급',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        '제한된 계정은 이 등급보다 높은 시리즈를 볼 수 없습니다.',
+      'components.Settings.SettingsCategories.ageGateCountry': '등급 국가',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        '등급에 사용되는 2글자 국가 코드입니다. 예: US.',
+      'components.Settings.SettingsCategories.saveSuccess': '범주 설정 저장.',
+      'components.Settings.SettingsCategories.saveFailure':
+        '범주 설정은 저장할 수 없습니다.',
     },
   },
   {
@@ -6558,6 +12386,30 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Peržiūrėti problemas',
       'components.PermissionEdit.viewrecent': 'Peržiūrėti neseniai pridėtus',
       'components.PermissionEdit.viewrequests': 'Peržiūrėti rezervacijas',
+      'components.IssueDetails.allepisodes': 'Visi epizodai',
+      'i18n.back': 'Atgal',
+      'components.Settings.SettingsLogs.logs': 'Logai',
+      'components.Settings.SettingsLogs.level': 'Rimtumas',
+      'components.Settings.SettingsLogs.filterInfo': 'Informacija',
+      'components.Settings.SettingsLogs.filterWarn': 'Perspėjimas',
+      'components.Settings.SettingsLogs.filterError': 'Klaida',
+      'components.Settings.SettingsJobsCache.runnow': 'Paleisti dabar',
+      'components.Settings.SettingsJobsCache.process': 'Procesas',
+      'components.Settings.SettingsJobsCache.command': 'Komanda',
+      'components.Settings.SettingsJobsCache.cachehits': 'Kvietimai',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Viso raktų',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Praleisti',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Vėliausia',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Išleidimo data šiuo metu neprieinama.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Leidimai',
+      'components.Settings.SettingsAbout.appDataPath': 'Duomenų aplankas',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentacija',
+      'components.Settings.SettingsAbout.timezone': 'Laiko zona',
+      'components.Settings.SettingsAbout.totalmedia': 'Viso medijos',
+      'components.Settings.SettingsAbout.totalrequests': 'Viso rezervacijų',
+      'components.Settings.SettingsAbout.uptodate': 'Atnaujinta',
+      'components.Settings.SettingsAbout.version': 'Versija',
     },
   },
   {
@@ -6650,6 +12502,45 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': 'Vis nylig lag til',
       'components.PermissionEdit.viewrequests': 'Vis Forespørsler',
       'components.PermissionEdit.viewwatchlists': 'Vis Visningsliste',
+      'components.IssueDetails.allepisodes': 'Alle Episoder',
+      'i18n.back': 'Tilbake',
+      'components.Settings.SettingsLogs.logs': 'Logger',
+      'components.Settings.SettingsLogs.level': 'Alvorlighetsgrad',
+      'components.Settings.SettingsLogs.filterDebug': 'Detaljert',
+      'components.Settings.SettingsLogs.filterInfo': 'Info',
+      'components.Settings.SettingsLogs.filterWarn': 'Varsel',
+      'components.Settings.SettingsLogs.filterError': 'Feil',
+      'components.Settings.SettingsLogs.logDetails': 'Logg-detaljer',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Kopier til utklippstavlen',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Kopierte loggmelding til utklippstavlen.',
+      'components.Settings.SettingsJobsCache.runnow': 'Kjør nå',
+      'components.Settings.SettingsJobsCache.canceljob': 'Avbryt',
+      'components.Settings.SettingsJobsCache.process': 'Prosess',
+      'components.Settings.SettingsJobsCache.command': 'Kommando',
+      'components.Settings.SettingsJobsCache.cachehits': 'Treff',
+      'components.Settings.SettingsJobsCache.cachekeys':
+        'Totalt antall nøkkler',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Bom',
+      'components.Settings.SettingsJobsCache.flushcache': 'Tøm mellomlager',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Siste versjon',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Utgivelsesdata er for øyeblikket utilgjengelig.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Utgivelser',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Vis på GitHub',
+      'components.Settings.SettingsAbout.appDataPath': 'Datakatalog',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentasjon',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Diskuter på GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Tidssone',
+      'components.Settings.SettingsAbout.totalmedia':
+        'Totalt antall tilgjengelig',
+      'components.Settings.SettingsAbout.totalrequests': 'Forespørsler totalt',
+      'components.Settings.SettingsAbout.uptodate': 'Oppdatert',
+      'components.Settings.SettingsAbout.version': 'Versjon',
     },
   },
   {
@@ -6768,6 +12659,53 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': 'Onlangs toegevoegd weergeven',
       'components.PermissionEdit.viewrequests': 'Aanvragen weergeven',
       'components.PermissionEdit.viewwatchlists': 'Plex-kijklijsten weergeven',
+      'components.IssueDetails.allepisodes': 'Alle afleveringen',
+      'i18n.back': 'Terug',
+      'components.Settings.SettingsLogs.logs': 'Logboeken',
+      'components.Settings.SettingsLogs.level': 'Ernst',
+      'components.Settings.SettingsLogs.filterDebug': 'Foutopsporing',
+      'components.Settings.SettingsLogs.filterInfo': 'Info',
+      'components.Settings.SettingsLogs.filterWarn': 'Waarschuwing',
+      'components.Settings.SettingsLogs.filterError': 'Fout',
+      'components.Settings.SettingsLogs.logDetails': 'Loggegevens',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Naar klembord kopiëren',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Logbericht naar klembord gekopieerd.',
+      'components.Settings.SettingsJobsCache.runnow': 'Nu uitvoeren',
+      'components.Settings.SettingsJobsCache.canceljob': 'Taak annuleren',
+      'components.Settings.SettingsJobsCache.process': 'Proces',
+      'components.Settings.SettingsJobsCache.command': 'Commando',
+      'components.Settings.SettingsJobsCache.cachehits': 'Treffers',
+      'components.Settings.SettingsJobsCache.cachekeys':
+        'Totaal aantal sleutels',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Missers',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS-cache',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Treffers',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Missers',
+      'components.Settings.SettingsJobsCache.failures': 'Fouten',
+      'components.Settings.SettingsJobsCache.flushcache': 'Cache wissen',
+      'components.Settings.SettingsJobsCache.hitRate': 'Trefferpercentage',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Afbeeldingen in cache',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4-fallbacks',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Nieuwste',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Versiegegevens zijn momenteel niet beschikbaar.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Versies',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Bekijken op GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Over Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Gegevensmap',
+      'components.Settings.SettingsAbout.documentation': 'Documentatie',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'GitHub-discussies',
+      'components.Settings.SettingsAbout.timezone': 'Tijdzone',
+      'components.Settings.SettingsAbout.totalmedia': 'Totaal aantal media',
+      'components.Settings.SettingsAbout.totalrequests':
+        'Totaal aantal aanvragen',
+      'components.Settings.SettingsAbout.uptodate': 'Bijgewerkt',
+      'components.Settings.SettingsAbout.version': 'Versie',
     },
   },
   {
@@ -6885,6 +12823,52 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Wyświetl problemy',
       'components.PermissionEdit.viewrecent': 'Wyświetl ostatnio dodane',
       'components.PermissionEdit.viewrequests': 'Wyświetl prośby',
+      'components.IssueDetails.allepisodes': 'Wszystkie odcinki',
+      'i18n.back': 'Powrót',
+      'components.Settings.SettingsLogs.logs': 'Logi',
+      'components.Settings.SettingsLogs.level': 'Powaga',
+      'components.Settings.SettingsLogs.filterDebug': 'Debug',
+      'components.Settings.SettingsLogs.filterInfo': 'Informacje',
+      'components.Settings.SettingsLogs.filterWarn': 'Ostrzeżenie',
+      'components.Settings.SettingsLogs.filterError': 'Błąd',
+      'components.Settings.SettingsLogs.logDetails': 'Szczegóły dziennika',
+      'components.Settings.SettingsLogs.copyToClipboard': 'Skopiuj do schowka',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Skopiowano komunikat dziennika do schowka.',
+      'components.Settings.SettingsJobsCache.runnow': 'Uruchom teraz',
+      'components.Settings.SettingsJobsCache.canceljob': 'Anuluj zadanie',
+      'components.Settings.SettingsJobsCache.process': 'Proces',
+      'components.Settings.SettingsJobsCache.command': 'Polecenie',
+      'components.Settings.SettingsJobsCache.cachehits': 'Trafienia',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Klucze ogółem',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Chybienia',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Pamięć podręczna DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Trafienia',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Chybienia',
+      'components.Settings.SettingsJobsCache.failures': 'Błędy',
+      'components.Settings.SettingsJobsCache.flushcache':
+        'Opróżnij pamięć podręczną',
+      'components.Settings.SettingsJobsCache.hitRate': 'Współczynnik trafień',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Zbuforowane obrazy',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks':
+        'Przełączenia awaryjne na IPv4',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Najnowszy',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Dane o wydaniu są obecnie niedostępne.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Wydania',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Zobacz na GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'O Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Katalog danych',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentacja',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Dyskusje na GitHubie',
+      'components.Settings.SettingsAbout.timezone': 'Strefa czasowa',
+      'components.Settings.SettingsAbout.totalmedia': 'Multimedia ogółem',
+      'components.Settings.SettingsAbout.totalrequests': 'Łączna liczba próśb',
+      'components.Settings.SettingsAbout.uptodate': 'Aktualne',
+      'components.Settings.SettingsAbout.version': 'Wersja',
     },
   },
   {
@@ -7233,6 +13217,426 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': 'Ver Recentemente Adicionados',
       'components.PermissionEdit.viewrequests': 'Visualizar Solicitações',
       'components.PermissionEdit.viewwatchlists': 'Ver listas para assistir',
+      'components.RequestModal.RequestTree.seasonNumber': 'Temporada {number}',
+      'components.RequestModal.RequestTree.specials': 'Especiais',
+      'components.Requests.episodeQueue': 'Fila de episódios',
+      'components.Requests.retry': 'Tentar novamente',
+      'components.Requests.approve': 'Aprovar',
+      'components.Requests.decline': 'Rejeitar',
+      'components.Requests.requested': 'Solicitado',
+      'components.Requests.approved': 'Aprovada',
+      'components.Requests.searching': 'Procurando',
+      'components.Requests.downloading': 'Baixando',
+      'components.Requests.importing': 'Importando',
+      'components.Requests.library': 'Adicionando à Biblioteca',
+      'components.Requests.available': 'Disponível',
+      'components.Requests.unavailable': 'Indisponível',
+      'components.Requests.failed': 'Falhou',
+      'components.Requests.declined': 'Rejeitado',
+      'components.Requests.cancelled': 'Cancelado',
+      'components.Requests.pending': 'Pendente',
+      'components.Requests.completed': 'Concluído',
+      'components.Requests.statusUpdated': 'Status atualizado',
+      'i18n.unknown': 'Desconhecido',
+      'components.Requests.history': 'História',
+      'components.RequestStatus.SoftwareRequests.approve': 'Aprovar',
+      'components.RequestStatus.SoftwareRequests.approved': 'Aprovada',
+      'components.RequestStatus.SoftwareRequests.available': 'Disponível',
+      'components.RequestStatus.SoftwareRequests.cancel': 'Cancelar',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'Cancelado',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'Excluir pedido cancelado',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        'Limpar este pedido cancelado?',
+      'components.RequestStatus.SoftwareRequests.decline': 'Rejeitar',
+      'components.RequestStatus.SoftwareRequests.declined': 'Rejeitado',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'Baixar cópias',
+      'components.RequestStatus.SoftwareRequests.downloading': 'Baixando',
+      'components.RequestStatus.SoftwareRequests.failed': 'Falhou',
+      'components.RequestStatus.SoftwareRequests.history': 'História',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'Carregando histórico de status...',
+      'components.RequestStatus.SoftwareRequests.importing':
+        'Verificando Importação',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'Este pedido de software não pôde ser atualizado.',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        'Nenhuma atualização de status salva está disponível.',
+      'components.RequestStatus.SoftwareRequests.pending': 'Aprovação pendente',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'Remover dos pedidos',
+      'components.RequestStatus.SoftwareRequests.retry': 'Tentar novamente',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'O provedor não pode confirmar se o download anterior começou. Verifique a fila e o histórico do cliente. Continue apenas se não houver nenhum download correspondente.',
+      'components.RequestStatus.SoftwareRequests.searching': 'Buscando',
+      'components.RequestStatus.SoftwareRequests.title':
+        'Solicitações de software',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'Retirar',
+      'i18n.back': 'Voltar',
+      'downloads.actions': 'História da ação',
+      'downloads.active': 'Avisos ativos.',
+      'downloads.activeState': 'Precisa de atenção.',
+      'downloads.actor': 'Usuário {id}',
+      'downloads.blocked': 'Bloqueado manualmente.',
+      'downloads.blocklist':
+        'Bloqueie esta versão para evitar baixá-la novamente',
+      'downloads.blocklisted': 'Bloqueio solicitado.',
+      'downloads.cancel': 'Cancelar',
+      'downloads.changed': 'A configuração do serviço mudou.',
+      'downloads.clientKept': 'Arquivos de clientes mantidos.',
+      'downloads.clientRemoved': 'Remoção do cliente solicitada',
+      'downloads.confirm': 'Confirmar rejeição',
+      'downloads.copy': 'Cópia ou link rígido (mantenha arquivos de origem)',
+      'downloads.denied': 'Gerenciar downloads é necessário.',
+      'downloads.description':
+        'Reveja avisos de aquisição, selecione arquivos para importação manual e rejeite downloads indesejados.',
+      'downloads.disappeared': 'Não está mais na fila.',
+      'downloads.empty': 'Sem avisos de download nesta vista.',
+      'downloads.failed': 'A caixa de entrada não pôde ser carregada.',
+      'downloads.failedState': 'Precisa de revisão.',
+      'downloads.history': 'História',
+      'downloads.import': 'Importar arquivos selecionados',
+      'downloads.importFailed': 'A importação falhou.',
+      'downloads.importMode': 'Modo de importação',
+      'downloads.importReview':
+        'Importação concluída sem uma importação de arquivo confirmada',
+      'downloads.importWarning':
+        'Confirme o alvo e reveja todas as razões de rejeição. O serviço de aquisição determina a qualidade dos arquivos e a correspondência dos episódios.',
+      'downloads.imported': 'Importado manualmente.',
+      'downloads.importingState': 'Importação pendente',
+      'downloads.ineligible':
+        'Nenhuma correspondência confirmada, não pode importar.',
+      'downloads.loading': 'Carregando avisos de download...',
+      'downloads.move': 'Mova-se (remover arquivos de origem)',
+      'downloads.next': 'Próxima página',
+      'downloads.noFiles':
+        'Nenhum arquivo com um alvo confirmado da biblioteca foi encontrado.',
+      'downloads.notBlocklisted': 'Lançamento não está na lista de bloqueio.',
+      'downloads.outcome':
+        'A ação não pôde ser confirmada. Refresque e reveja antes de tentar novamente.',
+      'downloads.partial':
+        'Alguns serviços de aquisição não puderam ser verificados. Seus avisos podem estar desaparecidos ou desatualizados.',
+      'downloads.pending':
+        'Ação aceita. Prepare-se para verificar o resultado da infraestrutura.',
+      'downloads.preview': 'Arquivos de visualização',
+      'downloads.previous': 'Página anterior',
+      'downloads.recovered': 'Recuperado.',
+      'downloads.refresh': 'Atualizar',
+      'downloads.reject': 'Rejeitar download',
+      'downloads.rejected': 'Manualmente rejeitado.',
+      'downloads.rejectingState': 'Rejeição pendente.',
+      'downloads.rejection':
+        'Rejeitar remove este item da fila de aquisição. Reveja as opções antes de confirmar.',
+      'downloads.remove':
+        'Remova o download e arquivos de seu cliente de download.',
+      'downloads.resolvedState': 'Resolvido',
+      'downloads.search': 'Buscar',
+      'downloads.select': 'Selecionar {name}',
+      'downloads.targetChoose': 'Escolha uma combinação de biblioteca.',
+      'downloads.targetHelp':
+        'Procure títulos já neste serviço de aquisição. Escolher uma partida não adiciona um novo título.',
+      'downloads.targetLabel': 'Correspondência de biblioteca',
+      'downloads.targetNoResults':
+        'Não foram encontrados títulos correspondentes nesta biblioteca de serviços.',
+      'downloads.targetQuery': 'Filme, série, álbum ou livro',
+      'downloads.targetRequired':
+        'Escolha uma combinação de biblioteca antes de importar arquivos.',
+      'downloads.targetSelected': 'Combinação selecionada: {title}{subtitle}',
+      'downloads.title': 'Baixar caixa de entrada',
+      'downloads.truncated':
+        'Apenas os primeiros 20 serviços de aquisição foram verificados.',
+      'downloads.unknownImport': 'Resultado da importação desconhecido',
+      'downloads.unknownReject': 'Resultado de rejeição desconhecido.',
+      'components.IndexerSearch.accessDenied':
+        'Você precisa de permissão para controlar os pedidos para procurar indexadores.',
+      'components.IndexerSearch.categories': 'Categorias de indexadores',
+      'components.IndexerSearch.category': 'Categoria de mídia',
+      'components.IndexerSearch.categoryAdult': 'Adulto',
+      'components.IndexerSearch.categoryAudiobook': 'Audiolivros',
+      'components.IndexerSearch.categoryComic': 'Quadrinhos',
+      'components.IndexerSearch.categoryEbook': 'Livros',
+      'components.IndexerSearch.categoryGame': 'Jogos de PC',
+      'components.IndexerSearch.categoryMagazine': 'Revistas',
+      'components.IndexerSearch.categoryModern': 'ROMs modernos',
+      'components.IndexerSearch.categoryMovie': 'Filmes',
+      'components.IndexerSearch.categoryMusic': 'Música',
+      'components.IndexerSearch.categoryRetro': 'ROMs retrô',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Abrir configurações Prowlarr',
+      'components.IndexerSearch.downloaderFailed':
+        'O Prowlarr não conseguiu enviar este lançamento. Faça uma nova busca e tente novamente.',
+      'components.IndexerSearch.grabs': 'Downloads',
+      'components.IndexerSearch.intro':
+        'Procure lançamentos em seus indexadores Prowlarr em todas as categorias de mídia SeerrNG.',
+      'components.IndexerSearch.leechers': 'Leechers.',
+      'components.IndexerSearch.loadFailed':
+        'A configuração de pesquisa Prowlarr não pôde ser carregada.',
+      'components.IndexerSearch.loadMore': 'Carregue mais resultados.',
+      'components.IndexerSearch.loadingMore': 'Carregando…',
+      'components.IndexerSearch.manualMode':
+        'Os resultados da busca são separados das solicitações do SeerrNG. Você pode enviar um resultado para um cliente de download configurado no Prowlarr.',
+      'components.IndexerSearch.noConnection': 'Prowlarr não está conectado.',
+      'components.IndexerSearch.noConnectionHelp':
+        'Peça a um administrador para conectar Prowlarr em Configurações > Serviços.',
+      'components.IndexerSearch.noResults':
+        'Nenhum lançamento corresponde a esta busca.',
+      'components.IndexerSearch.noResultsHelp':
+        'Verifique os filtros de categoria e indexadores habilitados em Prowlarr. Os resultados da pesquisa não confirmam que um aplicativo pode importar um lançamento.',
+      'components.IndexerSearch.openResult': 'Abra detalhes do indexador.',
+      'components.IndexerSearch.protocol': 'Protocolo',
+      'components.IndexerSearch.published': 'Publicado',
+      'components.IndexerSearch.query': 'Termos de busca',
+      'components.IndexerSearch.queryPlaceholder':
+        'Título, autor, álbum, edição ou nome do jogo',
+      'components.IndexerSearch.requestStillUsesManager':
+        'Enviar um resultado não altera uma solicitação do SeerrNG. O Prowlarr encaminha o resultado ao cliente de download configurado.',
+      'components.IndexerSearch.resultCount':
+        'O Prowlarr retornou {count} lançamentos.',
+      'components.IndexerSearch.search': 'Buscar indexadores',
+      'components.IndexerSearch.searchFailed':
+        'A pesquisa Prowlarr falhou. Verifique a conexão e tente novamente.',
+      'components.IndexerSearch.searching': 'Procurando nos indexadores…',
+      'components.IndexerSearch.seeders': 'Seeders',
+      'components.IndexerSearch.sendToDownloader': 'Enviar para o downloader',
+      'components.IndexerSearch.sendingToDownloader': 'Enviando…',
+      'components.IndexerSearch.sentToDownloader':
+        'Enviado para o cliente de download configurado do Prowlarr.',
+      'components.IndexerSearch.size': 'Tamanho',
+      'components.IndexerSearch.title': 'Busca de indexadores',
+      'components.IndexerSearch.tooManySearches':
+        'Limite de busca alcançado. Espere um minuto antes de procurar novamente.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'Nenhum indexador habilitado está disponível. Active um indexador no Prowlarr ou ajuste os filtros de categoria.',
+      'components.SettingsProwlarr.addDetectedMatches':
+        'Adicione correspondências detectadas.{count})',
+      'components.SettingsProwlarr.address': 'Nome do Host',
+      'components.SettingsProwlarr.adult': 'Adulto',
+      'components.SettingsProwlarr.apiKey': 'Chave da API',
+      'components.SettingsProwlarr.apiKeySaved':
+        'Uma chave está salva. Deixe isso em branco para continuar usando.',
+      'components.SettingsProwlarr.audiobook': 'Audiolivros',
+      'components.SettingsProwlarr.basePath': 'Caminho de base',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'Escolha as categorias Prowlarr enviadas com cada busca. Os padrões usam categorias padrão de Newznab/Torznab; testam a conexão para ver categorias personalizadas anunciadas por indexadores habilitados.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'Selecione pelo menos uma categoria.',
+      'components.SettingsProwlarr.categoryMappingTitle':
+        'Filtros de categoria',
+      'components.SettingsProwlarr.clearApiKey': 'Remover chave de API salva',
+      'components.SettingsProwlarr.comic': 'Quadrinhos',
+      'components.SettingsProwlarr.connected': 'Ligado a Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'Contagens incluem indexadores habilitados e pesquisáveis que anunciam suporte para pelo menos uma categoria selecionada. Eles mostram cobertura de busca, não captura bem sucedida ou importações.',
+      'components.SettingsProwlarr.coverageTitle':
+        'Cobertura do indexador por meio',
+      'components.SettingsProwlarr.description':
+        'Conecte sua instância Prowlarr uma vez para fazer buscas manuais de categoria nos indexadores que você já gerencia lá.',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        'Categorias personalizadas sugeridas são combinadas pelos nomes anunciados. Revise-os antes de salvar, isso não muda Prowlarr ou envia downloads.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr aceitou a conexão da API de gerenciamento. Esses resultados testam cada indexador habilitado separadamente, desativados até as datas chegarem de Prowlarr.',
+      'components.SettingsProwlarr.diagnosticFailed': 'Falhou',
+      'components.SettingsProwlarr.diagnosticOk': 'Conectado',
+      'components.SettingsProwlarr.diagnosticTitle':
+        'Resultado da conexão do indexador',
+      'components.SettingsProwlarr.disabledUntil': 'Deficiente até {date}',
+      'components.SettingsProwlarr.ebook': 'Livros',
+      'components.SettingsProwlarr.game': 'Jogos de PC',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'Escolha quais indexers do Prowlarr habilitados serão pesquisados para cada tipo de mídia. Use Ctrl+clique no Windows/Linux ou Command+clique no macOS para selecionar vários indexers. Uma seleção vazia desativa a pesquisa para esse tipo.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        'Indexers para {category}',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'Atribuições de Indexers por Tipo de Mídia',
+      'components.SettingsProwlarr.indexerCount':
+        'Indicadores: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'Os usuários podem abrir os detalhes do indexer a partir dos resultados da pesquisa.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'Os nomes dos indexers e os links de detalhes estão ocultos para os usuários.',
+      'components.SettingsProwlarr.indexerNotSearchable': '(não pesquisável)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'Limites de pesquisa',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'Limite as pesquisas de cada usuário por minuto no total e para cada indexer selecionado.',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr está salvo, mas seu inventário não está disponível.',
+      'components.SettingsProwlarr.keepApiKey':
+        'Mantenha a chave da API salva.',
+      'components.SettingsProwlarr.loadFailed':
+        'Não foi possível carregar as configurações do Prowlarr.',
+      'components.SettingsProwlarr.magazine': 'Revistas',
+      'components.SettingsProwlarr.modern': 'ROMs modernos',
+      'components.SettingsProwlarr.movie': 'Filmes',
+      'components.SettingsProwlarr.music': 'Música',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'Nenhum indexador Prowlarr ainda está configurado.',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Teste a conexão com o Prowlarr para carregar seus indexers e atribuí-los por categoria.',
+      'components.SettingsProwlarr.port': 'Porta',
+      'components.SettingsProwlarr.recentFailure': 'Falha recente: {date}',
+      'components.SettingsProwlarr.retro': 'ROMs retrô',
+      'components.SettingsProwlarr.save': 'Salvar configurações Prowlarr',
+      'components.SettingsProwlarr.saveFailed':
+        'Não foi possível salvar as configurações do Prowlarr.',
+      'components.SettingsProwlarr.saved': 'Configurações do Prowlarr salvas.',
+      'components.SettingsProwlarr.saving': 'Salvando…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        'Insira um número inteiro de 1 a 60.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        'Máximo de pesquisas por usuário por minuto no {indexer}',
+      'components.SettingsProwlarr.searchesPerUser':
+        'Máximo de pesquisas por usuário por minuto',
+      'components.SettingsProwlarr.selectedCategories':
+        '{count} Categorias selecionadas',
+      'components.SettingsProwlarr.selectedIndexers':
+        '{count} indexers selecionados',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'Permitir nomes e detalhes dos indexers nos resultados da pesquisa',
+      'components.SettingsProwlarr.sports': 'Esportes',
+      'components.SettingsProwlarr.supportNote':
+        'Esta configuração se conecta apenas ao Prowlarr. O NZBHydra2 não é suportado aqui no momento.',
+      'components.SettingsProwlarr.test':
+        'Conexão de teste e inspeção de cobertura',
+      'components.SettingsProwlarr.testFailed':
+        'A conexão Prowlarr falhou. Verifique o endereço e a chave API.',
+      'components.SettingsProwlarr.testHint':
+        'As buscas começaram na SeerrNG Consulta Prowlarr diretamente. Pedidos aprovados ainda passam pelo gerente de mídia configurado ou provedor de software, que possui aquisição e rastreamento.',
+      'components.SettingsProwlarr.testing': 'Checando Prowlarr...',
+      'components.SettingsProwlarr.title': 'Indices Prowlarr',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} pesquisável e habilitado de {total} configurado',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'Usar SSL',
+      'components.Settings.SettingsLogs.logs': 'Diários',
+      'components.Settings.SettingsLogs.searchLogs': 'Pesquisar logs',
+      'components.Settings.SettingsLogs.level': 'Severidade',
+      'components.Settings.SettingsLogs.filterDebug': 'Depurar',
+      'components.Settings.SettingsLogs.filterInfo': 'Informacional',
+      'components.Settings.SettingsLogs.filterWarn': 'Alerta',
+      'components.Settings.SettingsLogs.filterError': 'Erro',
+      'components.Settings.SettingsLogs.logDetails': 'Detalhes do Log',
+      'components.Settings.SettingsLogs.copyToClipboard': 'Copiar',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Mensagem copiada para área de transferência.',
+      'components.Settings.SettingsJobsCache.runnow': 'Executar Agora',
+      'components.Settings.SettingsJobsCache.canceljob': 'Cancelar Tarefa',
+      'components.Settings.SettingsJobsCache.process': 'Processo',
+      'components.Settings.SettingsJobsCache.command': 'Comando',
+      'components.Settings.SettingsJobsCache.enabled': 'Activado',
+      'components.Settings.SettingsJobsCache.disabled': 'Desativado',
+      'components.Settings.SettingsJobsCache.cachehits': 'Encontrado',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Total de Chaves',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Não Encontrado',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Acertos',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Falhas',
+      'components.Settings.SettingsJobsCache.failures': 'Falhas',
+      'components.Settings.SettingsJobsCache.flushcache': 'Limpar Cache',
+      'components.Settings.SettingsJobsCache.hitRate': 'Taxa de acertos',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Imagens Armazenadas em Cache',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks':
+        'Alternativos IPv4',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'Instalado',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Última Versão',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Informações de versão indisponíveis.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Versões',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Ver no GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Sobre o SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': 'Configurações',
+      'components.Settings.SettingsAbout.documentation': 'Documentação',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Discussões no GitHub',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG é destinado a gerenciamento de mídia pessoal legal. O projeto não tolera pirataria ou violação de direitos autorais. Usuários são responsáveis por cumprir as leis, licenças e termos de serviço aplicáveis em sua região.',
+      'components.Settings.SettingsAbout.legalUseTitle': 'Uso legal',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'Atribuição de metadados',
+      'components.Settings.SettingsAbout.supportdevelopment':
+        'Apoio ao Desenvolvimento',
+      'components.Settings.SettingsAbout.timezone': 'Fuso Horário',
+      'components.Settings.SettingsAbout.totalmedia': 'Total de Títulos',
+      'components.Settings.SettingsAbout.totalrequests':
+        'Total de Solicitações',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'Este produto usa o TMDB e suas APIs, mas não é endossado, certificado ou aprovado de qualquer outra forma pelo TMDB. <ApiTermsLink>Termos de uso da API do TMDB</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'Não foi possível verificar atualizações',
+      'components.Settings.SettingsAbout.uptodate': 'Atualizado',
+      'components.Settings.SettingsAbout.version': 'Versão',
+      'components.Settings.SettingsCategories.title': 'Categorias de mídia',
+      'components.Settings.SettingsCategories.description':
+        'Escolha quais categorias todos podem procurar e solicitar. Categorias deficientes desaparecem da navegação e descoberta, e novos pedidos estão bloqueados. Pedidos existentes e histórico de download ficam disponíveis no Status de Pedido.',
+      'components.Settings.SettingsCategories.groupTitle':
+        'Categorias Disponíveis',
+      'components.Settings.SettingsCategories.groupDescription':
+        'Estes interruptores controlam a disponibilidade da categoria em SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'Filmes',
+      'components.Settings.SettingsCategories.tv': 'Séries',
+      'components.Settings.SettingsCategories.music': 'Música',
+      'components.Settings.SettingsCategories.ebook': 'Livros',
+      'components.Settings.SettingsCategories.audiobook': 'Audiolivros',
+      'components.Settings.SettingsCategories.comic': 'Quadrinhos',
+      'components.Settings.SettingsCategories.magazine': 'Revistas',
+      'components.Settings.SettingsCategories.adult': 'Adulto',
+      'components.Settings.SettingsCategories.retro': 'Emulação (Retro)',
+      'components.Settings.SettingsCategories.modern': 'Emulação (Moderna)',
+      'components.Settings.SettingsCategories.game': 'Jogos para PC',
+      'components.Settings.SettingsCategories.movieDescription':
+        'Permitir a descoberta do filme e pedidos.',
+      'components.Settings.SettingsCategories.tvDescription':
+        'Permita uma série de descobertas e pedidos.',
+      'components.Settings.SettingsCategories.musicDescription':
+        'Permita a descoberta da música e pedidos.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'Permita a descoberta do livro e pedidos.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'Permitir a descoberta do audiolivro e pedidos.',
+      'components.Settings.SettingsCategories.comicDescription':
+        'Permita a descoberta em quadrinhos e pedidos.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'Permita a descoberta da revista e pedidos.',
+      'components.Settings.SettingsCategories.adultDescription':
+        'Permitir descoberta e solicitações de cenas adultas. Requer um serviço Whisparr v3 configurado e permissão de usuário específica para adultos.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'Permitir a descoberta retro ROM e pedidos.',
+      'components.Settings.SettingsCategories.modernDescription':
+        'Permita a descoberta moderna da ROM e pedidos.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'Permita a descoberta de jogos e pedidos.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'Conteúdo adulto é visível para todos com acesso',
+      'components.Settings.SettingsCategories.adultWarning':
+        'Se você compartilhar esta instância com a família ou expô-la por meio de um proxy reverso, qualquer pessoa com a permissão Solicitar Adulto poderá ver o que você navega e solicita. Marque as contas da família como restritas abaixo ou nas Permissões de cada usuário, para que nunca vejam conteúdo Adulto.',
+      'components.Settings.SettingsCategories.ageGateTitle':
+        'Restrição por Idade',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'Contas restritas não podem ver ou solicitar conteúdo Adulto, e filmes, séries, músicas, livros, quadrinhos e títulos marcados como maduros são ocultados no servidor. A filtragem usa classificações e tags dos provedores e é feita da melhor forma possível para títulos sem metadados.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'Restringir contas por padrão',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'Contas sem configuração explícita são restritas. Administradores estão isentos.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'Classificação máxima de filmes',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'Contas restritas não podem ver filmes com classificação acima desta.',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'Classificação máxima de séries',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'Contas restritas não podem ver séries com classificação acima desta.',
+      'components.Settings.SettingsCategories.ageGateCountry':
+        'País de classificação',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'Código de país de duas letras cujas classificações são usadas, por exemplo US.',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'Configurações de categoria salvas.',
+      'components.Settings.SettingsCategories.saveFailure':
+        'As configurações de categoria não puderam ser salvas.',
     },
   },
   {
@@ -7350,6 +13754,52 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': 'Ver Recentemente Adicionados',
       'components.PermissionEdit.viewrequests': 'Ver Pedidos',
       'components.PermissionEdit.viewwatchlists': 'Ver lista para ver do Plex',
+      'components.IssueDetails.allepisodes': 'Todos Episódios',
+      'i18n.back': 'Voltar',
+      'components.Settings.SettingsLogs.logs': 'Registos',
+      'components.Settings.SettingsLogs.level': 'Gravidade',
+      'components.Settings.SettingsLogs.filterDebug': 'Depuração',
+      'components.Settings.SettingsLogs.filterInfo': 'Informação',
+      'components.Settings.SettingsLogs.filterWarn': 'Aviso',
+      'components.Settings.SettingsLogs.filterError': 'Erro',
+      'components.Settings.SettingsLogs.logDetails': 'Detalhes do registo',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Copiar Para a Área de Transferência',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Mensagem do registo copiada para o área de transferência.',
+      'components.Settings.SettingsJobsCache.runnow': 'Executar Agora',
+      'components.Settings.SettingsJobsCache.canceljob': 'Cancelar Tarefa',
+      'components.Settings.SettingsJobsCache.process': 'Processo',
+      'components.Settings.SettingsJobsCache.command': 'Comando',
+      'components.Settings.SettingsJobsCache.cachehits': 'Acertos',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Chaves Totais',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Falhas',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Acertos',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Falhas',
+      'components.Settings.SettingsJobsCache.failures': 'Falhas',
+      'components.Settings.SettingsJobsCache.flushcache': 'Limpar Cache',
+      'components.Settings.SettingsJobsCache.hitRate': 'Taxa de acertos',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Imagens Armazenadas em Cache',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Recursos a IPv4',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Última Versão',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Os dados de versão estão atualmente indisponíveis.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Versões',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Ver no GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Sobre Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Configurações',
+      'components.Settings.SettingsAbout.documentation': 'Documentação',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Discussões no GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Fuso Horário',
+      'components.Settings.SettingsAbout.totalmedia': 'Total de Multimédia',
+      'components.Settings.SettingsAbout.totalrequests': 'Todos os Pedidos',
+      'components.Settings.SettingsAbout.uptodate': 'Atualizado',
+      'components.Settings.SettingsAbout.version': 'Versão',
     },
   },
   {
@@ -7417,6 +13867,37 @@ export const localeData = [
       'components.PermissionEdit.viewrequests': 'Vizualizați Solicitările',
       'components.PermissionEdit.viewwatchlists':
         'Vizualizați Listele de Urmărire Plex',
+      'components.IssueDetails.allepisodes': 'Toate episoadele',
+      'components.Settings.SettingsJobsCache.canceljob': 'Anulează job-ul',
+      'components.Settings.SettingsJobsCache.command': 'Comandă',
+      'components.Settings.SettingsJobsCache.cachehits': 'Accesări',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Total chei',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Ratări',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Accesări',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Ratări',
+      'components.Settings.SettingsJobsCache.failures': 'Eșecuri',
+      'components.Settings.SettingsJobsCache.flushcache': 'Golește cache',
+      'components.Settings.SettingsJobsCache.hitRate': 'Rate de succes',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Imagini stocate în cache',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks':
+        'Fallback-uri IPv4',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Ultima',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Nu sunt disponibile informații despre release.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Release-uri',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Vizualizează pe GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Despre Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Directorul de date',
+      'components.Settings.SettingsAbout.documentation': 'Documentație',
+      'components.Settings.SettingsAbout.githubdiscussions': 'Discuții GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Fus orar',
+      'components.Settings.SettingsAbout.totalmedia': 'Total materiale',
+      'components.Settings.SettingsAbout.totalrequests': 'Total cereri',
+      'components.Settings.SettingsAbout.uptodate': 'La zi',
+      'components.Settings.SettingsAbout.version': 'Versiune',
     },
   },
   {
@@ -7536,6 +14017,54 @@ export const localeData = [
       'components.PermissionEdit.viewrequests': 'Просмотр запросов',
       'components.PermissionEdit.viewwatchlists':
         'Просмотр списков просмотра Plex',
+      'components.IssueDetails.allepisodes': 'Все эпизоды',
+      'i18n.back': 'Назад',
+      'components.Settings.SettingsLogs.logs': 'Логи',
+      'components.Settings.SettingsLogs.level': 'Важность',
+      'components.Settings.SettingsLogs.filterDebug': 'Отладочные',
+      'components.Settings.SettingsLogs.filterInfo': 'Информационные',
+      'components.Settings.SettingsLogs.filterWarn': 'Предупреждения',
+      'components.Settings.SettingsLogs.filterError': 'Ошибка',
+      'components.Settings.SettingsLogs.logDetails':
+        'Подробные сведения о логе',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Скопировать в буфер обмена',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Сообщение лога скопировано в буфер обмена.',
+      'components.Settings.SettingsJobsCache.runnow': 'Выполнить сейчас',
+      'components.Settings.SettingsJobsCache.canceljob': 'Отменить задание',
+      'components.Settings.SettingsJobsCache.process': 'Процесс',
+      'components.Settings.SettingsJobsCache.command': 'Команда',
+      'components.Settings.SettingsJobsCache.cachehits': 'Удачных обращений',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Всего ключей',
+      'components.Settings.SettingsJobsCache.cachemisses':
+        'Неудачных обращений',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Кеш DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Попаданий',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Промахов',
+      'components.Settings.SettingsJobsCache.failures': 'Ошибки',
+      'components.Settings.SettingsJobsCache.flushcache': 'Очистить кэш',
+      'components.Settings.SettingsJobsCache.hitRate': 'Процент попаданий',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Изображений кэшированно',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks':
+        'Переходов на IPv4',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Последняя',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Данные о релизе в настоящее время недоступны.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Релизы',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Посмотреть на GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'О Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Папка конфигурации',
+      'components.Settings.SettingsAbout.documentation': 'Документация',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Обсуждения на GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Часовой пояс',
+      'components.Settings.SettingsAbout.totalmedia': 'Всего мультимедиа',
+      'components.Settings.SettingsAbout.totalrequests': 'Всего запросов',
+      'components.Settings.SettingsAbout.uptodate': 'Актуальная',
+      'components.Settings.SettingsAbout.version': 'Версия',
     },
   },
   {
@@ -7625,6 +14154,42 @@ export const localeData = [
       'components.PermissionEdit.viewrequests': 'Shikoni Kërkesat',
       'components.PermissionEdit.viewwatchlists':
         'Shiko listat e shikimit të Plex',
+      'components.IssueDetails.allepisodes': 'Të gjithë Episodet',
+      'i18n.back': 'Mbrapa.',
+      'components.Settings.SettingsLogs.logs': 'Regjistrat',
+      'components.Settings.SettingsLogs.level': 'Ashpërsia',
+      'components.Settings.SettingsLogs.filterDebug': 'Korrigjjo',
+      'components.Settings.SettingsLogs.filterInfo': 'Informacion',
+      'components.Settings.SettingsLogs.filterWarn': 'Paralajmërim',
+      'components.Settings.SettingsLogs.filterError': 'Gabim',
+      'components.Settings.SettingsLogs.logDetails': 'Detajet e regjistrit',
+      'components.Settings.SettingsLogs.copyToClipboard': 'Kopjo',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Mesazhi i regjistrit u kopjua.',
+      'components.Settings.SettingsJobsCache.runnow': 'Nise Tani',
+      'components.Settings.SettingsJobsCache.canceljob': 'Anuloni punën',
+      'components.Settings.SettingsJobsCache.process': 'Procesi',
+      'components.Settings.SettingsJobsCache.command': 'Komandë',
+      'components.Settings.SettingsJobsCache.cachehits': 'Hitet',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Çelësat totalë',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Mungesa',
+      'components.Settings.SettingsJobsCache.flushcache': 'Pastro Cache',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'E fundit',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Të dhënat e lëshimit nuk janë të disponueshme.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Lëshimet',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Shikoni në GitHub',
+      'components.Settings.SettingsAbout.appDataPath':
+        'Direktoria e të dhënave',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentacioni',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Diskutimet e GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Zona Kohore',
+      'components.Settings.SettingsAbout.totalmedia': 'Media totale',
+      'components.Settings.SettingsAbout.totalrequests': 'Kërkesat totale',
+      'components.Settings.SettingsAbout.uptodate': 'E përditësuar',
+      'components.Settings.SettingsAbout.version': 'Versioni',
     },
   },
   {
@@ -7695,6 +14260,34 @@ export const localeData = [
       'components.PermissionEdit.request4k': 'Zahtevajte 4K',
       'components.PermissionEdit.users': 'Upravljajte korisnica',
       'components.PermissionEdit.viewrequests': 'Pogledaj zahteve',
+      'components.IssueDetails.allepisodes': 'Sve epizode',
+      'i18n.back': 'Nazad',
+      'components.Settings.SettingsLogs.logs': 'Logovi',
+      'components.Settings.SettingsLogs.level': 'Ozbiljnost',
+      'components.Settings.SettingsLogs.filterDebug': 'Otklanjanje grešaka',
+      'components.Settings.SettingsLogs.filterInfo': 'Info',
+      'components.Settings.SettingsLogs.filterWarn': 'Upozorenje',
+      'components.Settings.SettingsLogs.filterError': 'Greška',
+      'components.Settings.SettingsLogs.logDetails': 'Detalji dnevnika',
+      'components.Settings.SettingsJobsCache.runnow': 'Pokreni sada',
+      'components.Settings.SettingsJobsCache.canceljob': 'Otkaži posao',
+      'components.Settings.SettingsJobsCache.process': 'Proces',
+      'components.Settings.SettingsJobsCache.command': 'Komanda',
+      'components.Settings.SettingsJobsCache.cachehits': 'Pogodaka',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Ukupno ključeva',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Gospođica',
+      'components.Settings.SettingsJobsCache.flushcache': 'Obriši keš',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Najnovije',
+      'components.Settings.SettingsAbout.Releases.releases': 'Izdanja',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Pogledaj na GitHub',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentacija',
+      'components.Settings.SettingsAbout.githubdiscussions': 'GitHub rasprave',
+      'components.Settings.SettingsAbout.timezone': 'Vremenska zona',
+      'components.Settings.SettingsAbout.totalmedia': 'Ukupno medija',
+      'components.Settings.SettingsAbout.totalrequests': 'Ukupno zahteva',
+      'components.Settings.SettingsAbout.uptodate': 'Najsvežiji',
+      'components.Settings.SettingsAbout.version': 'Verzija',
     },
   },
   {
@@ -7811,6 +14404,53 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Visa ärenden',
       'components.PermissionEdit.viewrecent': 'Se nyligen tillagda',
       'components.PermissionEdit.viewrequests': 'Visa förfrågningar',
+      'components.IssueDetails.allepisodes': 'Alla avsnitt',
+      'i18n.back': 'Bakåt',
+      'components.Settings.SettingsLogs.logs': 'Loggar',
+      'components.Settings.SettingsLogs.level': 'Allvarlighetsgrad',
+      'components.Settings.SettingsLogs.filterDebug': 'Felsök',
+      'components.Settings.SettingsLogs.filterInfo': 'Info',
+      'components.Settings.SettingsLogs.filterWarn': 'Varning',
+      'components.Settings.SettingsLogs.filterError': 'Fel',
+      'components.Settings.SettingsLogs.logDetails': 'Logginformation',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Kopiera till urklipp',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Kopierat loggmeddelande till urklipp.',
+      'components.Settings.SettingsJobsCache.runnow': 'Kör nu',
+      'components.Settings.SettingsJobsCache.canceljob': 'Avbryt jobb',
+      'components.Settings.SettingsJobsCache.process': 'Process',
+      'components.Settings.SettingsJobsCache.command': 'Kommando',
+      'components.Settings.SettingsJobsCache.cachehits': 'Träffar',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Totalt antal nycklar',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Missar',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS-cache',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Träffar',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Missar',
+      'components.Settings.SettingsJobsCache.failures': 'Misslyckanden',
+      'components.Settings.SettingsJobsCache.flushcache': 'Rensa cache',
+      'components.Settings.SettingsJobsCache.hitRate': 'Träffratio',
+      'components.Settings.SettingsJobsCache.imagecachecount': 'Bilder cachade',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4-reserv',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        'Senaste versionen',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Versionsdata är för närvarande inte tillgänglig.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Versioner',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Visa på GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Om Seerr',
+      'components.Settings.SettingsAbout.appDataPath': 'Datakatalog',
+      'components.Settings.SettingsAbout.documentation': 'Dokumentation',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'GitHub-diskussioner',
+      'components.Settings.SettingsAbout.timezone': 'Tidszon',
+      'components.Settings.SettingsAbout.totalmedia':
+        'Totalt antal mediaobjekt',
+      'components.Settings.SettingsAbout.totalrequests':
+        'Totalt antal förfrågningar',
+      'components.Settings.SettingsAbout.uptodate': 'Uppdaterad',
+      'components.Settings.SettingsAbout.version': 'Version',
     },
   },
   {
@@ -7925,6 +14565,50 @@ export const localeData = [
       'components.PermissionEdit.viewissues': 'Sorunları Görüntüle',
       'components.PermissionEdit.viewrecent': 'Son Eklenenleri Görüntüle',
       'components.PermissionEdit.viewrequests': 'Talepleri Görüntüle',
+      'components.IssueDetails.allepisodes': 'Tüm Bölümler',
+      'i18n.back': 'Geri',
+      'components.Settings.SettingsLogs.logs': 'Günlükler',
+      'components.Settings.SettingsLogs.level': 'Önem Derecesi',
+      'components.Settings.SettingsLogs.filterDebug': 'Hata Ayıklama',
+      'components.Settings.SettingsLogs.filterInfo': 'Bilgi',
+      'components.Settings.SettingsLogs.filterWarn': 'Uyarı',
+      'components.Settings.SettingsLogs.filterError': 'Hata',
+      'components.Settings.SettingsLogs.logDetails': 'Günlük Ayrıntıları',
+      'components.Settings.SettingsLogs.copyToClipboard': 'Panoya Kopyala',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Günlük mesajı panoya kopyalandı.',
+      'components.Settings.SettingsJobsCache.runnow': 'Şimdi Çalıştır',
+      'components.Settings.SettingsJobsCache.canceljob': 'Görevi İptal Et',
+      'components.Settings.SettingsJobsCache.process': 'İşle',
+      'components.Settings.SettingsJobsCache.command': 'Komut',
+      'components.Settings.SettingsJobsCache.cachehits': 'İsabet',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Toplam Anahtar',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Kaçırma',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS Önbelleği',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'İsabet',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Kaçırma',
+      'components.Settings.SettingsJobsCache.failures': 'Başarısızlıklar',
+      'components.Settings.SettingsJobsCache.flushcache': 'Önbelleği Temizle',
+      'components.Settings.SettingsJobsCache.hitRate': 'İsabet Oranı',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Önbelleğe Alınan Resimler',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 Yedekleri',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'En Son',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Sürüm verileri şu anda kullanılamıyor.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Sürümler',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        "GitHub'da Görüntüle",
+      'components.Settings.SettingsAbout.aboutseerr': 'Seerr Hakkında',
+      'components.Settings.SettingsAbout.appDataPath': 'Veri Dizini',
+      'components.Settings.SettingsAbout.documentation': 'Belgeler',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'GitHub Tartışmaları',
+      'components.Settings.SettingsAbout.timezone': 'Saat Dilimi',
+      'components.Settings.SettingsAbout.totalmedia': 'Toplam Medya',
+      'components.Settings.SettingsAbout.totalrequests': 'Toplam Talepler',
+      'components.Settings.SettingsAbout.uptodate': 'Güncel',
+      'components.Settings.SettingsAbout.version': 'Sürüm',
     },
   },
   {
@@ -8040,6 +14724,52 @@ export const localeData = [
       'components.PermissionEdit.viewrequests': 'Перегляд запитів',
       'components.PermissionEdit.viewwatchlists':
         'Перегляд списків переглядів Plex',
+      'components.IssueDetails.allepisodes': 'Всі епізоди',
+      'i18n.back': 'Назад',
+      'components.Settings.SettingsLogs.logs': 'Логи',
+      'components.Settings.SettingsLogs.level': 'Важливість',
+      'components.Settings.SettingsLogs.filterDebug': 'Налагоджувальні',
+      'components.Settings.SettingsLogs.filterInfo': 'Інформаційні',
+      'components.Settings.SettingsLogs.filterWarn': 'Попередження',
+      'components.Settings.SettingsLogs.filterError': 'Помилки',
+      'components.Settings.SettingsLogs.logDetails':
+        'Докладні відомості про лог',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Скопіювати в буфер обміну',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Повідомлення лога скопійовано в буфер обміну.',
+      'components.Settings.SettingsJobsCache.runnow': 'Виконати зараз',
+      'components.Settings.SettingsJobsCache.canceljob': 'Скасувати завдання',
+      'components.Settings.SettingsJobsCache.process': 'Процес',
+      'components.Settings.SettingsJobsCache.command': 'Команда',
+      'components.Settings.SettingsJobsCache.cachehits': 'Вдалих звернень',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Усього ключів',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Невдалих звернень',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Кеш DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Вдалих звернень',
+      'components.Settings.SettingsJobsCache.dnscachemisses':
+        'Невдалих звернень',
+      'components.Settings.SettingsJobsCache.failures': 'Помилки',
+      'components.Settings.SettingsJobsCache.flushcache': 'Очистити кеш',
+      'components.Settings.SettingsJobsCache.hitRate': 'Частка вдалих',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Зображення кешовані',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Запасні IPv4',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Остання',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        'Дані про реліз наразі недоступні.',
+      'components.Settings.SettingsAbout.Releases.releases': 'Релізи',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Подивитися на GitHub',
+      'components.Settings.SettingsAbout.appDataPath': 'Каталог даних',
+      'components.Settings.SettingsAbout.documentation': 'Документація',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Обговорення на GitHub',
+      'components.Settings.SettingsAbout.timezone': 'Часовий пояс',
+      'components.Settings.SettingsAbout.totalmedia': 'Усього мультимедіа',
+      'components.Settings.SettingsAbout.totalrequests': 'Усього запитів',
+      'components.Settings.SettingsAbout.uptodate': 'Актуальна',
+      'components.Settings.SettingsAbout.version': 'Версія',
     },
   },
   {
@@ -8367,6 +15097,385 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': '查看最近添加的内容',
       'components.PermissionEdit.viewrequests': '查看请求',
       'components.PermissionEdit.viewwatchlists': '查看关注列表',
+      'components.RequestModal.RequestTree.seasonNumber': '第 {number} 季',
+      'components.RequestModal.RequestTree.specials': '特别篇',
+      'components.Requests.episodeQueue': '剧集队列',
+      'components.Requests.retry': '重试',
+      'components.Requests.approve': '批准',
+      'components.Requests.decline': '拒绝',
+      'components.Requests.requested': '已提出请求',
+      'components.Requests.approved': '已批准',
+      'components.Requests.searching': '搜索中',
+      'components.Requests.downloading': '正在下载',
+      'components.Requests.importing': '正在导入',
+      'components.Requests.library': '正在添加到媒体库',
+      'components.Requests.available': '可用',
+      'components.Requests.unavailable': '不可用',
+      'components.Requests.failed': '失败',
+      'components.Requests.declined': '已拒绝',
+      'components.Requests.cancelled': '已取消',
+      'components.Requests.pending': '待处理',
+      'components.Requests.completed': '已完成',
+      'components.Requests.statusUpdated': '状态已更新',
+      'i18n.unknown': '未知',
+      'components.Requests.history': '历史',
+      'components.RequestStatus.SoftwareRequests.approve': '批准',
+      'components.RequestStatus.SoftwareRequests.approved': '已批准',
+      'components.RequestStatus.SoftwareRequests.available': '可用',
+      'components.RequestStatus.SoftwareRequests.cancel': '取消',
+      'components.RequestStatus.SoftwareRequests.cancelled': '已取消',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        '清除已取消的请求',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        '要删除这项已取消的请求吗？',
+      'components.RequestStatus.SoftwareRequests.decline': '拒绝',
+      'components.RequestStatus.SoftwareRequests.declined': '已拒绝',
+      'components.RequestStatus.SoftwareRequests.downloadCopies': '下载副本',
+      'components.RequestStatus.SoftwareRequests.downloading': '正在下载',
+      'components.RequestStatus.SoftwareRequests.failed': '失败',
+      'components.RequestStatus.SoftwareRequests.history': '历史记录',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        '正在加载状态历史…',
+      'components.RequestStatus.SoftwareRequests.importing': '正在验证导入',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        '此软件请求无法更新。',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        '没有可用的已保存状态更新。',
+      'components.RequestStatus.SoftwareRequests.pending': '待核准',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        '从请求中移除',
+      'components.RequestStatus.SoftwareRequests.retry': '重试',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        '提供商无法确认之前的下载是否已开始。请检查下载客户端的队列和历史记录。只有确认没有匹配的下载后才能继续。',
+      'components.RequestStatus.SoftwareRequests.searching': '搜索中',
+      'components.RequestStatus.SoftwareRequests.title': '软件请求',
+      'components.RequestStatus.SoftwareRequests.withdraw': '撤回',
+      'i18n.back': '返回',
+      'downloads.actions': '行动历史',
+      'downloads.active': '主动警告',
+      'downloads.activeState': '需要关注',
+      'downloads.actor': '用户 {id}',
+      'downloads.blocked': '手动屏蔽',
+      'downloads.blocklist': '屏蔽此发布以避免再次下载',
+      'downloads.blocklisted': '已请求屏蔽',
+      'downloads.cancel': '取消',
+      'downloads.changed': '服务配置改变',
+      'downloads.clientKept': '保存客户端文件',
+      'downloads.clientRemoved': '请求删除客户',
+      'downloads.confirm': '确认拒绝',
+      'downloads.copy': '复制或硬链接( 保留源文件)',
+      'downloads.denied': '需要管理下载权限 。',
+      'downloads.description':
+        '审查获取警告,选择要手动导入的文件,并拒绝不想要的下载.',
+      'downloads.disappeared': '不再排队',
+      'downloads.empty': '在此视图中没有下载警告 。',
+      'downloads.failed': '无法装入信箱 。',
+      'downloads.failedState': '需求审查',
+      'downloads.history': '历史',
+      'downloads.import': '导入选中的文件',
+      'downloads.importFailed': '导入失败',
+      'downloads.importMode': '导入模式',
+      'downloads.importReview': '在未确认文件导入的情况下导入完成',
+      'downloads.importWarning':
+        '确认目标并审查所有拒绝理由。 获取服务决定文件质量和插曲匹配.',
+      'downloads.imported': '人工进口',
+      'downloads.importingState': '待导入',
+      'downloads.ineligible': '没有确认匹配 – 无法导入',
+      'downloads.loading': '正在装入下载警告...',
+      'downloads.move': '移动( 删除源文件)',
+      'downloads.next': '下一页',
+      'downloads.noFiles': '未找到有确认的库目标的文件 。',
+      'downloads.notBlocklisted': '该发布版本尚未加入屏蔽列表',
+      'downloads.outcome': '无法确认行动。 在重试前刷新并审查 。',
+      'downloads.partial': '一些购置服务无法检查。 他们的警告可能缺失或过时。',
+      'downloads.pending': '行动得到接受。 刷新以检查后端结果 。',
+      'downloads.preview': '预览文件',
+      'downloads.previous': '上一页',
+      'downloads.recovered': '已恢复',
+      'downloads.refresh': '刷新',
+      'downloads.reject': '拒绝下载',
+      'downloads.rejected': '手动拒绝',
+      'downloads.rejectingState': '待驳回',
+      'downloads.rejection':
+        '拒绝从获取队列中删除此项目 。 在确认之前审查选项 。',
+      'downloads.remove': '从下载客户端中删除下载和文件',
+      'downloads.resolvedState': '已解决',
+      'downloads.search': '搜索',
+      'downloads.select': '选择 {name}',
+      'downloads.targetChoose': '选择库匹配',
+      'downloads.targetHelp':
+        '已在此获取服务中搜索标题 。 选择匹配不添加新标题 。',
+      'downloads.targetLabel': '库匹配',
+      'downloads.targetNoResults': '在此服务库中找不到匹配的标题 。',
+      'downloads.targetQuery': '电影、系列、专辑或书籍',
+      'downloads.targetRequired': '在导入文件前选择一个库匹配 。',
+      'downloads.targetSelected': '选中的匹配 : {title}{subtitle}',
+      'downloads.title': '下载收件箱',
+      'downloads.truncated': '只有前20项采购服务得到检查。',
+      'downloads.unknownImport': '导入结果未知',
+      'downloads.unknownReject': '拒绝结果未知',
+      'components.IndexerSearch.accessDenied':
+        '您需要具备请求管理权限才能搜索索引器。',
+      'components.IndexerSearch.categories': '索引器类别',
+      'components.IndexerSearch.category': '媒体类别',
+      'components.IndexerSearch.categoryAdult': '成人',
+      'components.IndexerSearch.categoryAudiobook': '音频',
+      'components.IndexerSearch.categoryComic': '漫画',
+      'components.IndexerSearch.categoryEbook': '书籍',
+      'components.IndexerSearch.categoryGame': '个人电脑游戏',
+      'components.IndexerSearch.categoryMagazine': '杂志',
+      'components.IndexerSearch.categoryModern': '现代光盘',
+      'components.IndexerSearch.categoryMovie': '电影',
+      'components.IndexerSearch.categoryMusic': '音乐',
+      'components.IndexerSearch.categoryRetro': '反光光盘',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': '打开 Prowlarr 设置',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr 无法发送此资源。请重新搜索并再次尝试。',
+      'components.IndexerSearch.grabs': '下载次数',
+      'components.IndexerSearch.intro':
+        '在 SeerrNG 的所有媒体类别中搜索 Prowlarr 索引器上的发布资源。',
+      'components.IndexerSearch.leechers': '下载者',
+      'components.IndexerSearch.loadFailed': '无法加载 Prowlarr 搜索配置。',
+      'components.IndexerSearch.loadMore': '加载更多结果',
+      'components.IndexerSearch.loadingMore': '载入中…',
+      'components.IndexerSearch.manualMode':
+        '搜索结果与 SeerrNG 请求相互独立。您可以将某条结果发送到在 Prowlarr 中配置的下载客户端。',
+      'components.IndexerSearch.noConnection': 'Prowlarr 未连接。',
+      'components.IndexerSearch.noConnectionHelp':
+        '请管理员在设置 > 服务下连接 Prowlarr 。',
+      'components.IndexerSearch.noResults': '没有与此搜索匹配的发布资源。',
+      'components.IndexerSearch.noResultsHelp':
+        '请检查 Prowlarr 中的类别筛选条件和已启用的索引器。搜索结果并不保证应用能够导入相应资源。',
+      'components.IndexerSearch.openResult': '打开索引器详情',
+      'components.IndexerSearch.protocol': '协议',
+      'components.IndexerSearch.published': '发布日期',
+      'components.IndexerSearch.query': '搜索词',
+      'components.IndexerSearch.queryPlaceholder':
+        '标题、作者、专辑、期号或游戏名称',
+      'components.IndexerSearch.requestStillUsesManager':
+        '发送结果不会更改 SeerrNG 请求。Prowlarr 会将该结果转交给已配置的下载客户端。',
+      'components.IndexerSearch.resultCount':
+        'Prowlarr 返回了 {count} 个发布资源。',
+      'components.IndexerSearch.search': '搜索索引器',
+      'components.IndexerSearch.searchFailed':
+        'Prowlarr 搜索失败。检查连接并重试。',
+      'components.IndexerSearch.searching': '正在搜索索引器...',
+      'components.IndexerSearch.seeders': '种子',
+      'components.IndexerSearch.sendToDownloader': '发送到下载器',
+      'components.IndexerSearch.sendingToDownloader': '正在发送…',
+      'components.IndexerSearch.sentToDownloader':
+        '已发送至 Prowlarr 配置的下载客户端。',
+      'components.IndexerSearch.size': '大小',
+      'components.IndexerSearch.title': '索引器搜索',
+      'components.IndexerSearch.tooManySearches':
+        '已达到搜索次数限制。请等待一分钟后再搜索。',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        '没有可用的可搜索索引器 。 启用 Prowlarr 中的索引器或调整分类过滤器。',
+      'components.SettingsProwlarr.addDetectedMatches':
+        '添加检测到的匹配( E){count})',
+      'components.SettingsProwlarr.address': '主机名',
+      'components.SettingsProwlarr.adult': '成人',
+      'components.SettingsProwlarr.apiKey': 'API 密钥',
+      'components.SettingsProwlarr.apiKeySaved':
+        '键已保存 。 留下这个空白 继续使用它。',
+      'components.SettingsProwlarr.audiobook': '音频',
+      'components.SettingsProwlarr.basePath': '基础路径',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        '选择 Prowlarr 与每次搜索一起发送的类别。 默认使用标准 Newznab/ Torznab 分类; 测试连接, 查看启用索引器广告的自定义分类 。',
+      'components.SettingsProwlarr.categoryMappingEmpty': '选择至少一个类别。',
+      'components.SettingsProwlarr.categoryMappingTitle': '类别过滤器',
+      'components.SettingsProwlarr.clearApiKey': '删除已保存的 API 密钥',
+      'components.SettingsProwlarr.comic': '漫画',
+      'components.SettingsProwlarr.connected': '连接到 Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        '计数包括启用的,可搜索的索引器,为至少一个选定的类别发布支持广告. 它们显示搜索范围,没有成功抓取或进口.',
+      'components.SettingsProwlarr.coverageTitle': '按媒介分列的指数覆盖率',
+      'components.SettingsProwlarr.description':
+        '连接您的 Prowlarr 实例一次, 以在您已经管理的索引器上进行有类别意识的手动搜索 。',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        '建议的定制类别与其公布的名称相匹配。 保存前审查它们;这不会改变Prowlarr或发送下载.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr接受了管理API连接. 这些结果测试分别启用可搜索索引器; 禁用至日期来自 Prowlarr 。',
+      'components.SettingsProwlarr.diagnosticFailed': '失败',
+      'components.SettingsProwlarr.diagnosticOk': '已连接',
+      'components.SettingsProwlarr.diagnosticTitle': '索引连接结果',
+      'components.SettingsProwlarr.disabledUntil': '禁用至 {date}',
+      'components.SettingsProwlarr.ebook': '书籍',
+      'components.SettingsProwlarr.game': '个人电脑游戏',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        '选择针对每种媒体类型搜索哪些已启用的 Prowlarr 索引器。在 Windows/Linux 上使用 Ctrl+点击，或在 macOS 上使用 Command+点击来选择多个索引器。空选择将禁用该类型的搜索。',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        '{category} 的索引器',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        '按媒体类型分配索引器',
+      'components.SettingsProwlarr.indexerCount': '指数:{count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        '用户可以从搜索结果中打开索引器详情。',
+      'components.SettingsProwlarr.indexerNameHidden':
+        '索引器名称和详情链接对用户隐藏。',
+      'components.SettingsProwlarr.indexerNotSearchable': '（不可搜索）',
+      'components.SettingsProwlarr.indexerSearchLimits': '搜索限制',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        '限制每个用户每分钟的整体搜索次数以及每个选定索引器的搜索次数。',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr 已保存,但是其索引器目录尚未提供。',
+      'components.SettingsProwlarr.keepApiKey': '保留保存的 API 密钥',
+      'components.SettingsProwlarr.loadFailed': '无法加载 Prowlarr 设置。',
+      'components.SettingsProwlarr.magazine': '杂志',
+      'components.SettingsProwlarr.modern': '现代光盘',
+      'components.SettingsProwlarr.movie': '电影',
+      'components.SettingsProwlarr.music': '音乐',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        '没有 Prowlarr 索引器已经配置 。',
+      'components.SettingsProwlarr.noIndexerInventory':
+        '测试 Prowlarr 连接以加载其索引器并按类别分配。',
+      'components.SettingsProwlarr.port': '端口',
+      'components.SettingsProwlarr.recentFailure': '最近失败 : {date}',
+      'components.SettingsProwlarr.retro': '反光光盘',
+      'components.SettingsProwlarr.save': '保存 Prowlarr 设置',
+      'components.SettingsProwlarr.saveFailed': '无法保存 Prowlarr 设置。',
+      'components.SettingsProwlarr.saved': 'Prowlarr 设置已保存。',
+      'components.SettingsProwlarr.saving': '正在保存...',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        '请输入 1 到 60 之间的整数。',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        '每个用户每分钟在 {indexer} 上的最大搜索次数',
+      'components.SettingsProwlarr.searchesPerUser':
+        '每个用户每分钟的最大搜索次数',
+      'components.SettingsProwlarr.selectedCategories': '{count} 选定类别',
+      'components.SettingsProwlarr.selectedIndexers': '已选择 {count} 个索引器',
+      'components.SettingsProwlarr.showIndexerDetails':
+        '允许在搜索结果中显示索引器名称和详情',
+      'components.SettingsProwlarr.sports': '体育',
+      'components.SettingsProwlarr.supportNote':
+        '此设置仅连接到 Prowlarr。此处目前不支持 NZBHydra2。',
+      'components.SettingsProwlarr.test': '测试连接和检查覆盖范围',
+      'components.SettingsProwlarr.testFailed':
+        'Prowlarr 连接失败。检查地址和 API 密钥。',
+      'components.SettingsProwlarr.testHint':
+        '搜索直接从 SeerrNG 查询 Prowlarr 开始 。 批准的请求仍然通过他们配置的媒体管理器或软件供应商进行,后者拥有采购和跟踪权。',
+      'components.SettingsProwlarr.testing': '检查中 Prowlarr…',
+      'components.SettingsProwlarr.title': 'Prowlarr 索引',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} 可搜索并启用 {total} 配置',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': '使用 SSL',
+      'components.Settings.SettingsLogs.logs': '日志',
+      'components.Settings.SettingsLogs.searchLogs': '搜索日志',
+      'components.Settings.SettingsLogs.level': '等級',
+      'components.Settings.SettingsLogs.filterDebug': '除错',
+      'components.Settings.SettingsLogs.filterInfo': '消息',
+      'components.Settings.SettingsLogs.filterWarn': '警告',
+      'components.Settings.SettingsLogs.filterError': '错误',
+      'components.Settings.SettingsLogs.logDetails': '日志详細信息',
+      'components.Settings.SettingsLogs.copyToClipboard': '复制到剪贴板',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        '日志消息已复制到剪贴板。',
+      'components.Settings.SettingsJobsCache.runnow': '执行',
+      'components.Settings.SettingsJobsCache.canceljob': '取消作业',
+      'components.Settings.SettingsJobsCache.process': '程序',
+      'components.Settings.SettingsJobsCache.command': '命令',
+      'components.Settings.SettingsJobsCache.enabled': '已启用',
+      'components.Settings.SettingsJobsCache.disabled': '已禁用',
+      'components.Settings.SettingsJobsCache.cachehits': '击中数',
+      'components.Settings.SettingsJobsCache.cachekeys': '键数',
+      'components.Settings.SettingsJobsCache.cachemisses': '失误数',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS 缓存',
+      'components.Settings.SettingsJobsCache.dnscachehits': '点击数',
+      'components.Settings.SettingsJobsCache.dnscachemisses': '错过',
+      'components.Settings.SettingsJobsCache.failures': '失败',
+      'components.Settings.SettingsJobsCache.flushcache': '清除缓存',
+      'components.Settings.SettingsJobsCache.hitRate': '点击率',
+      'components.Settings.SettingsJobsCache.imagecachecount': '已缓存图片',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 退缩',
+      'components.Settings.SettingsAbout.Releases.installedversion': '已安装',
+      'components.Settings.SettingsAbout.Releases.latestversion':
+        '最新软件版本',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        '软件发行数据当前不可用。',
+      'components.Settings.SettingsAbout.Releases.releases': '软件版本',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        '在 GitHub 上查看',
+      'components.Settings.SettingsAbout.aboutseerr': '关于 SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': '数据目录',
+      'components.Settings.SettingsAbout.documentation': '文档',
+      'components.Settings.SettingsAbout.githubdiscussions': 'GitHub 讨论区',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG 用于合法的个人媒体管理。 该项目不容许盗版或侵犯版权。 用户有责任遵守本地区适用的法律、许可证和服务条款。',
+      'components.Settings.SettingsAbout.legalUseTitle': '合法使用',
+      'components.Settings.SettingsAbout.metadataAttribution': '元数据来源标注',
+      'components.Settings.SettingsAbout.supportdevelopment': '支助发展',
+      'components.Settings.SettingsAbout.timezone': '时区',
+      'components.Settings.SettingsAbout.totalmedia': '媒体数',
+      'components.Settings.SettingsAbout.totalrequests': '请求数',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        '本产品使用 TMDB 及其 API，但未获得 TMDB 的认可、认证或其他形式的批准。<ApiTermsLink>TMDB API 使用条款</ApiTermsLink>。',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        '无法检查更新',
+      'components.Settings.SettingsAbout.uptodate': '最新',
+      'components.Settings.SettingsAbout.version': '软件版本',
+      'components.Settings.SettingsCategories.title': '媒体类别',
+      'components.Settings.SettingsCategories.description':
+        '选择可以浏览和请求的类别 。 已停用类别从导航和发现中消失,新请求被屏蔽. 现有请求和下载历史保留在请求状态中。',
+      'components.Settings.SettingsCategories.groupTitle': '可用类别',
+      'components.Settings.SettingsCategories.groupDescription':
+        '这些开关控制类别的可用性横跨 SeerrNG.',
+      'components.Settings.SettingsCategories.movie': '电影',
+      'components.Settings.SettingsCategories.tv': '剧集',
+      'components.Settings.SettingsCategories.music': '音乐',
+      'components.Settings.SettingsCategories.ebook': '书籍',
+      'components.Settings.SettingsCategories.audiobook': '音频',
+      'components.Settings.SettingsCategories.comic': '漫画',
+      'components.Settings.SettingsCategories.magazine': '杂志',
+      'components.Settings.SettingsCategories.adult': '成人',
+      'components.Settings.SettingsCategories.retro': '模拟( 回顾)',
+      'components.Settings.SettingsCategories.modern': '模拟(现代)',
+      'components.Settings.SettingsCategories.game': 'PC 游戏',
+      'components.Settings.SettingsCategories.movieDescription':
+        '允许电影的发现和请求。',
+      'components.Settings.SettingsCategories.tvDescription':
+        '允许系列发现和请求.',
+      'components.Settings.SettingsCategories.musicDescription':
+        '允许音乐发现和请求.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        '允许书籍的发现和请求.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        '允许音频书的发现和请求.',
+      'components.Settings.SettingsCategories.comicDescription':
+        '允许漫画发现和请求.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        '允许杂志发现和请求.',
+      'components.Settings.SettingsCategories.adultDescription':
+        '允许发现并请求成人场景内容。需要已配置的 Whisparr v3 服务以及针对成人的特定用户权限。',
+      'components.Settings.SettingsCategories.retroDescription':
+        '允许反光ROM发现和请求.',
+      'components.Settings.SettingsCategories.modernDescription':
+        '允许现代模拟ROM的发现和请求.',
+      'components.Settings.SettingsCategories.gameDescription':
+        '允许PC游戏的发现和请求.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        '成人内容对所有拥有访问权限的人可见',
+      'components.Settings.SettingsCategories.adultWarning':
+        '如果您与家人共享此实例，或通过反向代理将其暴露，任何被授予“请求成人内容”权限的人都能看到您浏览和请求的内容。请在下方或每个用户的“权限”中将家庭账户标记为受限，以确保他们永远看不到成人内容。',
+      'components.Settings.SettingsCategories.ageGateTitle': '年龄限制',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        '受限账户无法查看或请求成人内容，且成熟的电影、剧集、音乐、书籍、漫画及带标签的标题将在服务器端隐藏。过滤使用提供商评级和标签，对于没有元数据的标题，过滤效果为尽力而为。',
+      'components.Settings.SettingsCategories.ageGateDefault': '默认限制账户',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        '未明确设置限制的账户将被限制。管理员除外。',
+      'components.Settings.SettingsCategories.ageGateMovieMax': '最高电影评级',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        '受限账户无法查看高于此评级的电影。',
+      'components.Settings.SettingsCategories.ageGateTvMax': '最高剧集评级',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        '受限账户无法查看高于此评级的剧集。',
+      'components.Settings.SettingsCategories.ageGateCountry': '评级国家',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        '用于评级的两位字母国家代码，例如 US。',
+      'components.Settings.SettingsCategories.saveSuccess': '类别设置已保存 。',
+      'components.Settings.SettingsCategories.saveFailure':
+        '无法保存分类设置 。',
     },
   },
   {
@@ -8694,6 +15803,384 @@ export const localeData = [
       'components.PermissionEdit.viewrecent': '查看最近新增',
       'components.PermissionEdit.viewrequests': '查看請求',
       'components.PermissionEdit.viewwatchlists': '檢視觀看清單',
+      'components.RequestModal.RequestTree.seasonNumber': '第 {number} 季',
+      'components.RequestModal.RequestTree.specials': '特別篇',
+      'components.Requests.episodeQueue': '集數佇列',
+      'components.Requests.retry': '重試',
+      'components.Requests.approve': '批准',
+      'components.Requests.decline': '拒絕',
+      'components.Requests.requested': '已提出請求',
+      'components.Requests.approved': '獲批准',
+      'components.Requests.searching': '搜尋中',
+      'components.Requests.downloading': '下載中',
+      'components.Requests.importing': '匯入中',
+      'components.Requests.library': '正在新增至媒體庫',
+      'components.Requests.available': '可用',
+      'components.Requests.unavailable': '不可用',
+      'components.Requests.failed': '失敗',
+      'components.Requests.declined': '已拒絕',
+      'components.Requests.cancelled': '已取消',
+      'components.Requests.pending': '待處理',
+      'components.Requests.completed': '已完成',
+      'components.Requests.statusUpdated': '狀態已更新',
+      'i18n.unknown': '未知',
+      'components.Requests.history': '歷史',
+      'components.RequestStatus.SoftwareRequests.approve': '批准',
+      'components.RequestStatus.SoftwareRequests.approved': '獲批准',
+      'components.RequestStatus.SoftwareRequests.available': '可用',
+      'components.RequestStatus.SoftwareRequests.cancel': '取消',
+      'components.RequestStatus.SoftwareRequests.cancelled': '已取消',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        '清除已取消的請求',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        '要清除這項已取消的請求嗎？',
+      'components.RequestStatus.SoftwareRequests.decline': '拒絕',
+      'components.RequestStatus.SoftwareRequests.declined': '已拒絕',
+      'components.RequestStatus.SoftwareRequests.downloadCopies': '下載副本',
+      'components.RequestStatus.SoftwareRequests.downloading': '下載中',
+      'components.RequestStatus.SoftwareRequests.failed': '失敗',
+      'components.RequestStatus.SoftwareRequests.history': '歷史',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        '正在載入狀態歷史…',
+      'components.RequestStatus.SoftwareRequests.importing': '正在驗證匯入',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        '此軟體請求無法更新。',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        '目前沒有可用的已儲存狀態更新。',
+      'components.RequestStatus.SoftwareRequests.pending': '待核准',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        '從請求中移除',
+      'components.RequestStatus.SoftwareRequests.retry': '重試',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        '提供者無法確認上次下載是否已開始。請檢查下載用戶端的佇列與歷史紀錄。只有在沒有相符下載時才繼續。',
+      'components.RequestStatus.SoftwareRequests.searching': '搜尋中',
+      'components.RequestStatus.SoftwareRequests.title': '軟體請求',
+      'components.RequestStatus.SoftwareRequests.withdraw': '撤回',
+      'i18n.back': '返回',
+      'downloads.actions': '動作歷史',
+      'downloads.active': '啟動警告',
+      'downloads.activeState': '需要注意',
+      'downloads.actor': '使用者 {id}',
+      'downloads.blocked': '手動封鎖',
+      'downloads.blocklist': '將此發行版本加入封鎖清單，避免再次下載',
+      'downloads.blocklisted': '已要求加入封鎖清單',
+      'downloads.cancel': '取消',
+      'downloads.changed': '服務設定已變更',
+      'downloads.clientKept': '保留客戶端檔案',
+      'downloads.clientRemoved': '要求移除客戶端',
+      'downloads.confirm': '确认拒絕',
+      'downloads.copy': '复制或硬連結( 保留來源檔案)',
+      'downloads.denied': '需要管理下載權限 。',
+      'downloads.description':
+        '檢視取得警告, 選擇要手動匯入的檔案, 並拒絕不想要的下載 。',
+      'downloads.disappeared': '不再排隊',
+      'downloads.empty': '此檢視中沒有下載警告 。',
+      'downloads.failed': '收件箱無法載入 。',
+      'downloads.failedState': '需求审查',
+      'downloads.history': '歷史',
+      'downloads.import': '匯入選取的檔案',
+      'downloads.importFailed': '匯入失敗',
+      'downloads.importMode': '匯入模式',
+      'downloads.importReview': '未確定檔案匯入完成匯入',
+      'downloads.importWarning':
+        '確認目標, 取得服務決定了檔案的質量與插曲匹配 。',
+      'downloads.imported': '手動匯入',
+      'downloads.importingState': '待匯入',
+      'downloads.ineligible': '沒有確認的匹配─無法匯入',
+      'downloads.loading': '正在載入下載警告...',
+      'downloads.move': '移動( 移動來源檔案)',
+      'downloads.next': '下一頁',
+      'downloads.noFiles': '找不到有確認圖書館目標的檔案 。',
+      'downloads.notBlocklisted': '此發行版本尚未加入封鎖清單',
+      'downloads.outcome': '動作無法確定 。 重試前刷新與檢視 。',
+      'downloads.partial': '有些购置服務無法檢查 。 警告可能缺失或过时。',
+      'downloads.pending': '接受行動 刷新以檢查後端結果 。',
+      'downloads.preview': '預覽檔案',
+      'downloads.previous': '前一頁',
+      'downloads.recovered': '已恢复',
+      'downloads.refresh': '刷新',
+      'downloads.reject': '拒絕下載',
+      'downloads.rejected': '手動拒絕',
+      'downloads.rejectingState': '待定',
+      'downloads.rejection': '拒絕將此項目從取得队列中移除 。 檢查選項後再證實',
+      'downloads.remove': '從下載客戶端移除下載檔案',
+      'downloads.resolvedState': '已解決',
+      'downloads.search': '搜尋',
+      'downloads.select': '選擇 {name}',
+      'downloads.targetChoose': '選擇函式庫匹配',
+      'downloads.targetHelp':
+        '已在此取得服務中搜尋標題 。 選擇匹配不新增標題 。',
+      'downloads.targetLabel': '文库匹配',
+      'downloads.targetNoResults': '此服務文庫中找不到符合的標題 。',
+      'downloads.targetQuery': '電影、系列、相簿或書',
+      'downloads.targetRequired': '在匯入檔案前選擇函式庫符合 。',
+      'downloads.targetSelected': '選取的符合 : {title}{subtitle}',
+      'downloads.title': '下載收件箱',
+      'downloads.truncated': '只有前20家收购公司被查。',
+      'downloads.unknownImport': '匯入結果未知',
+      'downloads.unknownReject': '拒絕結果未知',
+      'components.IndexerSearch.accessDenied':
+        '您需要具備請求管理權限才能搜尋索引器。',
+      'components.IndexerSearch.categories': '索引器類別',
+      'components.IndexerSearch.category': '媒體類別',
+      'components.IndexerSearch.categoryAdult': '成人',
+      'components.IndexerSearch.categoryAudiobook': '音效簿',
+      'components.IndexerSearch.categoryComic': '漫畫',
+      'components.IndexerSearch.categoryEbook': '書籍',
+      'components.IndexerSearch.categoryGame': 'PC 遊戲',
+      'components.IndexerSearch.categoryMagazine': '雜誌',
+      'components.IndexerSearch.categoryModern': '現代 ROM',
+      'components.IndexerSearch.categoryMovie': '電影',
+      'components.IndexerSearch.categoryMusic': '音樂',
+      'components.IndexerSearch.categoryRetro': '反轉 ROM',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': '開啟 Prowlarr 設定',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr 無法傳送此搜尋結果。請重新搜尋並再試一次。',
+      'components.IndexerSearch.grabs': '下載次數',
+      'components.IndexerSearch.intro':
+        '在 SeerrNG 的所有媒體類別中搜尋 Prowlarr 索引器上的發布資源。',
+      'components.IndexerSearch.leechers': '下載者',
+      'components.IndexerSearch.loadFailed': '無法載入 Prowlarr 搜尋設定 。',
+      'components.IndexerSearch.loadMore': '載入更多結果',
+      'components.IndexerSearch.loadingMore': '載入中…',
+      'components.IndexerSearch.manualMode':
+        '搜尋結果與 SeerrNG 請求各自獨立。您可以將某筆結果傳送到 Prowlarr 中設定的下載用戶端。',
+      'components.IndexerSearch.noConnection': '未連線到 Prowlarr。',
+      'components.IndexerSearch.noConnectionHelp':
+        '請管理員前往「設定 > 服務」連接 Prowlarr。',
+      'components.IndexerSearch.noResults': '沒有符合此搜尋的發布資源。',
+      'components.IndexerSearch.noResultsHelp':
+        '請檢查 Prowlarr 中的類別篩選條件和已啟用的索引器。搜尋結果不保證應用程式能匯入相應項目。',
+      'components.IndexerSearch.openResult': '開啟索引器細節',
+      'components.IndexerSearch.protocol': '協定',
+      'components.IndexerSearch.published': '發布日期',
+      'components.IndexerSearch.query': '搜尋詞',
+      'components.IndexerSearch.queryPlaceholder':
+        '標題、作者、專輯、期號或遊戲名稱',
+      'components.IndexerSearch.requestStillUsesManager':
+        '傳送結果不會變更 SeerrNG 請求。Prowlarr 會將結果交給已設定的下載用戶端。',
+      'components.IndexerSearch.resultCount':
+        'Prowlarr 已傳回 {count} 個發布項目。',
+      'components.IndexerSearch.search': '搜尋索引器',
+      'components.IndexerSearch.searchFailed':
+        'Prowlarr 搜尋失敗。請檢查連線後再試一次。',
+      'components.IndexerSearch.searching': '正在搜尋索引器...',
+      'components.IndexerSearch.seeders': '種子數',
+      'components.IndexerSearch.sendToDownloader': '傳送至下載器',
+      'components.IndexerSearch.sendingToDownloader': '傳送中…',
+      'components.IndexerSearch.sentToDownloader':
+        '已傳送至 Prowlarr 設定的下載用戶端。',
+      'components.IndexerSearch.size': '大小',
+      'components.IndexerSearch.title': '索引器搜尋',
+      'components.IndexerSearch.tooManySearches':
+        '已達搜尋次數上限。請等候一分鐘後再搜尋。',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        '沒有可用的可搜尋索引器 。 開啟 Prowlarr 中的索引器或調整類別的過程 。',
+      'components.SettingsProwlarr.addDetectedMatches':
+        '新增檢測到的匹配( E){count})',
+      'components.SettingsProwlarr.address': '主機名稱',
+      'components.SettingsProwlarr.adult': '成人',
+      'components.SettingsProwlarr.apiKey': 'API 金鑰',
+      'components.SettingsProwlarr.apiKeySaved':
+        '已儲存金鑰 。 留下這個空白繼續使用它。',
+      'components.SettingsProwlarr.audiobook': '音效簿',
+      'components.SettingsProwlarr.basePath': '基本路徑',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        '选择 Prowlarr 与每次搜索一起发送的类别。 默认使用标准 Newznab/ Torznab 分类; 测试连接, 查看启用索引器广告的自定义分类 。',
+      'components.SettingsProwlarr.categoryMappingEmpty': '選擇至少一個類別 。',
+      'components.SettingsProwlarr.categoryMappingTitle': '分類过滤器',
+      'components.SettingsProwlarr.clearApiKey': '移除已儲存的 API 金鑰',
+      'components.SettingsProwlarr.comic': '漫畫',
+      'components.SettingsProwlarr.connected': '已連接到 Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        '數目包括啟動的、可搜尋的索引器, 以廣告至少一個選取的類別的支援 。 它們顯示搜索範圍, 而不是成功抓取或匯入 。',
+      'components.SettingsProwlarr.coverageTitle': '按媒體分列的索引覆盖率',
+      'components.SettingsProwlarr.description':
+        '將您的 Prowlarr 實體連接一次, 以在您已經管理過的索引器上進行手動的分類搜尋 。',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        '所推荐的自訂類別都符合其公示的名字。 儲存前檢查它們; 這不會改變 Prowlarr 或者傳送下載 。',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr 接受管理 API 連接 。 這些結果測試每一個都開啟了可搜尋索引器; 禁用至日期來自 Prowlarr 。',
+      'components.SettingsProwlarr.diagnosticFailed': '失敗',
+      'components.SettingsProwlarr.diagnosticOk': '已連接',
+      'components.SettingsProwlarr.diagnosticTitle': '索引器連接結果',
+      'components.SettingsProwlarr.disabledUntil': '禁用至 {date}',
+      'components.SettingsProwlarr.ebook': '書籍',
+      'components.SettingsProwlarr.game': 'PC 遊戲',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        '選擇要為每種媒體類型搜尋的已啟用 Prowlarr 索引器。在 Windows/Linux 上按住 Ctrl 點選，或在 macOS 上按住 Command 點選以選擇多個索引器。未選擇任何項目將停用該類型的搜尋。',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        '{category} 的索引器',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        '依媒體類型分配索引器',
+      'components.SettingsProwlarr.indexerCount': '指數:{count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        '使用者可從搜尋結果開啟索引器詳細資訊。',
+      'components.SettingsProwlarr.indexerNameHidden':
+        '索引器名稱和詳細資訊連結對使用者隱藏。',
+      'components.SettingsProwlarr.indexerNotSearchable': '（無法搜尋）',
+      'components.SettingsProwlarr.indexerSearchLimits': '搜尋限制',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        '限制每位使用者每分鐘的總搜尋次數，以及每個已選索引器的搜尋次數。',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr 已儲存, 但是其索引器目錄尚未提供 。',
+      'components.SettingsProwlarr.keepApiKey': '保留保存的 API 金鑰',
+      'components.SettingsProwlarr.loadFailed': '無法載入 Prowlarr 設定。',
+      'components.SettingsProwlarr.magazine': '雜誌',
+      'components.SettingsProwlarr.modern': '現代 ROM',
+      'components.SettingsProwlarr.movie': '電影',
+      'components.SettingsProwlarr.music': '音樂',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        '尚未設定 Prowlarr 索引器 。',
+      'components.SettingsProwlarr.noIndexerInventory':
+        '測試 Prowlarr 連線以載入其索引器，並依類別進行分配。',
+      'components.SettingsProwlarr.port': '通訊埠',
+      'components.SettingsProwlarr.recentFailure': '最近失敗 : {date}',
+      'components.SettingsProwlarr.retro': '反轉 ROM',
+      'components.SettingsProwlarr.save': '保存 Prowlarr 设置',
+      'components.SettingsProwlarr.saveFailed': '無法儲存 Prowlarr 設定。',
+      'components.SettingsProwlarr.saved': 'Prowlarr 設定已儲存。',
+      'components.SettingsProwlarr.saving': '儲存中…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        '請輸入 1 到 60 之間的整數。',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        '每位使用者在 {indexer} 上每分鐘的最大搜尋次數',
+      'components.SettingsProwlarr.searchesPerUser':
+        '每位使用者每分鐘的最大搜尋次數',
+      'components.SettingsProwlarr.selectedCategories': '{count} 選擇的類別',
+      'components.SettingsProwlarr.selectedIndexers': '已選擇 {count} 個索引器',
+      'components.SettingsProwlarr.showIndexerDetails':
+        '允許在搜尋結果中顯示索引器名稱和詳細資訊',
+      'components.SettingsProwlarr.sports': '体育',
+      'components.SettingsProwlarr.supportNote':
+        '此設定僅連線至 Prowlarr。目前在此處不支援 NZBHydra2。',
+      'components.SettingsProwlarr.test': '測試連接和檢查覆盖范围',
+      'components.SettingsProwlarr.testFailed':
+        'Prowlarr 連線失敗。請檢查位址和 API 金鑰。',
+      'components.SettingsProwlarr.testHint':
+        '搜尋直接從 SeerrNG 查詢 Prowlarr 開始 。 經許可的請求仍通過他們所設定的媒體管理員或軟體提供商,',
+      'components.SettingsProwlarr.testing': '检查中 Prowlarr…',
+      'components.SettingsProwlarr.title': 'Prowlarr 索引',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} 可搜尋且已啟用 {total} 配置',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': '使用安全通訊協定（SSL）',
+      'components.Settings.SettingsLogs.logs': '日誌',
+      'components.Settings.SettingsLogs.searchLogs': '搜尋日誌',
+      'components.Settings.SettingsLogs.level': '等級',
+      'components.Settings.SettingsLogs.filterDebug': '除錯',
+      'components.Settings.SettingsLogs.filterInfo': '訊息',
+      'components.Settings.SettingsLogs.filterWarn': '警告',
+      'components.Settings.SettingsLogs.filterError': '錯誤',
+      'components.Settings.SettingsLogs.logDetails': '日誌詳細信息',
+      'components.Settings.SettingsLogs.copyToClipboard': '複製到剪貼板',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        '日誌訊息已複製到剪貼板。',
+      'components.Settings.SettingsJobsCache.runnow': '執行',
+      'components.Settings.SettingsJobsCache.canceljob': '取消作業',
+      'components.Settings.SettingsJobsCache.process': '程序',
+      'components.Settings.SettingsJobsCache.command': '指令',
+      'components.Settings.SettingsJobsCache.enabled': '已開啟',
+      'components.Settings.SettingsJobsCache.disabled': '已禁用',
+      'components.Settings.SettingsJobsCache.cachehits': '擊中數',
+      'components.Settings.SettingsJobsCache.cachekeys': '鍵數',
+      'components.Settings.SettingsJobsCache.cachemisses': '失誤數',
+      'components.Settings.SettingsJobsCache.dnsCache': 'DNS 快取',
+      'components.Settings.SettingsJobsCache.dnscachehits': '命中',
+      'components.Settings.SettingsJobsCache.dnscachemisses': '失誤',
+      'components.Settings.SettingsJobsCache.failures': '失敗',
+      'components.Settings.SettingsJobsCache.flushcache': '清除快取',
+      'components.Settings.SettingsJobsCache.hitRate': '命中率',
+      'components.Settings.SettingsJobsCache.imagecachecount': '快取的影像',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 後退',
+      'components.Settings.SettingsAbout.Releases.installedversion': '已安裝',
+      'components.Settings.SettingsAbout.Releases.latestversion': '最新版本',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        '無法獲取軟體版本資料。',
+      'components.Settings.SettingsAbout.Releases.releases': '軟體版本',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        '在 GitHub 上查看',
+      'components.Settings.SettingsAbout.aboutseerr': '關於 SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': '資料目錄',
+      'components.Settings.SettingsAbout.documentation': '使用說明',
+      'components.Settings.SettingsAbout.githubdiscussions': 'GitHub 討論區',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG 用于合法的个人媒体管理。 该项目不容许盗版或侵犯版权。 用户有责任遵守本地区适用的法律、许可证和服务条款。',
+      'components.Settings.SettingsAbout.legalUseTitle': '合法使用',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        '中繼資料來源標示',
+      'components.Settings.SettingsAbout.supportdevelopment': '支助发展',
+      'components.Settings.SettingsAbout.timezone': '時區',
+      'components.Settings.SettingsAbout.totalmedia': '媒體數',
+      'components.Settings.SettingsAbout.totalrequests': '請求數',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        '本產品使用 TMDB 及其 API，但未獲得 TMDB 的背書、認證或其他形式的核准。<ApiTermsLink>TMDB API 使用條款</ApiTermsLink>。',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        '無法檢查更新',
+      'components.Settings.SettingsAbout.uptodate': '最新',
+      'components.Settings.SettingsAbout.version': '軟體版本',
+      'components.Settings.SettingsCategories.title': '媒體類別',
+      'components.Settings.SettingsCategories.description':
+        '選擇每個人可以瀏覽和要求的類別 。 已關閉的分類從導航與發現中消失, 新的要求被封鎖 。 已有的要求和下載歷史保留在要求狀態中 。',
+      'components.Settings.SettingsCategories.groupTitle': '可用的分類',
+      'components.Settings.SettingsCategories.groupDescription':
+        '這些 SeerrNG 的開關控制類別可用性 。',
+      'components.Settings.SettingsCategories.movie': '電影',
+      'components.Settings.SettingsCategories.tv': '影集',
+      'components.Settings.SettingsCategories.music': '音樂',
+      'components.Settings.SettingsCategories.ebook': '書籍',
+      'components.Settings.SettingsCategories.audiobook': '音效簿',
+      'components.Settings.SettingsCategories.comic': '漫畫',
+      'components.Settings.SettingsCategories.magazine': '雜誌',
+      'components.Settings.SettingsCategories.adult': '成人',
+      'components.Settings.SettingsCategories.retro': '模擬( 逆轉 )',
+      'components.Settings.SettingsCategories.modern': '模擬( 现代)',
+      'components.Settings.SettingsCategories.game': 'PC 遊戲',
+      'components.Settings.SettingsCategories.movieDescription':
+        '允許電影發現和要求',
+      'components.Settings.SettingsCategories.tvDescription':
+        '允許系列發現與要求 。',
+      'components.Settings.SettingsCategories.musicDescription':
+        '允許音樂發現與要求 。',
+      'components.Settings.SettingsCategories.ebookDescription':
+        '允許查閱書本和要求',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        '允許音效書的發現和要求 。',
+      'components.Settings.SettingsCategories.comicDescription':
+        '允許漫畫發現和要求。',
+      'components.Settings.SettingsCategories.magazineDescription':
+        '允許雜誌發現和要求。',
+      'components.Settings.SettingsCategories.adultDescription':
+        '允許成人場景的發現與請求。需要已設定的 Whisparr v3 服務以及特定的成人使用者權限。',
+      'components.Settings.SettingsCategories.retroDescription':
+        '允許反轉 ROM 發現與要求 。',
+      'components.Settings.SettingsCategories.modernDescription':
+        '允許現代模擬 ROM 發現與要求 。',
+      'components.Settings.SettingsCategories.gameDescription':
+        '允許 PC 遊戲發現與要求 。',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        '成人內容對所有有存取權限的人可見',
+      'components.Settings.SettingsCategories.adultWarning':
+        '如果您與家人共用此執行個體，或透過反向代理公開它，任何被授予「請求成人內容」權限的人都可以看到您瀏覽和請求的內容。請在下方或每個使用者的「權限」中將家庭帳戶標記為受限，以確保他們永遠看不到成人內容。',
+      'components.Settings.SettingsCategories.ageGateTitle': '年齡限制',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        '受限帳戶無法查看或請求成人內容，且成熟的電影、影集、音樂、書籍、漫畫及標籤標題將在伺服器端隱藏。過濾使用供應商評級和標籤，對於沒有元數據的標題，過濾為盡力而為。',
+      'components.Settings.SettingsCategories.ageGateDefault': '預設限制帳戶',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        '未明確設定限制的帳戶將被限制。管理員不受此限制。',
+      'components.Settings.SettingsCategories.ageGateMovieMax': '最高電影評級',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        '受限帳戶無法查看評級高於此的電影。',
+      'components.Settings.SettingsCategories.ageGateTvMax': '最高影集評級',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        '受限帳戶無法查看評級高於此的影集。',
+      'components.Settings.SettingsCategories.ageGateCountry': '評級國家',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        '使用該國評級的兩字國家代碼，例如 US。',
+      'components.Settings.SettingsCategories.saveSuccess': '已儲存分類設定 。',
+      'components.Settings.SettingsCategories.saveFailure':
+        '分類設定無法儲存 。',
     },
   },
   {
@@ -9040,6 +16527,416 @@ export const localeData = [
         'Xem nội dung mới được thêm gần đây',
       'components.PermissionEdit.viewrequests': 'Xem yêu cầu',
       'components.PermissionEdit.viewwatchlists': 'Xem danh sách theo dõi',
+      'components.RequestModal.RequestTree.seasonNumber': 'Mùa phim {number}',
+      'components.RequestModal.RequestTree.specials': 'Tập đặc biệt',
+      'components.Requests.episodeQueue': 'Hàng đợi tập phim',
+      'components.Requests.retry': 'Thử lại',
+      'components.Requests.approve': 'Phê duyệt',
+      'components.Requests.decline': 'Từ chối',
+      'components.Requests.requested': 'Đã yêu cầu',
+      'components.Requests.approved': 'Đã phê duyệt',
+      'components.Requests.searching': 'Đang tìm kiếm',
+      'components.Requests.downloading': 'Đang tải về',
+      'components.Requests.importing': 'Đang nhập',
+      'components.Requests.library': 'Đang thêm vào thư viện',
+      'components.Requests.available': 'Có sẵn',
+      'components.Requests.unavailable': 'Không khả dụng',
+      'components.Requests.failed': 'Thất bại',
+      'components.Requests.declined': 'Đã từ chối',
+      'components.Requests.cancelled': 'Đã hủy',
+      'components.Requests.pending': 'Đang chờ',
+      'components.Requests.completed': 'Đã hoàn tất',
+      'components.Requests.statusUpdated': 'Trạng thái đã cập nhật',
+      'i18n.unknown': 'Không biết',
+      'components.Requests.history': 'Lịch sử',
+      'components.RequestStatus.SoftwareRequests.approve': 'Phê duyệt',
+      'components.RequestStatus.SoftwareRequests.approved': 'Đã phê duyệt',
+      'components.RequestStatus.SoftwareRequests.available': 'Có sẵn',
+      'components.RequestStatus.SoftwareRequests.cancel': 'Hủy',
+      'components.RequestStatus.SoftwareRequests.cancelled': 'Đã hủy',
+      'components.RequestStatus.SoftwareRequests.clearCancelled':
+        'Xoá yêu cầu bị hủy',
+      'components.RequestStatus.SoftwareRequests.clearCancelledTitle':
+        'Xóa yêu cầu bị hủy?',
+      'components.RequestStatus.SoftwareRequests.decline': 'Từ chối',
+      'components.RequestStatus.SoftwareRequests.declined': 'Đã từ chối',
+      'components.RequestStatus.SoftwareRequests.downloadCopies':
+        'Tải về các bản sao',
+      'components.RequestStatus.SoftwareRequests.downloading': 'Đang tải về',
+      'components.RequestStatus.SoftwareRequests.failed': 'Thất bại',
+      'components.RequestStatus.SoftwareRequests.history': 'Lịch sử',
+      'components.RequestStatus.SoftwareRequests.historyLoading':
+        'Đang tải lịch sử trạng thái...',
+      'components.RequestStatus.SoftwareRequests.importing':
+        'Đang xác minh dữ liệu nhập',
+      'components.RequestStatus.SoftwareRequests.manageError':
+        'Không thể cập nhật yêu cầu phần mềm này.',
+      'components.RequestStatus.SoftwareRequests.noHistory':
+        'Không có bản cập nhật trạng thái đã lưu.',
+      'components.RequestStatus.SoftwareRequests.pending': 'Đang chờ phê duyệt',
+      'components.RequestStatus.SoftwareRequests.removeFromRequests':
+        'Xóa khỏi yêu cầu',
+      'components.RequestStatus.SoftwareRequests.retry': 'Thử lại',
+      'components.RequestStatus.SoftwareRequests.retryCheckRequired':
+        'Nhà cung cấp không thể xác nhận liệu lượt tải xuống trước đó đã bắt đầu hay chưa. Hãy kiểm tra hàng đợi và lịch sử của trình tải xuống. Chỉ tiếp tục nếu không có lượt tải xuống nào trùng khớp.',
+      'components.RequestStatus.SoftwareRequests.searching': 'Đang tìm kiếm',
+      'components.RequestStatus.SoftwareRequests.title': 'Yêu cầu phần mềm',
+      'components.RequestStatus.SoftwareRequests.withdraw': 'Rút yêu cầu',
+      'i18n.back': 'Quay lại',
+      'downloads.actions': 'Hành động lịch sử',
+      'downloads.active': 'Cảnh báo hoạt động',
+      'downloads.activeState': 'Cần sự chú ý',
+      'downloads.actor': 'Người dùng {id}',
+      'downloads.blocked': 'Bị chặn bằng tay',
+      'downloads.blocklist':
+        'Đưa bản phát hành này vào danh sách chặn để tránh tải xuống lại',
+      'downloads.blocklisted': 'Đã yêu cầu chặn',
+      'downloads.cancel': 'Hủy',
+      'downloads.changed': 'Cấu hình dịch vụ đã thay đổi',
+      'downloads.clientKept': 'Giữ tập tin khách',
+      'downloads.clientRemoved': 'Yêu cầu gỡ bỏ khách',
+      'downloads.confirm': 'Xác nhận bị từ chối',
+      'downloads.copy': 'Chép hay liên kết cứng (giữ tập tin nguồn)',
+      'downloads.denied': 'Cần thiết quyền tải về.',
+      'downloads.description':
+        'Xem lại cảnh báo thu thập, chọn tập tin để nhập khẩu thủ công, và từ chối việc tải về bị động.',
+      'downloads.disappeared': 'Không còn trong hàng đợi',
+      'downloads.empty': 'Không có cảnh báo tải về.',
+      'downloads.failed': 'Không thể tải hộp thư đến.',
+      'downloads.failedState': 'Cần xem lại',
+      'downloads.history': 'Lịch sử',
+      'downloads.import': 'Nhập các tập tin đã chọn',
+      'downloads.importFailed': 'Nhập thất bại',
+      'downloads.importMode': 'Nhập chế độ',
+      'downloads.importReview':
+        'Quá trình nhập đã hoàn tất mà không có quá trình nhập tệp được xác nhận',
+      'downloads.importWarning':
+        'Xác nhận mục tiêu và xem xét tất cả các lý do bị từ chối. Dịch vụ thu thập quyết định chất lượng tập tin và tập tin khớp.',
+      'downloads.imported': 'Nhập bằng tay',
+      'downloads.importingState': 'Đang chờ nhập',
+      'downloads.ineligible': 'Không xác nhận trùng — không thể nhập',
+      'downloads.loading': 'Đang tải cảnh báo tải về...',
+      'downloads.move': 'Di chuyển (tập tin mã nguồn)',
+      'downloads.next': 'Trang kế',
+      'downloads.noFiles': 'Không tìm thấy tập tin có thư viện xác nhận.',
+      'downloads.notBlocklisted': 'Phát hành chưa bị chặn',
+      'downloads.outcome':
+        'Không thể xác nhận hành động. Cập nhật và xem lại trước khi thử lại.',
+      'downloads.partial':
+        'Không thể kiểm tra một số dịch vụ thu thập được. Lời cảnh báo của họ có thể bị mất hoặc lỗi thời.',
+      'downloads.pending': 'Chấp nhận. Cập nhật để xem kết quả hậu phương.',
+      'downloads.preview': 'Xem thử tập tin',
+      'downloads.previous': 'Trang trước',
+      'downloads.recovered': 'Tìm lại',
+      'downloads.refresh': 'Cập nhật',
+      'downloads.reject': 'Tải xuống',
+      'downloads.rejected': 'Từ chối bằng tay',
+      'downloads.rejectingState': 'Đang đợi từ chối',
+      'downloads.rejection':
+        'Từ chối gỡ bỏ mục này khỏi hàng đợi lấy. Xem lại các tùy chọn trước khi xác nhận.',
+      'downloads.remove': 'Gỡ bỏ các tập tin và tải về từ trình khách tải về',
+      'downloads.resolvedState': 'Đã xử lý',
+      'downloads.search': 'Tìm kiếm',
+      'downloads.select': 'Chọn {name}',
+      'downloads.targetChoose': 'Chọn một đối tượng thư viện',
+      'downloads.targetHelp':
+        'Danh sách tìm kiếm đã có trong dịch vụ thu thập này. Chọn kết quả không thêm tiêu đề mới.',
+      'downloads.targetLabel': 'Khớp thư viện',
+      'downloads.targetNoResults':
+        'Không tìm thấy tựa đề nào tương ứng trong thư viện dịch vụ này.',
+      'downloads.targetQuery': 'Phim ảnh, loạt, album hoặc sách',
+      'downloads.targetRequired':
+        'Chọn một thư viện khớp trước khi nhập tập tin.',
+      'downloads.targetSelected': 'Chọn {title}{subtitle}',
+      'downloads.title': 'Tải về Inbox',
+      'downloads.truncated':
+        'Chỉ có 20 dịch vụ thu thập đầu tiên được kiểm tra.',
+      'downloads.unknownImport': 'Nhập kết quả không rõ',
+      'downloads.unknownReject': 'Không rõ kết quả từ chối',
+      'components.IndexerSearch.accessDenied':
+        'Bạn cần quyền Quản lý yêu cầu để tìm kiếm trên các trình lập chỉ mục.',
+      'components.IndexerSearch.categories': 'Danh mục các trình lập chỉ mục',
+      'components.IndexerSearch.category': 'Loại phương tiện',
+      'components.IndexerSearch.categoryAdult': 'Người lớn',
+      'components.IndexerSearch.categoryAudiobook': 'Sổ tay âm thanh',
+      'components.IndexerSearch.categoryComic': 'Truyện tranh',
+      'components.IndexerSearch.categoryEbook': 'Sách',
+      'components.IndexerSearch.categoryGame': 'Trò chơi máy tính',
+      'components.IndexerSearch.categoryMagazine': 'Tạp chí',
+      'components.IndexerSearch.categoryModern': 'ROM hiện đại',
+      'components.IndexerSearch.categoryMovie': 'Phim',
+      'components.IndexerSearch.categoryMusic': 'Âm nhạc',
+      'components.IndexerSearch.categoryRetro': 'ROM cổ điển',
+      'components.IndexerSearch.categoryTv': 'TV',
+      'components.IndexerSearch.configure': 'Mở cài đặt Prowlarr',
+      'components.IndexerSearch.downloaderFailed':
+        'Prowlarr không thể gửi bản phát hành này. Hãy chạy tìm kiếm mới và thử lại.',
+      'components.IndexerSearch.grabs': 'Lượt tải',
+      'components.IndexerSearch.intro':
+        'Tìm kiếm các bản phát hành trên trình lập chỉ mục Prowlarr trong mọi danh mục phương tiện của SeerrNG.',
+      'components.IndexerSearch.leechers': 'Người tải xuống',
+      'components.IndexerSearch.loadFailed':
+        'Không thể tải cấu hình tìm kiếm Prowlarr.',
+      'components.IndexerSearch.loadMore': 'Tải thêm kết quả',
+      'components.IndexerSearch.loadingMore': 'Đang tải…',
+      'components.IndexerSearch.manualMode':
+        'Kết quả tìm kiếm tách biệt với các yêu cầu trong SeerrNG. Bạn có thể gửi một kết quả đến ứng dụng khách tải xuống đã cấu hình trong Prowlarr.',
+      'components.IndexerSearch.noConnection': 'Prowlarr chưa được kết nối.',
+      'components.IndexerSearch.noConnectionHelp':
+        'Yêu cầu nhà quản trị kết nối Prowlarr trong Thiết lập > Dịch vụ.',
+      'components.IndexerSearch.noResults':
+        'Không có bản phát hành khớp với tìm kiếm này.',
+      'components.IndexerSearch.noResultsHelp':
+        'Kiểm tra bộ lọc danh mục và các trình lập chỉ mục đang bật trong Prowlarr. Kết quả tìm kiếm không đảm bảo ứng dụng có thể nhập bản phát hành.',
+      'components.IndexerSearch.openResult': 'Mở chi tiết trình lập chỉ mục',
+      'components.IndexerSearch.protocol': 'Giao thức',
+      'components.IndexerSearch.published': 'Ngày phát hành',
+      'components.IndexerSearch.query': 'Từ khóa tìm kiếm',
+      'components.IndexerSearch.queryPlaceholder':
+        'Tựa đề, tác giả, album nhạc, số phát hành hoặc tên trò chơi',
+      'components.IndexerSearch.requestStillUsesManager':
+        'Việc gửi một kết quả không làm thay đổi yêu cầu SeerrNG. Prowlarr sẽ chuyển kết quả đó đến ứng dụng khách tải xuống đã cấu hình.',
+      'components.IndexerSearch.resultCount':
+        'Prowlarr đã trả về {count} bản phát hành.',
+      'components.IndexerSearch.search': 'Tìm kiếm các trình lập chỉ mục',
+      'components.IndexerSearch.searchFailed':
+        'Tìm kiếm Prowlarr không thành công. Hãy kiểm tra kết nối và thử lại.',
+      'components.IndexerSearch.searching':
+        'Đang tìm kiếm trên các trình lập chỉ mục…',
+      'components.IndexerSearch.seeders': 'Người chia sẻ',
+      'components.IndexerSearch.sendToDownloader': 'Gửi xuống trình tải xuống',
+      'components.IndexerSearch.sendingToDownloader': 'Đang gửi…',
+      'components.IndexerSearch.sentToDownloader':
+        'Đã gửi đến máy khách tải xuống được cấu hình của Prowlarr.',
+      'components.IndexerSearch.size': 'Cỡ',
+      'components.IndexerSearch.title': 'Tìm kiếm indexer',
+      'components.IndexerSearch.tooManySearches':
+        'Đã đạt giới hạn tìm kiếm. Chờ một phút rồi tìm kiếm lại.',
+      'components.SettingsProwlarr.noSearchableIndexers':
+        'Không có mục lục có khả năng tìm kiếm. Bật mục lục trong Prowlarr hoặc điều chỉnh bộ lọc phân loại.',
+      'components.SettingsProwlarr.addDetectedMatches':
+        'Thêm các khớp phát hiện ({count})',
+      'components.SettingsProwlarr.address': 'Tên máy',
+      'components.SettingsProwlarr.adult': 'Người lớn',
+      'components.SettingsProwlarr.apiKey': 'Phím API',
+      'components.SettingsProwlarr.apiKeySaved':
+        'Một chìa khóa đã được lưu giữ. Để nó trống không để tiếp tục sử dụng.',
+      'components.SettingsProwlarr.audiobook': 'Sổ tay âm thanh',
+      'components.SettingsProwlarr.basePath': 'Đường dẫn cơ bản',
+      'components.SettingsProwlarr.categoryMappingDescription':
+        'Chọn phân loại Prowlarr được gửi với mỗi tìm kiếm. Mặc định dùng phân loại Newznab/Torznab chuẩn; thử ra kết nối để xem quảng cáo phân loại tự chọn bởi những người có khả năng làm chỉ mục.',
+      'components.SettingsProwlarr.categoryMappingEmpty':
+        'Chọn ít nhất một loại.',
+      'components.SettingsProwlarr.categoryMappingTitle': 'Lọc phân loại',
+      'components.SettingsProwlarr.clearApiKey': 'Đã lưu API Khóa',
+      'components.SettingsProwlarr.comic': 'Truyện tranh',
+      'components.SettingsProwlarr.connected':
+        'Đã kết nối tới Prowlarr {version}.',
+      'components.SettingsProwlarr.coverageDescription':
+        'Số đếm bao gồm những người chỉ mục tìm kiếm có khả năng hỗ trợ ít nhất một loại được chọn. Chúng hiển thị các bản tin tìm kiếm, không thành công trong việc lấy hay nhập khẩu.',
+      'components.SettingsProwlarr.coverageTitle':
+        'Mức độ bao phủ của người lập chỉ mục theo phương tiện',
+      'components.SettingsProwlarr.description':
+        'Kết nối ví dụ Prowlarr của bạn một lần để chạy sổ tay đánh dấu phân loại tìm kiếm qua các chỉ mục bạn đã quản lý ở đó.',
+      'components.SettingsProwlarr.detectedMatchesHelp':
+        'Các danh mục tùy chỉnh được đề xuất được khớp với tên được quảng cáo của chúng. Xem lại chúng trước khi lưu; điều này không thay đổi Prowlarr hoặc gửi các bản tải xuống.',
+      'components.SettingsProwlarr.diagnosticDescription':
+        'Prowlarr đã chấp nhận kết nối API quản lý. Các kết quả này kiểm tra riêng từng bộ chỉ mục có thể tìm kiếm được kích hoạt; bị vô hiệu hóa cho đến khi ngày đến từ Prowlarr.',
+      'components.SettingsProwlarr.diagnosticFailed': 'Thất bại',
+      'components.SettingsProwlarr.diagnosticOk': 'Đã kết nối',
+      'components.SettingsProwlarr.diagnosticTitle':
+        'Kết quả kết nối bộ chỉ mục',
+      'components.SettingsProwlarr.disabledUntil': 'Tắt cho đến {date}',
+      'components.SettingsProwlarr.ebook': 'Sách',
+      'components.SettingsProwlarr.game': 'Trò chơi máy tính',
+      'components.SettingsProwlarr.indexerAssignmentDescription':
+        'Chọn các indexer Prowlarr đang được bật để tìm kiếm cho từng loại phương tiện. Sử dụng Ctrl-click trên Windows/Linux hoặc Command-click trên macOS để chọn nhiều indexer. Việc không chọn gì sẽ tắt tìm kiếm cho loại đó.',
+      'components.SettingsProwlarr.indexerAssignmentSelectLabel':
+        'Indexer cho {category}',
+      'components.SettingsProwlarr.indexerAssignmentTitle':
+        'Gán Indexer theo Loại Phương Tiện',
+      'components.SettingsProwlarr.indexerCount': 'Chỉ số: {count, number}',
+      'components.SettingsProwlarr.indexerDetailsVisible':
+        'Người dùng có thể mở chi tiết indexer từ kết quả tìm kiếm.',
+      'components.SettingsProwlarr.indexerNameHidden':
+        'Tên indexer và liên kết chi tiết được ẩn khỏi người dùng.',
+      'components.SettingsProwlarr.indexerNotSearchable':
+        '(không thể tìm kiếm)',
+      'components.SettingsProwlarr.indexerSearchLimits': 'Giới hạn tìm kiếm',
+      'components.SettingsProwlarr.indexerSearchLimitsDescription':
+        'Hạn chế số lần tìm kiếm của mỗi người dùng mỗi phút tổng thể và cho từng indexer được chọn.',
+      'components.SettingsProwlarr.inventoryFailed':
+        'Prowlarr đã được lưu nhưng kho lưu trữ chỉ mục của nó không khả dụng.',
+      'components.SettingsProwlarr.keepApiKey': 'Giữ giữ phím API',
+      'components.SettingsProwlarr.loadFailed':
+        'Không thể tải cài đặt Prowlarr.',
+      'components.SettingsProwlarr.magazine': 'Tạp chí',
+      'components.SettingsProwlarr.modern': 'ROM hiện đại',
+      'components.SettingsProwlarr.movie': 'Phim',
+      'components.SettingsProwlarr.music': 'Âm nhạc',
+      'components.SettingsProwlarr.noConfiguredIndexers':
+        'Chưa có bộ chỉ mục Prowlarr nào được định cấu hình.',
+      'components.SettingsProwlarr.noIndexerInventory':
+        'Kiểm tra kết nối Prowlarr để tải các indexer của nó và gán chúng theo danh mục.',
+      'components.SettingsProwlarr.port': 'Cổng',
+      'components.SettingsProwlarr.recentFailure': 'Lỗi gần đây: {date}',
+      'components.SettingsProwlarr.retro': 'ROM cổ điển',
+      'components.SettingsProwlarr.save': 'Lưu cài đặt Prowlarr',
+      'components.SettingsProwlarr.saveFailed':
+        'Không thể lưu cài đặt Prowlarr.',
+      'components.SettingsProwlarr.saved': 'Đã lưu cài đặt Prowlarr.',
+      'components.SettingsProwlarr.saving': 'Đang lưu…',
+      'components.SettingsProwlarr.searchLimitInvalid':
+        'Nhập một số nguyên từ 1 đến 60.',
+      'components.SettingsProwlarr.searchesPerIndexer':
+        'Số lần tìm kiếm tối đa mỗi người dùng mỗi phút trên {indexer}',
+      'components.SettingsProwlarr.searchesPerUser':
+        'Số lần tìm kiếm tối đa mỗi người dùng mỗi phút',
+      'components.SettingsProwlarr.selectedCategories': '{count} phân loại',
+      'components.SettingsProwlarr.selectedIndexers':
+        '{count} indexer đã được chọn',
+      'components.SettingsProwlarr.showIndexerDetails':
+        'Cho phép hiển thị tên và chi tiết indexer trong kết quả tìm kiếm',
+      'components.SettingsProwlarr.sports': 'Thể thao',
+      'components.SettingsProwlarr.supportNote':
+        'Cài đặt này chỉ kết nối với Prowlarr. NZBHydra2 hiện chưa được hỗ trợ ở đây.',
+      'components.SettingsProwlarr.test':
+        'Kiểm tra kết nối và kiểm tra vùng phủ sóng',
+      'components.SettingsProwlarr.testFailed':
+        'Kết nối Prowlarr không thành công. Kiểm tra địa chỉ và khóa API.',
+      'components.SettingsProwlarr.testHint':
+        'Tìm kiếm bắt đầu từ truy vấn SeerrNG Prowlarr trực tiếp. Các yêu cầu được phê duyệt vẫn phải thông qua trình quản lý phương tiện hoặc nhà cung cấp phần mềm đã định cấu hình của họ, công ty sở hữu chức năng thu thập và theo dõi.',
+      'components.SettingsProwlarr.testing': 'Đang kiểm tra Prowlarr…',
+      'components.SettingsProwlarr.title': 'Bộ chỉ mục Prowlarr',
+      'components.SettingsProwlarr.totalIndexers':
+        '{enabled} Name {total} Cấu hình',
+      'components.SettingsProwlarr.tv': 'TV',
+      'components.SettingsProwlarr.useSsl': 'Dùng SSL',
+      'components.Settings.SettingsLogs.logs': 'Bản ghi',
+      'components.Settings.SettingsLogs.searchLogs': 'Tìm kiếm nhật ký',
+      'components.Settings.SettingsLogs.level': 'Độ dốc',
+      'components.Settings.SettingsLogs.filterDebug': 'gỡ lỗi',
+      'components.Settings.SettingsLogs.filterInfo': 'Thông tin',
+      'components.Settings.SettingsLogs.filterWarn': 'Cảnh báo',
+      'components.Settings.SettingsLogs.filterError': 'Lỗi',
+      'components.Settings.SettingsLogs.logDetails': 'Chi tiết ghi lưu',
+      'components.Settings.SettingsLogs.copyToClipboard':
+        'Sao chép vào bảng nháp',
+      'components.Settings.SettingsLogs.copiedLogMessage':
+        'Sao chép tin nhắn vào bảng nháp',
+      'components.Settings.SettingsJobsCache.runnow': 'Chạy ngay',
+      'components.Settings.SettingsJobsCache.canceljob': 'Thôi công việc',
+      'components.Settings.SettingsJobsCache.process': 'Tiến trình',
+      'components.Settings.SettingsJobsCache.command': 'Câu lệnh',
+      'components.Settings.SettingsJobsCache.enabled': 'Bật',
+      'components.Settings.SettingsJobsCache.disabled': 'Tắt',
+      'components.Settings.SettingsJobsCache.cachehits': 'Trúng',
+      'components.Settings.SettingsJobsCache.cachekeys': 'Tổng phím',
+      'components.Settings.SettingsJobsCache.cachemisses': 'Bỏ lỡ',
+      'components.Settings.SettingsJobsCache.dnsCache': 'Bộ nhớ tạm DNS',
+      'components.Settings.SettingsJobsCache.dnscachehits': 'Trúng',
+      'components.Settings.SettingsJobsCache.dnscachemisses': 'Bỏ lỡ',
+      'components.Settings.SettingsJobsCache.failures': 'Lỗi',
+      'components.Settings.SettingsJobsCache.flushcache': 'Bộ nhớ tạm Flush',
+      'components.Settings.SettingsJobsCache.hitRate': 'Trúng',
+      'components.Settings.SettingsJobsCache.imagecachecount':
+        'Hình ảnh được lưu vào bộ nhớ đệm',
+      'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Gặp lỗi lPv4',
+      'components.Settings.SettingsAbout.Releases.installedversion':
+        'Đã cài đặt',
+      'components.Settings.SettingsAbout.Releases.latestversion': 'Mới nhất',
+      'components.Settings.SettingsAbout.Releases.releasedataMissing':
+        '@ info/ rich',
+      'components.Settings.SettingsAbout.Releases.releases': 'Phát hành',
+      'components.Settings.SettingsAbout.Releases.viewongithub':
+        'Xem trên GitHub',
+      'components.Settings.SettingsAbout.aboutseerr': 'Giới thiệu về SeerrNG',
+      'components.Settings.SettingsAbout.appDataPath': 'Thư mục dữ liệu',
+      'components.Settings.SettingsAbout.documentation': 'Tài liệu',
+      'components.Settings.SettingsAbout.githubdiscussions':
+        'Cuộc thảo luận GitHub',
+      'components.Settings.SettingsAbout.legalUse':
+        'SeerrNG có mục đích quản lý truyền thông cá nhân hợp pháp. Dự án này không cho phép cướp bóc hay vi phạm bản quyền. Người dùng chịu trách nhiệm về việc tuân thủ luật pháp, giấy phép và dịch vụ trong khu vực của họ.',
+      'components.Settings.SettingsAbout.legalUseTitle': 'Sử dụng hợp pháp',
+      'components.Settings.SettingsAbout.metadataAttribution':
+        'Ghi nguồn siêu dữ liệu',
+      'components.Settings.SettingsAbout.supportdevelopment':
+        'Hỗ trợ phát triển',
+      'components.Settings.SettingsAbout.timezone': 'Vùng làm việc',
+      'components.Settings.SettingsAbout.totalmedia': 'Tổng phương tiện',
+      'components.Settings.SettingsAbout.totalrequests': 'Tổng yêu cầu',
+      'components.Settings.SettingsAbout.tmdbAttributionCopy':
+        'Sản phẩm này sử dụng TMDB và các API của TMDB nhưng không được TMDB chứng thực, chứng nhận hoặc phê duyệt dưới bất kỳ hình thức nào. <ApiTermsLink>Điều khoản API TMDB</ApiTermsLink>.',
+      'components.Settings.SettingsAbout.updateCheckUnavailable':
+        'Không thể kiểm tra bản cập nhật',
+      'components.Settings.SettingsAbout.uptodate': 'Cập nhật đầy đủ',
+      'components.Settings.SettingsAbout.version': 'Phiên bản',
+      'components.Settings.SettingsCategories.title': 'Loại',
+      'components.Settings.SettingsCategories.description':
+        'Chọn phân loại nào mọi người có thể duyệt và yêu cầu. Các loại bị tắt biến mất khỏi việc định vị và khám phá, và các yêu cầu mới bị chặn. Yêu cầu tồn tại và tải về lịch sử trong trạng thái yêu cầu.',
+      'components.Settings.SettingsCategories.groupTitle': 'Loại',
+      'components.Settings.SettingsCategories.groupDescription':
+        'Những công tắc điều khiển phân loại có sẵn qua SeerrNG.',
+      'components.Settings.SettingsCategories.movie': 'Phim',
+      'components.Settings.SettingsCategories.tv': 'Loạt phim',
+      'components.Settings.SettingsCategories.music': 'Âm nhạc',
+      'components.Settings.SettingsCategories.ebook': 'Sách',
+      'components.Settings.SettingsCategories.audiobook': 'Sổ tay âm thanh',
+      'components.Settings.SettingsCategories.comic': 'Truyện tranh',
+      'components.Settings.SettingsCategories.magazine': 'Tạp chí',
+      'components.Settings.SettingsCategories.adult': 'Người lớn',
+      'components.Settings.SettingsCategories.retro': 'Mô phỏng',
+      'components.Settings.SettingsCategories.modern': 'Mô phỏng (Modern)',
+      'components.Settings.SettingsCategories.game': 'Trò chơi PC',
+      'components.Settings.SettingsCategories.movieDescription':
+        'Cho phép phát hiện và yêu cầu phim ảnh.',
+      'components.Settings.SettingsCategories.tvDescription':
+        'Cho phép phát hiện và yêu cầu loạt.',
+      'components.Settings.SettingsCategories.musicDescription':
+        'Cho phép phát hiện và yêu cầu âm nhạc.',
+      'components.Settings.SettingsCategories.ebookDescription':
+        'Cho phép khám phá sách và yêu cầu.',
+      'components.Settings.SettingsCategories.audiobookDescription':
+        'Cho phép phát hiện và yêu cầu âm thanh.',
+      'components.Settings.SettingsCategories.comicDescription':
+        'Cho phép phát hiện và yêu cầu truyện tranh.',
+      'components.Settings.SettingsCategories.magazineDescription':
+        'Cho phép phát hiện và yêu cầu tạp chí.',
+      'components.Settings.SettingsCategories.adultDescription':
+        'Cho phép khám phá và yêu cầu nội dung người lớn. Yêu cầu dịch vụ Whisparr v3 đã cấu hình và quyền người dùng cụ thể cho nội dung người lớn.',
+      'components.Settings.SettingsCategories.retroDescription':
+        'Cho phép phát hiện và yêu cầu ROM ngược.',
+      'components.Settings.SettingsCategories.modernDescription':
+        'Cho phép phát hiện và yêu cầu ROM hiện đại.',
+      'components.Settings.SettingsCategories.gameDescription':
+        'Cho phép phát hiện và yêu cầu trò chơi PC.',
+      'components.Settings.SettingsCategories.adultWarningTitle':
+        'Nội dung người lớn hiển thị cho tất cả người có quyền truy cập',
+      'components.Settings.SettingsCategories.adultWarning':
+        'Nếu bạn chia sẻ phiên bản này với gia đình hoặc phơi bày nó thông qua proxy ngược, bất kỳ ai được cấp quyền Yêu cầu Người lớn đều có thể xem những gì bạn duyệt và yêu cầu. Đánh dấu các tài khoản gia đình là bị hạn chế bên dưới, hoặc trong Quyền của từng người dùng, để họ không bao giờ thấy nội dung Người lớn.',
+      'components.Settings.SettingsCategories.ageGateTitle': 'Cổng tuổi',
+      'components.Settings.SettingsCategories.ageGateDescription':
+        'Tài khoản bị hạn chế không thể xem hoặc yêu cầu nội dung Người lớn, và các phim, series, nhạc, sách, truyện tranh, và tiêu đề có thẻ bị ẩn ở phía máy chủ. Lọc sử dụng xếp hạng và thẻ từ nhà cung cấp và là nỗ lực tốt nhất cho các tiêu đề không có dữ liệu mô tả.',
+      'components.Settings.SettingsCategories.ageGateDefault':
+        'Hạn chế tài khoản theo mặc định',
+      'components.Settings.SettingsCategories.ageGateDefaultDescription':
+        'Các tài khoản không có cài đặt rõ ràng sẽ bị hạn chế. Quản trị viên được miễn.',
+      'components.Settings.SettingsCategories.ageGateMovieMax':
+        'Xếp hạng phim cao nhất',
+      'components.Settings.SettingsCategories.ageGateMovieMaxDescription':
+        'Tài khoản bị hạn chế không thể xem phim có xếp hạng cao hơn mức này.',
+      'components.Settings.SettingsCategories.ageGateTvMax':
+        'Xếp hạng series cao nhất',
+      'components.Settings.SettingsCategories.ageGateTvMaxDescription':
+        'Tài khoản bị hạn chế không thể xem series có xếp hạng cao hơn mức này.',
+      'components.Settings.SettingsCategories.ageGateCountry':
+        'Quốc gia xếp hạng',
+      'components.Settings.SettingsCategories.ageGateCountryDescription':
+        'Mã quốc gia hai chữ cái dùng để áp dụng xếp hạng, ví dụ US.',
+      'components.Settings.SettingsCategories.saveSuccess':
+        'Thiết lập phân loại đã lưu.',
+      'components.Settings.SettingsCategories.saveFailure':
+        'Không thể lưu thiết lập phân loại.',
     },
   },
 ] as const;
