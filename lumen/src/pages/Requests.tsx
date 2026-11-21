@@ -35,6 +35,9 @@ import RequestHistorySheet from '../components/RequestHistorySheet';
 import { Avatar } from '../components/Shell';
 import { SoftwareRequestHistorySheet } from '../components/SoftwareRequestHistorySheet';
 import { useToast } from '../components/toast';
+import TvSeasonMappingSheet, {
+  canMapTvSeasons,
+} from '../components/TvSeasonMappingSheet';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
 import {
@@ -176,6 +179,7 @@ async function requestListOnce(path: string): Promise<RequestListPage> {
         results: {
           request: RequestItem;
           status: NonNullable<RequestItem['currentStatus']>;
+          canRemove?: boolean;
         }[];
       }>(path.replace('/request?', '/request/status?'));
       if (
@@ -196,9 +200,10 @@ async function requestListOnce(path: string): Promise<RequestListPage> {
       return {
         ...data,
         authoritativeStatus: true,
-        results: data.results.map(({ request, status }) => ({
+        results: data.results.map(({ request, status, canRemove }) => ({
           ...request,
           currentStatus: status,
+          canRemove,
         })),
       };
     } catch (error) {
@@ -1039,7 +1044,7 @@ function RequesterFilter({
   }>(`/request/status/users?take=100&skip=${page * 100}`);
   const users = data?.results ?? [];
   return (
-    <div className="toolbar" role="group" aria-label="Requester filter">
+    <>
       <label className="sel">
         <span className="lbl">Requester</span>
         <select value={value} onChange={(event) => change(event.target.value)}>
@@ -1077,7 +1082,7 @@ function RequesterFilter({
           Retry Loading Users
         </button>
       )}
-    </div>
+    </>
   );
 }
 
@@ -1305,12 +1310,14 @@ export default function Requests() {
   const [historyRevision, setHistoryRevision] = useState(0);
   const [acting, setActing] = useState<number | null>(null);
   const [queueEdit, setQueueEdit] = useState<Row | null>(null);
+  const [mapping, setMapping] = useState<Row | null>(null);
   const [editing, setEditing] = useState<Row | null>(null);
   // a decline, a cancel or a remove waits for a yes; none can be taken back
   const [confirming, setConfirming] = useState<{
     id: number;
-    how: 'decline' | 'cancel' | 'remove';
+    how: 'decline' | 'cancel' | 'remove' | 'removeMedia';
     title: string;
+    request?: RequestItem;
   } | null>(null);
   useEffect(() => {
     if (!viewAll) return;
@@ -1648,6 +1655,48 @@ export default function Requests() {
     }
   };
 
+  const removeManagedCopy = async (request: RequestItem) => {
+    if (!manage || request.canRemove !== true || !request.media.id) return;
+    const query = new URLSearchParams({ is4k: String(request.is4k) });
+    if (request.type === 'book') {
+      let format = request.bookFormat || 'ebook';
+      if (format === 'both') {
+        const ebook = request.media.externalServiceId != null;
+        const audiobook = request.media.audiobookExternalServiceId != null;
+        format = ebook !== audiobook ? (ebook ? 'ebook' : 'audiobook') : 'both';
+      }
+      query.set('format', format);
+    }
+    setActing(request.id);
+    try {
+      await api(
+        `/media/${request.media.id}/file?${query}`,
+        { method: 'DELETE' },
+        'empty'
+      );
+      forget(`/request/status/${request.id}`);
+      toast(
+        t(
+          'lumen.requestHistory.mediaRemoved',
+          'Managed copy removed. Request history was kept.'
+        )
+      );
+      setTick((value) => value + 1);
+    } catch (error) {
+      toast(
+        friendlyError(
+          error,
+          t(
+            'lumen.requestHistory.mediaRemoveFailed',
+            'Could not remove the managed copy.'
+          )
+        )
+      );
+    } finally {
+      setActing(null);
+    }
+  };
+
   const renderRequestActions = (x: Row, moderate: boolean) => {
     const st = requestRowStatus(x, serverName, liveDownloads, allowRawHashes);
     return (
@@ -1671,6 +1720,40 @@ export default function Requests() {
             {t('components.Requests.retry', 'Retry')}
           </button>
         )}
+        {manage && x.r.id > 0 && canMapTvSeasons(x.r) && (
+          <button
+            className="btn btn-sm btn-quiet"
+            disabled={acting !== null}
+            onClick={() => setMapping(x)}
+          >
+            {t('lumen.requestMapping.open', 'Map Seasons')}
+          </button>
+        )}
+        {moderate &&
+          x.r.status !== 1 &&
+          x.r.canRemove === true &&
+          Number.isSafeInteger(x.r.media.id) &&
+          (x.r.media.id ?? 0) > 0 && (
+            <button
+              className="btn btn-sm btn-quiet"
+              disabled={acting !== null}
+              onClick={() =>
+                setConfirming({
+                  id: x.r.id,
+                  how: 'removeMedia',
+                  title:
+                    x.title ||
+                    t('lumen.requestHistory.unknownTitle', 'this item'),
+                  request: x.r,
+                })
+              }
+            >
+              {t(
+                'lumen.requestHistory.removeManagedCopy',
+                'Remove from Service'
+              )}
+            </button>
+          )}
         {moderate && x.r.id > 0 ? (
           <>
             {x.r.status === 1 && (
@@ -1759,12 +1842,10 @@ export default function Requests() {
     <>
       <header className="ph">
         <div className="ph-row">
-          <div>
-            <h1>Requests</h1>
-            <Link className="chip" to="/book-series/requests">
-              Book Series Requests
-            </Link>
-          </div>
+          <h1>Requests</h1>
+          <Link className="chip" to="/book-series/requests">
+            Book Series Requests
+          </Link>
           <Avatar className="avatar ph-only-avatar" />
         </div>
         <p className="sub">
@@ -1872,110 +1953,110 @@ export default function Requests() {
         </div>
       )}
       {everyone && (
-        <RequesterFilter
-          value={requester}
-          change={(value) => setRequestFilter('requestedBy', value)}
-        />
-      )}
-      {everyone && show !== 'software' && (
-        <div className="toolbar">
-          <label className="sel">
-            <span className="lbl">Media Type</span>
-            <select
-              value={mediaType}
-              onChange={(event) =>
-                setRequestFilter('mediaType', event.target.value)
-              }
-            >
-              {mediaTypes.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          {mediaType === 'book' && (
-            <label className="sel">
-              <span className="lbl">Book Format</span>
-              <select
-                value={bookFormat}
-                onChange={(event) =>
-                  setRequestFilter('bookFormat', event.target.value)
-                }
+        <div className="toolbar" role="group" aria-label="Request filters">
+          <RequesterFilter
+            value={requester}
+            change={(value) => setRequestFilter('requestedBy', value)}
+          />
+          {show !== 'software' && (
+            <>
+              <label className="sel">
+                <span className="lbl">Media Type</span>
+                <select
+                  value={mediaType}
+                  onChange={(event) =>
+                    setRequestFilter('mediaType', event.target.value)
+                  }
+                >
+                  {mediaTypes.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {mediaType === 'book' && (
+                <label className="sel">
+                  <span className="lbl">Book Format</span>
+                  <select
+                    value={bookFormat}
+                    onChange={(event) =>
+                      setRequestFilter('bookFormat', event.target.value)
+                    }
+                  >
+                    <option value="all">All formats</option>
+                    <option value="ebook">Ebook</option>
+                    <option value="audiobook">Audiobook</option>
+                  </select>
+                </label>
+              )}
+              <label className="sel">
+                <span className="lbl">Sort</span>
+                <select
+                  value={sortMode}
+                  onChange={(event) =>
+                    setRequestFilter('order', event.target.value)
+                  }
+                >
+                  {REQUEST_SORTS.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="sel">
+                <span className="lbl">Date Added</span>
+                <select
+                  value={timeFrame}
+                  onChange={(event) =>
+                    setRequestFilter('timeFrame', event.target.value)
+                  }
+                >
+                  {REQUEST_TIME_FRAMES.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <form
+                className="toolbar-search"
+                aria-label="Search media requests"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  const value = new FormData(event.currentTarget).get('search');
+                  setRequestFilter(
+                    'search',
+                    typeof value === 'string' ? value.trim() : ''
+                  );
+                }}
               >
-                <option value="all">All formats</option>
-                <option value="ebook">Ebook</option>
-                <option value="audiobook">Audiobook</option>
-              </select>
-            </label>
+                <label className="search">
+                  <input
+                    key={search}
+                    name="search"
+                    type="search"
+                    aria-label="Search media requests"
+                    placeholder="Search media requests"
+                    maxLength={200}
+                    defaultValue={search}
+                  />
+                </label>
+                <button className="btn btn-tonal btn-sm">Search</button>
+                {search && (
+                  <button
+                    type="button"
+                    className="btn btn-quiet btn-sm"
+                    onClick={() => setRequestFilter('search', '')}
+                  >
+                    Clear Search
+                  </button>
+                )}
+              </form>
+            </>
           )}
-          <label className="sel">
-            <span className="lbl">Sort</span>
-            <select
-              value={sortMode}
-              onChange={(event) =>
-                setRequestFilter('order', event.target.value)
-              }
-            >
-              {REQUEST_SORTS.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="sel">
-            <span className="lbl">Date Added</span>
-            <select
-              value={timeFrame}
-              onChange={(event) =>
-                setRequestFilter('timeFrame', event.target.value)
-              }
-            >
-              {REQUEST_TIME_FRAMES.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
         </div>
-      )}
-      {everyone && show !== 'software' && (
-        <form
-          className="toolbar"
-          aria-label="Search media requests"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const value = new FormData(event.currentTarget).get('search');
-            setRequestFilter(
-              'search',
-              typeof value === 'string' ? value.trim() : ''
-            );
-          }}
-        >
-          <label className="search">
-            <input
-              key={search}
-              name="search"
-              type="search"
-              aria-label="Search media requests"
-              placeholder="Search media requests"
-              maxLength={200}
-              defaultValue={search}
-            />
-          </label>
-          <button className="btn btn-tonal btn-sm">Search</button>
-          {search && (
-            <button
-              type="button"
-              className="btn btn-quiet btn-sm"
-              onClick={() => setRequestFilter('search', '')}
-            >
-              Clear Search
-            </button>
-          )}
-        </form>
       )}
       {softwareView && (
         <div
@@ -2138,29 +2219,37 @@ export default function Requests() {
             confirming.how === 'cancel'
               ? 'Cancel this request?'
               : confirming.how === 'remove'
-                ? `Remove ${confirming.title}?`
-                : 'Decline this request?'
+                ? `Remove ${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')}?`
+                : confirming.how === 'removeMedia'
+                  ? `Remove ${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')} from the service?`
+                  : 'Decline this request?'
           }
           body={
             confirming.how === 'cancel'
-              ? `${confirming.title} won’t be fetched. You can ask for it again later.`
+              ? `${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')} won’t be fetched. You can ask for it again later.`
               : confirming.how === 'remove'
-                ? `This deletes the request for ${confirming.title} for good. It can’t be undone.`
-                : `${confirming.title} won’t be fetched, and the person who asked will see it was declined.`
+                ? `This deletes the request for ${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')} for good. It can’t be undone.`
+                : confirming.how === 'removeMedia'
+                  ? `This removes the managed copy of ${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')}. Its SeerrNG request and history will remain.`
+                  : `${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')} won’t be fetched, and the person who asked will see it was declined.`
           }
           confirm={
             confirming.how === 'cancel'
               ? 'Cancel request'
               : confirming.how === 'remove'
                 ? 'Remove request'
-                : 'Decline request'
+                : confirming.how === 'removeMedia'
+                  ? 'Remove from Service'
+                  : 'Decline request'
           }
           onClose={() => setConfirming(null)}
           onConfirm={() => {
-            const { id, how } = confirming;
+            const { id, how, request } = confirming;
             setConfirming(null);
             if (how === 'cancel') void cancel(id);
-            else void decide(id, how);
+            else if (how === 'removeMedia') {
+              if (request) void removeManagedCopy(request);
+            } else void decide(id, how);
           }}
         />
       )}
@@ -2181,7 +2270,8 @@ export default function Requests() {
         requestKey === 'requestId' &&
         !confirming &&
         !editing &&
-        !queueEdit && (
+        !queueEdit &&
+        !mapping && (
           <RequestHistorySheet
             key={`${focusedId}:${historyRevision}`}
             id={focusedId}
@@ -2230,6 +2320,24 @@ export default function Requests() {
             setQueueEdit(null);
             toast('Episode Queue saved.');
             setTick((t) => t + 1);
+          }}
+        />
+      )}
+      {mapping && (
+        <TvSeasonMappingSheet
+          request={mapping.r}
+          title={mapping.title}
+          close={() => setMapping(null)}
+          saved={() => {
+            forget(`/request/status/${mapping.r.id}`);
+            setMapping(null);
+            setTick((value) => value + 1);
+            toast(
+              t(
+                'lumen.requestMapping.success',
+                'Season mapping saved and request retried.'
+              )
+            );
           }}
         />
       )}

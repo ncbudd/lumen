@@ -150,18 +150,12 @@ export default function ImportMediaServerUsers({
       )}
       {!!eligible.length && (
         <div
-          className="setlist"
+          className="setlist picklist"
           role="group"
-          aria-label={t(
-            'lumen.importMediaServerUsers.userGroup',
-            '{provider} users',
-            {
-              provider,
-            }
-          )}
+          aria-label={`${provider} users`}
         >
           {eligible.map((user) => (
-            <label className="set" key={user.id}>
+            <label className="set pick" key={user.id}>
               <span>
                 <b>{user.title || user.username}</b>
                 {user.isImported && (

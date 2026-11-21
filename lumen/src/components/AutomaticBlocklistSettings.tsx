@@ -3,7 +3,6 @@ import { api } from '../api';
 import { forget } from '../apiCache';
 import { friendlyError } from '../errors';
 import { useApi } from '../hooks';
-import { useLumenLocale } from '../i18n';
 import { Section } from './cards';
 import { ServiceNote } from './extra';
 import { KeywordResults } from './SubjectTagFilter';
@@ -29,60 +28,47 @@ function GenreField({
   disabled: boolean;
   onChange: (value: string) => void;
 }) {
-  const { t } = useLumenLocale();
   const genres = useApi<{ id: number; name: string }[]>(`/genres/${kind}`);
   const selected = value ? value.split(',') : [];
   const catalog = Array.isArray(genres.data) ? genres.data : [];
+  const title =
+    kind === 'movie' ? 'Blocklisted Movie Genres' : 'Blocklisted TV Genres';
   return (
     <>
-      <ServiceNote
-        error={genres.error}
-        what={t('lumen.automaticBlocklist.genres', 'genres')}
-        retry={genres.reload}
-      />
-      <label className="set cfg-row">
-        <b>
-          {kind === 'movie'
-            ? t(
-                'lumen.automaticBlocklist.movieGenres',
-                'Blocklisted Movie Genres'
-              )
-            : t('lumen.automaticBlocklist.tvGenres', 'Blocklisted TV Genres')}
-        </b>
-        <select
-          multiple
-          size={5}
-          value={selected}
-          disabled={disabled || !Array.isArray(genres.data)}
-          onChange={(event) =>
-            onChange(
-              Array.from(
-                event.target.selectedOptions,
-                (option) => option.value
-              ).join(',')
-            )
-          }
-        >
-          {selected
-            .filter((id) => !catalog.some((genre) => String(genre.id) === id))
-            .map((id) => (
-              <option key={id} value={id}>
-                {t('lumen.automaticBlocklist.genreId', 'Genre #{id}', { id })}
-              </option>
-            ))}
-          {catalog.map(({ id, name }) => (
-            <option key={id} value={id}>
-              {name}
-            </option>
+      <ServiceNote error={genres.error} what="genres" retry={genres.reload} />
+      <div className="set cfg-stack">
+        <b>{title}</b>
+        <div className="setlist picklist" role="group" aria-label={title}>
+          {[
+            ...selected
+              .filter((id) => !catalog.some((genre) => String(genre.id) === id))
+              .map((id) => ({ id, name: `Genre #${id}` })),
+            ...catalog.map(({ id, name }) => ({ id: String(id), name })),
+          ].map(({ id, name }) => (
+            <label className="set pick" key={id}>
+              <b>{name}</b>
+              <input
+                type="checkbox"
+                checked={selected.includes(id)}
+                disabled={disabled || !Array.isArray(genres.data)}
+                onChange={(event) =>
+                  onChange(
+                    (event.target.checked
+                      ? [...selected, id]
+                      : selected.filter((item) => item !== id)
+                    ).join(',')
+                  )
+                }
+              />
+            </label>
           ))}
-        </select>
-      </label>
+        </div>
+      </div>
     </>
   );
 }
 
 function SettingsForm({ initial }: { initial: Settings }) {
-  const { t } = useLumenLocale();
   const [saved, setSaved] = useState(initial);
   const [draft, setDraft] = useState(initial);
   const [pages, setPages] = useState(String(initial.blocklistedTagsLimit));
@@ -141,31 +127,15 @@ function SettingsForm({ initial }: { initial: Settings }) {
         ),
       });
       if (changes.some((key) => result[key] !== values[key]))
-        throw new Error(
-          t(
-            'lumen.automaticBlocklist.confirmFailure',
-            'Could not confirm the saved blocklist settings.'
-          )
-        );
+        throw new Error('Could not confirm the saved blocklist settings.');
       setSaved(values);
       setDraft(values);
       setPages(String(values.blocklistedTagsLimit));
       forget(endpoint);
-      setNotice(
-        t(
-          'lumen.automaticBlocklist.saved',
-          'Automatic blocklist settings saved.'
-        )
-      );
+      setNotice('Automatic blocklist settings saved.');
     } catch (error) {
       setFailure(
-        friendlyError(
-          error,
-          t(
-            'lumen.automaticBlocklist.saveFailure',
-            'Could not save automatic blocklist settings.'
-          )
-        )
+        friendlyError(error, 'Could not save automatic blocklist settings.')
       );
     } finally {
       pending.current = false;
@@ -178,24 +148,11 @@ function SettingsForm({ initial }: { initial: Settings }) {
       <div className="setlist">
         <label
           className="set cfg-row"
-          aria-label={t(
-            'lumen.automaticBlocklist.keywords',
-            'Blocklisted TMDB Keyword IDs'
-          )}
+          aria-label="Blocklisted TMDB Keyword IDs"
         >
           <span>
-            <b>
-              {t(
-                'lumen.automaticBlocklist.keywords',
-                'Blocklisted TMDB Keyword IDs'
-              )}
-            </b>
-            <small>
-              {t(
-                'lumen.automaticBlocklist.keywordHelp',
-                'Enter up to 100 IDs, separated by commas.'
-              )}
-            </small>
+            <b>Blocklisted TMDB Keyword IDs</b>
+            <small>Enter up to 100 IDs, separated by commas.</small>
           </span>
           <input
             className="cfg-input"
@@ -207,12 +164,7 @@ function SettingsForm({ initial }: { initial: Settings }) {
         </label>
         <div className="toolbar">
           <label className="sel">
-            <span className="lbl">
-              {t(
-                'lumen.automaticBlocklist.keywordSearch',
-                'Find Blocklist Keywords'
-              )}
-            </span>
+            <span className="lbl">Find Blocklist Keywords</span>
             <input
               className="cfg-input"
               type="search"
@@ -234,7 +186,7 @@ function SettingsForm({ initial }: { initial: Settings }) {
             disabled={busy || !keywordInput.trim()}
             onClick={findKeywords}
           >
-            {t('lumen.automaticBlocklist.findKeywords', 'Find Keywords')}
+            Find Keywords
           </button>
         </div>
         {keywordQuery && (
@@ -269,24 +221,11 @@ function SettingsForm({ initial }: { initial: Settings }) {
         />
         <label
           className="set cfg-row"
-          aria-label={t(
-            'lumen.automaticBlocklist.pageLimit',
-            'Limit Pages per Blocklist Tag or Genre'
-          )}
+          aria-label="Limit Pages per Blocklist Tag or Genre"
         >
           <span>
-            <b>
-              {t(
-                'lumen.automaticBlocklist.pageLimit',
-                'Limit Pages per Blocklist Tag or Genre'
-              )}
-            </b>
-            <small>
-              {t(
-                'lumen.automaticBlocklist.pageLimitHelp',
-                'Enter a whole number from 0 to 250.'
-              )}
-            </small>
+            <b>Limit Pages per Blocklist Tag or Genre</b>
+            <small>Enter a whole number from 0 to 250.</small>
           </span>
           <input
             className="cfg-input"
@@ -310,10 +249,7 @@ function SettingsForm({ initial }: { initial: Settings }) {
           className="btn btn-tonal btn-sm"
           disabled={busy || !validTags || !validPages || !changes.length}
         >
-          {t(
-            'lumen.automaticBlocklist.save',
-            'Save Automatic Blocklist Settings'
-          )}
+          Save Automatic Blocklist Settings
         </button>
       </div>
       {notice && (
@@ -331,16 +267,12 @@ function SettingsForm({ initial }: { initial: Settings }) {
 }
 
 export default function AutomaticBlocklistSettings() {
-  const { t } = useLumenLocale();
   const settings = useApi<Partial<Settings>>(endpoint);
   return (
-    <Section title={t('lumen.automaticBlocklist.title', 'Automatic Blocklist')}>
+    <Section title="Automatic Blocklist">
       <ServiceNote
         error={settings.error}
-        what={t(
-          'lumen.automaticBlocklist.settings',
-          'automatic blocklist settings'
-        )}
+        what="automatic blocklist settings"
         retry={settings.reload}
       />
       {settings.data ? (
@@ -348,10 +280,7 @@ export default function AutomaticBlocklistSettings() {
       ) : (
         !settings.error && (
           <p className="note" role="status">
-            {t(
-              'lumen.automaticBlocklist.loading',
-              'Loading automatic blocklist settings…'
-            )}
+            Loading automatic blocklist settings…
           </p>
         )
       )}
