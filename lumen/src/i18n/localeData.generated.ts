@@ -881,9 +881,228 @@ export const localeData = [
         'قد يحسّن مستوى المعالجة الأعلى ترتيب النتائج، لكنه يستغرق وقتًا أطول ويزيد التكلفة لكل مجموعة.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'اختياري للخوادم المحلية التي لا تتطلب مفتاحًا.',
+      'components.NotificationTypeSelector.mediarequested':
+        'الطلب معلق للموافقة',
+      'components.NotificationTypeSelector.mediaapproved':
+        'تمت الموافقة على الطلب',
+      'components.NotificationTypeSelector.mediaavailable':
+        'المحتوى المطلوب متاح',
+      'components.NotificationTypeSelector.mediafailed': 'فشل إنشاء الطلب',
+      'components.NotificationTypeSelector.mediadeclined': 'تم رفض الطلب',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'تم الموافقة على الطلب بشكل تلقائي',
+      'components.NotificationTypeSelector.issuecreated':
+        'تم التبليغ عن المشكلة',
+      'components.NotificationTypeSelector.issuecomment': 'تعليق على المشكلة',
+      'components.NotificationTypeSelector.issueresolved': 'تم حل المشكلة',
+      'components.NotificationTypeSelector.issuereopened':
+        'تم إعادة فتح المشكلة',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'تم تقديم الطلب بشكل تلقائي',
+      'components.NotificationTypeSelector.softwareavailable':
+        'البرمجيات المطلوبة متاحة',
+      'components.NotificationTypeSelector.softwareStatus':
+        'تحديثات طلبات البرمجيات',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'الحصول على تنبيهات عند تعليق المستخدمين على المشاكل.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'الحصول على تنبيهات عند إعادة فتح المشاكل من قبل المستخدمين.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'الحصول على تنبيهات في حالة حل المشاكل من قبل المستخدمين.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'إرسال تنبيهات في حالة وجود تعليقات جديدة على المشاكل.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'إرسال تنبيهات في حالة التبليغ عن مشاكل.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'إرسال تنبيهات عند إعادة فتح المشاكل.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'إرسال تنبيهات عند حل المشاكل.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'إرسال إشعارات عند الموافقة تلقائيًا على طلبات الوسائط الجديدة التي يقدمها المستخدمون.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'إرسال تنبيهات عند الموافقة على الطلبات بشكل يدوي.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'تلقي إشعار عند تقديم طلبات وسائط جديدة تلقائيًا لعناصر موجودة في قائمة متابعتك.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'إرسال تنبيهات عندما يتوفر المحتوى المطلوب.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'إرسال تنبيهات في حالة رفض الطلبات.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'إرسال إشعارات عند فشل إضافة طلبات الوسائط إلى Radarr أو Sonarr أو Lidarr أو Bookshelf.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'إرسال تنبيهات في حالة وصول طلبات جديدة تتطلب الموافقة.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'أنواع التنبيهات',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        'إرسال إخطارات بطلبات البرمجيات التي تنتظر الموافقة عليها أو التي تمت الموافقة عليها أو رفضها أو فشلها.',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'أرسل إشعارات عندما تصبح ROMs وألعاب PC التي طلبتها جاهزة للتنزيل.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'يتم إخطارك عندما يكون طلب البرمجيات الخاص بك في انتظار الموافقة أو يتم الموافقة عليه أو رفضه أو فشله.',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'تلقي تنبيهات في حالة وصول تعليقات جديدة على مشاكل تم فتحها بواسطتك.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'تلقي تنبيهات في حالة قيام المستخدمين بالتبليغ عن مشاكل.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'تلقي تنبيهات عندما يتم إعادة فتح مشكلة تم الإبلاغ عنها بواسطتك.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'تلقَّ إشعارًا عند حل المشكلات التي أبلغت عنها.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'تلقي تنبيهات في حالة الموافقة بشكل تلقائي على طلب محتوى جديد من قبل المستخدمين.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'تلقَّ إشعارًا عند الموافقة على طلبات الوسائط الخاصة بك.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'تلقَّ إشعارًا عندما يصبح المحتوى الذي طلبته متاحًا.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'تلقي تنبيهات عندما يتم رفض الطلبات.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'احصل على إشعار عند فشل إضافة طلبات الوسائط إلى Radarr أو Sonarr أو Lidarr أو Bookshelf.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'تلقَّ إشعارًا عندما يرسل مستخدمون آخرون طلبات وسائط جديدة تتطلب الموافقة.',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'ستتلقى إشعارًا عندما تصبح ROMs وألعاب PC التي طلبتها جاهزة للتنزيل.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'اشتراك نشط',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'المتصفح',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'تاريخ الإنشاء',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'حذف الاشتراك',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'الجهاز',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'تعطيل تنبيهات الويب',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'حدث خطأ ما أثناء تعطيل تنبيهات الويب.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'تفعيل تنبيهات الويب',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'حدث خطأ ما أثناء تفعيل تنبيهات الويب.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'المحرك',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'إدارة الأجهزة',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'لا توجد اشتراكات تنبيهات ويب لعرضها.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'نظام التشغيل',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'تم حذف الاشتراك.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'حدث خطأ ما أثناء حذف اشتراك المستخدم.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'النوع',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'غير معروف',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'تم تعطيل تنبيهات الويب.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'تم تفعيل تنبيهات الويب.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'فشل حفظ إعدادات تنبيهات الويب.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'تم حفظ إعدادات تنبيهات الويب بنجاح!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'الجهاز الإفتراضي',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'رقم عضوية المستخدم',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'مضافا إليه هوية المستعمل',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'معرّف Discord للمستخدم',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'إزالة',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'رقم معرف <FindDiscordIdLink> متعدد الأرقام </FindDiscordIdLink> المرتبط بحساب المستخدم الخاص بك. بالنسبة للحسابات المنزلية المتعددة، يمكنك إضافة أكثر من معرف مستخدم Discord واحد.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'لم يقم مالك الخادم بتمكين إعلامات Discord. لن يتم استخدام هذه المعلومات إلا إذا قام مالك الخادم بتكوين خدمة خارجية.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'فشل حفظ إعدادات الإعلام Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'تم حفظ إعدادات الإشعارات Discord بنجاح!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'البريد الإلكترونيّ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'فشل حفظ إعدادات تنبيه الإيميل.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'تم حفظ إعدادات تنبيه الإيميل بنجاح!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'التنبيهات',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'مفتاح PGP العام',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'رسائل إيميل مشفرة باستخدام <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'رمز الوصول',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'أنشئ رمزًا من <PushbulletSettingsLink>إعدادات الحساب</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'فشل حفظ إعدادات تنبيه Pushbullet.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'تم حفظ إعدادات تنبيه Pushbullet بنجاح!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'رمز API للتطبيق',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>تسجيل تطبيق application</ApplicationRegistrationLink> للإستخدام مع {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'مستخدم أو مفتاح مجموعة',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'الثلاثين خانة الخاصةبـ <UsersGroupsLink>بمعرف المستخدم أو المجموعة </UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'فشل حفظ إعدادات تنبيه Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'تم حفظ إعدادات تنبيه Pushover بنجاح!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'أرسل بصمت',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'ارسال التنبيهات بدون صوت',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'صوت التنبيه',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'رقم عضوية المحادثة',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>ابدأ محادثة</TelegramBotLink>، وأضف <GetIdBotLink>@get_id_bot</GetIdBotLink>، ثم أرسل الأمر <code>/my_id</code>.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'معرّف الخيط/الموضوع',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'إذا كانت المحادثة الجماعية تدعم المواضيع، يمكنك تحديد معرّف الخيط/الموضوع هنا',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'فشل حفظ إعدادات تنبيه التليقرام.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'تم حفظ إعدادات تنبيه التليقرام بنجاح!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'يجب أن يكون كل معرّف معرّف مستخدم صالحًا على Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'يجب ذكر مفتاح عام PGP صحيح',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'يجب توفير رمز وصول.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'يجب توفير رمز تطبيق صالح.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'يجب ذكر مفتاح مستخدم او مجموعة صحيح',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'يجب ذكر رقم هوية محادثة صحيحة',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'يجب أن يكون معرّف الخيط/الموضوع عدداً صحيحاً موجباً',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'ويب بوش Web Push',
       'components.Layout.Sidebar.comingSoon': 'قريبًا',
       'components.Layout.Sidebar.you': 'أنت',
       'components.Layout.Sidebar.watchSessions': 'جلسات المشاهدة',
+      'lumen.status.queued': 'في قائمة الانتظار',
+      'lumen.status.shared': 'متاح للمستخدمين الآخرين',
+      'lumen.status.partlyInLibrary': 'متاح جزئيًا في المكتبة',
+      'lumen.status.onServer': 'على {server}',
+      'lumen.status.partlyOnServer': 'متوفر جزئيًا على {server}',
+      'lumen.status.downloadingPercent': 'جارٍ التنزيل بنسبة {percent}%',
+      'lumen.status.allInLibrary': 'جميع العناصر ({count}) في المكتبة',
+      'lumen.status.ownedInLibrary': '{owned} من {total} في المكتبة',
+      'lumen.status.blocklisted': 'محظور',
+      'lumen.status.inLibrary': 'في المكتبة',
+      'lumen.status.requested': 'تم طلبه',
+      'lumen.status.downloading': 'قيد التنزيل',
+      'lumen.status.complete': 'مكتمل',
       'lumen.nav.administration': 'الإدارة',
       'lumen.nav.lumenSettings': 'إعدادات Lumen',
       'lumen.nav.seerrAdministration': 'إدارة SeerrNG',
@@ -1479,6 +1698,8 @@ export const localeData = [
       'lumen.issueReport.submit': 'إرسال البلاغ',
       'lumen.issueReport.media': 'وسيط',
       'lumen.calendar.title': 'تقويم الإصدارات',
+      'lumen.calendar.description':
+        'الإصدارات القادمة للأفلام والمسلسلات والموسيقى والكتب والقصص المصورة والمجلات وألعاب الكمبيوتر والمحاكاة من خدماتك المتصلة.',
       'lumen.calendar.filters': 'عوامل تصفية التقويم',
       'lumen.calendar.previousMonth': 'الشهر السابق',
       'lumen.calendar.month': 'الشهر',
@@ -1980,6 +2201,447 @@ export const localeData = [
       'lumen.adminDiscovery.forbidden':
         'ليس لديك إذن لتغيير بيانات اعتماد التكامل.',
       'lumen.adminDiscovery.loading': 'جارٍ تحميل بيانات اعتماد الاستكشاف…',
+      'lumen.automaticBlocklist.genres': 'الأنواع',
+      'lumen.automaticBlocklist.movieGenres': 'أنواع الأفلام المحظورة',
+      'lumen.automaticBlocklist.tvGenres': 'أنواع المسلسلات المحظورة',
+      'lumen.automaticBlocklist.genreId': 'النوع رقم {id}',
+      'lumen.automaticBlocklist.confirmFailure':
+        'تعذر تأكيد حفظ إعدادات الحظر التلقائي.',
+      'lumen.automaticBlocklist.saved': 'تم حفظ إعدادات الحظر التلقائي.',
+      'lumen.automaticBlocklist.saveFailure':
+        'تعذر حفظ إعدادات الحظر التلقائي.',
+      'lumen.automaticBlocklist.keywords': 'معرّفات كلمات TMDB المحظورة',
+      'lumen.automaticBlocklist.keywordHelp':
+        'أدخل حتى 100 معرّف مفصولة بفواصل.',
+      'lumen.automaticBlocklist.keywordSearch': 'البحث عن كلمات الحظر',
+      'lumen.automaticBlocklist.findKeywords': 'البحث عن كلمات',
+      'lumen.automaticBlocklist.pageLimit': 'حد الصفحات لكل وسم أو نوع محظور',
+      'lumen.automaticBlocklist.pageLimitHelp':
+        'أدخل عددًا صحيحًا من 0 إلى 250.',
+      'lumen.automaticBlocklist.save': 'حفظ إعدادات الحظر التلقائي',
+      'lumen.automaticBlocklist.title': 'الحظر التلقائي',
+      'lumen.automaticBlocklist.settings': 'إعدادات الحظر التلقائي',
+      'lumen.automaticBlocklist.loading': 'جارٍ تحميل إعدادات الحظر التلقائي…',
+      'lumen.keywordResults.what': 'وسوم الموضوع',
+      'lumen.keywordResults.loading': 'جارٍ البحث عن وسوم الموضوع…',
+      'lumen.keywordResults.empty': 'لا توجد وسوم موضوع مطابقة.',
+      'lumen.keywordResults.results': 'نتائج وسوم الموضوع',
+      'lumen.keywordResults.pages': 'صفحات وسوم الموضوع',
+      'lumen.keywordResults.previous': 'صفحة وسوم الموضوع السابقة',
+      'lumen.keywordResults.page': 'صفحة الوسوم {page}',
+      'lumen.keywordResults.pageTotal': ' من {total}',
+      'lumen.keywordResults.next': 'صفحة وسوم الموضوع التالية',
+      'lumen.streamingPolicy.title': 'سياسة الطلب وفق الاشتراكات',
+      'lumen.streamingPolicy.what': 'سياسة الطلب وفق الاشتراكات',
+      'lumen.streamingPolicy.loading': 'جارٍ تحميل سياسة الطلب…',
+      'lumen.streamingPolicy.enabled': 'تفعيل سياسة الطلب وفق الاشتراكات',
+      'lumen.streamingPolicy.description':
+        'تطبيق إجراء بناءً على خدمات البث التي يشترك فيها مقدم الطلب.',
+      'lumen.streamingPolicy.when': 'عندما يكون العنوان',
+      'lumen.streamingPolicy.available': 'متاحًا ضمن اشتراكاته',
+      'lumen.streamingPolicy.unavailable': 'غير متاح ضمن اشتراكاته',
+      'lumen.streamingPolicy.action': 'إجراء الطلب',
+      'lumen.streamingPolicy.reject': 'رفض',
+      'lumen.streamingPolicy.pending': 'يتطلب موافقة',
+      'lumen.streamingPolicy.approve': 'موافقة',
+      'lumen.streamingPolicy.rejectionMessage': 'رسالة الرفض',
+      'lumen.streamingPolicy.allowOverride': 'السماح بالاستثناءات لكل مستخدم',
+      'lumen.streamingPolicy.save': 'حفظ سياسة الطلب',
+      'lumen.streamingPolicy.saved': 'تم حفظ سياسة الطلب.',
+      'lumen.streamingPolicy.saveFailure': 'تعذر حفظ سياسة الطلب.',
+      'lumen.streamingPolicy.confirmFailure': 'تعذر تأكيد حفظ سياسة الطلب.',
+      'lumen.discoveryRegions.regions': 'المناطق',
+      'lumen.discoveryRegions.languages': 'اللغات',
+      'lumen.discoveryRegions.field.discoverRegion': 'منطقة الاستكشاف',
+      'lumen.discoveryRegions.field.streamingRegion': 'منطقة البث',
+      'lumen.discoveryRegions.field.originalLanguage': 'اللغة الأصلية',
+      'lumen.discoveryRegions.field.blocklistRegion': 'منطقة قائمة الحظر',
+      'lumen.discoveryRegions.field.blocklistLanguage': 'لغة قائمة الحظر',
+      'lumen.discoveryRegions.visibility.includeAdult':
+        'تضمين محتوى البالغين في بحث TMDB والاستكشاف',
+      'lumen.discoveryRegions.visibility.hideAvailable':
+        'إخفاء العناوين المتاحة',
+      'lumen.discoveryRegions.visibility.hideRequested':
+        'إخفاء العناوين المطلوبة',
+      'lumen.discoveryRegions.visibility.hideBlocklisted':
+        'إخفاء العناوين المحظورة عن مديري قائمة الحظر',
+      'lumen.discoveryRegions.any.region': 'أي منطقة',
+      'lumen.discoveryRegions.any.language': 'أي لغة',
+      'lumen.discoveryRegions.save': 'حفظ إعدادات منطقة الاستكشاف',
+      'lumen.discoveryRegions.saved': 'تم حفظ إعدادات منطقة الاستكشاف.',
+      'lumen.discoveryRegions.confirmFailure':
+        'تعذر تأكيد إعدادات الاستكشاف المحفوظة.',
+      'lumen.discoveryRegions.saveFailure': 'تعذر حفظ إعدادات منطقة الاستكشاف.',
+      'lumen.discoveryRegions.title': 'مناطق ولغات الاستكشاف',
+      'lumen.discoveryRegions.settings': 'إعدادات منطقة الاستكشاف',
+      'lumen.discoveryRegions.loading': 'جارٍ تحميل إعدادات منطقة الاستكشاف…',
+      'lumen.identityPacks.fileTooLarge':
+        'يجب ألا يتجاوز حجم الحزمة 5 ميبي بايت.',
+      'lumen.identityPacks.invalidFile':
+        'اختر ملف JSON مدعومًا لمطابقة العناوين.',
+      'lumen.identityPacks.readFailure': 'تعذرت قراءة الملف المحدد.',
+      'lumen.identityPacks.published':
+        'تم نشر {name}. {total} مطابقة، {imported} جديدة، {updated} معدلة، {unchanged} دون تغيير، {removed} محذوفة.',
+      'lumen.identityPacks.publishFailure':
+        'تعذر نشر الحزمة. تحقق من الملف وحاول مجددًا.',
+      'lumen.identityPacks.downloadFailure': 'تعذر تنزيل الحزمة. حاول مجددًا.',
+      'lumen.identityPacks.deleted': 'تم حذف {name} من جميع الحسابات.',
+      'lumen.identityPacks.deleteFailure': 'تعذر حذف الحزمة. حاول مجددًا.',
+      'lumen.identityPacks.title': 'مطابقات عناوين الاستكشاف المشتركة',
+      'lumen.identityPacks.help':
+        'تنطبق الحزم المشتركة على كل الحسابات. وتكون المطابقة الخاصة بالمستخدم هي المعتمدة عند التعارض.',
+      'lumen.identityPacks.what': 'حزم مطابقة العناوين المشتركة',
+      'lumen.identityPacks.loading': 'جارٍ تحميل الحزم المشتركة…',
+      'lumen.identityPacks.choose': 'اختيار ملف الحزمة',
+      'lumen.identityPacks.draftSummary':
+        'تحتوي {name} ({id}) على {count} من مطابقات العناوين.',
+      'lumen.identityPacks.replaceWarning':
+        'يؤدي النشر إلى استبدال جميع الإدخالات في أي حزمة موجودة تحمل هذا المعرّف.',
+      'lumen.identityPacks.acknowledge':
+        'أفهم أن هذه الحزمة تنطبق على جميع الحسابات.',
+      'lumen.identityPacks.replace': 'استبدال الحزمة المشتركة',
+      'lumen.identityPacks.publish': 'نشر الحزمة المشتركة',
+      'lumen.identityPacks.clear': 'مسح الملف المحدد',
+      'lumen.identityPacks.empty': 'لم يتم نشر أي حزم مشتركة.',
+      'lumen.identityPacks.packCount': '{id} · {count} من مطابقات العناوين',
+      'lumen.identityPacks.download': 'تنزيل الحزمة',
+      'lumen.identityPacks.delete': 'حذف الحزمة',
+      'lumen.identityPacks.deleteWarning':
+        'يؤدي حذف {name} إلى إزالة مطابقاتها المشتركة من جميع الحسابات.',
+      'lumen.identityPacks.confirmDelete': 'حذف الحزمة المشتركة',
+      'lumen.identityPacks.keep': 'الاحتفاظ بالحزمة المشتركة',
+      'lumen.adminUsers.allUsers': 'جميع المستخدمين',
+      'lumen.adminUsers.ascending': 'تصاعدي',
+      'lumen.adminUsers.backToAccount': 'العودة إلى الحساب',
+      'lumen.adminUsers.cancel': 'إلغاء',
+      'lumen.adminUsers.createFailure': 'تعذر إنشاء الحساب.',
+      'lumen.adminUsers.createLocalUser': 'إنشاء مستخدم محلي',
+      'lumen.adminUsers.createUser': 'إنشاء مستخدم',
+      'lumen.adminUsers.created': 'تم إنشاء {name}.',
+      'lumen.adminUsers.creating': 'جارٍ الإنشاء…',
+      'lumen.adminUsers.deleteFailure': 'تعذر حذف الحساب.',
+      'lumen.adminUsers.deleteTitle': 'حذف {name}؟',
+      'lumen.adminUsers.deleteUser': 'حذف المستخدم',
+      'lumen.adminUsers.deleteWarning':
+        'سيؤدي ذلك إلى حذف الحساب وسجل الطلبات نهائيًا.',
+      'lumen.adminUsers.deleted': 'تم حذف {name}.',
+      'lumen.adminUsers.descending': 'تنازلي',
+      'lumen.adminUsers.editProfile': 'تعديل الملف الشخصي',
+      'lumen.adminUsers.email': 'البريد الإلكتروني',
+      'lumen.adminUsers.emailRequired': 'أدخل عنوان بريد إلكتروني.',
+      'lumen.adminUsers.emailSetupLink':
+        'إرسال رابط إعداد كلمة المرور بالبريد الإلكتروني',
+      'lumen.adminUsers.empty': 'لا يوجد مستخدمون يطابقون هذا البحث.',
+      'lumen.adminUsers.episodeQueue': 'قائمة انتظار الحلقات',
+      'lumen.adminUsers.importUsers': 'استيراد مستخدمي {provider}',
+      'lumen.adminUsers.invalidUserId': 'معرّف مستخدم غير صالح.',
+      'lumen.adminUsers.keepUser': 'الاحتفاظ بالمستخدم',
+      'lumen.adminUsers.linkedAccounts': 'الحسابات المرتبطة',
+      'lumen.adminUsers.loading': 'جارٍ تحميل المستخدمين…',
+      'lumen.adminUsers.maturityLimits': 'حدود التصنيف العمري',
+      'lumen.adminUsers.mediaCategories': 'فئات الوسائط',
+      'lumen.adminUsers.nextPage': 'الصفحة التالية',
+      'lumen.adminUsers.notificationSettings': 'إعدادات الإشعارات',
+      'lumen.adminUsers.notificationsLoading': 'جارٍ تحميل إعدادات الإشعارات…',
+      'lumen.adminUsers.page': 'الصفحة {page}',
+      'lumen.adminUsers.password': 'كلمة المرور',
+      'lumen.adminUsers.permissions': 'الأذونات',
+      'lumen.adminUsers.previousPage': 'الصفحة السابقة',
+      'lumen.adminUsers.profile': 'الملف الشخصي',
+      'lumen.adminUsers.profileLoading': 'جارٍ تحميل الملف الشخصي…',
+      'lumen.adminUsers.profileSaveFailure': 'تعذر حفظ الملف الشخصي.',
+      'lumen.adminUsers.profileSaved': 'تم حفظ الملف الشخصي.',
+      'lumen.adminUsers.refresh': 'تحديث',
+      'lumen.adminUsers.requestCount': '{count} من الطلبات',
+      'lumen.adminUsers.requestQuotas': 'حصص الطلبات',
+      'lumen.adminUsers.requests': 'الطلبات',
+      'lumen.adminUsers.role.administrator': 'مسؤول',
+      'lumen.adminUsers.role.member': 'عضو',
+      'lumen.adminUsers.role.owner': 'المالك',
+      'lumen.adminUsers.role.userManager': 'مدير المستخدمين',
+      'lumen.adminUsers.saveProfile': 'حفظ الملف الشخصي',
+      'lumen.adminUsers.search': 'بحث',
+      'lumen.adminUsers.searchUsers': 'البحث عن المستخدمين',
+      'lumen.adminUsers.setLocalPassword': 'تعيين كلمة مرور محلية',
+      'lumen.adminUsers.setupLinkRequirement':
+        'تتطلب روابط الإعداد عنوان التطبيق وإشعارات البريد الإلكتروني.',
+      'lumen.adminUsers.signInLinks': 'روابط تسجيل الدخول',
+      'lumen.adminUsers.sort.created': 'تاريخ الإضافة',
+      'lumen.adminUsers.sort.displayname': 'الاسم',
+      'lumen.adminUsers.sort.requests': 'عدد الطلبات',
+      'lumen.adminUsers.sort.role': 'الدور',
+      'lumen.adminUsers.sort.updated': 'آخر تحديث',
+      'lumen.adminUsers.sort.usertype': 'نوع الحساب',
+      'lumen.adminUsers.sortBy': 'الترتيب حسب',
+      'lumen.adminUsers.sortDirection': 'اتجاه الترتيب',
+      'lumen.adminUsers.title': 'المستخدمون',
+      'lumen.adminUsers.tvRequestAccess': 'الوصول إلى طلبات التلفزيون',
+      'lumen.adminUsers.username': 'اسم المستخدم',
+      'lumen.adminUsers.usernameRequired': 'أدخل اسم مستخدم.',
+      'lumen.adminUsers.users': 'المستخدمون',
+      'lumen.adminUsers.viewRequests': 'عرض طلبات {name}',
+      'lumen.adminUsers.viewWatchlist': 'عرض قائمة متابعة {name}',
+      'lumen.adminUsers.watchlist': 'قائمة المتابعة',
+      'lumen.managedEpisodeQueue.saved':
+        'تم حفظ القيمة الافتراضية لقائمة انتظار الحلقات.',
+      'lumen.managedEpisodeQueue.saveFailure':
+        'تعذر حفظ القيمة الافتراضية لقائمة انتظار الحلقات.',
+      'lumen.managedEpisodeQueue.title':
+        'القيمة الافتراضية لقائمة انتظار الحلقات',
+      'lumen.managedEpisodeQueue.loading': 'جارٍ تحميل قائمة انتظار الحلقات…',
+      'lumen.managedEpisodeQueue.episodesAhead': 'الحلقات مقدمًا',
+      'lumen.managedEpisodeQueue.off': 'إيقاف',
+      'lumen.managedEpisodeQueue.saveDefault': 'حفظ كقيمة افتراضية',
+      'lumen.managedEpisodeQueue.confirmTitle':
+        'هل تريد حفظ القيمة الافتراضية لقائمة انتظار الحلقات لـ {name}؟',
+      'lumen.managedEpisodeQueue.confirmBody':
+        'ينطبق هذا على طلبات التلفاز التفاعلية الحالية والمستقبلية. تظل الحلقات المطلوبة بالفعل كما هي.',
+      'lumen.managedEpisodeQueue.goBack': 'رجوع',
+      'lumen.managedTvAccess.title': 'الوصول إلى طلبات التلفاز',
+      'lumen.managedTvAccess.loading': 'جارٍ تحميل الوصول إلى طلبات التلفاز…',
+      'lumen.managedTvAccess.everyone': 'مفعّل للجميع',
+      'lumen.managedTvAccess.status.off': 'الموافقة مطلوبة',
+      'lumen.managedTvAccess.status.pending': 'بانتظار الموافقة',
+      'lumen.managedTvAccess.status.approved': 'تمت الموافقة · متوقف',
+      'lumen.managedTvAccess.status.enabled': 'مفعّل لهذا الحساب',
+      'lumen.managedTvAccess.status.denied': 'تم رفض الطلب',
+      'lumen.managedTvAccess.requested': 'طُلب في {date}',
+      'lumen.managedTvAccess.refresh': 'تحديث الوصول',
+      'lumen.managedTvAccess.review': 'مراجعة طلبات الوصول إلى التلفاز',
+      'lumen.managedPassword.mismatch':
+        'أدخل كلمتي مرور متطابقتين لا تقل كل منهما عن 8 أحرف.',
+      'lumen.managedPassword.saved': 'تم حفظ كلمة المرور المحلية.',
+      'lumen.managedPassword.saveFailure': 'تعذر حفظ كلمة المرور المحلية.',
+      'lumen.managedPassword.description':
+        'عيّن كلمة مرور جديدة لتسجيل دخول {name} المحلي إلى SeerrNG.',
+      'lumen.managedPassword.newPassword': 'كلمة المرور المحلية الجديدة',
+      'lumen.managedPassword.confirmPassword':
+        'تأكيد كلمة المرور المحلية الجديدة',
+      'lumen.managedPassword.save': 'حفظ كلمة المرور المحلية',
+      'lumen.managedLoginLinks.revoked': 'تم إبطال رابط تسجيل الدخول.',
+      'lumen.managedLoginLinks.updateFailure': 'تعذر تحديث روابط تسجيل الدخول.',
+      'lumen.managedLoginLinks.copied': 'تم نسخ رابط تسجيل الدخول.',
+      'lumen.managedLoginLinks.copyFallback': 'حدّد الرابط وانسخه من الحقل.',
+      'lumen.managedLoginLinks.title': 'روابط تسجيل دخول لمرة واحدة',
+      'lumen.managedLoginLinks.description':
+        'تنتهي صلاحية كل رابط بعد 30 دقيقة أو استخدامه مرة واحدة.',
+      'lumen.managedLoginLinks.create': 'إنشاء رابط تسجيل دخول',
+      'lumen.managedLoginLinks.newLink': 'رابط تسجيل الدخول الجديد',
+      'lumen.managedLoginLinks.copy': 'نسخ الرابط',
+      'lumen.managedLoginLinks.what': 'روابط تسجيل الدخول',
+      'lumen.managedLoginLinks.loading': 'جارٍ تحميل روابط تسجيل الدخول…',
+      'lumen.managedLoginLinks.empty': 'لا توجد روابط تسجيل دخول بعد.',
+      'lumen.managedLoginLinks.status.active': 'نشط',
+      'lumen.managedLoginLinks.status.used': 'مستخدم',
+      'lumen.managedLoginLinks.status.revoked': 'مُبطل',
+      'lumen.managedLoginLinks.status.expired': 'منتهي الصلاحية',
+      'lumen.managedLoginLinks.expires': 'تنتهي صلاحيته في {date}',
+      'lumen.managedLoginLinks.revoke': 'إبطال الرابط',
+      'lumen.managedMaturity.saved': 'تم حفظ حدود التصنيف العمري.',
+      'lumen.managedMaturity.saveFailure': 'تعذر حفظ حدود التصنيف العمري.',
+      'lumen.managedMaturity.what': 'حدود التصنيف العمري',
+      'lumen.managedMaturity.loading': 'جارٍ تحميل حدود التصنيف العمري…',
+      'lumen.managedMaturity.description':
+        'ينطبق الحد على التصفح والطلبات. تُحظر العناوين التي ليس لها تصنيف أمريكي معروف عند تعيين حد.',
+      'lumen.managedMaturity.movieMaturityRatingLimit': 'حد تصنيف الأفلام',
+      'lumen.managedMaturity.tvMaturityRatingLimit': 'حد تصنيف المسلسلات',
+      'lumen.managedMaturity.noLimit': 'بلا حد',
+      'lumen.managedMaturity.save': 'حفظ حدود التصنيف العمري',
+      'lumen.managedMediaCategories.saved': 'تم حفظ فئات الوسائط.',
+      'lumen.managedMediaCategories.indexerSaved':
+        'تم حفظ إعدادات ظهور أدوات الفهرسة.',
+      'lumen.managedMediaCategories.saveFailure': 'تعذر حفظ فئات الوسائط.',
+      'lumen.managedMediaCategories.indexerFailure':
+        'تعذر حفظ إعدادات ظهور أدوات الفهرسة.',
+      'lumen.managedMediaCategories.what': 'فئات الوسائط',
+      'lumen.managedMediaCategories.loading': 'جارٍ تحميل فئات الوسائط…',
+      'lumen.managedMediaCategories.serverDefaults':
+        'يستخدم الإعدادات الافتراضية للخادم.',
+      'lumen.managedMediaCategories.accountOverrides':
+        'يستخدم إعدادات الحساب المخصصة.',
+      'lumen.managedMediaCategories.save': 'حفظ الفئات',
+      'lumen.managedMediaCategories.restore':
+        'استعادة الإعدادات الافتراضية للخادم',
+      'lumen.managedMediaCategories.indexerDisabled':
+        'عطّل الخادم تفاصيل أدوات الفهرسة.',
+      'lumen.managedMediaCategories.indexerDetails': 'تفاصيل أدوات الفهرسة',
+      'lumen.managedMediaCategories.useDefault':
+        'استخدام إعداد الخادم الافتراضي',
+      'lumen.managedMediaCategories.show': 'إظهار',
+      'lumen.managedMediaCategories.hide': 'إخفاء',
+      'lumen.managedQuotas.perDay': 'لكل {count} يوم',
+      'lumen.managedQuotas.perDays': 'لكل {count} أيام',
+      'lumen.managedQuotas.allTime': 'طوال الوقت',
+      'lumen.managedQuotas.requestWindow': '{count} طلب {window}',
+      'lumen.managedQuotas.requestsWindow': '{count} طلبات {window}',
+      'lumen.managedQuotas.unlimited': 'طلبات غير محدودة',
+      'lumen.managedQuotas.bothValues':
+        'أدخل القيمتين أو امسحهما لاستخدام الإعداد الافتراضي للخادم.',
+      'lumen.managedQuotas.saved': 'تم حفظ حصة الطلبات.',
+      'lumen.managedQuotas.saveFailure': 'تعذر حفظ حصة الطلبات.',
+      'lumen.managedQuotas.what': 'حصص الطلبات',
+      'lumen.managedQuotas.loading': 'جارٍ تحميل حصص الطلبات…',
+      'lumen.managedQuotas.description':
+        'اترك الحقلين فارغين لاستخدام الإعداد الافتراضي للخادم.',
+      'lumen.managedQuotas.mediaType': 'نوع الوسائط',
+      'lumen.managedQuotas.serverDefault': 'الإعداد الافتراضي للخادم: {value}',
+      'lumen.managedQuotas.limit': 'حد الطلبات',
+      'lumen.managedQuotas.days': 'أيام الحصة',
+      'lumen.managedQuotas.save': 'حفظ الحصة',
+      'lumen.managedQuotas.category.movie': 'أفلام',
+      'lumen.managedQuotas.category.tv': 'مسلسلات',
+      'lumen.managedQuotas.category.music': 'موسيقى',
+      'lumen.managedQuotas.category.book': 'كتب',
+      'lumen.managedQuotas.category.comic': 'قصص مصورة',
+      'lumen.managedQuotas.category.magazine': 'مجلات',
+      'lumen.managedQuotas.category.software': 'برامج',
+      'lumen.managedLinkedAccounts.unlinked': 'تم إلغاء ربط الحساب.',
+      'lumen.managedLinkedAccounts.unlinkFailure': 'تعذر إلغاء ربط الحساب.',
+      'lumen.managedLinkedAccounts.what': 'الحسابات المرتبطة',
+      'lumen.managedLinkedAccounts.passwordStatus': 'حالة كلمة المرور',
+      'lumen.managedLinkedAccounts.loading': 'جارٍ تحميل الحسابات المرتبطة…',
+      'lumen.managedLinkedAccounts.empty': 'لا توجد حسابات مرتبطة.',
+      'lumen.managedLinkedAccounts.unlink': 'إلغاء ربط {name}',
+      'lumen.managedLinkedAccounts.confirmTitle': 'هل تريد إلغاء ربط {name}؟',
+      'lumen.managedLinkedAccounts.confirmBody':
+        'سيؤدي ذلك إلى إزالة طريقة تسجيل الدخول المرتبطة بهذا الحساب.',
+      'lumen.managedLinkedAccounts.confirm': 'إلغاء ربط الحساب',
+      'lumen.managedLinkedAccounts.goBack': 'رجوع',
+      'lumen.importMediaServerUsers.sync': 'مزامنة المستخدمين الحاليين',
+      'lumen.importMediaServerUsers.importSelected':
+        'استيراد المستخدمين المحددين',
+      'lumen.importMediaServerUsers.imported':
+        'تم استيراد {added} وتحديث {refreshed}.',
+      'lumen.importMediaServerUsers.failure': 'تعذر استيراد المستخدمين.',
+      'lumen.importMediaServerUsers.title': 'استيراد مستخدمي {provider}',
+      'lumen.importMediaServerUsers.what': 'مستخدمو {provider}',
+      'lumen.importMediaServerUsers.loading': 'جارٍ تحميل مستخدمي الخدمة…',
+      'lumen.importMediaServerUsers.syncExisting': 'مزامنة المستخدمين الحاليين',
+      'lumen.importMediaServerUsers.noNewUsers':
+        'لا يوجد مستخدمون جدد لاستيرادهم.',
+      'lumen.importMediaServerUsers.userGroup': 'مستخدمو {provider}',
+      'lumen.importMediaServerUsers.alreadyImported': 'تم استيراده بالفعل',
+      'lumen.importMediaServerUsers.close': 'إغلاق الاستيراد',
+      'lumen.importMediaServerUsers.confirmTitle': '{action}؟',
+      'lumen.importMediaServerUsers.syncBody':
+        'حدّث حسابات Plex المرتبطة واستورد أي مستخدم Plex جديد مؤهل.',
+      'lumen.importMediaServerUsers.selectedBody':
+        'تم تحديد {count} من {provider}.',
+      'lumen.importMediaServerUsers.goBack': 'رجوع',
+      'components.NotificationTypeSelector.mediaPendingUpdated':
+        'تم تحديث الطلب المعلق',
+      'lumen.notifications.accountSettings': 'إعدادات الحساب',
+      'lumen.notifications.addPublicKey':
+        'أضف مفتاحًا عامًا لتشفير إشعارات البريد الإلكتروني.',
+      'lumen.notifications.chooseEvents': 'اختر الأحداث التي ترسل إشعارات.',
+      'lumen.notifications.confirmPublicKeyFailure':
+        'تعذر تأكيد حفظ المفتاح. أعد تحميل الإعدادات ثم حاول مرة أخرى.',
+      'lumen.notifications.confirmRemoveKey': 'تأكيد إزالة المفتاح',
+      'lumen.notifications.confirmRemovePublicKey':
+        'هل تريد إزالة المفتاح وإيقاف تشفير OpenPGP للإشعارات؟',
+      'lumen.notifications.discordIdLimit':
+        'أدخل حتى عشرة معرّفات Discord صالحة، معرّفًا واحدًا في كل سطر.',
+      'lumen.notifications.discordIdRequired':
+        'أدخل معرّف Discord واحدًا على الأقل لتلقي الإشارات.',
+      'lumen.notifications.discordIdTip':
+        'أدخل معرّف مستخدم واحدًا في كل سطر. يحدد الخادم الأحداث التي يمكنها إرسال الإشارات.',
+      'lumen.notifications.emailDisabled':
+        'إشعارات البريد الإلكتروني معطلة على هذا الخادم.',
+      'lumen.notifications.keepKey': 'الاحتفاظ بالمفتاح',
+      'lumen.notifications.keepPushbulletToken':
+        'تم إعداد رمز وصول. اترك حقل الاستبدال فارغًا للاحتفاظ به.',
+      'lumen.notifications.keepPushoverCredentials':
+        'اترك حقول بيانات الاعتماد فارغة للاحتفاظ بالبيانات الحالية.',
+      'lumen.notifications.loading': 'جارٍ تحميل إعدادات الإشعارات…',
+      'lumen.notifications.openBot': 'فتح @{bot}',
+      'lumen.notifications.optionalForumTopic': 'اختياري لمواضيع المنتدى.',
+      'lumen.notifications.publicKeyConfigured':
+        'تم إعداد مفتاح عام لإشعارات البريد الإلكتروني.',
+      'lumen.notifications.publicKeyRemoved': 'تمت إزالة المفتاح العام.',
+      'lumen.notifications.publicKeySaveFailure':
+        'تعذر حفظ المفتاح العام. حاول مرة أخرى.',
+      'lumen.notifications.publicKeySaved': 'تم حفظ المفتاح العام.',
+      'lumen.notifications.pushoverSounds': 'أصوات Pushover',
+      'lumen.notifications.removePublicKey': 'إزالة المفتاح العام',
+      'lumen.notifications.removePushbulletToken':
+        'إزالة الرمز وتعطيل أحداث Pushbullet',
+      'lumen.notifications.removePushoverCredentials':
+        'إزالة بيانات الاعتماد وتعطيل أحداث Pushover',
+      'lumen.notifications.replacementAccessToken': 'رمز وصول بديل',
+      'lumen.notifications.replacementApplicationToken': 'رمز تطبيق بديل',
+      'lumen.notifications.replacementPublicKey': 'مفتاح OpenPGP عام بديل',
+      'lumen.notifications.replacementUserKey': 'مفتاح مستخدم أو مجموعة بديل',
+      'lumen.notifications.saveDiscord': 'حفظ إعدادات Discord',
+      'lumen.notifications.savePreferences': 'حفظ تفضيلات {label}',
+      'lumen.notifications.savePublicKey': 'حفظ المفتاح العام',
+      'lumen.notifications.savePushbullet': 'حفظ إعدادات Pushbullet',
+      'lumen.notifications.savePushover': 'حفظ إعدادات Pushover',
+      'lumen.notifications.saveTelegram': 'حفظ إعدادات Telegram',
+      'lumen.notifications.saving': 'جارٍ الحفظ…',
+      'lumen.notifications.telegramEvents':
+        'اختر الأحداث التي تريد إرسالها إلى Telegram.',
+      'lumen.notifications.telegramStartChat':
+        'ابدأ محادثة مع بوت Telegram المُعد قبل تفعيل الإشعارات.',
+      'lumen.notifications.validationPushoverCredentials':
+        'أدخل رمز تطبيق من 30 حرفًا ومفتاح مستخدم أو مجموعة لتفعيل أحداث Pushover.',
+      'lumen.notifications.allowBrowserNotifications':
+        'اسمح بالإشعارات في المتصفح لتسجيل هذا الجهاز.',
+      'lumen.notifications.browserDeviceRemoved': 'تمت إزالة جهاز المتصفح.',
+      'lumen.notifications.browserPushDisabled':
+        'تسجيل إشعارات المتصفح معطل. تحقق من تفضيلات الإشعارات.',
+      'lumen.notifications.browserRegisterFailure':
+        'تعذر تسجيل هذا المتصفح. حاول مرة أخرى.',
+      'lumen.notifications.browserRegistered': 'هذا المتصفح مسجل.',
+      'lumen.notifications.browserRegistrationRequirements':
+        'يتطلب تسجيل المتصفح متصفحًا متوافقًا واتصالًا آمنًا.',
+      'lumen.notifications.browserRemoveFailure':
+        'تعذرت إزالة جهاز المتصفح. حاول مرة أخرى.',
+      'lumen.notifications.disableThisBrowser': 'تعطيل هذا المتصفح',
+      'lumen.notifications.loadingBrowserDevices': 'جارٍ تحميل أجهزة المتصفح…',
+      'lumen.notifications.registerThisBrowser': 'تسجيل هذا المتصفح',
+      'lumen.notifications.registeredAt': 'تاريخ التسجيل: {date}',
+      'lumen.notifications.removeBrowserBody':
+        'سيتوقف {device} عن تلقي إشعارات SeerrNG.',
+      'lumen.notifications.removeBrowserTitle':
+        'هل تريد إزالة جهاز هذا المتصفح؟',
+      'lumen.notifications.thisBrowser': 'هذا المتصفح',
+      'lumen.notifications.browserDeviceName': 'جهاز متصفح',
+      'lumen.watchlist.movies': 'الأفلام',
+      'lumen.watchlist.series': 'المسلسلات',
+      'lumen.watchlist.music': 'الموسيقى',
+      'lumen.watchlist.books': 'الكتب',
+      'lumen.watchlist.comics': 'القصص المصورة',
+      'lumen.watchlist.magazines': 'المجلات',
+      'lumen.watchlist.recentlyAdded': 'أضيفت مؤخرًا',
+      'lumen.watchlist.titleAZ': 'العنوان (أ إلى ي)',
+      'lumen.watchlist.titleZA': 'العنوان (ي إلى أ)',
+      'lumen.watchlist.removeFailure': 'تعذرت إزالة هذا العنوان',
+      'lumen.watchlist.loading': 'جارٍ تحميل {label}…',
+      'lumen.watchlist.noTitles': 'لا توجد عناوين في هذه الصفحة.',
+      'lumen.watchlist.removeTitle': 'إزالة {title} من قائمة المتابعة',
+      'lumen.watchlist.removing': 'جارٍ الإزالة…',
+      'lumen.watchlist.remove': 'إزالة',
+      'lumen.watchlist.pages': 'صفحات قائمة المتابعة',
+      'lumen.watchlist.previous': 'الصفحة السابقة',
+      'lumen.watchlist.page': 'الصفحة {page}',
+      'lumen.watchlist.next': 'الصفحة التالية',
+      'lumen.watchlist.userTitle': 'قائمة متابعة المستخدم',
+      'lumen.watchlist.unavailable': 'قائمة المتابعة هذه غير متاحة.',
+      'lumen.watchlist.discoverTitle': 'استكشف قائمة المتابعة',
+      'lumen.watchlist.title': 'قائمة المتابعة',
+      'lumen.watchlist.personalTitle': 'قائمة المتابعة الشخصية',
+      'lumen.watchlist.backToUser': 'العودة إلى المستخدم',
+      'lumen.watchlist.filtersUnavailable':
+        'تشترك عناصر Plex وSeerrNG في هذه القائمة. عوامل التصفية غير متاحة في هذا العرض.',
+      'lumen.watchlist.filters': 'عوامل تصفية قائمة المتابعة',
+      'lumen.watchlist.search': 'البحث عن العناوين',
+      'lumen.watchlist.searchPlaceholder': 'البحث عن العناوين…',
+      'lumen.watchlist.mediaType': 'نوع الوسائط',
+      'lumen.watchlist.allTypes': 'كل الأنواع',
+      'lumen.watchlist.sortBy': 'ترتيب حسب',
+      'lumen.watchlist.addedOrder': 'ترتيب الإضافة',
+      'lumen.watchlist.apply': 'تطبيق عوامل التصفية',
+      'lumen.watchlist.clear': 'مسح عوامل التصفية',
     },
   },
   {
@@ -2203,6 +2865,193 @@ export const localeData = [
         'Трябва да предоставите валиден минимален TTL',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Трябва да предоставите валиден порт',
+      'components.NotificationTypeSelector.mediarequested':
+        'Заявка в очакване на одобрение',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Заявката е одобрена',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Заявката е налична',
+      'components.NotificationTypeSelector.mediafailed':
+        'Неуспешна обработка на заявката',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Заявката е отхвърлена',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Заявката е одобрена автоматично',
+      'components.NotificationTypeSelector.issuecreated': 'Докладван проблем',
+      'components.NotificationTypeSelector.issuecomment': 'Коментар на проблем',
+      'components.NotificationTypeSelector.issueresolved': 'Разрешен проблем',
+      'components.NotificationTypeSelector.issuereopened':
+        'Повторно отворен проблем',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Заявката е подадена автоматично',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Получавайте известия, когато други потребители коментират проблеми.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Получавайте известия, когато проблеми се отварят отново от други потребители.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Получавайте известия, когато проблеми бъдат разрешени от други потребители.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Изпращайте известия, когато проблемите получат нови коментари.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Изпращайте известия при докладване на проблеми.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Изпращайте известия, когато проблеми се отварят отново.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Изпращайте известия, когато проблеми бъдат разрешени.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Изпращайте известия, когато потребители подадат нови медийни заявки, които се одобряват автоматично.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Изпращайте известия, когато медийните заявки бъдат одобрени ръчно.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Получавайте известия, когато автоматично се подават заявки за съдържание от вашия списък за гледане.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Изпращайте известия, когато заявената медия стане налична.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Изпращайте известия, когато медийните заявки бъдат отхвърлени.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Изпращайте известия, когато медийните заявки не могат да бъдат добавени към Radarr или Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Изпращайте известия, когато потребителите изпращат нови медийни заявки, които изискват одобрение.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Видове известия',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Получавайте известия, когато проблемите, за които сте докладвали, получат нови коментари.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Получавайте известия, когато други потребители съобщават за проблеми.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Получавайте известия, когато проблемите, за които сте докладвали, бъдат отворени отново.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Получавайте известия, когато проблемите, за които сте докладвали, бъдат разрешени.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Получавайте известия, когато други потребители изпращат нови медийни заявки, които се одобряват автоматично.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Получавайте известия, когато заявките ви за медии бъдат одобрени.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Получавайте известия, когато заявките ви за медии станат налични.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Получавайте известия, когато заявките ви за медия бъдат отхвърлени.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Получавайте известия, когато медийните заявки не успеят да бъдат добавени към Radarr или Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Получавайте известия, когато други потребители изпращат нови медийни заявки, които изискват одобрение.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Активен абонамент',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Браузър',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Създаден',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Изтриване на абонамент',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Устройство',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Деактивиране на уеб push известия',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Нещо се обърка при деактивирането на уеб push известията.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Активиране на уеб push известия',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Нещо се обърка при активирането на уеб push известията.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Ядро',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Управление на устройства',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Нямате уеб push абонаменти за показване.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Операционна система',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Абонаментът е изтрит.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Нещо се обърка при изтриването на абонамента.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'тип',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Неизвестно',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Уеб push известията са деактивирани.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Уеб push известията са активирани.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Настройките за уеб push известия не успяха да се запазят.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Настройките за уеб push известия са запазени успешно!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Устройство по подразбиране',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Потребителски ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '<FindDiscordIdLink>Многоцифреният ID номер</FindDiscordIdLink>, свързан с вашия потребителски акаунт',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Настройките за известия чрез Discord не успяха да се запазят.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Настройките за известия чрез Discord са запазени успешно!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Имейл',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Настройките за известия по имейл не успяха да се запазят.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Настройките за известия по имейл са запазени успешно!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Известия',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Публичен PGP ключ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Шифроване на имейл съобщения с помощта на <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Токен за достъп',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Създайте токен от вашите <PushbulletSettingsLink>Настройки на профила</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Настройките за известия чрез Pushbullet не успяха да се запазят.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Настройките за известия чрез Pushbullet са запазени успешно!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'API токен на приложението',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Регистрирайте приложение</ApplicationRegistrationLink> за използване с {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Ключ на потребител или група',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Вашият 30-знаков <UsersGroupsLink>идентификатор на потребител или група</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Настройките за известия чрез Pushover не успяха да се запазят.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Настройките за известия чрез Pushover са запазени успешно!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Изпращане безшумно',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Изпращане на известия без звук',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Звук на известието',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Чат ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Започнете чат</TelegramBotLink>, добавете <GetIdBotLink>@get_id_bot</GetIdBotLink> и въведете командата <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID на разговор/тема',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Ако вашият групов чат има активирани теми, можете да посочите ID на темата тук',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Настройките за известия чрез Telegram не успяха да се запазят.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Настройките за известия чрез Telegram са запазени успешно!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Трябва да предоставите валиден потребителски ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Трябва да предоставите валиден публичен PGP ключ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Трябва да предоставите токен за достъп',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Трябва да предоставите валиден токен на приложението',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Трябва да предоставите валиден ключ на потребител или група',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Трябва да предоставите валиден чат ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'ID на разговора/темата трябва да е положително цяло число',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -2357,6 +3206,143 @@ export const localeData = [
       'components.Settings.SettingsAbout.version': 'Versió',
       'components.Settings.SettingsNetwork.docs': 'documentació',
       'components.Settings.SettingsNetwork.network': 'Plataforma',
+      'components.NotificationTypeSelector.mediarequested':
+        "Sol·licitud pendent d'aprovació",
+      'components.NotificationTypeSelector.mediaapproved':
+        'Sol·licitud aprovada',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Sol·licitud disponible',
+      'components.NotificationTypeSelector.mediafailed':
+        "S'ha produït un error en el processament de la sol·licitud",
+      'components.NotificationTypeSelector.mediadeclined':
+        'Sol·licitud rebutjada',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Sol·licituds aprovades automàticament',
+      'components.NotificationTypeSelector.issuecreated':
+        'Incidència informada',
+      'components.NotificationTypeSelector.issuecomment':
+        'Comentari de la incidència',
+      'components.NotificationTypeSelector.issueresolved': 'Incidència resolta',
+      'components.NotificationTypeSelector.issuereopened':
+        'Incidències reobertes',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Sol·licitud enviada automàticament',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        "Notifica'm quan altres usuaris facin comentaris sobre incidències.",
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        "Notifica'm quan es tornin a obrir incidències per altres usuaris.",
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        "Notifica'm quan altres usuaris resolguin incidències.",
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Envia notificacions quan les incidències rebin comentaris nous.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        "Envieu notificacions quan s'informin d'incidències.",
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        "Notifica'm quan es tornin a obrir incidències.",
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Envieu notificacions quan es resolguin les incidències.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Envieu notificacions quan els usuaris envien sol·licituds de contingut nous que s’aprovin automàticament.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Envia notificacions quan la sol·licitud s’aprova manualment.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        "Rep notificacions quan s'enviïn automàticament sol·licituds de contingut multimèdia nous per als elements de la teva llista de seguiment de Plex.",
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Envia notificacions quan la sol·licitud estigui disponible.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Envia notificacions quan es rebutja una sol·licitud.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Envia notificacions quan el contingut sol·licitat no s’afegeix a Radarr o Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Envia notificacions quan es sol·licita contingut que requereix aprovació.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Tipus de notificacions',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        "Notifica'm quan incidències reportades per mi rebin comentaris nous.",
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        "Notifica'm quan altres usuaris informen incidències.",
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        "Notifica'm quan es tornin a obrir incidències reportades per mi.",
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        "Notifica'm quan es resolguin incidències reportades per mi.",
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Rep notificacions quan altres usuaris envien sol·licituds de contingut noves que s’aprovin automàticament.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        "Rep notificacions quan s'aprovin les teves sol·licituds de contingut.",
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Rep notificacions quan les teves sol·licituds de contingut estiguin disponibles.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Rep notificacions quan es rebutgin les teves sol·licituds de contingut.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Rep notificacions quan no es puguin afegir sol·licituds de contingut a Radarr o Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Rep notificacions quan altres usuaris envien sol·licituds de contingut noves que requereixen aprovació.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        "IDs d'usuari",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        "El <FindDiscordIdLink>número d'ID de diversos dígits</FindDiscordIdLink> associat al vostre compte d'usuari. Si disposeu de multiples comptes podeu afegir mes d'un ID de Discord.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        "No s'ha pogut desar la configuració de les notificacions de Discord.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        "La configuració de les notificacions de Discord s'ha desat correctament!",
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Correu electrònic',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        "No s'ha pogut desar la configuració de les notificacions per correu electrònic.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        "La configuració de les notificacions per correu electrònic s'ha desat correctament!",
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notificacions',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Clau pública PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Xifra els missatges de correu electrònic mitjançant <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        "Testimoni d'accés",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Creeu un testimoni des del vostra <PushbulletSettingsLink>configuració del compte</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        "La configuració de les notificacions Pushbullet no s'ha pogut desar.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        "La configuració de notificació Pushbullet s'ha desat correctament!",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        "Testimoni API de l'aplicació",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registreu una aplicació</ApplicationRegistrationLink> per utilitzar-la amb {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        "Clau d'usuari o grup",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        "El vostre <UsersGroupsLink>identificador d'usuari o grup </UsersGroupsLink> de 30 caràcters",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        "La configuració de notificacions Pushover no s'ha pogut desar.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        "La configuració de notificació Pushover s'ha desat correctament!",
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Envia missatges silenciosament',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Envia notificacions sense so',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Identificador del xat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        "<TelegramBotLink>Inicieu un xat</TelegramBotLink>, afegiu <GetIdBotLink>@get_id_bot</GetIdBotLink> i executeu l'ordre <code>/my_id</code>",
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        "No s'ha pogut desar la configuració de les notificacions de Telegram.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        "La configuració de les notificacions de Telegram s'ha desat correctament!",
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        "Cada ID ha de ser un ID d'usuari de Discord vàlid",
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Heu de proporcionar una clau pública PGP vàlida',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        "Heu de proporcionar un testimoni d'accés",
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        "Heu de proporcionar un testimoni d'aplicació vàlid",
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        "Heu de proporcionar una clau d'usuari o grup vàlida",
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Heu de proporcionar un identificador de xat vàlid',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -2576,6 +3562,196 @@ export const localeData = [
         'Musíte zadat platné minimální TTL',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Musíte zadat platný port',
+      'components.NotificationTypeSelector.mediarequested':
+        'Žádost čeká na schválení',
+      'components.NotificationTypeSelector.mediaapproved': 'Žádost schválena',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Žádost je dostupná',
+      'components.NotificationTypeSelector.mediafailed':
+        'Zpracování žádosti selhalo',
+      'components.NotificationTypeSelector.mediadeclined': 'Žádost odmítnuta',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Žádost automaticky schválena',
+      'components.NotificationTypeSelector.issuecreated': 'Problém nahlášen',
+      'components.NotificationTypeSelector.issuecomment': 'Komentář k problému',
+      'components.NotificationTypeSelector.issueresolved': 'Problém vyřešen',
+      'components.NotificationTypeSelector.issuereopened':
+        'Problém znovu otevřen',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Žádost byla automaticky odeslána',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Dostávat oznámení, když ostatní uživatelé komentují problémy.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Dostávat oznámení, když jsou problémy znovu otevřeny jinými uživateli.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Dostávat oznámení, když jsou problémy vyřešeny jinými uživateli.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Odesílat oznámení, když problémy obdrží nové komentáře.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Odesílat oznámení, když jsou problémy nahlášeny.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Odesílat oznámení, když jsou problémy znovu otevřeny.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Odesílat oznámení, když jsou problémy vyřešeny.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Odesílat oznámení, když uživatelé odešlou nové žádosti o média, které jsou automaticky schváleny.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Odesílat oznámení, když jsou žádosti o média ručně schváleny.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Dostávat oznámení, když jsou nové žádosti o média automaticky odeslány pro položky na vašem Seznamu ke zhlédnutí.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Odesílat oznámení, když se žádosti o média stanou dostupné.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Odesílat oznámení, když jsou žádosti o média odmítnuty.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Odesílat oznámení, když se nepodaří přidat žádosti o média do Radarru nebo Sonarru.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Odesílat oznámení, když uživatelé zadají žádost o média vyžadující schválení.',
+      'components.NotificationTypeSelector.notificationTypes': 'Typy oznámení',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Dostávat oznámení, když vámi nahlášené problémy obdrží nové komentáře.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Dostávat oznámení, když ostatní uživatelé nahlásí problémy.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Dostávat oznámení, když jsou vámi nahlášené problémy znovu otevřeny.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Dostávat oznámení, když jsou vámi nahlášené problémy vyřešeny.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Dostávat oznámení, když ostatní uživatelé zadají nové žádosti o média, které jsou automaticky schváleny.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Dostávat oznámení, když jsou vaše žádosti o média schváleny.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Dostávat oznámení, když se vaše žádosti o média stanou dostupné.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Dostávat oznámení, když jsou vaše žádosti o média odmítnuty.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Dostávat oznámení, když se nepodaří přidat žádosti o média do Radarru nebo Sonarru.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Dostávat oznámení, když ostatní uživatelé zadají nové žádosti o média, které vyžadují schválení.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Aktivní předplatné',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Prohlížeč',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Vytvořeno',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Odstranit předplatné',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Zařízení',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Zakázat web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Při zakazování web push se něco pokazilo.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Povolit web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Při povolování web push se něco pokazilo.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Modul',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Spravovat zařízení',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Nemáte žádná předplatná web push k zobrazení.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Operační systém',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Předplatné odstraněno.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Při odstraňování předplatného uživatele se něco pokazilo.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'typ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Neznámý',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Web push bylo zakázáno.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Web push bylo povoleno.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Nepodařilo se uložit nastavení oznámení web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Nastavení oznámení web push úspěšně uloženo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Výchozí zařízení',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID uživatelů',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Přidat ID uživatele',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'ID uživatele Discord',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Odebrat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '<FindDiscordIdLink>Vícemístné identifikační číslo</FindDiscordIdLink> spojené s vaším uživatelským účtem. Pro více účtů v jedné domácnosti můžete přidat více než jedno ID uživatele Discordu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Nastavení oznámení Discordu se nepodařilo uložit.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Nastavení oznámení Discordu úspěšně uloženo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Nastavení e-mailových oznámení se nepodařilo uložit.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Nastavení e-mailových oznámení bylo úspěšně uloženo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Oznámení',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Veřejný klíč PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Šifrování e-mailových zpráv pomocí <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Přístupový token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Vytvořte token z <PushbulletSettingsLink>Nastavení účtu</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Nastavení oznámení Pushbullet se nepodařilo uložit.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Nastavení oznámení Pushbullet úspěšně uloženo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Token API aplikace',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registrace aplikace</ApplicationRegistrationLink> pro použití s {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Klíč uživatele nebo skupiny',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Váš 30znakový <UsersGroupsLink>identifikátor uživatele nebo skupiny</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Nastavení oznámení Pushover se nepodařilo uložit.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Nastavení oznámení Pushover úspěšně uloženo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Odeslat potichu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Odesílat oznámení bez zvuku',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Zvuk oznámení',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID chatu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Zahajte chat</TelegramBotLink>, přidejte <GetIdBotLink>@get_id_bot</GetIdBotLink> a zadejte příkaz <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID vlákna nebo tématu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Pokud má váš skupinový chat povolená témata, můžete sem zadat ID vlákna nebo tématu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Nastavení oznámení Telegramu se nepodařilo uložit.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Nastavení oznámení Telegramu úspěšně uloženo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Každé ID musí být platné ID uživatele Discordu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Musíte zadat platný veřejný klíč PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Musíte zadat přístupový token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Musíte zadat platný token aplikace',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Musíte zadat platný klíč uživatele nebo skupiny',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Musíte zadat platné ID chatu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'ID vlákna nebo tématu musí být kladné celé číslo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -2788,6 +3964,199 @@ export const localeData = [
         'Du skal angive en gyldig minimum-TLL',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Du skal angive en gyldig port',
+      'components.NotificationTypeSelector.mediarequested':
+        'Anmodning afventer godkendelse',
+      'components.NotificationTypeSelector.mediaapproved': 'Anmodning godkendt',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Anmodning tilgængelig',
+      'components.NotificationTypeSelector.mediafailed':
+        'Anmodningsbehandling mislykkedes',
+      'components.NotificationTypeSelector.mediadeclined': 'Anmodning afvist',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Anmodning godkendt automatisk',
+      'components.NotificationTypeSelector.issuecreated': 'Problem rapporteret',
+      'components.NotificationTypeSelector.issuecomment':
+        'Kommentar til problem',
+      'components.NotificationTypeSelector.issueresolved': 'Problem løst',
+      'components.NotificationTypeSelector.issuereopened': 'Problem genåbnet',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Anmodning indsendt automatisk',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Få besked, når andre brugere kommenterer på problemer.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Få besked, når problemer genåbnes af andre brugere.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Få besked, når problemer er løst af andre brugere.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Send notifikationer, når der kommer nye kommentarer til problemer.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Send notifikationer, når der rapporteres problemer.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Send notifikationer, når problemer genåbnes.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Send notifikationer, når problemer er løst.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Send notifikationer, når brugere indsender nye medieanmodninger, som automatisk godkendes.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Send notifikationer, når medieanmodninger godkendes manuelt.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Få besked, når der automatisk indsendes nye medieanmodninger til elementer på din Se senere-liste.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Send notifikationer, når medieanmodninger bliver tilgængelige.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Send beskeder, når medieanmodninger afvises.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Send notifikationer, når medieanmodninger ikke kan tilføjes til Radarr eller Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Send notifikationer, når brugere indsender nye medieanmodninger, der kræver godkendelse.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Notifikationstyper',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Få besked, når problemer, du har rapporteret, får nye kommentarer.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Få besked, når andre brugere rapporterer problemer.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Få besked, når problemer, du har rapporteret, genåbnes.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Få besked, når de problemer, du har rapporteret, er løst.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Få besked, når andre brugere indsender nye medieanmodninger, som automatisk godkendes.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Få besked, når dine medieanmodninger godkendes.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Få besked, når dine medieanmodninger bliver tilgængelige.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Få besked, når dine medieanmodninger afvises.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Få besked, når medieanmodninger ikke kan føjes til Radarr eller Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Få besked, når andre brugere indsender nye medieanmodninger, der kræver godkendelse.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Aktivt abonnement',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Browser',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Oprettet',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Slet abonnement',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Enhed',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Deaktiver web-push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Noget gik galt under deaktivering af web-push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Aktivér web-push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Noget gik galt under aktivering af web-push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Engine',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Administrér enheder',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Du har ingen web-push-abonnementer at vise.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Operativsystem',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Abonnement slettet.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Noget gik galt under sletning af brugerabonnementet.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'type',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Ukendt',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Web-push er blevet deaktiveret.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Web-push er blevet aktiveret.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Indstillinger for web-push-notifikationer kunne ikke gemmes.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Indstillinger for web-push-notifikationer er gemt!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Enhedsstandard',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Bruger-IDer',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Tilføj bruger-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord-bruger-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Fjern',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'Det <FindDiscordIdLink>flercifrede ID-nummer</FindDiscordIdLink>, der er knyttet til din brugerkonto. Hvis der er flere konti i husstanden, kan du tilføje mere end ét Discord-bruger-ID.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'Serverejeren har ikke aktiveret Discord-notifikationer. Disse oplysninger bruges kun, hvis serverejeren konfigurerer en ekstern tjeneste.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Indstillinger for Discord-notifikationer kunne ikke gemmes.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Indstillinger for Discord-notifikationer er gemt!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Email',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Indstillinger for email-notifikationer kunne ikke gemmes.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Indstillinger for email-notifikationer er gemt!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notifikationer',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'PGP offentlig nøgle',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Kryptér e-mails med <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Adgangstoken',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Opret en token fra dine <PushbulletSettingsLink>kontoindstillinger</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Indstillingerne for Pushbullet-notifikationer kunne ikke gemmes.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Indstillinger for Pushbullet-notifikationer er gemt!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Applikations-API-token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registrér en applikation</ApplicationRegistrationLink> til brug med {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Bruger- eller gruppenøgle',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Dit <UsersGroupsLink>bruger- eller gruppe-ID</UsersGroupsLink> på 30 tegn',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Indstillinger for Pushover-notifikationer kunne ikke gemmes.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Indstillinger for Pushover-notifikationer gemt!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Send lydløst',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Send notifikationer uden lyd',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Notifikationslyd',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Chat-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Start en chat</TelegramBotLink>, tilføj <GetIdBotLink>@get_id_bot</GetIdBotLink> og benyt <code>/my_id</code>-kommandoen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Tråd-/emne-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Hvis din gruppechat har emner aktiveret, kan du angive et tråd-/emne-ID her',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Telegram-notifikationsindstillingerne kunne ikke gemmes.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegram-notifikationsindstillinger gemt!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Hvert ID skal være et gyldigt Discord-bruger-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Du skal angive en gyldig offentlig PGP-nøgle',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Du skal angive et adgangstoken',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Du skal angive et gyldigt applikationstoken',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Du skal angive en gyldig bruger- eller gruppenøgle',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Du skal angive et gyldigt chat-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        "Tråd-/emne-ID'et skal være et positivt heltal",
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web-push',
     },
   },
   {
@@ -3732,6 +5101,211 @@ export const localeData = [
         'Ein höherer Aufwand kann die Bestellung verbessern, dauert jedoch länger und kostet mehr pro Deck.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'Optional für lokale Server, die keinen Schlüssel benötigen.',
+      'components.NotificationTypeSelector.mediarequested':
+        'Genehmigung ausstehend',
+      'components.NotificationTypeSelector.mediaapproved': 'Anfrage genehmigt',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Angefragtes Medium verfügbar',
+      'components.NotificationTypeSelector.mediafailed':
+        'Anfrageverarbeitung fehlgeschlagen',
+      'components.NotificationTypeSelector.mediadeclined': 'Anfrage abgelehnt',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Anfrage automatisch genehmigt',
+      'components.NotificationTypeSelector.issuecreated': 'Problem gemeldet',
+      'components.NotificationTypeSelector.issuecomment': 'Problemkommentar',
+      'components.NotificationTypeSelector.issueresolved': 'Problem gelöst',
+      'components.NotificationTypeSelector.issuereopened':
+        'Problem wiedereröffnet',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Anfrage automatisch übermittelt',
+      'components.NotificationTypeSelector.softwareavailable':
+        'Angeforderte Software verfügbar',
+      'components.NotificationTypeSelector.softwareStatus':
+        'Software-Anfrage-Updates',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Benachrichtigung erhalten, wenn andere Benutzer Kommentare zu Problemen verfassen.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Benachrichtigung erhalten, wenn Probleme von anderen Benutzern wieder geöffnet werden.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Benachrichtigung erhalten, wenn Probleme von anderen Benutzern gelöst werden.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Benachrichtigung erhalten, wenn Probleme neue Kommentare erhalten.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Benachrichtigung erhalten, wenn Probleme gemeldet werden.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Benachrichtigung erhalten, wenn Probleme wieder geöffnet werden.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Benachrichtigung erhalten, wenn Probleme gelöst sind.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Benachrichtigung erhalten, wenn das angefragte Medium automatisch genehmigt wird.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Benachrichtigung erhalten, wenn angefragte Medien manuell genehmigt wurden.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Benachrichtigung erhalten, wenn neue Medienanfragen für Objekte auf deiner Merkliste automatisch übermittelt werden.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Benachrichtigung erhalten, wenn angefragte Medien verfügbar werden.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Benachrichtigung erhalten, wenn Medienanfragen abgelehnt wurden.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Senden Sie Benachrichtigungen, wenn Medienanforderungen nicht zu Radarr, Sonarr, Lidarr oder Bookshelf hinzugefügt werden können.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Benachrichtigungen senden, wenn neue Medien angefragt wurden und auf Genehmigung warten.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Benachrichtigungstypen',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        'Senden Sie Benachrichtigungen für Softwareanforderungen, die auf die Genehmigung warten oder die genehmigt, abgelehnt oder fehlgeschlagen sind.',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'Benachrichtigungen senden, wenn die angeforderten ROMs und PC-Spiele zum Download bereit sind.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'Werden Sie benachrichtigt, wenn Ihre Softwareanforderung auf die Genehmigung wartet oder genehmigt, abgelehnt oder fehlgeschlagen ist.',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Benachrichtigung erhalten, wenn dein Problem neue Kommentare erhält.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Benachrichtigung erhalten, wenn andere Benutzer Probleme melden.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Benachrichtigung erhalten, wenn von dir gemeldete Probleme wieder geöffnet werden.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Benachrichtigung erhalten, wenn dein Problem gelöst wurde.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Benachrichtigung erhalten, wenn andere Benutzer neue Medienanfragen stellen, die automatisch genehmigt werden.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Benachrichtigung erhalten, wenn deine Medienanfragen genehmigt werden.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Benachrichtigung erhalten, wenn deine Medienanfragen verfügbar sind.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Benachrichtigung erhalten, wenn deine Medienanfrage abgelehnt wurde.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Lassen Sie sich benachrichtigen, wenn Medienanforderungen nicht zu Radarr, Sonarr, Lidarr oder Bookshelf hinzugefügt werden können.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Benachrichtigung erhalten, wenn andere Nutzer ein Medium anfragen, welches eine Genehmigung erfordert.',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'Lassen Sie sich benachrichtigen, wenn Ihre angeforderten ROMs und PC-Spiele zum Download bereit sind.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Aktives Abonnement',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Browser',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Erstellt',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Abonnement löschen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Gerät',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Web-Push deaktivieren',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Bei der Deaktivierung von Web-Push ist etwas schief gelaufen.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Web-Push aktivieren',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Bei der Aktivierung von Web-Push ist ein Fehler aufgetreten.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Motor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Geräte verwalten',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Es sind keine Web-Push-Abonnements vorhanden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Betriebssystem',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Abonnement gelöscht.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Beim Löschen des Benutzerabonnements ist ein Fehler aufgetreten.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'Typ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Unbekannt',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Web-Push wurde deaktiviert.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Web-Push wurde aktiviert.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Die Einstellungen für Web-Push-Benachrichtigungen konnten nicht gespeichert werden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Web-Push-Benachrichtigungseinstellungen erfolgreich gespeichert!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Gerätestandard',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Benutzer-IDs',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Benutzer-ID hinzufügen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord Benutzer-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Entfernen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'Die mit Ihrem Benutzerkonto verknüpfte mehrstellige <FindDiscordIdLink>-ID-Nummer</FindDiscordIdLink>. Für mehrere Haushaltskonten können Sie mehr als eine Discord-Benutzer-ID hinzufügen.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'Der Serverbesitzer hat Discord-Benachrichtigungen nicht aktiviert. Diese Informationen werden nur verwendet, wenn der Serverbesitzer einen externen Dienst konfiguriert.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Die Einstellungen für die Discord-Benachrichtigung konnten nicht gespeichert werden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord-Benachrichtigungseinstellungen erfolgreich gespeichert!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-Mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'E-Mail-Benachrichtigungseinstellungen konnten nicht gespeichert werden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'E-Mail-Benachrichtigungseinstellungen erfolgreich gespeichert!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Benachrichtigungen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Öffentlicher PGP-Schlüssel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Verschlüssele E-Mail-Nachrichten mit <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Zugangs-Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Erstelle ein Token aus deinen <PushbulletSettingsLink>Kontoeinstellungen</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Die Einstellungen für Pushbullet-Benachrichtigungen konnten nicht gespeichert werden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet-Benachrichtigungseinstellungen erfolgreich gespeichert!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Anwendungs API-Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registriere eine Anwendung</ApplicationRegistrationLink> zur Verwendung mit {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Benutzer- oder Gruppenschlüssel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Die 30-stellige <UsersGroupsLink>Benutzer- oder Gruppenkennung</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Die Einstellungen für die Pushover-Benachrichtigung konnten nicht gespeichert werden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushover-Benachrichtigungseinstellungen erfolgreich gespeichert!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Lautlos senden',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Sende Benachrichtigungen ohne Ton',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Benachrichtigungston',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Chat-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Starte einen Chat</TelegramBotLink>, füge <GetIdBotLink>@get_id_bot</GetIdBotLink> hinzu, und führe den Befehl <code>/my_id</code> aus',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Thread/Themen ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Wenn in deinem Gruppenchat Themen aktiviert sind, kannst du hier die ID des Threads/Themas angeben',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Die Einstellungen für die Telegram-Benachrichtigung konnten nicht gespeichert werden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegram-Benachrichtigungseinstellungen erfolgreich gespeichert!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Jede ID muss eine gültige Discord-Benutzer-ID sein.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Du musst einen gültigen öffentlichen PGP-Schlüssel angeben',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Ein Zugriffstoken muss angegeben werden',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Du musst einen gültigen Anwendungs-Token angeben',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Du musst einen gültigen Benutzer- oder Gruppenschlüssel angeben',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Du musst eine gültige Chat-ID angeben',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'Die Thread-/Themen-ID muss eine positive ganze Zahl sein.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web-Push',
     },
   },
   {
@@ -4643,6 +6217,225 @@ export const localeData = [
         'Higher effort can improve ordering but takes longer and costs more per deck.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'Optional for local servers that do not require a key.',
+      'components.NotificationTypeSelector.mediarequested':
+        'Request awaiting approval',
+      'components.NotificationTypeSelector.mediaapproved': 'Request approved',
+      'components.NotificationTypeSelector.mediaavailable': 'Media available',
+      'components.NotificationTypeSelector.mediafailed': 'Request failed',
+      'components.NotificationTypeSelector.mediadeclined': 'Request declined',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Request automatically approved',
+      'components.NotificationTypeSelector.issuecreated': 'Issue reported',
+      'components.NotificationTypeSelector.issuecomment': 'Issue comment added',
+      'components.NotificationTypeSelector.issueresolved': 'Issue resolved',
+      'components.NotificationTypeSelector.issuereopened': 'Issue reopened',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Media automatically requested',
+      'components.NotificationTypeSelector.softwareavailable':
+        'Software available',
+      'components.NotificationTypeSelector.softwareStatus':
+        'Software request status changed',
+      'components.NotificationTypeSelector.mediaPendingUpdated':
+        'Pending request updated',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Get notified when other users comment on issues.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Get notified when issues are reopened by other users.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Get notified when issues are resolved by other users.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Send notifications when issues receive new comments.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Send notifications when issues are reported.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Send notifications when issues are reopened.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Send notifications when issues are resolved.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Send notifications when users submit new media requests which are automatically approved.',
+      'components.NotificationTypeSelector.mediaPendingUpdatedDescription':
+        'Send notifications when a pending request’s owner, selections, or acquisition options change.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Send notifications when media requests are manually approved.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Get notified when new media requests are automatically submitted for items on Your Watchlist.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Send notifications when media requests become available.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Send notifications when media requests are declined.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Send notifications when media requests fail to be added to Radarr, Sonarr, Lidarr, or Bookshelf.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Send notifications when users submit new media requests which require approval.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Notification Types',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        'Send notifications for software requests awaiting approval or that were approved, declined, or failed.',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'Send notifications when requested ROMs and PC games are ready to download.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'Get notified when your software request is awaiting approval or is approved, declined, or fails.',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Get notified when issues you reported receive new comments.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Get notified when other users report issues.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Get notified when issues you reported are reopened.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Get notified when issues you reported are resolved.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Get notified when other users submit new media requests which are automatically approved.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Get notified when your media requests are approved.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Get notified when your media requests become available.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Get notified when your media requests are declined.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Get notified when media requests fail to be added to Radarr, Sonarr, Lidarr, or Bookshelf.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Get notified when other users submit new media requests which require approval.',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'Get notified when your requested ROMs and PC games are ready to download.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Active Subscription',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Browser',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Created',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Delete Subscription',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Device',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Disable web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Something went wrong while disabling web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Enable web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Something went wrong while enabling web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Engine',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Manage Devices',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'You have no web push subscriptions to show.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Operating System',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Subscription deleted.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Something went wrong while deleting the user subscription.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'type',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Unknown',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Web push has been disabled.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Web push has been enabled.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Web push notification settings failed to save.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Web push notification settings saved successfully!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Device Default',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'User IDs',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Add User ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord User ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Remove',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'The <FindDiscordIdLink>multi-digit ID number</FindDiscordIdLink> associated with your user account. For multiple household accounts you can add more than one Discord user ID.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'The server owner has not enabled Discord notifications. This information will only be used if the server owner configures an external service.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Discord notification settings failed to save.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord notification settings saved successfully!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Email',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Email notification settings failed to save.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Email notification settings saved successfully!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notifications',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'PGP Public Key',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Encrypt email messages using <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Access Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Create a token from your <PushbulletSettingsLink>Account Settings</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Pushbullet notification settings failed to save.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet notification settings saved successfully!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Application API Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Register an application</ApplicationRegistrationLink> for use with {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'User or Group Key',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Your 30-character <UsersGroupsLink>user or group identifier</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Pushover notification settings failed to save.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushover notification settings saved successfully!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Send Silently',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Send notifications with no sound',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Notification Sound',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Chat ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Start a chat</TelegramBotLink>, add <GetIdBotLink>@get_id_bot</GetIdBotLink>, and issue the <code>/my_id</code> command',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Thread/Topic ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        "If your group-chat has topics enabled, you can specify a thread/topic's ID here",
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Telegram notification settings failed to save.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegram notification settings saved successfully!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Each ID must be a valid Discord user ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'You must provide a valid PGP public key',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'You must provide an access token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'You must provide a valid application token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'You must provide a valid user or group key',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'You must provide a valid chat ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'The thread/topic ID must be a positive whole number',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
+      'lumen.status.queued': 'Queued',
+      'lumen.status.shared': 'Available to Other Users',
+      'lumen.status.partlyInLibrary': 'Partly in library',
+      'lumen.status.onServer': 'On {server}',
+      'lumen.status.partlyOnServer': 'Partly on {server}',
+      'lumen.status.downloadingPercent': 'Downloading {percent}%',
+      'lumen.status.allInLibrary': 'All {count} in library',
+      'lumen.status.ownedInLibrary': '{owned} of {total} in library',
+      'lumen.status.blocklisted': 'Blocklisted',
+      'lumen.status.inLibrary': 'In library',
+      'lumen.status.requested': 'Requested',
+      'lumen.status.downloading': 'Downloading',
+      'lumen.status.complete': 'Complete',
       'lumen.nav.administration': 'Administration',
       'lumen.nav.lumenSettings': 'Lumen Settings',
       'lumen.nav.seerrAdministration': 'SeerrNG Administration',
@@ -5184,6 +6977,8 @@ export const localeData = [
       'lumen.issueReport.submit': 'Submit Report',
       'lumen.issueReport.media': 'Media',
       'lumen.calendar.title': 'Release Calendar',
+      'lumen.calendar.description':
+        'Upcoming movie, series, music, book, comic, magazine, PC game, and emulation releases from your acquisition services.',
       'lumen.calendar.filters': 'Calendar Filters',
       'lumen.calendar.previousMonth': 'Previous Month',
       'lumen.calendar.month': 'Month',
@@ -5696,6 +7491,447 @@ export const localeData = [
       'lumen.adminDiscovery.forbidden':
         'You do not have permission to change integration credentials.',
       'lumen.adminDiscovery.loading': 'Loading discovery credentials…',
+      'lumen.automaticBlocklist.genres': 'genres',
+      'lumen.automaticBlocklist.movieGenres': 'Blocklisted Movie Genres',
+      'lumen.automaticBlocklist.tvGenres': 'Blocklisted TV Genres',
+      'lumen.automaticBlocklist.genreId': 'Genre #{id}',
+      'lumen.automaticBlocklist.confirmFailure':
+        'Could not confirm the saved blocklist settings.',
+      'lumen.automaticBlocklist.saved': 'Automatic blocklist settings saved.',
+      'lumen.automaticBlocklist.saveFailure':
+        'Could not save automatic blocklist settings.',
+      'lumen.automaticBlocklist.keywords': 'Blocklisted TMDB Keyword IDs',
+      'lumen.automaticBlocklist.keywordHelp':
+        'Enter up to 100 IDs, separated by commas.',
+      'lumen.automaticBlocklist.keywordSearch': 'Find Blocklist Keywords',
+      'lumen.automaticBlocklist.findKeywords': 'Find Keywords',
+      'lumen.automaticBlocklist.pageLimit':
+        'Limit Pages per Blocklist Tag or Genre',
+      'lumen.automaticBlocklist.pageLimitHelp':
+        'Enter a whole number from 0 to 250.',
+      'lumen.automaticBlocklist.save': 'Save Automatic Blocklist Settings',
+      'lumen.automaticBlocklist.title': 'Automatic Blocklist',
+      'lumen.automaticBlocklist.settings': 'automatic blocklist settings',
+      'lumen.automaticBlocklist.loading':
+        'Loading automatic blocklist settings…',
+      'lumen.keywordResults.what': 'subject tags',
+      'lumen.keywordResults.loading': 'Finding subject tags…',
+      'lumen.keywordResults.empty': 'No matching subject tags.',
+      'lumen.keywordResults.results': 'Subject Tag Results',
+      'lumen.keywordResults.pages': 'Subject Tag Pages',
+      'lumen.keywordResults.previous': 'Previous Tag Page',
+      'lumen.keywordResults.page': 'Tag page {page}',
+      'lumen.keywordResults.pageTotal': ' of {total}',
+      'lumen.keywordResults.next': 'Next Tag Page',
+      'lumen.streamingPolicy.title': 'Streaming Request Policy',
+      'lumen.streamingPolicy.what': 'streaming request policy',
+      'lumen.streamingPolicy.loading': 'Loading streaming request policy…',
+      'lumen.streamingPolicy.enabled': 'Enable Streaming Request Policy',
+      'lumen.streamingPolicy.description':
+        'Apply an action based on the requester’s streaming subscriptions.',
+      'lumen.streamingPolicy.when': 'When the title is',
+      'lumen.streamingPolicy.available': 'Available on their subscriptions',
+      'lumen.streamingPolicy.unavailable': 'Unavailable on their subscriptions',
+      'lumen.streamingPolicy.action': 'Request action',
+      'lumen.streamingPolicy.reject': 'Reject',
+      'lumen.streamingPolicy.pending': 'Require approval',
+      'lumen.streamingPolicy.approve': 'Approve',
+      'lumen.streamingPolicy.rejectionMessage': 'Rejection message',
+      'lumen.streamingPolicy.allowOverride': 'Allow per-user overrides',
+      'lumen.streamingPolicy.save': 'Save Streaming Request Policy',
+      'lumen.streamingPolicy.saved': 'Streaming request policy saved.',
+      'lumen.streamingPolicy.saveFailure':
+        'Could not save streaming request policy.',
+      'lumen.streamingPolicy.confirmFailure':
+        'Could not confirm the saved streaming request policy.',
+      'lumen.discoveryRegions.regions': 'Regions',
+      'lumen.discoveryRegions.languages': 'languages',
+      'lumen.discoveryRegions.field.discoverRegion': 'Discover Region',
+      'lumen.discoveryRegions.field.streamingRegion': 'Streaming Region',
+      'lumen.discoveryRegions.field.originalLanguage': 'Original Language',
+      'lumen.discoveryRegions.field.blocklistRegion': 'Blocklist Region',
+      'lumen.discoveryRegions.field.blocklistLanguage': 'Blocklist Language',
+      'lumen.discoveryRegions.visibility.includeAdult':
+        'Include Adult Content in TMDB Search and Discovery',
+      'lumen.discoveryRegions.visibility.hideAvailable':
+        'Hide Available Titles',
+      'lumen.discoveryRegions.visibility.hideRequested':
+        'Hide Requested Titles',
+      'lumen.discoveryRegions.visibility.hideBlocklisted':
+        'Hide Blocklisted Titles From Blocklist Managers',
+      'lumen.discoveryRegions.any.region': 'Any region',
+      'lumen.discoveryRegions.any.language': 'Any language',
+      'lumen.discoveryRegions.save': 'Save Discovery Region Settings',
+      'lumen.discoveryRegions.saved': 'Discovery region settings saved.',
+      'lumen.discoveryRegions.confirmFailure':
+        'Could not confirm the saved discovery settings.',
+      'lumen.discoveryRegions.saveFailure':
+        'Could not save discovery region settings.',
+      'lumen.discoveryRegions.title': 'Discovery Regions and Languages',
+      'lumen.discoveryRegions.settings': 'discovery region settings',
+      'lumen.discoveryRegions.loading': 'Loading discovery region settings…',
+      'lumen.identityPacks.fileTooLarge': 'The pack must be 5 MiB or smaller.',
+      'lumen.identityPacks.invalidFile':
+        'Choose a supported title-match pack JSON file.',
+      'lumen.identityPacks.readFailure': 'Could not read the selected file.',
+      'lumen.identityPacks.published':
+        'Published {name}. {total} matches, {imported} new, {updated} changed, {unchanged} unchanged, {removed} removed.',
+      'lumen.identityPacks.publishFailure':
+        'Could not publish the pack. Check the file and try again.',
+      'lumen.identityPacks.downloadFailure':
+        'Could not download the pack. Try again.',
+      'lumen.identityPacks.deleted': 'Deleted {name} for every account.',
+      'lumen.identityPacks.deleteFailure':
+        'Could not delete the pack. Try again.',
+      'lumen.identityPacks.title': 'Shared Discovery Title Matches',
+      'lumen.identityPacks.help':
+        'Shared packs apply to every account. A user’s private match takes precedence.',
+      'lumen.identityPacks.what': 'shared title-match packs',
+      'lumen.identityPacks.loading': 'Loading shared packs…',
+      'lumen.identityPacks.choose': 'Choose Pack File',
+      'lumen.identityPacks.draftSummary':
+        '{name} ({id}) contains {count} title matches.',
+      'lumen.identityPacks.replaceWarning':
+        'Publishing replaces all entries in any existing pack with this ID.',
+      'lumen.identityPacks.acknowledge':
+        'I understand this pack applies to every account.',
+      'lumen.identityPacks.replace': 'Replace Shared Pack',
+      'lumen.identityPacks.publish': 'Publish Shared Pack',
+      'lumen.identityPacks.clear': 'Clear Selected File',
+      'lumen.identityPacks.empty': 'No shared packs have been published.',
+      'lumen.identityPacks.packCount': '{id} · {count} title matches',
+      'lumen.identityPacks.download': 'Download Pack',
+      'lumen.identityPacks.delete': 'Delete Pack',
+      'lumen.identityPacks.deleteWarning':
+        'Deleting {name} removes its shared matches for every account.',
+      'lumen.identityPacks.confirmDelete': 'Delete Shared Pack',
+      'lumen.identityPacks.keep': 'Keep Shared Pack',
+      'lumen.adminUsers.allUsers': 'All Users',
+      'lumen.adminUsers.ascending': 'Ascending',
+      'lumen.adminUsers.backToAccount': 'Back to Account',
+      'lumen.adminUsers.cancel': 'Cancel',
+      'lumen.adminUsers.createFailure': 'Could not create the account.',
+      'lumen.adminUsers.createLocalUser': 'Create Local User',
+      'lumen.adminUsers.createUser': 'Create User',
+      'lumen.adminUsers.created': 'Created {name}.',
+      'lumen.adminUsers.creating': 'Creating…',
+      'lumen.adminUsers.deleteFailure': 'Could not delete the account.',
+      'lumen.adminUsers.deleteTitle': 'Delete {name}?',
+      'lumen.adminUsers.deleteUser': 'Delete User',
+      'lumen.adminUsers.deleteWarning':
+        'This permanently deletes the account and its request history.',
+      'lumen.adminUsers.deleted': 'Deleted {name}.',
+      'lumen.adminUsers.descending': 'Descending',
+      'lumen.adminUsers.editProfile': 'Edit Profile',
+      'lumen.adminUsers.email': 'Email',
+      'lumen.adminUsers.emailRequired': 'Enter an email address.',
+      'lumen.adminUsers.emailSetupLink': 'Email a password setup link',
+      'lumen.adminUsers.empty': 'No users match this search.',
+      'lumen.adminUsers.episodeQueue': 'Episode Queue',
+      'lumen.adminUsers.importUsers': 'Import {provider} Users',
+      'lumen.adminUsers.invalidUserId': 'Invalid user ID.',
+      'lumen.adminUsers.keepUser': 'Keep User',
+      'lumen.adminUsers.linkedAccounts': 'Linked Accounts',
+      'lumen.adminUsers.loading': 'Loading users…',
+      'lumen.adminUsers.maturityLimits': 'Maturity Limits',
+      'lumen.adminUsers.mediaCategories': 'Media Categories',
+      'lumen.adminUsers.nextPage': 'Next Page',
+      'lumen.adminUsers.notificationSettings': 'Notification Settings',
+      'lumen.adminUsers.notificationsLoading': 'Loading notification settings…',
+      'lumen.adminUsers.page': 'Page {page}',
+      'lumen.adminUsers.password': 'Password',
+      'lumen.adminUsers.permissions': 'Permissions',
+      'lumen.adminUsers.previousPage': 'Previous Page',
+      'lumen.adminUsers.profile': 'profile',
+      'lumen.adminUsers.profileLoading': 'Loading profile…',
+      'lumen.adminUsers.profileSaveFailure': 'Could not save the profile.',
+      'lumen.adminUsers.profileSaved': 'Profile saved.',
+      'lumen.adminUsers.refresh': 'Refresh',
+      'lumen.adminUsers.requestCount': '{count} requests',
+      'lumen.adminUsers.requestQuotas': 'Request Quotas',
+      'lumen.adminUsers.requests': 'Requests',
+      'lumen.adminUsers.role.administrator': 'Administrator',
+      'lumen.adminUsers.role.member': 'Member',
+      'lumen.adminUsers.role.owner': 'Owner',
+      'lumen.adminUsers.role.userManager': 'User Manager',
+      'lumen.adminUsers.saveProfile': 'Save Profile',
+      'lumen.adminUsers.search': 'Search',
+      'lumen.adminUsers.searchUsers': 'Search Users',
+      'lumen.adminUsers.setLocalPassword': 'Set Local Password',
+      'lumen.adminUsers.setupLinkRequirement':
+        'Setup links require an application URL and email notifications.',
+      'lumen.adminUsers.signInLinks': 'Sign-in Links',
+      'lumen.adminUsers.sort.created': 'Date Added',
+      'lumen.adminUsers.sort.displayname': 'Name',
+      'lumen.adminUsers.sort.requests': 'Request Count',
+      'lumen.adminUsers.sort.role': 'Role',
+      'lumen.adminUsers.sort.updated': 'Last Updated',
+      'lumen.adminUsers.sort.usertype': 'Account Type',
+      'lumen.adminUsers.sortBy': 'Sort By',
+      'lumen.adminUsers.sortDirection': 'Sort Direction',
+      'lumen.adminUsers.title': 'Users',
+      'lumen.adminUsers.tvRequestAccess': 'TV Request Access',
+      'lumen.adminUsers.username': 'Username',
+      'lumen.adminUsers.usernameRequired': 'Enter a username.',
+      'lumen.adminUsers.users': 'users',
+      'lumen.adminUsers.viewRequests': 'View Requests for {name}',
+      'lumen.adminUsers.viewWatchlist': 'View Watchlist for {name}',
+      'lumen.adminUsers.watchlist': 'Watchlist',
+      'lumen.managedEpisodeQueue.saved': 'Episode Queue default saved.',
+      'lumen.managedEpisodeQueue.saveFailure':
+        'Could not save the Episode Queue default.',
+      'lumen.managedEpisodeQueue.title': 'Episode Queue default',
+      'lumen.managedEpisodeQueue.loading': 'Loading Episode Queue…',
+      'lumen.managedEpisodeQueue.episodesAhead': 'Episodes Ahead',
+      'lumen.managedEpisodeQueue.off': 'Off',
+      'lumen.managedEpisodeQueue.saveDefault': 'Save Default',
+      'lumen.managedEpisodeQueue.confirmTitle':
+        'Save Episode Queue default for {name}?',
+      'lumen.managedEpisodeQueue.confirmBody':
+        'This applies to existing and future interactive TV requests. Episodes already requested stay in place.',
+      'lumen.managedEpisodeQueue.goBack': 'Go Back',
+      'lumen.managedTvAccess.title': 'TV request access',
+      'lumen.managedTvAccess.loading': 'Loading TV request access…',
+      'lumen.managedTvAccess.everyone': 'Enabled for everyone',
+      'lumen.managedTvAccess.status.off': 'Approval needed',
+      'lumen.managedTvAccess.status.pending': 'Waiting for approval',
+      'lumen.managedTvAccess.status.approved': 'Approved · off',
+      'lumen.managedTvAccess.status.enabled': 'Enabled for this account',
+      'lumen.managedTvAccess.status.denied': 'Request declined',
+      'lumen.managedTvAccess.requested': 'Requested {date}',
+      'lumen.managedTvAccess.refresh': 'Refresh Access',
+      'lumen.managedTvAccess.review': 'Review TV Access Requests',
+      'lumen.managedPassword.mismatch':
+        'Enter matching passwords of at least 8 characters.',
+      'lumen.managedPassword.saved': 'Local password saved.',
+      'lumen.managedPassword.saveFailure': 'Could not save the local password.',
+      'lumen.managedPassword.description':
+        'Set a new password for {name}’s SeerrNG local login.',
+      'lumen.managedPassword.newPassword': 'New Local Password',
+      'lumen.managedPassword.confirmPassword': 'Confirm New Local Password',
+      'lumen.managedPassword.save': 'Save Local Password',
+      'lumen.managedLoginLinks.revoked': 'Sign-in link revoked.',
+      'lumen.managedLoginLinks.updateFailure':
+        'Could not update sign-in links.',
+      'lumen.managedLoginLinks.copied': 'Sign-in link copied.',
+      'lumen.managedLoginLinks.copyFallback':
+        'Select and copy the link from the field.',
+      'lumen.managedLoginLinks.title': 'One-Time Sign-in Links',
+      'lumen.managedLoginLinks.description':
+        'Each link expires after 30 minutes or one use.',
+      'lumen.managedLoginLinks.create': 'Create Sign-in Link',
+      'lumen.managedLoginLinks.newLink': 'New sign-in link',
+      'lumen.managedLoginLinks.copy': 'Copy Link',
+      'lumen.managedLoginLinks.what': 'sign-in links',
+      'lumen.managedLoginLinks.loading': 'Loading sign-in links…',
+      'lumen.managedLoginLinks.empty': 'No sign-in links yet.',
+      'lumen.managedLoginLinks.status.active': 'Active',
+      'lumen.managedLoginLinks.status.used': 'Used',
+      'lumen.managedLoginLinks.status.revoked': 'Revoked',
+      'lumen.managedLoginLinks.status.expired': 'Expired',
+      'lumen.managedLoginLinks.expires': 'Expires {date}',
+      'lumen.managedLoginLinks.revoke': 'Revoke Link',
+      'lumen.managedMaturity.saved': 'Maturity limits saved.',
+      'lumen.managedMaturity.saveFailure': 'Could not save maturity limits.',
+      'lumen.managedMaturity.what': 'maturity limits',
+      'lumen.managedMaturity.loading': 'Loading maturity limits…',
+      'lumen.managedMaturity.description':
+        'A limit applies to browsing and requests. Titles without a recognized US rating are blocked when a limit is set.',
+      'lumen.managedMaturity.movieMaturityRatingLimit': 'Movie Rating Limit',
+      'lumen.managedMaturity.tvMaturityRatingLimit': 'Series Rating Limit',
+      'lumen.managedMaturity.noLimit': 'No Limit',
+      'lumen.managedMaturity.save': 'Save Maturity Limits',
+      'lumen.managedMediaCategories.saved': 'Media categories saved.',
+      'lumen.managedMediaCategories.indexerSaved': 'Indexer visibility saved.',
+      'lumen.managedMediaCategories.saveFailure':
+        'Could not save media categories.',
+      'lumen.managedMediaCategories.indexerFailure':
+        'Could not save indexer visibility.',
+      'lumen.managedMediaCategories.what': 'media categories',
+      'lumen.managedMediaCategories.loading': 'Loading media categories…',
+      'lumen.managedMediaCategories.serverDefaults': 'Using server defaults.',
+      'lumen.managedMediaCategories.accountOverrides':
+        'Using account overrides.',
+      'lumen.managedMediaCategories.save': 'Save Categories',
+      'lumen.managedMediaCategories.restore': 'Restore Server Defaults',
+      'lumen.managedMediaCategories.indexerDisabled':
+        'Indexer details are disabled by the server.',
+      'lumen.managedMediaCategories.indexerDetails': 'Indexer Details',
+      'lumen.managedMediaCategories.useDefault': 'Use Server Default',
+      'lumen.managedMediaCategories.show': 'Show',
+      'lumen.managedMediaCategories.hide': 'Hide',
+      'lumen.managedQuotas.perDay': 'per {count} day',
+      'lumen.managedQuotas.perDays': 'per {count} days',
+      'lumen.managedQuotas.allTime': 'across all time',
+      'lumen.managedQuotas.requestWindow': '{count} request {window}',
+      'lumen.managedQuotas.requestsWindow': '{count} requests {window}',
+      'lumen.managedQuotas.unlimited': 'unlimited requests',
+      'lumen.managedQuotas.bothValues':
+        'Enter both values or clear both to use the server default.',
+      'lumen.managedQuotas.saved': 'Request quota saved.',
+      'lumen.managedQuotas.saveFailure': 'Could not save the request quota.',
+      'lumen.managedQuotas.what': 'request quotas',
+      'lumen.managedQuotas.loading': 'Loading request quotas…',
+      'lumen.managedQuotas.description':
+        'Leave both fields blank to use the server default.',
+      'lumen.managedQuotas.mediaType': 'Media Type',
+      'lumen.managedQuotas.serverDefault': 'Server default: {value}',
+      'lumen.managedQuotas.limit': 'Request Limit',
+      'lumen.managedQuotas.days': 'Quota Days',
+      'lumen.managedQuotas.save': 'Save Quota',
+      'lumen.managedQuotas.category.movie': 'Movies',
+      'lumen.managedQuotas.category.tv': 'Series',
+      'lumen.managedQuotas.category.music': 'Music',
+      'lumen.managedQuotas.category.book': 'Books',
+      'lumen.managedQuotas.category.comic': 'Comics',
+      'lumen.managedQuotas.category.magazine': 'Magazines',
+      'lumen.managedQuotas.category.software': 'Software',
+      'lumen.managedLinkedAccounts.unlinked': 'Account unlinked.',
+      'lumen.managedLinkedAccounts.unlinkFailure':
+        'Could not unlink the account.',
+      'lumen.managedLinkedAccounts.what': 'linked accounts',
+      'lumen.managedLinkedAccounts.passwordStatus': 'password status',
+      'lumen.managedLinkedAccounts.loading': 'Loading linked accounts…',
+      'lumen.managedLinkedAccounts.empty': 'No linked accounts.',
+      'lumen.managedLinkedAccounts.unlink': 'Unlink {name}',
+      'lumen.managedLinkedAccounts.confirmTitle': 'Unlink {name}?',
+      'lumen.managedLinkedAccounts.confirmBody':
+        'This removes the linked sign-in method from this account.',
+      'lumen.managedLinkedAccounts.confirm': 'Unlink Account',
+      'lumen.managedLinkedAccounts.goBack': 'Go Back',
+      'lumen.importMediaServerUsers.sync': 'Sync Existing Users',
+      'lumen.importMediaServerUsers.importSelected': 'Import Selected Users',
+      'lumen.importMediaServerUsers.imported':
+        'Imported {added}, refreshed {refreshed}.',
+      'lumen.importMediaServerUsers.failure': 'Could not import users.',
+      'lumen.importMediaServerUsers.title': 'Import {provider} Users',
+      'lumen.importMediaServerUsers.what': '{provider} users',
+      'lumen.importMediaServerUsers.loading': 'Loading provider users…',
+      'lumen.importMediaServerUsers.syncExisting': 'Sync Existing Users',
+      'lumen.importMediaServerUsers.noNewUsers': 'No new users to import.',
+      'lumen.importMediaServerUsers.userGroup': '{provider} users',
+      'lumen.importMediaServerUsers.alreadyImported': 'Already Imported',
+      'lumen.importMediaServerUsers.close': 'Close Import',
+      'lumen.importMediaServerUsers.confirmTitle': '{action}?',
+      'lumen.importMediaServerUsers.syncBody':
+        'Refresh linked Plex accounts and import any newly eligible Plex users.',
+      'lumen.importMediaServerUsers.selectedBody':
+        '{count} selected from {provider}.',
+      'lumen.importMediaServerUsers.goBack': 'Go Back',
+      'lumen.notifications.accountSettings': 'Account Settings',
+      'lumen.notifications.addPublicKey':
+        'Add a public key to encrypt notification email.',
+      'lumen.notifications.chooseEvents':
+        'Choose which events send notifications.',
+      'lumen.notifications.confirmPublicKeyFailure':
+        'Could not confirm the saved key. Reload settings and try again.',
+      'lumen.notifications.confirmRemoveKey': 'Confirm Remove Key',
+      'lumen.notifications.confirmRemovePublicKey':
+        'Remove the key and turn off OpenPGP encryption for your notifications?',
+      'lumen.notifications.discordIdLimit':
+        'Enter up to ten valid Discord user IDs, one per line.',
+      'lumen.notifications.discordIdRequired':
+        'Enter at least one Discord user ID to receive mentions.',
+      'lumen.notifications.discordIdTip':
+        'Enter one user ID per line. The server controls which events can send mentions.',
+      'lumen.notifications.emailDisabled':
+        'Email notifications are disabled on this server.',
+      'lumen.notifications.keepKey': 'Keep Key',
+      'lumen.notifications.keepPushbulletToken':
+        'An access token is configured. Leave the replacement field empty to keep it.',
+      'lumen.notifications.keepPushoverCredentials':
+        'Leave the credential fields empty to keep configured credentials.',
+      'lumen.notifications.loading': 'Loading notification settings…',
+      'lumen.notifications.openBot': 'Open @{bot}',
+      'lumen.notifications.optionalForumTopic': 'Optional for forum topics.',
+      'lumen.notifications.publicKeyConfigured':
+        'A public key is configured for notification email.',
+      'lumen.notifications.publicKeyRemoved': 'Public key removed.',
+      'lumen.notifications.publicKeySaveFailure':
+        'Could not save the public key. Try again.',
+      'lumen.notifications.publicKeySaved': 'Public key saved.',
+      'lumen.notifications.pushoverSounds': 'Pushover sounds',
+      'lumen.notifications.removePublicKey': 'Remove Public Key',
+      'lumen.notifications.removePushbulletToken':
+        'Remove Token and Disable Pushbullet Events',
+      'lumen.notifications.removePushoverCredentials':
+        'Remove Credentials and Disable Pushover Events',
+      'lumen.notifications.replacementAccessToken': 'Replacement Access Token',
+      'lumen.notifications.replacementApplicationToken':
+        'Replacement Application Token',
+      'lumen.notifications.replacementPublicKey':
+        'Replacement OpenPGP Public Key',
+      'lumen.notifications.replacementUserKey': 'Replacement User or Group Key',
+      'lumen.notifications.saveDiscord': 'Save Discord Settings',
+      'lumen.notifications.savePreferences': 'Save {label} Preferences',
+      'lumen.notifications.savePublicKey': 'Save Public Key',
+      'lumen.notifications.savePushbullet': 'Save Pushbullet Settings',
+      'lumen.notifications.savePushover': 'Save Pushover Settings',
+      'lumen.notifications.saveTelegram': 'Save Telegram Settings',
+      'lumen.notifications.saving': 'Saving…',
+      'lumen.notifications.telegramEvents':
+        'Choose the events to send to Telegram.',
+      'lumen.notifications.telegramStartChat':
+        'Start a conversation with the configured Telegram bot before enabling notifications.',
+      'lumen.notifications.validationPushoverCredentials':
+        'Enter a 30-character application token and user or group key to enable Pushover events.',
+      'lumen.notifications.allowBrowserNotifications':
+        'Allow notifications in your browser to register this device.',
+      'lumen.notifications.browserDeviceRemoved': 'Browser device removed.',
+      'lumen.notifications.browserPushDisabled':
+        'Browser push registration is disabled. Check your notification preferences.',
+      'lumen.notifications.browserRegisterFailure':
+        'Could not register this browser. Try again.',
+      'lumen.notifications.browserRegistered': 'This browser is registered.',
+      'lumen.notifications.browserRegistrationRequirements':
+        'Browser registration requires a compatible browser and a secure connection.',
+      'lumen.notifications.browserRemoveFailure':
+        'Could not remove the browser device. Try again.',
+      'lumen.notifications.disableThisBrowser': 'Disable This Browser',
+      'lumen.notifications.loadingBrowserDevices': 'Loading browser devices…',
+      'lumen.notifications.registerThisBrowser': 'Register This Browser',
+      'lumen.notifications.registeredAt': 'Registered {date}',
+      'lumen.notifications.removeBrowserBody':
+        '{device} will stop receiving SeerrNG push notifications.',
+      'lumen.notifications.removeBrowserTitle': 'Remove this browser device?',
+      'lumen.notifications.thisBrowser': 'This browser',
+      'lumen.notifications.browserDeviceName': 'Browser device',
+      'lumen.watchlist.movies': 'Movies',
+      'lumen.watchlist.series': 'Series',
+      'lumen.watchlist.music': 'Music',
+      'lumen.watchlist.books': 'Books',
+      'lumen.watchlist.comics': 'Comics',
+      'lumen.watchlist.magazines': 'Magazines',
+      'lumen.watchlist.recentlyAdded': 'Recently Added',
+      'lumen.watchlist.titleAZ': 'Title (A to Z)',
+      'lumen.watchlist.titleZA': 'Title (Z to A)',
+      'lumen.watchlist.removeFailure': 'Couldn’t remove this title',
+      'lumen.watchlist.loading': 'Loading {label}…',
+      'lumen.watchlist.noTitles': 'No titles on this page.',
+      'lumen.watchlist.removeTitle': 'Remove {title} from Watchlist',
+      'lumen.watchlist.removing': 'Removing…',
+      'lumen.watchlist.remove': 'Remove',
+      'lumen.watchlist.pages': 'Watchlist pages',
+      'lumen.watchlist.previous': 'Previous Page',
+      'lumen.watchlist.page': 'Page {page}',
+      'lumen.watchlist.next': 'Next Page',
+      'lumen.watchlist.userTitle': 'User Watchlist',
+      'lumen.watchlist.unavailable': 'This watchlist is unavailable.',
+      'lumen.watchlist.discoverTitle': 'Discover Watchlist',
+      'lumen.watchlist.title': 'Watchlist',
+      'lumen.watchlist.personalTitle': 'Personal Watchlist',
+      'lumen.watchlist.backToUser': 'Back to User',
+      'lumen.watchlist.filtersUnavailable':
+        'Plex and SeerrNG items share this list. Filters are unavailable in this view.',
+      'lumen.watchlist.filters': 'Watchlist filters',
+      'lumen.watchlist.search': 'Search titles',
+      'lumen.watchlist.searchPlaceholder': 'Search titles…',
+      'lumen.watchlist.mediaType': 'Media Type',
+      'lumen.watchlist.allTypes': 'All Types',
+      'lumen.watchlist.sortBy': 'Sort By',
+      'lumen.watchlist.addedOrder': 'Added Order',
+      'lumen.watchlist.apply': 'Apply Filters',
+      'lumen.watchlist.clear': 'Clear Filters',
     },
   },
   {
@@ -5828,6 +8064,145 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Σύνολο αιτημάτων',
       'components.Settings.SettingsAbout.uptodate': 'Ενημερωμένο',
       'components.Settings.SettingsAbout.version': 'Έκδοση',
+      'components.NotificationTypeSelector.mediarequested':
+        'Αίτημα σε αναμονή έγκρισης',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Το αίτημα εγκρίθηκε',
+      'components.NotificationTypeSelector.mediaavailable': 'Αίτημα διαθέσιμο',
+      'components.NotificationTypeSelector.mediafailed':
+        'Η επεξεργασία του αιτήματος απέτυχε',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Το αίτημα απορρίφθηκε',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Το αίτημα εγκρίθηκε αυτόματα',
+      'components.NotificationTypeSelector.issuecreated': 'Αναφέρθηκε πρόβλημα',
+      'components.NotificationTypeSelector.issuecomment': 'Σχόλιο προβλήματος',
+      'components.NotificationTypeSelector.issueresolved':
+        'Το πρόβλημα επιλύθηκε',
+      'components.NotificationTypeSelector.issuereopened':
+        'Το πρόβλημα ανοίχθηκε ξανά',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Καταχωρήθηκε αίτημα αυτόματα',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Ειδοποιηθείτε όταν άλλοι χρήστες σχολιάζουν σε προβλήματα.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Ειδοποιηθείτε όταν άλλοι χρήστες ξανανοίγουν προβλήματα.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Ειδοποιηθείτε όταν προβλήματα λύνονται από άλλους χρήστες.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Αποστολή ειδοποιήσεων όταν υπάρχουν νέα σχόλια σε προβλήματα.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Αποστολή ειδοποιήσεων όταν αναφέρονται προβλήματα.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Αποστολή ειδοποιήσεων όταν ξανανοίγονται προβλήματα.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Αποστολή ειδοποιήσεων όταν λύνονται προβλήματα.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Αποστολή ειδοποιήσεων όταν τα μέσα εγκρίνονται αυτόματα.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Αποστολή ειδοποιήσεων όταν αιτήματα εγκρίνονται χειροκίνητα.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Ειδοποιηθείτε όταν νέα αιτήματα καταχωρούνται αυτόματα από τη λίστα παρακολούθησης Plex.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Αποστολή ειδοποιήσεων όταν τα αιτούμενα μέσα γίνονται διαθέσιμα.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Αποστολή ειδοποιήσεων όταν ένα αίτημα μέσου απορρίπτεται.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Αποστολή ειδοποιήσεων όταν τα αιτούμενα μέσα δεν μπόρεσαν να προστεθούν στο Radarr ή στο Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Αποστολή ειδοποιήσεων όταν έχουν ζητηθεί μέσα και χρειάζονται έγκριση.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Τύποι Ειδοποιήσεων',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Ειδοποιηθείτε όταν προβλήματα που έχετε αναφέρει λαμβάνουν νέα σχόλια.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Ειδοποιηθείτε όταν άλλοι χρήστες αναφέρουν προβλήματα.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Ειδοποιηθείτε όταν προβλήματα που αναφέρατε ξανανοίγουν.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Ειδοποιηθείτε όταν προβλήματα που αναφέρατε επιλύονται.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Ειδοποιηθείτε όταν άλλοι χρήστες κάνουν αιτήματα που εγκρίνονται αυτόματα.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Ειδοποιηθείτε όταν τα αιτήματα σας εγκρίνονται.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Ειδοποιηθείτε όταν τα αιτήματα σας γίνονται διαθέσιμα.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Ειδοποιηθείτε όταν τα αιτήματα σας απορρίπτονται.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Ειδοποιηθείτε όταν αιτήματα αποτυγχάνουν να προστεθούν στο Radarr ή το Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Ειδοποιηθείτε όταν άλλοι χρήστες υποβάλλουν αιτήματα τα οποία απαιτούν έγκριση.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Προεπιλογή συσκευής',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Αναγνωριστικό χρήστη',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'Ο <FindDiscordIdLink>multi-digit ID αριθμός</FindDiscordIdLink> που σχετίζεται με τον λογαριασμό σας',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Οι ρυθμίσεις των ειδοποιήσεων Discord δεν κατάφεραν να αποθηκευτούν.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Οι ρυθμίσεις των ειδοποιήσεων Discord αποθηκεύτηκαν επιτυχώς!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Email',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Οι ρυθμίσεις των ειδοποιήσεων για το email δεν κατάφεραν να αποθηκευτούν.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Οι ρυθμίσεις των ειδοποιήσεων για το email αποθηκεύτηκαν επιτυχώς!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Ειδοποιήσεις',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Δημόσιο κλειδί PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Κρυπτογράφηση μηνυμάτων ηλεκτρονικού ταχυδρομείου χρησιμοποιώντας <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Token πρόσβασης',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Δημιουργήστε ένα token από τις <PushbulletSettingsLink>Ρυθμίσεις Λογαριασμού</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Οι ρυθμίσεις ειδοποιήσεων Pushbullet απέτυχαν να αποθηκευτούν.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Οι ρυθμίσεις ειδοποιήσεων Pushbullet αποθηκεύτηκαν επιτυχώς!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'API Token εφαρμογής',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Καταχωρήστε μια εφαρμογή</ApplicationRegistrationLink> για χρήση με το {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Κλειδί χρήστη ή ομάδας',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Το αναγνωριστικό 30 χαρακτήρων <UsersGroupsLink>του χρήστη ή της ομάδας σας</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Οι ρυθμίσεις ειδοποιήσεων του Pushover απέτυχαν να αποθηκευτούν.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Οι ρυθμίσεις ειδοποιήσεων του Pushover αποθηκεύτηκαν επιτυχώς!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Αθόρυβη Αποστολή',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Στείλε ειδοποιήσεις χωρίς ήχο',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Ήχος ειδοποίησης',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Αναγνωριστικό συνομιλίας',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Ξεκίνα μια συνομιλία</TelegramBotLink>, πρόσθεσε το <GetIdBotLink>@get_id_bot</GetIdBotLink> και δώσε την εντολή <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Οι ρυθμίσεις των ειδοποιήσεων Telegram δεν κατάφεραν να αποθηκευτούν.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Οι ρυθμίσεις των ειδοποιήσεων Telegram αποθηκεύτηκαν επιτυχώς!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Πρέπει να δώσεις ένα έγκυρο αναγνωριστικό χρήστη',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Πρέπει να βάλεις ένα έγκυρο δημόσιο κλειδί PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Πρέπει να δώσετε ένα token πρόσβασης',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Πρέπει να δώσετε ένα έγκυρο token εφαρμογής',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Πρέπει να δώσετε ένα έγκυρο κλειδί χρήστη ή ομάδας',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Πρέπει να δώσεις ένα έγκυρο αναγνωριστικό συνομιλίας',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -6772,6 +9147,214 @@ export const localeData = [
         'El esfuerzo más alto puede mejorar el orden, pero tarda más y cuesta más por cubierta.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'Opcional para servidores locales que no requieren una llave.',
+      'components.NotificationTypeSelector.mediarequested':
+        'Petición pendiente de aprobar',
+      'components.NotificationTypeSelector.mediaapproved': 'Petición Aprobada',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Contenido solicitado disponible',
+      'components.NotificationTypeSelector.mediafailed':
+        'Fallo en el procesamiento de la solicitud',
+      'components.NotificationTypeSelector.mediadeclined': 'Petición Rechazada',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Petición Aprobada Automáticamente',
+      'components.NotificationTypeSelector.issuecreated':
+        'Incidencia Reportada',
+      'components.NotificationTypeSelector.issuecomment':
+        'Comentario de Incidencia',
+      'components.NotificationTypeSelector.issueresolved':
+        'Incidencia Resuelta',
+      'components.NotificationTypeSelector.issuereopened':
+        'Incidencia Reabierta',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Petición Enviada Automáticamente',
+      'components.NotificationTypeSelector.softwareavailable':
+        'Solicitud de software disponible',
+      'components.NotificationTypeSelector.softwareStatus':
+        'Actualizaciones de solicitudes de software',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Notificar cuando otros usuarios comenten incidencias.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Notificar cuando se reabran incidencias por otros usuarios.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Notificar cuando otros usuarios resuelvan incidencias.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Envía notificaciones cuando las incidencias reciben nuevos comentarios.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Enviar notificaciones cuando las incidencias sean reportadas.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Enviar notificación cuando se reabran incidencias.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Enviar notificación cuando se resuelvan incidencias.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Envía notificaciones cuando los usuarios solicitan nuevos contenidos que se aprueban automáticamente.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Envía una notificación cuando el contenido solicitado es aprobado manualmente.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Reciba notificaciones cuando se envíen automáticamente nuevas solicitudes de medios para elementos de su lista de seguimiento.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Envía una notificación cuando el contenido solicitado está disponible.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Envía notificaciones cuando las solicitudes sean rechazadas.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Enviar notificaciones cuando no se puedan añadir solicitudes de medios a Radarr, Sonarr, Lidarr o Bookshelf.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Envía una notificación cuando se solicita nuevo contenido que requiere ser aprobado.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Tipos de Notificación',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        'Enviar notificaciones para solicitudes de software en espera de aprobación o que fueron aprobadas, rechazadas o fallidas.',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'Reciba notificaciones cuando las ROMs y los juegos de PC solicitados estén listos para descargar.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'Reciba notificaciones cuando su solicitud de software esté esperando aprobación o sea aprobada, rechazada o falle.',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Reciba notificaciones cuando las incidencias que haya reportado reciban nuevos comentarios.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Reciba notificaciones cuando otros usuarios reporten incidencias.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Recibir notificaciones cuando se vuelvan a abrir incidencias que haya reportado.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Reciba notificaciones cuando se resuelvan las incidencias que haya reportado.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Reciba notificaciones cuando otros usuarios envíen nuevas solicitudes de medios que se aprueben automáticamente.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Reciba notificaciones cuando sus solicitudes de medios sean aprobadas.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Reciba notificaciones cuando el contenido que solicitó esté disponible.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Reciba notificaciones cuando sus solicitudes de medios sean rechazadas.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Reciba notificaciones cuando no se puedan añadir solicitudes de medios a Radarr, Sonarr, Lidarr o Bookshelf.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Reciba notificaciones cuando otros usuarios envíen nuevas solicitudes de medios que requieran aprobación.',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'Reciba notificaciones cuando las ROM y los juegos de PC que solicitó estén listos para descargar.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Suscripción activa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Navegador',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Creado',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Eliminar suscripción',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Dispositivo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Desactivado empuje web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Algo salió mal mientras desactivaba el empuje web.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Activar el empuje web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Algo salió mal mientras se activa la web.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Motor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Gestionar dispositivos',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'No tienes suscripciones de empuje web para mostrar.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Sistema operativo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Suscripción eliminada.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Algo salió mal al eliminar la suscripción de usuario.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'Tipo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Desconocido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'El empuje web ha sido deshabilitado.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Se ha habilitado el empuje web.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Los ajustes de notificación de empuje web no guardaron.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Ajustes de notificación de empuje web guardados con éxito!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Dispositivo Predeterminado',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID de Usuario',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Agregar ID de usuario',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord ID de usuario',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Retirar',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'El <FindDiscordIdLink>Número de identificación de varios dígitos</FindDiscordIdLink> asociado con su cuenta de usuario. Para múltiples cuentas de hogar se puede añadir más de uno Discord ID de usuario.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'El propietario del servidor no ha habilitado Discord notificaciones. Esta información solo se utilizará si el propietario del servidor configura un servicio externo.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'No se han podido guardar los ajustes de notificaciones de Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        '¡Los ajustes de notificaciones de Discord se han guardado correctamente!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Correo electrónico',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Error al guardar los ajustes de notificaciones por email.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        '¡Ajustes de notificación por email guardados correctamente!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notificaciones',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Clave Pública PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Encriptar mensajes por email usando <OpenPgpLink>OpenPGP2</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Token de Acceso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Crea un token desde tu <PushbulletSettingsLink>Opciones de Cuenta</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Fallo al guardar los ajustes de la notificación Pushbullet.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        '¡Los ajustes de notificación Pushbullet se han guardado con éxito!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Token de aplicación API',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registrar una aplicación</ApplicationRegistrationLink> para usar con {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Clave de usuario o grupo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Tu <UsersGroupsLink>identificador de usuario o grupo</UsersGroupsLink> de 30 caracteres',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'No se pudo guardar la configuración de notificaciones de Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        '¡Se han guardado los ajustes de notificación de Pushover!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Enviar de forma silenciosa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Enviar notificaciones sin sonido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Sonido de Notificacion',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID del Chat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Comienza un chat</TelegramBotLink>, añade el <GetIdBotLink>@get_id_bot</GetIdBotLink>, y envía el comando <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID de hilo/tema',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Si su cadena de grupo tiene temas habilitados, puede especificar un ID de hilo/topic aquí',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Error al guardar los ajustes de notificaciones de Telegram.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        '¡Ajustes de notificaciones de Telegram guardados correctamente!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Cada ID debe ser un ID de usuario de Discord válido.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Debes introducir una clave pública PGP valida',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Debes indicar un token de acceso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Debes proporcionar un token de aplicación válido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Debes proporcionar una clave de usuario o grupo válida',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Debes indicar un Id de chat válido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'El ID de hilo/topic debe ser un número entero positivo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Empuje web',
     },
   },
   {
@@ -7706,6 +10289,213 @@ export const localeData = [
         'El esfuerzo más alto puede mejorar el orden, pero tarda más y cuesta más por cubierta.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'Opcional para servidores locales que no requieren una llave.',
+      'components.NotificationTypeSelector.mediarequested':
+        'Petición pendiente de aprobar',
+      'components.NotificationTypeSelector.mediaapproved': 'Petición Aprobada',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Petición Disponible',
+      'components.NotificationTypeSelector.mediafailed':
+        'Procesamiento de Petición Fallida',
+      'components.NotificationTypeSelector.mediadeclined': 'Petición Rechazada',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Petición Aprobada Automáticamente',
+      'components.NotificationTypeSelector.issuecreated':
+        'Incidencia Reportada',
+      'components.NotificationTypeSelector.issuecomment':
+        'Comentario de Incidencia',
+      'components.NotificationTypeSelector.issueresolved': 'Cuestión resuelta',
+      'components.NotificationTypeSelector.issuereopened':
+        'Incidencia Reabierta',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Petición Enviada Automáticamente',
+      'components.NotificationTypeSelector.softwareavailable':
+        'Solicitud de software disponible',
+      'components.NotificationTypeSelector.softwareStatus':
+        'Actualizaciones de la solicitud de software',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Notificar cuando otros usuarios comenten incidencias.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Notificar cuando se reabran incidencias por otros usuarios.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Notificar cuando otros usuarios resuelvan incidencias.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Envía notificaciones cuando las incidencias reciben nuevos comentarios.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Enviar notificaciones cuando las incidencias sean reportadas.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Enviar notificaciones cuando se reabran los problemas.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Enviar notificaciones cuando se resuelvan los problemas.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Envía notificaciones cuando los usuarios solicitan nuevos contenidos que se aprueban automáticamente.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Envía una notificación cuando el contenido solicitado es aprobado manualmente.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Obtenga notificado cuando las nuevas solicitudes de medios se envían automáticamente para artículos en su lista de vigilancia.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Envía una notificación cuando el contenido solicitado está disponible.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Envía notificaciones cuando las solicitudes sean rechazadas.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Envíe notificaciones cuando las solicitudes de medios no se puedan agregar a Radarr, Sonarr, Lidarr o Bookshelf.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Envía una notificación cuando se solicita nuevo contenido que requiere ser aprobado.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Tipos de Notificación',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        'Enviar notificaciones para solicitudes de software en espera de aprobación o que fueron aprobadas, rechazadas o fallidas.',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'Enviar notificaciones cuando se solicite ROMs y juegos de PC están listos para descargar.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'Obtenga notificado cuando su solicitud de software está esperando aprobación o es aprobado, rechazado o fracasa.',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Obtenga notificado cuando los problemas que reportó reciben nuevos comentarios.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Obtenga la notificación cuando otros usuarios reportan problemas.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Obtenga notificado cuando los problemas que reportó se reabrieron.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Obtenga notificado cuando los problemas que reportó se resuelven.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Notificar cuando otros usuarios envíen nuevas solicitudes que se aprueben automáticamente.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Notificar cuando las solicitudes sean aprobadas.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Notificar cuando tus contenidos solicitados estén disponibles.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Notificar cuando tus contenidos solicitados sean rechazados.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Reciba notificaciones cuando las solicitudes de medios no se puedan agregar a Radarr, Sonarr, Lidarr o Bookshelf.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Notificar cuando otros usuarios envíen nuevas solicitudes que requieran aprobación.',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'Obtenga notificado cuando sus ROMs solicitados y los juegos de PC están listos para descargar.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Suscripción activa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Navegador',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Creado',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Suscripción',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Dispositivo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Desactivado empuje web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Algo salió mal mientras desactivaba el empuje web.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Activar el empuje web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Algo salió mal mientras se activa la web.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Motor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Gestionar dispositivos',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'No tienes suscripciones de empuje web para mostrar.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Sistema operativo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Suscripción eliminada.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Algo salió mal al eliminar la suscripción de usuario.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'Tipo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Desconocido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'El empuje web ha sido deshabilitado.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Se ha habilitado el empuje web.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Los ajustes de notificación de empuje web no guardaron.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Ajustes de notificación de empuje web guardados con éxito!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Dispositivo predeterminado',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID de Usuario',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Agregar ID de usuario',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord ID de usuario',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Retirar',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'El <FindDiscordIdLink>Número de identificación de varios dígitos</FindDiscordIdLink> asociado con su cuenta de usuario. Para múltiples cuentas de hogar se puede añadir más de uno Discord ID de usuario.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'El propietario del servidor no ha habilitado Discord notificaciones. Esta información solo se utilizará si el propietario del servidor configura un servicio externo.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'No se han podido guardar los ajustes de notificaciones de Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        '¡Los ajustes de notificaciones de Discord se han guardado correctamente!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Correo electrónico',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Error al guardar los ajustes de notificaciones por email.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        '¡Ajustes de notificación por email guardados correctamente!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notificaciones',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Clave Pública PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Encriptar mensajes por email usando <OpenPgpLink>OpenPGP2</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Acceso Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Cree una ficha de su <PushbulletSettingsLink>Ajustes de la cuenta</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Los ajustes de notificación de pushbullet no guardaron.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Ajustes de notificación de pushbullet guardados con éxito!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Aplicación API Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registrar una solicitud</ApplicationRegistrationLink> para uso con {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Usuario o clave de grupo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Tu 30 caracteres <UsersGroupsLink>identificador de usuario o grupo</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Los ajustes de notificación de pushover no guardaron.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Ajustes de notificación de pushover guardados con éxito!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Enviar de forma silenciosa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Enviar notificaciones sin sonido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Sonido de notificación',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID del Chat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Comienza un chat</TelegramBotLink>, añade el <GetIdBotLink>@get_id_bot</GetIdBotLink>, y envía el comando <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID de hilo/tema',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Si su cadena de grupo tiene temas habilitados, puede especificar un ID de hilo/topic aquí',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Error al guardar los ajustes de notificaciones de Telegram.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        '¡Ajustes de notificaciones de Telegram guardados correctamente!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Cada ID debe ser un ID de usuario de Discord válido.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Debes introducir una clave pública PGP valida',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Usted debe proporcionar un acceso a la ficha',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Usted debe proporcionar una ficha de aplicación válida',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Usted debe proporcionar un usuario válido o clave de grupo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Debes indicar un Id de chat válido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'El ID de hilo/topic debe ser un número entero positivo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Empuje web',
     },
   },
   {
@@ -7920,6 +10710,195 @@ export const localeData = [
         'Pead sisestama kehtiva minimaalse TTL-i',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Pead sisestama kehtiva pordinumbri',
+      'components.NotificationTypeSelector.mediarequested':
+        'Taotlus ootab heakskiitu',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Taotlus heaks kiidetud',
+      'components.NotificationTypeSelector.mediaavailable': 'Taotlus saadaval',
+      'components.NotificationTypeSelector.mediafailed':
+        'Taotluse töötlemine ebaõnnestus',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Taotlus tagasi lükatud',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Taotlus automaatselt heaks kiidetud',
+      'components.NotificationTypeSelector.issuecreated':
+        'Probleemist teatatud',
+      'components.NotificationTypeSelector.issuecomment':
+        'Probleemi kommentaar',
+      'components.NotificationTypeSelector.issueresolved':
+        'Probleem lahendatud',
+      'components.NotificationTypeSelector.issuereopened':
+        'Probleem uuesti avatud',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Taotlus automaatselt esitatud',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Saa teavitus, kui teised kasutajad kommenteerivad probleeme.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Saa teavitus, kui teised kasutajad avavad probleeme uuesti.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Saa teavitus, kui teised kasutajad lahendavad probleeme.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Saa teavitusi, kui probleemidele lisatakse uusi kommentaare.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Saa teavitusi, kui teatatakse uutest probleemidest.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Saa teavitusi, kui probleeme avatakse uuesti.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Saa teavitusi, kui probleemid lahendatakse.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Saa teavitusi, kui kasutajate uued taotlused kiidetakse automaatselt heaks.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Saa teavitusi, kui taotlused kiidetakse käsitsi heaks.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Saa teavitus, kui sinu Soovinimekirjas olevate üksuste kohta esitatakse automaatselt uued taotlused.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Saa teavitusi, kui taotletud meedia saabub serverisse.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Saa teavitusi, kui taotlkused lükatakse tagasi.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Saa teavitusi, kui taotluse lisamine Radarrisse või Sonarrisse ebaõnnestub.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Saa teavitusi, kui kasutajad esitavad uusi taotlusi, mis vajavad heakskiitu.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Teavituste tüübid',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Saa teavitus, kui sinu teatatud probleemidele lisatakse kommentaare.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Saa teavitus, kui teised kasutajad teatavad probleemidest.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Saa teavitus, kui sinu teatatud probleemid avatakse uuesti.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Saa teavitus, kui sinu teatatud probleemid lahendatakse.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Saa teavitus, kui teised kasutajad esitavad taotlusi, mis kiidetakse automaatselt heaks.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Saa teavitus, kui sinu taotlused kiidetakse heaks.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Saa teavitus, kui sinu taotlused on vaatamiseks saadaval.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Saa teavitus, kui sinu taotlused lükatakse tagasi.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Saa teavitus, kui sinu taotluse lisamine Radarrisse või Sonarrisse ebaõnnestub.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Saa teavitus, kui teised kasutajad esitavad taotlusi, mis vajavad heakskiitu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Aktiivne tellimus',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Brauser',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Loodud',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Kustuta tellimus',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Seade',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Lülita veebitõuketeated välja',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Veebitõuketeadete väljalülitamisel läks midagi valesti.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Lülita veebitõuketeated sisse',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Veebitõuketeadete sisselülitamisel läks midagi valesti.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Mootor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Halda seadmeid',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Sul pole ühtegi kuvatavat veebitõuketeadete tellimust.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Operatsioonisüsteem',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Tellimus kustutatud.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Kasutaja tellimuse kustutamisel läks midagi valesti.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'tüüp',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Tundmatu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Veebitõuketeated on välja lülitatud.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Veebitõuketeated on sisse lülitatud.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Veebitõuketeadete seadete salvestamine ebaõnnestus.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Veebitõuketeadete seaded on edukalt salvestatud!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Seadme vaikesäte',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Kasutaja ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'Sinu kasutajakontoga seotud <FindDiscordIdLink>mitmekohaline ID-number</FindDiscordIdLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Discordi teavituste seadete salvestamine ebaõnnestus.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discordi teavituste seaded on edukalt salvestatud!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-post',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'E-posti teavituste seadete salvestamine ebaõnnestus.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'E-posti teavituste seaded on edukalt salvestatud!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Teavitused',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Avalik PGP-võti',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Krüpteeri e-kirjad, kasutades <OpenPgpLink>OpenPGP</OpenPgpLink>-d',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Juurdepääsuluba (Access Token)',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Loo luba oma <PushbulletSettingsLink>kontoseadetes</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Pushbulleti teavituste seadete salvestamine ebaõnnestus.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbulleti teavituste seaded on edukalt salvestatud!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Rakenduse API-luba',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registreeri rakendus</ApplicationRegistrationLink>, et kasutada seda koos rakendusega {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Kasutaja või grupi võti',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Sinu 30-kohaline <UsersGroupsLink>kasutaja või grupi identifikaator</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Pushoveri teavituste seadete salvestamine ebaõnnestus.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushoveri teavituste seaded on edukalt salvestatud!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Saada hääletult',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Saada teavitused ilma helita',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Teavituse heli',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Vestluse ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Alusta vestlust</TelegramBotLink>, lisa <GetIdBotLink>@get_id_bot</GetIdBotLink> ja sisesta käsk <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Lõime/teema ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Kui sinu grupivestluses on teemad (topics) lubatud, saad siin määrata konkreetse lõime või teema ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Telegrami teavituste seadete salvestamine ebaõnnestus.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegrami teavituste seaded on edukalt salvestatud!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Pead sisestama kehtiva kasutaja ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Pead sisestama kehtiva avaliku PGP-võtme',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Pead sisestama juurdepääsuloa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Pead sisestama kehtiva rakenduse loa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Pead sisestama kehtiva kasutaja või grupi võtme',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Pead sisestama kehtiva vestluse ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'Lõime/teema ID peab olema positiivne täisarv',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Veebitõuketeated',
     },
   },
   {
@@ -8053,6 +11032,73 @@ export const localeData = [
         'Ota tuki välityspalvelimelle käyttöön',
       'components.Settings.SettingsNetwork.trustProxyTip':
         'Sallii Seerr:in rekisteröidä välityspalvelimen takana olevien asiakkaiden IP:t oikein',
+      'components.NotificationTypeSelector.mediarequested':
+        'Pyyntö odottaa hyväksymistä',
+      'components.NotificationTypeSelector.mediaapproved': 'Pyyntö hyväksytty',
+      'components.NotificationTypeSelector.mediaavailable': 'Pyyntö saatavilla',
+      'components.NotificationTypeSelector.mediafailed':
+        'Pyynnön suorittaminen epäonnistui',
+      'components.NotificationTypeSelector.mediadeclined': 'Pyyntö hylätty',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Pyyntö hyväksytään automaattisesti',
+      'components.NotificationTypeSelector.issuecreated': 'Ongelma ilmoitettu',
+      'components.NotificationTypeSelector.issuecomment': 'Ongelman kommentti',
+      'components.NotificationTypeSelector.issueresolved': 'Ongelma ratkaistu',
+      'components.NotificationTypeSelector.issuereopened':
+        'Ongelma avattu uudelleen',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Pyyntö lähetetty automaattisesti',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Saat ilmoituksen, kun muut käyttäjät kommentoivat ongelmia.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Saat ilmoituksen, kun muut käyttäjät avaavat ongelmia uudelleen.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Saat ilmoituksen, kun muut käyttäjät ovat ratkaisseet ongelmia.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Lähetä ilmoituksia, kun ongelmiin tulee uusia kommentteja.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Lähetä ilmoituksia, kun ongelmista ilmoitetaan.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Lähetä ilmoituksia, kun ongelmia avataan uudelleen.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Lähetä ilmoituksia, kun ongelmat on ratkaistu.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Lähetä ilmoituksia, kun käyttäjät lähettävät uusia mediapyyntöjä, jotka hyväksytään automaattisesti.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Lähetä ilmoituksia, kun mediapyyntöjä hyväksytään manuaalisesti.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Saat ilmoituksen, kun seurantalistallasi oleville kohteille lähetetään automaattisesti uusia mediapyyntöjä.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Lähetä ilmoituksia, kun mediapyyntöjä tulee saataville.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Lähetä ilmoituksia, kun mediapyyntöjä hylätään.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Lähetä ilmoitus jos pyynnön lisäys Radarr:iin tai Sonarr:iin epäonnistuu.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Lähetä ilmoitus uusista hyväksymisen vaativista pyynnöistä.',
+      'components.NotificationTypeSelector.notificationTypes': 'Ilmoitustyypit',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Ilmoita uusista ongelmien kommenteista.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Ilmoita uusista ongelmista.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Ilmoita uudelleenavatuista ongelmista.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Ilmoita kun ongelma on selvitetty.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Ilmoita muiden käyttäjien automaattisesti hyväksytyistä pyynnöistä.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Ilmoita kun pyyntö on hyväksytty.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Ilmoita kun pyydetty media on katsottavissa.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Ilmoita kun pyyntö on hylätty.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Ilmoita kun median lisäys Radarr:iin tai Sonarr:iin epäonnistuu.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Ilmoita muiden käyttäjien pyynnöistä jotka vaativat hyväksymisen.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Hallinnoi laitteita',
     },
   },
   {
@@ -9002,9 +12048,227 @@ export const localeData = [
         'Un niveau plus élevé peut améliorer le classement, mais prend plus de temps et coûte davantage par sélection.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'Facultatif pour les serveurs locaux qui ne demandent pas de clé.',
+      'components.NotificationTypeSelector.mediarequested':
+        'Demande en attente de validation',
+      'components.NotificationTypeSelector.mediaapproved': 'Demande validée',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Média demandé disponible',
+      'components.NotificationTypeSelector.mediafailed':
+        "Échec d'ajout de la demande",
+      'components.NotificationTypeSelector.mediadeclined': 'Demande refusée',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Demande validée automatiquement',
+      'components.NotificationTypeSelector.issuecreated': 'Problème signalé',
+      'components.NotificationTypeSelector.issuecomment':
+        'Commentaires du problème',
+      'components.NotificationTypeSelector.issueresolved': 'Problème résolu',
+      'components.NotificationTypeSelector.issuereopened': 'Problème rouvert',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Demande soumise automatiquement',
+      'components.NotificationTypeSelector.softwareavailable':
+        'Demande de logiciel disponible',
+      'components.NotificationTypeSelector.softwareStatus':
+        'Mises à jour des requêtes logicielles',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        "M'avertir lorsque d'autres utilisateurs commentent un problème.",
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        "M'avertir lorsqu'un problème est rouvert par d'autres utilisateurs.",
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        "M'avertir lorsqu'un problème est résolu par d'autres utilisateurs.",
+      'components.NotificationTypeSelector.issuecommentDescription':
+        "Envoyer des notifications lorsqu'un problème reçoit de nouveaux commentaires.",
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        "Envoyer des notifications lorsqu'un problème est signalé.",
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        "Envoyer des notifications lorsqu'un problème est rouvert.",
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        "Envoyer des notifications lorsqu'un problème est résolu.",
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Envoyer des notifications lorsque des utilisateurs soumettent des demandes de médias qui sont validées automatiquement.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        "Envoyer des notifications lorsqu'une demande de média est validée manuellement.",
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Recevez une notification lorsque de nouvelles demandes de médias sont automatiquement soumises pour des éléments de votre liste de suivi.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Envoyer des notifications lorsque le média demandé devient disponible.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        "Envoyer des notifications lorsqu'une demande de média est refusée.",
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Envoyez des notifications lorsque les demandes multimédias ne parviennent pas à être ajoutées à Radarr, Sonarr, Lidarr ou Bookshelf.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Envoyer des notifications lorsque des utilisateurs soumettent une demande de média nécessitant une validation.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Types de notifications',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        "Envoyer des notifications pour les demandes de logiciels en attente d'approbation ou qui ont été approuvées, refusées ou échouées.",
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'Envoyer des notifications lorsque les ROM et les jeux PC demandés sont prêts à être téléchargés.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        "Soyez informé lorsque votre demande de logiciel est en attente d'approbation ou est approuvé, refusé ou échoué.",
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        "M'avertir lorsque les problèmes que j'ai signalés reçoivent de nouveaux commentaires.",
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        "M'avertir lorsque d'autres utilisateurs signalent des problèmes.",
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        "M'avertir lorsque les problèmes que j'ai signalés sont rouverts.",
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        "M'avertir lorsque les problèmes que j'ai signalés sont résolus.",
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        "M'avertir lorsque des utilisateurs soumettent une demande de média qui est validée automatiquement.",
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        "M'avertir lorsque mes demandes de médias sont validées.",
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        "M'avertir lorsque mes demandes de médias deviennent disponibles.",
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        "M'avertir lorsque mes demandes de médias sont refusées.",
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Soyez averti lorsque les demandes multimédias ne parviennent pas à être ajoutées à Radarr, Sonarr, Lidarr ou Bookshelf.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        "M'avertir lorsque d'autres utilisateurs soumettent une demande de média nécessitant une validation.",
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'Soyez informé lorsque vos ROM et jeux PC demandés sont prêts à être téléchargés.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Abonnement actif',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Navigateur',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Créé',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        "Supprimer l'abonnement",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Appareil',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Désactiver le push web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        "Une erreur s'est produite lors de la désactivation des notifications push web.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Activer le push web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        "Une erreur s'est produite lors de l'activation des notifications push web.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Moteur',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Gérer les appareils',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        "Vous n'avez aucun abonnement push web à afficher.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        "Système d'exploitation",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Abonnement supprimé.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        "Une erreur s'est produite lors de la suppression de l'abonnement utilisateur.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'type',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Inconnu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Les notifications push web ont été désactivées.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Les notifications push web ont été activées.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        "Les paramètres de la notification push web n'ont pas été enregistrés.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Les paramètres de notification push web ont été enregistrés !',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Appareil par défaut',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Identifiants',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        "Ajouter l'ID utilisateur",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'ID utilisateur Discord',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Retirer',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        "Le <FindDiscordIdLink>numéro d'identification à plusieurs chiffres</FindDiscordIdLink> associé à votre compte utilisateur. Pour les foyers disposant de plusieurs comptes, vous pouvez ajouter plus d'un ID utilisateur Discord.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        "Le propriétaire du serveur n'a pas activé les notifications Discord. Ces informations ne seront utilisées que s'il configure un service externe.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        "Les paramètres de notification Discord n'ont pas pu être enregistrés.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Les paramètres de notification Discord ont été enregistrés !',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        "Impossible d'enregistrer les paramètres de notification par e-mail.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Les paramètres de notification par e-mail ont été enregistrés !',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notifications',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Clé publique PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Chiffrer les e-mails en utilisant <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        "Jeton d'accès",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Créer un jeton depuis les <PushbulletSettingsLink>paramètres de votre compte</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        "Les paramètres de notification Pushbullet n'ont pas pu être enregistrés.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Paramètres de notification Pushbullet enregistrés !',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        "Jeton API d'application",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Enregistrer une application</ApplicationRegistrationLink> à utiliser avec {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        "Clé d'utilisateur ou de groupe",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        "Votre <UsersGroupsLink>identifiant d'utilisateur ou de groupe</UsersGroupsLink> à 30 caractères",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        "Les paramètres de notification Pushover n'ont pas pu être enregistrés.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Les paramètres de notification Pushover ont été enregistrés !',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Envoie les messages silencieusement',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Envoyer des notifications sans son',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Son de notification',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID de discussion',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Démarre une discussion</TelegramBotLink>, ajoute <GetIdBotLink>@get_id_bot</GetIdBotLink>, et utilise la commande <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID du fil de discussion',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Si votre discussion de groupe prend en charge les fils de discussion, vous pouvez spécifier son identifiant ici',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        "Impossible d'enregistrer les paramètres de notification de Telegram.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Les paramètres de notification Telegram ont été enregistrés !',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Chaque ID doit être un ID utilisateur Discord valide.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Vous devez fournir une clé publique PGP valide',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        "Vous devez fournir un jeton d'accès",
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        "Vous devez fournir un jeton d'application valide",
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        "Vous devez fournir une clé d'utilisateur ou de groupe valide",
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Vous devez fournir un identifiant de chat valide',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        "L'identifiant du fil de discussion doit être un nombre entier positif",
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Push Web',
       'components.Layout.Sidebar.comingSoon': 'À venir',
       'components.Layout.Sidebar.you': 'Vous',
       'components.Layout.Sidebar.watchSessions': 'Séances de visionnage',
+      'lumen.status.queued': 'En attente de téléchargement',
+      'lumen.status.shared': 'Disponible pour d’autres utilisateurs',
+      'lumen.status.partlyInLibrary': 'Partiellement dans la bibliothèque',
+      'lumen.status.onServer': 'Sur {server}',
+      'lumen.status.partlyOnServer': 'Partiellement sur {server}',
+      'lumen.status.downloadingPercent': 'Téléchargement à {percent} %',
+      'lumen.status.allInLibrary': 'Les {count} sont dans la bibliothèque',
+      'lumen.status.ownedInLibrary': '{owned} sur {total} dans la bibliothèque',
+      'lumen.status.blocklisted': 'Bloqué',
+      'lumen.status.inLibrary': 'Dans la bibliothèque',
+      'lumen.status.requested': 'Demandé',
+      'lumen.status.downloading': 'Téléchargement en cours',
+      'lumen.status.complete': 'Complet',
       'lumen.nav.administration': 'Administration',
       'lumen.nav.lumenSettings': 'Paramètres de Lumen',
       'lumen.nav.seerrAdministration': 'Administration de SeerrNG',
@@ -9653,6 +12917,8 @@ export const localeData = [
       'lumen.issueReport.submit': 'Envoyer le signalement',
       'lumen.issueReport.media': 'Média',
       'lumen.calendar.title': 'Calendrier des sorties',
+      'lumen.calendar.description':
+        'Prochaines sorties de films, séries, musique, livres, BD, magazines, jeux PC et émulation depuis vos services connectés.',
       'lumen.calendar.filters': 'Filtres du calendrier',
       'lumen.calendar.previousMonth': 'Mois précédent',
       'lumen.calendar.month': 'Mois',
@@ -10208,6 +13474,503 @@ export const localeData = [
         'Vous n’avez pas l’autorisation de modifier les identifiants d’intégration.',
       'lumen.adminDiscovery.loading':
         'Chargement des identifiants de découverte…',
+      'lumen.automaticBlocklist.genres': 'genres',
+      'lumen.automaticBlocklist.movieGenres': 'Genres de films bloqués',
+      'lumen.automaticBlocklist.tvGenres': 'Genres de séries bloqués',
+      'lumen.automaticBlocklist.genreId': 'Genre nº {id}',
+      'lumen.automaticBlocklist.confirmFailure':
+        'Impossible de confirmer l’enregistrement des paramètres de blocage automatique.',
+      'lumen.automaticBlocklist.saved':
+        'Paramètres de blocage automatique enregistrés.',
+      'lumen.automaticBlocklist.saveFailure':
+        'Impossible d’enregistrer les paramètres de blocage automatique.',
+      'lumen.automaticBlocklist.keywords': 'ID de mots-clés TMDB bloqués',
+      'lumen.automaticBlocklist.keywordHelp':
+        'Saisissez jusqu’à 100 ID séparés par des virgules.',
+      'lumen.automaticBlocklist.keywordSearch':
+        'Rechercher des mots-clés de blocage',
+      'lumen.automaticBlocklist.findKeywords': 'Rechercher des mots-clés',
+      'lumen.automaticBlocklist.pageLimit':
+        'Limiter les pages par balise ou genre bloqué',
+      'lumen.automaticBlocklist.pageLimitHelp':
+        'Saisissez un nombre entier entre 0 et 250.',
+      'lumen.automaticBlocklist.save': 'Enregistrer le blocage automatique',
+      'lumen.automaticBlocklist.title': 'Blocage automatique',
+      'lumen.automaticBlocklist.settings':
+        'les paramètres de blocage automatique',
+      'lumen.automaticBlocklist.loading':
+        'Chargement des paramètres de blocage automatique…',
+      'lumen.keywordResults.what': 'balises de sujet',
+      'lumen.keywordResults.loading': 'Recherche des balises de sujet…',
+      'lumen.keywordResults.empty': 'Aucune balise de sujet correspondante.',
+      'lumen.keywordResults.results': 'Résultats des balises de sujet',
+      'lumen.keywordResults.pages': 'Pages des balises de sujet',
+      'lumen.keywordResults.previous': 'Page précédente de balises',
+      'lumen.keywordResults.page': 'Page {page} des balises',
+      'lumen.keywordResults.pageTotal': ' sur {total}',
+      'lumen.keywordResults.next': 'Page suivante de balises',
+      'lumen.streamingPolicy.title':
+        'Politique de demande selon les abonnements',
+      'lumen.streamingPolicy.what':
+        'la politique de demande selon les abonnements',
+      'lumen.streamingPolicy.loading': 'Chargement de la politique de demande…',
+      'lumen.streamingPolicy.enabled':
+        'Activer la politique selon les abonnements',
+      'lumen.streamingPolicy.description':
+        'Appliquer une action selon les services de diffusion auxquels la personne est abonnée.',
+      'lumen.streamingPolicy.when': 'Quand le titre est',
+      'lumen.streamingPolicy.available': 'Disponible sur ses services',
+      'lumen.streamingPolicy.unavailable': 'Indisponible sur ses services',
+      'lumen.streamingPolicy.action': 'Action de demande',
+      'lumen.streamingPolicy.reject': 'Refuser',
+      'lumen.streamingPolicy.pending': 'Exiger une approbation',
+      'lumen.streamingPolicy.approve': 'Approuver',
+      'lumen.streamingPolicy.rejectionMessage': 'Message de refus',
+      'lumen.streamingPolicy.allowOverride':
+        'Autoriser les dérogations par utilisateur',
+      'lumen.streamingPolicy.save': 'Enregistrer la politique de demande',
+      'lumen.streamingPolicy.saved': 'Politique de demande enregistrée.',
+      'lumen.streamingPolicy.saveFailure':
+        'Impossible d’enregistrer la politique de demande.',
+      'lumen.streamingPolicy.confirmFailure':
+        'Impossible de confirmer l’enregistrement de la politique de demande.',
+      'lumen.discoveryRegions.regions': 'régions',
+      'lumen.discoveryRegions.languages': 'langues',
+      'lumen.discoveryRegions.field.discoverRegion': 'Région de découverte',
+      'lumen.discoveryRegions.field.streamingRegion': 'Région de diffusion',
+      'lumen.discoveryRegions.field.originalLanguage': 'Langue d’origine',
+      'lumen.discoveryRegions.field.blocklistRegion':
+        'Région de la liste de blocage',
+      'lumen.discoveryRegions.field.blocklistLanguage':
+        'Langue de la liste de blocage',
+      'lumen.discoveryRegions.visibility.includeAdult':
+        'Inclure le contenu pour adultes dans la recherche et la découverte TMDB',
+      'lumen.discoveryRegions.visibility.hideAvailable':
+        'Masquer les titres disponibles',
+      'lumen.discoveryRegions.visibility.hideRequested':
+        'Masquer les titres demandés',
+      'lumen.discoveryRegions.visibility.hideBlocklisted':
+        'Masquer les titres bloqués aux gestionnaires de la liste de blocage',
+      'lumen.discoveryRegions.any.region': 'Toutes les régions',
+      'lumen.discoveryRegions.any.language': 'Toutes les langues',
+      'lumen.discoveryRegions.save':
+        'Enregistrer les paramètres de région de découverte',
+      'lumen.discoveryRegions.saved':
+        'Les paramètres de région de découverte ont été enregistrés.',
+      'lumen.discoveryRegions.confirmFailure':
+        'Impossible de confirmer les paramètres de découverte enregistrés.',
+      'lumen.discoveryRegions.saveFailure':
+        'Impossible d’enregistrer les paramètres de région de découverte.',
+      'lumen.discoveryRegions.title': 'Régions et langues de découverte',
+      'lumen.discoveryRegions.settings': 'paramètres de région de découverte',
+      'lumen.discoveryRegions.loading':
+        'Chargement des paramètres de région de découverte…',
+      'lumen.identityPacks.fileTooLarge': 'Le pack doit faire 5 Mio ou moins.',
+      'lumen.identityPacks.invalidFile':
+        'Choisissez un fichier JSON de correspondances de titres compatible.',
+      'lumen.identityPacks.readFailure':
+        'Impossible de lire le fichier sélectionné.',
+      'lumen.identityPacks.published':
+        'Pack {name} publié. {total} correspondances, {imported} nouvelles, {updated} modifiées, {unchanged} inchangées, {removed} supprimées.',
+      'lumen.identityPacks.publishFailure':
+        'Impossible de publier le pack. Vérifiez le fichier et réessayez.',
+      'lumen.identityPacks.downloadFailure':
+        'Impossible de télécharger le pack. Réessayez.',
+      'lumen.identityPacks.deleted':
+        'Le pack {name} a été supprimé pour tous les comptes.',
+      'lumen.identityPacks.deleteFailure':
+        'Impossible de supprimer le pack. Réessayez.',
+      'lumen.identityPacks.title': 'Correspondances de titres partagées',
+      'lumen.identityPacks.help':
+        'Les packs partagés s’appliquent à tous les comptes. Une correspondance privée reste prioritaire.',
+      'lumen.identityPacks.what': 'packs de correspondances de titres partagés',
+      'lumen.identityPacks.loading': 'Chargement des packs partagés…',
+      'lumen.identityPacks.choose': 'Choisir un fichier de pack',
+      'lumen.identityPacks.draftSummary':
+        '{name} ({id}) contient {count} correspondances de titres.',
+      'lumen.identityPacks.replaceWarning':
+        'La publication remplace toutes les entrées d’un pack existant portant cet identifiant.',
+      'lumen.identityPacks.acknowledge':
+        'Je comprends que ce pack s’applique à tous les comptes.',
+      'lumen.identityPacks.replace': 'Remplacer le pack partagé',
+      'lumen.identityPacks.publish': 'Publier le pack partagé',
+      'lumen.identityPacks.clear': 'Effacer le fichier sélectionné',
+      'lumen.identityPacks.empty': 'Aucun pack partagé n’a été publié.',
+      'lumen.identityPacks.packCount':
+        '{id} · {count} correspondances de titres',
+      'lumen.identityPacks.download': 'Télécharger le pack',
+      'lumen.identityPacks.delete': 'Supprimer le pack',
+      'lumen.identityPacks.deleteWarning':
+        'La suppression de {name} retire ses correspondances partagées pour tous les comptes.',
+      'lumen.identityPacks.confirmDelete': 'Supprimer le pack partagé',
+      'lumen.identityPacks.keep': 'Conserver le pack partagé',
+      'lumen.adminUsers.allUsers': 'Tous les utilisateurs',
+      'lumen.adminUsers.ascending': 'Croissant',
+      'lumen.adminUsers.backToAccount': 'Retour au compte',
+      'lumen.adminUsers.cancel': 'Annuler',
+      'lumen.adminUsers.createFailure': 'Impossible de créer le compte.',
+      'lumen.adminUsers.createLocalUser': 'Créer un utilisateur local',
+      'lumen.adminUsers.createUser': 'Créer l’utilisateur',
+      'lumen.adminUsers.created': '{name} a été créé.',
+      'lumen.adminUsers.creating': 'Création…',
+      'lumen.adminUsers.deleteFailure': 'Impossible de supprimer le compte.',
+      'lumen.adminUsers.deleteTitle': 'Supprimer {name} ?',
+      'lumen.adminUsers.deleteUser': 'Supprimer l’utilisateur',
+      'lumen.adminUsers.deleteWarning':
+        'Cette action supprime définitivement le compte et son historique de demandes.',
+      'lumen.adminUsers.deleted': '{name} a été supprimé.',
+      'lumen.adminUsers.descending': 'Décroissant',
+      'lumen.adminUsers.editProfile': 'Modifier le profil',
+      'lumen.adminUsers.email': 'Adresse e-mail',
+      'lumen.adminUsers.emailRequired': 'Saisissez une adresse e-mail.',
+      'lumen.adminUsers.emailSetupLink':
+        'Envoyer un lien de création de mot de passe par e-mail',
+      'lumen.adminUsers.empty':
+        'Aucun utilisateur ne correspond à cette recherche.',
+      'lumen.adminUsers.episodeQueue': 'File d’attente des épisodes',
+      'lumen.adminUsers.importUsers': 'Importer les utilisateurs {provider}',
+      'lumen.adminUsers.invalidUserId': 'Identifiant utilisateur invalide.',
+      'lumen.adminUsers.keepUser': 'Conserver l’utilisateur',
+      'lumen.adminUsers.linkedAccounts': 'Comptes associés',
+      'lumen.adminUsers.loading': 'Chargement des utilisateurs…',
+      'lumen.adminUsers.maturityLimits': 'Limites de classification',
+      'lumen.adminUsers.mediaCategories': 'Catégories de médias',
+      'lumen.adminUsers.nextPage': 'Page suivante',
+      'lumen.adminUsers.notificationSettings': 'Paramètres de notification',
+      'lumen.adminUsers.notificationsLoading':
+        'Chargement des paramètres de notification…',
+      'lumen.adminUsers.page': 'Page {page}',
+      'lumen.adminUsers.password': 'Mot de passe',
+      'lumen.adminUsers.permissions': 'Autorisations',
+      'lumen.adminUsers.previousPage': 'Page précédente',
+      'lumen.adminUsers.profile': 'profil',
+      'lumen.adminUsers.profileLoading': 'Chargement du profil…',
+      'lumen.adminUsers.profileSaveFailure':
+        'Impossible d’enregistrer le profil.',
+      'lumen.adminUsers.profileSaved': 'Profil enregistré.',
+      'lumen.adminUsers.refresh': 'Actualiser',
+      'lumen.adminUsers.requestCount': '{count} demandes',
+      'lumen.adminUsers.requestQuotas': 'Quotas de demandes',
+      'lumen.adminUsers.requests': 'Demandes',
+      'lumen.adminUsers.role.administrator': 'Administrateur',
+      'lumen.adminUsers.role.member': 'Membre',
+      'lumen.adminUsers.role.owner': 'Propriétaire',
+      'lumen.adminUsers.role.userManager': 'Gestionnaire des utilisateurs',
+      'lumen.adminUsers.saveProfile': 'Enregistrer le profil',
+      'lumen.adminUsers.search': 'Rechercher',
+      'lumen.adminUsers.searchUsers': 'Rechercher des utilisateurs',
+      'lumen.adminUsers.setLocalPassword': 'Définir un mot de passe local',
+      'lumen.adminUsers.setupLinkRequirement':
+        'Les liens de création nécessitent une URL d’application et les notifications par e-mail.',
+      'lumen.adminUsers.signInLinks': 'Liens de connexion',
+      'lumen.adminUsers.sort.created': 'Date d’ajout',
+      'lumen.adminUsers.sort.displayname': 'Nom',
+      'lumen.adminUsers.sort.requests': 'Nombre de demandes',
+      'lumen.adminUsers.sort.role': 'Rôle',
+      'lumen.adminUsers.sort.updated': 'Dernière mise à jour',
+      'lumen.adminUsers.sort.usertype': 'Type de compte',
+      'lumen.adminUsers.sortBy': 'Trier par',
+      'lumen.adminUsers.sortDirection': 'Ordre de tri',
+      'lumen.adminUsers.title': 'Utilisateurs',
+      'lumen.adminUsers.tvRequestAccess': 'Accès aux demandes TV',
+      'lumen.adminUsers.username': 'Nom d’utilisateur',
+      'lumen.adminUsers.usernameRequired': 'Saisissez un nom d’utilisateur.',
+      'lumen.adminUsers.users': 'utilisateurs',
+      'lumen.adminUsers.viewRequests': 'Voir les demandes de {name}',
+      'lumen.adminUsers.viewWatchlist': 'Voir la liste de suivi de {name}',
+      'lumen.adminUsers.watchlist': 'Liste de suivi',
+      'lumen.managedEpisodeQueue.saved':
+        'Valeur par défaut de la file d’épisodes enregistrée.',
+      'lumen.managedEpisodeQueue.saveFailure':
+        'Impossible d’enregistrer la valeur par défaut de la file d’épisodes.',
+      'lumen.managedEpisodeQueue.title':
+        'Valeur par défaut de la file d’épisodes',
+      'lumen.managedEpisodeQueue.loading': 'Chargement de la file d’épisodes…',
+      'lumen.managedEpisodeQueue.episodesAhead': 'Épisodes à l’avance',
+      'lumen.managedEpisodeQueue.off': 'Désactivé',
+      'lumen.managedEpisodeQueue.saveDefault':
+        'Enregistrer comme valeur par défaut',
+      'lumen.managedEpisodeQueue.confirmTitle':
+        'Enregistrer la valeur par défaut de la file d’épisodes pour {name} ?',
+      'lumen.managedEpisodeQueue.confirmBody':
+        'Cela s’applique aux demandes TV interactives existantes et futures. Les épisodes déjà demandés restent inchangés.',
+      'lumen.managedEpisodeQueue.goBack': 'Retour',
+      'lumen.managedTvAccess.title': 'Accès aux demandes TV',
+      'lumen.managedTvAccess.loading': 'Chargement de l’accès aux demandes TV…',
+      'lumen.managedTvAccess.everyone': 'Activé pour tout le monde',
+      'lumen.managedTvAccess.status.off': 'Approbation requise',
+      'lumen.managedTvAccess.status.pending': 'En attente d’approbation',
+      'lumen.managedTvAccess.status.approved': 'Approuvé · désactivé',
+      'lumen.managedTvAccess.status.enabled': 'Activé pour ce compte',
+      'lumen.managedTvAccess.status.denied': 'Demande refusée',
+      'lumen.managedTvAccess.requested': 'Demandé le {date}',
+      'lumen.managedTvAccess.refresh': 'Actualiser l’accès',
+      'lumen.managedTvAccess.review': 'Examiner les demandes d’accès TV',
+      'lumen.managedPassword.mismatch':
+        'Saisissez deux mots de passe identiques d’au moins 8 caractères.',
+      'lumen.managedPassword.saved': 'Mot de passe local enregistré.',
+      'lumen.managedPassword.saveFailure':
+        'Impossible d’enregistrer le mot de passe local.',
+      'lumen.managedPassword.description':
+        'Définissez un nouveau mot de passe pour la connexion locale SeerrNG de {name}.',
+      'lumen.managedPassword.newPassword': 'Nouveau mot de passe local',
+      'lumen.managedPassword.confirmPassword':
+        'Confirmez le nouveau mot de passe local',
+      'lumen.managedPassword.save': 'Enregistrer le mot de passe local',
+      'lumen.managedLoginLinks.revoked': 'Lien de connexion révoqué.',
+      'lumen.managedLoginLinks.updateFailure':
+        'Impossible de mettre à jour les liens de connexion.',
+      'lumen.managedLoginLinks.copied': 'Lien de connexion copié.',
+      'lumen.managedLoginLinks.copyFallback':
+        'Sélectionnez et copiez le lien dans le champ.',
+      'lumen.managedLoginLinks.title': 'Liens de connexion à usage unique',
+      'lumen.managedLoginLinks.description':
+        'Chaque lien expire après 30 minutes ou une utilisation.',
+      'lumen.managedLoginLinks.create': 'Créer un lien de connexion',
+      'lumen.managedLoginLinks.newLink': 'Nouveau lien de connexion',
+      'lumen.managedLoginLinks.copy': 'Copier le lien',
+      'lumen.managedLoginLinks.what': 'liens de connexion',
+      'lumen.managedLoginLinks.loading': 'Chargement des liens de connexion…',
+      'lumen.managedLoginLinks.empty':
+        'Aucun lien de connexion pour le moment.',
+      'lumen.managedLoginLinks.status.active': 'Actif',
+      'lumen.managedLoginLinks.status.used': 'Utilisé',
+      'lumen.managedLoginLinks.status.revoked': 'Révoqué',
+      'lumen.managedLoginLinks.status.expired': 'Expiré',
+      'lumen.managedLoginLinks.expires': 'Expire le {date}',
+      'lumen.managedLoginLinks.revoke': 'Révoquer le lien',
+      'lumen.managedMaturity.saved': 'Limites de classification enregistrées.',
+      'lumen.managedMaturity.saveFailure':
+        'Impossible d’enregistrer les limites de classification.',
+      'lumen.managedMaturity.what': 'limites de classification',
+      'lumen.managedMaturity.loading':
+        'Chargement des limites de classification…',
+      'lumen.managedMaturity.description':
+        'Une limite s’applique à la navigation et aux demandes. Les titres sans classification américaine reconnue sont bloqués lorsqu’une limite est définie.',
+      'lumen.managedMaturity.movieMaturityRatingLimit':
+        'Limite de classification des films',
+      'lumen.managedMaturity.tvMaturityRatingLimit':
+        'Limite de classification des séries',
+      'lumen.managedMaturity.noLimit': 'Aucune limite',
+      'lumen.managedMaturity.save': 'Enregistrer les limites de classification',
+      'lumen.managedMediaCategories.saved':
+        'Catégories de médias enregistrées.',
+      'lumen.managedMediaCategories.indexerSaved':
+        'Visibilité des indexeurs enregistrée.',
+      'lumen.managedMediaCategories.saveFailure':
+        'Impossible d’enregistrer les catégories de médias.',
+      'lumen.managedMediaCategories.indexerFailure':
+        'Impossible d’enregistrer la visibilité des indexeurs.',
+      'lumen.managedMediaCategories.what': 'catégories de médias',
+      'lumen.managedMediaCategories.loading':
+        'Chargement des catégories de médias…',
+      'lumen.managedMediaCategories.serverDefaults':
+        'Utilisation des valeurs par défaut du serveur.',
+      'lumen.managedMediaCategories.accountOverrides':
+        'Utilisation des paramètres personnalisés du compte.',
+      'lumen.managedMediaCategories.save': 'Enregistrer les catégories',
+      'lumen.managedMediaCategories.restore':
+        'Restaurer les valeurs par défaut du serveur',
+      'lumen.managedMediaCategories.indexerDisabled':
+        'Les détails des indexeurs sont désactivés par le serveur.',
+      'lumen.managedMediaCategories.indexerDetails': 'Détails des indexeurs',
+      'lumen.managedMediaCategories.useDefault':
+        'Utiliser la valeur par défaut du serveur',
+      'lumen.managedMediaCategories.show': 'Afficher',
+      'lumen.managedMediaCategories.hide': 'Masquer',
+      'lumen.managedQuotas.perDay': 'par {count} jour',
+      'lumen.managedQuotas.perDays': 'par {count} jours',
+      'lumen.managedQuotas.allTime': 'sur toute la période',
+      'lumen.managedQuotas.requestWindow': '{count} demande {window}',
+      'lumen.managedQuotas.requestsWindow': '{count} demandes {window}',
+      'lumen.managedQuotas.unlimited': 'demandes illimitées',
+      'lumen.managedQuotas.bothValues':
+        'Saisissez les deux valeurs ou effacez-les pour utiliser la valeur par défaut du serveur.',
+      'lumen.managedQuotas.saved': 'Quota de demandes enregistré.',
+      'lumen.managedQuotas.saveFailure':
+        'Impossible d’enregistrer le quota de demandes.',
+      'lumen.managedQuotas.what': 'quotas de demandes',
+      'lumen.managedQuotas.loading': 'Chargement des quotas de demandes…',
+      'lumen.managedQuotas.description':
+        'Laissez les deux champs vides pour utiliser la valeur par défaut du serveur.',
+      'lumen.managedQuotas.mediaType': 'Type de média',
+      'lumen.managedQuotas.serverDefault':
+        'Valeur par défaut du serveur : {value}',
+      'lumen.managedQuotas.limit': 'Limite de demandes',
+      'lumen.managedQuotas.days': 'Durée du quota en jours',
+      'lumen.managedQuotas.save': 'Enregistrer le quota',
+      'lumen.managedQuotas.category.movie': 'Films',
+      'lumen.managedQuotas.category.tv': 'Séries',
+      'lumen.managedQuotas.category.music': 'Musique',
+      'lumen.managedQuotas.category.book': 'Livres',
+      'lumen.managedQuotas.category.comic': 'Bandes dessinées',
+      'lumen.managedQuotas.category.magazine': 'Magazines',
+      'lumen.managedQuotas.category.software': 'Logiciels',
+      'lumen.managedLinkedAccounts.unlinked': 'Compte déconnecté.',
+      'lumen.managedLinkedAccounts.unlinkFailure':
+        'Impossible de déconnecter le compte.',
+      'lumen.managedLinkedAccounts.what': 'comptes associés',
+      'lumen.managedLinkedAccounts.passwordStatus': 'état du mot de passe',
+      'lumen.managedLinkedAccounts.loading': 'Chargement des comptes associés…',
+      'lumen.managedLinkedAccounts.empty': 'Aucun compte associé.',
+      'lumen.managedLinkedAccounts.unlink': 'Déconnecter {name}',
+      'lumen.managedLinkedAccounts.confirmTitle': 'Déconnecter {name} ?',
+      'lumen.managedLinkedAccounts.confirmBody':
+        'Cela supprime ce moyen de connexion associé à ce compte.',
+      'lumen.managedLinkedAccounts.confirm': 'Déconnecter le compte',
+      'lumen.managedLinkedAccounts.goBack': 'Retour',
+      'lumen.importMediaServerUsers.sync':
+        'Synchroniser les utilisateurs existants',
+      'lumen.importMediaServerUsers.importSelected':
+        'Importer les utilisateurs sélectionnés',
+      'lumen.importMediaServerUsers.imported':
+        'Importés : {added}, actualisés : {refreshed}.',
+      'lumen.importMediaServerUsers.failure':
+        'Impossible d’importer les utilisateurs.',
+      'lumen.importMediaServerUsers.title':
+        'Importer les utilisateurs {provider}',
+      'lumen.importMediaServerUsers.what': 'utilisateurs {provider}',
+      'lumen.importMediaServerUsers.loading':
+        'Chargement des utilisateurs du service…',
+      'lumen.importMediaServerUsers.syncExisting':
+        'Synchroniser les utilisateurs existants',
+      'lumen.importMediaServerUsers.noNewUsers':
+        'Aucun nouvel utilisateur à importer.',
+      'lumen.importMediaServerUsers.userGroup': 'utilisateurs {provider}',
+      'lumen.importMediaServerUsers.alreadyImported': 'Déjà importé',
+      'lumen.importMediaServerUsers.close': 'Fermer l’importation',
+      'lumen.importMediaServerUsers.confirmTitle': '{action} ?',
+      'lumen.importMediaServerUsers.syncBody':
+        'Actualiser les comptes Plex associés et importer tout nouvel utilisateur Plex admissible.',
+      'lumen.importMediaServerUsers.selectedBody':
+        '{count} sélectionné(s) depuis {provider}.',
+      'lumen.importMediaServerUsers.goBack': 'Retour',
+      'components.NotificationTypeSelector.mediaPendingUpdated':
+        'Demande en attente mise à jour',
+      'lumen.notifications.accountSettings': 'Paramètres du compte',
+      'lumen.notifications.addPublicKey':
+        'Ajoutez une clé publique pour chiffrer les notifications par e-mail.',
+      'lumen.notifications.chooseEvents':
+        'Choisissez les événements qui envoient des notifications.',
+      'lumen.notifications.confirmPublicKeyFailure':
+        'Impossible de confirmer l’enregistrement de la clé. Rechargez les paramètres et réessayez.',
+      'lumen.notifications.confirmRemoveKey':
+        'Confirmer la suppression de la clé',
+      'lumen.notifications.confirmRemovePublicKey':
+        'Supprimer la clé et désactiver le chiffrement OpenPGP des notifications ?',
+      'lumen.notifications.discordIdLimit':
+        'Saisissez jusqu’à dix identifiants Discord valides, un par ligne.',
+      'lumen.notifications.discordIdRequired':
+        'Saisissez au moins un identifiant Discord pour recevoir les mentions.',
+      'lumen.notifications.discordIdTip':
+        'Saisissez un identifiant par ligne. Le serveur détermine les événements qui peuvent envoyer des mentions.',
+      'lumen.notifications.emailDisabled':
+        'Les notifications par e-mail sont désactivées sur ce serveur.',
+      'lumen.notifications.keepKey': 'Conserver la clé',
+      'lumen.notifications.keepPushbulletToken':
+        'Un jeton d’accès est configuré. Laissez le champ de remplacement vide pour le conserver.',
+      'lumen.notifications.keepPushoverCredentials':
+        'Laissez les champs d’identifiants vides pour conserver les identifiants configurés.',
+      'lumen.notifications.loading':
+        'Chargement des paramètres de notification…',
+      'lumen.notifications.openBot': 'Ouvrir @{bot}',
+      'lumen.notifications.optionalForumTopic':
+        'Facultatif pour les sujets de forum.',
+      'lumen.notifications.publicKeyConfigured':
+        'Une clé publique est configurée pour les notifications par e-mail.',
+      'lumen.notifications.publicKeyRemoved': 'Clé publique supprimée.',
+      'lumen.notifications.publicKeySaveFailure':
+        'Impossible d’enregistrer la clé publique. Réessayez.',
+      'lumen.notifications.publicKeySaved': 'Clé publique enregistrée.',
+      'lumen.notifications.pushoverSounds': 'Sons Pushover',
+      'lumen.notifications.removePublicKey': 'Supprimer la clé publique',
+      'lumen.notifications.removePushbulletToken':
+        'Supprimer le jeton et désactiver les événements Pushbullet',
+      'lumen.notifications.removePushoverCredentials':
+        'Supprimer les identifiants et désactiver les événements Pushover',
+      'lumen.notifications.replacementAccessToken':
+        'Jeton d’accès de remplacement',
+      'lumen.notifications.replacementApplicationToken':
+        'Jeton d’application de remplacement',
+      'lumen.notifications.replacementPublicKey':
+        'Clé publique OpenPGP de remplacement',
+      'lumen.notifications.replacementUserKey':
+        'Clé utilisateur ou groupe de remplacement',
+      'lumen.notifications.saveDiscord': 'Enregistrer les paramètres Discord',
+      'lumen.notifications.savePreferences':
+        'Enregistrer les préférences {label}',
+      'lumen.notifications.savePublicKey': 'Enregistrer la clé publique',
+      'lumen.notifications.savePushbullet':
+        'Enregistrer les paramètres Pushbullet',
+      'lumen.notifications.savePushover': 'Enregistrer les paramètres Pushover',
+      'lumen.notifications.saveTelegram': 'Enregistrer les paramètres Telegram',
+      'lumen.notifications.saving': 'Enregistrement…',
+      'lumen.notifications.telegramEvents':
+        'Choisissez les événements à envoyer sur Telegram.',
+      'lumen.notifications.telegramStartChat':
+        'Démarrez une conversation avec le bot Telegram configuré avant d’activer les notifications.',
+      'lumen.notifications.validationPushoverCredentials':
+        'Saisissez un jeton d’application de 30 caractères et une clé utilisateur ou de groupe pour activer les événements Pushover.',
+      'lumen.notifications.allowBrowserNotifications':
+        'Autorisez les notifications dans votre navigateur pour enregistrer cet appareil.',
+      'lumen.notifications.browserDeviceRemoved':
+        'Appareil de navigateur supprimé.',
+      'lumen.notifications.browserPushDisabled':
+        'L’inscription aux notifications push du navigateur est désactivée. Vérifiez vos préférences de notification.',
+      'lumen.notifications.browserRegisterFailure':
+        'Impossible d’enregistrer ce navigateur. Réessayez.',
+      'lumen.notifications.browserRegistered': 'Ce navigateur est enregistré.',
+      'lumen.notifications.browserRegistrationRequirements':
+        'L’inscription du navigateur nécessite un navigateur compatible et une connexion sécurisée.',
+      'lumen.notifications.browserRemoveFailure':
+        'Impossible de supprimer l’appareil du navigateur. Réessayez.',
+      'lumen.notifications.disableThisBrowser': 'Désactiver ce navigateur',
+      'lumen.notifications.loadingBrowserDevices':
+        'Chargement des appareils du navigateur…',
+      'lumen.notifications.registerThisBrowser': 'Enregistrer ce navigateur',
+      'lumen.notifications.registeredAt': 'Enregistré le {date}',
+      'lumen.notifications.removeBrowserBody':
+        '{device} ne recevra plus les notifications push de SeerrNG.',
+      'lumen.notifications.removeBrowserTitle':
+        'Supprimer cet appareil de navigateur ?',
+      'lumen.notifications.thisBrowser': 'Ce navigateur',
+      'lumen.notifications.browserDeviceName': 'Appareil de navigateur',
+      'lumen.watchlist.movies': 'Films',
+      'lumen.watchlist.series': 'Séries',
+      'lumen.watchlist.music': 'Musique',
+      'lumen.watchlist.books': 'Livres',
+      'lumen.watchlist.comics': 'Bandes dessinées',
+      'lumen.watchlist.magazines': 'Magazines',
+      'lumen.watchlist.recentlyAdded': 'Ajoutés récemment',
+      'lumen.watchlist.titleAZ': 'Titre (A à Z)',
+      'lumen.watchlist.titleZA': 'Titre (Z à A)',
+      'lumen.watchlist.removeFailure': 'Impossible de retirer ce titre',
+      'lumen.watchlist.loading': 'Chargement de {label}…',
+      'lumen.watchlist.noTitles': 'Aucun titre sur cette page.',
+      'lumen.watchlist.removeTitle': 'Retirer {title} de la liste de suivi',
+      'lumen.watchlist.removing': 'Retrait…',
+      'lumen.watchlist.remove': 'Retirer',
+      'lumen.watchlist.pages': 'Pages de la liste de suivi',
+      'lumen.watchlist.previous': 'Page précédente',
+      'lumen.watchlist.page': 'Page {page}',
+      'lumen.watchlist.next': 'Page suivante',
+      'lumen.watchlist.userTitle': 'Liste de suivi de l’utilisateur',
+      'lumen.watchlist.unavailable': 'Cette liste de suivi est indisponible.',
+      'lumen.watchlist.discoverTitle': 'Découvrir la liste de suivi',
+      'lumen.watchlist.title': 'Liste de suivi',
+      'lumen.watchlist.personalTitle': 'Liste de suivi personnelle',
+      'lumen.watchlist.backToUser': 'Retour à l’utilisateur',
+      'lumen.watchlist.filtersUnavailable':
+        'Les éléments Plex et SeerrNG partagent cette liste. Les filtres ne sont pas disponibles dans cette vue.',
+      'lumen.watchlist.filters': 'Filtres de la liste de suivi',
+      'lumen.watchlist.search': 'Rechercher des titres',
+      'lumen.watchlist.searchPlaceholder': 'Rechercher des titres…',
+      'lumen.watchlist.mediaType': 'Type de média',
+      'lumen.watchlist.allTypes': 'Tous les types',
+      'lumen.watchlist.sortBy': 'Trier par',
+      'lumen.watchlist.addedOrder': 'Ordre d’ajout',
+      'lumen.watchlist.apply': 'Appliquer les filtres',
+      'lumen.watchlist.clear': 'Effacer les filtres',
     },
   },
   {
@@ -10344,6 +14107,142 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Ukupno zahtjeva',
       'components.Settings.SettingsAbout.uptodate': 'Aktualno',
       'components.Settings.SettingsAbout.version': 'Verzija',
+      'components.NotificationTypeSelector.mediarequested':
+        'Zahtjev čeka odobrenje',
+      'components.NotificationTypeSelector.mediaapproved': 'Zahtjev odobren',
+      'components.NotificationTypeSelector.mediaavailable': 'Zahtjev dostupan',
+      'components.NotificationTypeSelector.mediafailed':
+        'Obrada zahtjeva nije uspjela',
+      'components.NotificationTypeSelector.mediadeclined': 'Zahtjev je odbijen',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Automatsko odobravanje zahtjeva',
+      'components.NotificationTypeSelector.issuecreated': 'Problem prijavljen',
+      'components.NotificationTypeSelector.issuecomment': 'Komentiraj problem',
+      'components.NotificationTypeSelector.issueresolved': 'Problem riješen',
+      'components.NotificationTypeSelector.issuereopened':
+        'Problem ponovno otvoren',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Zahtjev je automatski poslan',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Primite obavijest kada drugi korisnici komentiraju probleme.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Primite obavijest kada problem ponovno otvore drugi korisnici.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Primite obavijest kada drugi korisnici riješe probleme.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Pošaljite obavijest kada problemi dobiju nove komentare.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Pošalji obavijest kada se problem prijavi.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Pošalji obavijest kada se problem ponovno otvori.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Pošalji obavijest kada se problem riješi.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Slanje obavijesti kada korisnici pošalju novi medijski zahtjev koji se automatski odobrava.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Slanje obavijesti kada se medijski zahtjev ručno odobri.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Primite obavijest kada se automatski pošalje novi medijski zahtjevi za stavke na vašoj Plex listi koju pratite.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Slanje obavijesti kada medijski zahtjevi postanu dostupni.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Slanje obavijesti kada su medijski zahtjevi odbijeni.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Slanje obavijesti kada se medijski zahtjevi ne uspiju dodati u Radarr ili Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Slanje obavijesti kada korisnici pošalju nove medijske zahtjeve koji zahtijevaju odobrenje.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Vrste obavijesti',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Primite obavijest kada problemi koje ste prijavili dobiju nove komentare.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Primite obavijest kada drugi korisnici prijave probleme.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Primite obavijest kada se problemi koje ste prijavili ponovno otvore.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Primite obavijest kada problemi koje ste prijavili budu riješeni.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Primite obavijest kada drugi korisnici pošalju nove medijske zahtjeve koji se automatski odobravaju.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Primite obavijest kada vaši zahtjevi za medije budu odobreni.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Primite obavijest kada vaši medijski zahtjevi postanu dostupni.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Primite obavijest kada vaši medijski zahtjevi budu odbijeni.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Primite obavijest kada se medijski zahtjevi ne uspiju dodati u Radarr ili Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Primite obavijest kada drugi korisnici pošalju nove medijske zahtjeve koji zahtijevaju odobrenje.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Zadane postavke uređaja',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID korisnika',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '<FindDiscordIdLink>Višeznamenkasti ID broj</FindDiscordIdLink> povezan s tvojim korisničkim računom',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Neuspjelo spremanje Discord postavki obavijesti.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord postavke obavijesti su uspješno spremljene!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Neuspjelo spremanje e-mail postavki obavijesti.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'E-mail postavke obavijesti su uspješno spremljene!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Obavijesti',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Javni PGP ključ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Šifriraj e-mail poruke koristeći <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Token za pristup',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Stvori token iz tvojih <PushbulletSettingsLink>postavki računa</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Neuspjelo spremanje Pushbullet postavki obavijesti.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet postavke obavijesti su uspješno spremljene!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'API token programa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registriraj jedan program</ApplicationRegistrationLink> za korištenje s {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Ključ korisnika ili grupe',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Tvoj <UsersGroupsLink>identifikator korisnika ili grupe</UsersGroupsLink> s 30 znakova',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Neuspjelo spremanje Pushover postavki obavijesti.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushover postavke obavijesti su uspješno spremljene!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Pošalji tiho',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Pošalji obavijesti bez zvuka',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Zvuk obavijesti',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Chat ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Započni chat</TelegramBotLink>, dodaj <GetIdBotLink>@get_id_bot</GetIdBotLink> zadaj naredbu <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Neuspjelo spremanje Telegram postavki obavijesti.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegram postavke obavijesti su uspješno spremljene!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Moraš navesti valjani korisnički ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Moraš navesti valjani javni ključ stvoren PGP-om',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Moraš navesti valjani token za pristup',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Moraš navesti valjani token programa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Moraš navesti valjani ključ korisnika ili grupe',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Moraš navesti valjani chat ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -10385,6 +14284,69 @@ export const localeData = [
       'components.PermissionEdit.viewrequests': 'צפייה בבקשות',
       'components.IssueDetails.allepisodes': 'כל הפרקים',
       'components.Settings.SettingsNetwork.proxyHostname': 'שם מארח Proxy',
+      'components.NotificationTypeSelector.mediarequested':
+        'בקשה ממתינה לאישור',
+      'components.NotificationTypeSelector.mediaapproved': 'בקשה אושרה',
+      'components.NotificationTypeSelector.mediaavailable': 'בקשה זמינה',
+      'components.NotificationTypeSelector.mediafailed': 'עיבוד הבקשה נכשל',
+      'components.NotificationTypeSelector.mediadeclined': 'בקשה נדחתה',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'בקשה אושרה אוטומטית',
+      'components.NotificationTypeSelector.issuecreated': 'מקרה חדש נפתח',
+      'components.NotificationTypeSelector.issuecomment': 'תגובה למקרה',
+      'components.NotificationTypeSelector.issueresolved': 'פנייה נפתרה',
+      'components.NotificationTypeSelector.issuereopened': 'מקרה נפתח מחדש',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'בקשה נפתחה אוטומטית',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'קבלת התראות כאשר משתמשים אחרים מגיבים למקרה.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'קבלת התראות כאשר משתמשים אחרים פותחים את המקרה מחדש.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'קבלת התראות כאשר המקרה נפתר ע״י משתמשים אחרים.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'קבלת התראות כאשר מתקבלות תגובות חדשות למקרים.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'קבלת התראות כאשר מקרה חדש נפתח.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'קבלת התראות כאשר מקרים נפתחים מחדש.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'קבלת התראות כאשר פניות נפתרות.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'קבלת התראות כאשר משתמשים פותחים בקשה חדשה שמאושרת אוטומטית.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'שליחת התראות כאשר בקשות מדיה מאושרות אוטומטית.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'שליחת התראות כאשר הבקשה נוצרת אוטומטית עבור מדיה ברשימת הצפייה.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'שליחת התראות כאשר ניתן ליצור בקשות מדיה.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'קבלת התראות כאשר בקשות מדיה נדחות.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'קבלת התראות כאשר יש כשל בהוספת בקשות מדיה אל Radarr או Sonarr',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'קבלת התראות כאשר משתמשים פותחים בקשות מדיה שדורשות אישור.',
+      'components.NotificationTypeSelector.notificationTypes': 'סוגי התראות',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'קבלת התראות כאשר תקלות שדיווחת מקבלות תגובות חדשות.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'קבלת התראות כאשר משתמשים אחרים מדווחים על תקלות.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'קבל התראה כשבעיות שפתחת נפתחות מחדש.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'קבלת התראות כאשר הבעיות שדיווחת נפתרות.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'קבלת התראות כאשר משתמשים אחרים מגישים בקשות מדיה חדשות אשר מאושרות אוטומטית.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'קבלת התראות שבקשות המדיה שלך מאושרות.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'קבלת התראות כאשר בקשות המדיה שלך הופכות לזמינות.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'קבלת התראות כאשר בקשות המדיה שלך נדחות.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'קבלת התראות כאשר בקשות מדיה נכשלות להתווסף ל-Radarr או Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'קבלת התראות כאשר משתמשים אחרים מגישים בקשות מדיה חדשות שדורשות אישור.',
     },
   },
   {
@@ -11291,6 +15253,213 @@ export const localeData = [
         'उच्च प्रयास आदेश में सुधार कर सकते हैं लेकिन प्रति डेक अधिक समय लगता है और लागत लेता है।',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'वैकल्पिक स्थानीय सर्वरों के लिए जिन्हें कुंजी की आवश्यकता नहीं है।',
+      'components.NotificationTypeSelector.mediarequested':
+        'अनुमोदन की प्रतीक्षा में अनुरोध',
+      'components.NotificationTypeSelector.mediaapproved': 'स्वीकृत अनुरोध',
+      'components.NotificationTypeSelector.mediaavailable':
+        'अनुरोधित मीडिया उपलब्ध',
+      'components.NotificationTypeSelector.mediafailed':
+        'अनुरोध प्रसंस्करण विफल',
+      'components.NotificationTypeSelector.mediadeclined':
+        'अनुरोध अस्वीकार किया गया',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'स्वचालित रूप से स्वीकृत अनुरोध',
+      'components.NotificationTypeSelector.issuecreated':
+        'मुद्दा रिपोर्ट किया गया',
+      'components.NotificationTypeSelector.issuecomment': 'मुद्दे पर टिप्पणी',
+      'components.NotificationTypeSelector.issueresolved': 'मुद्दा हल किया गया',
+      'components.NotificationTypeSelector.issuereopened':
+        'मुद्दा फिर से खोला गया',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'अनुरोध अपने-आप सबमिट किया गया',
+      'components.NotificationTypeSelector.softwareavailable':
+        'अनुरोधित सॉफ़्टवेयर उपलब्ध',
+      'components.NotificationTypeSelector.softwareStatus':
+        'सॉफ़्टवेयर अनुरोधों के अपडेट',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'जब अन्य उपयोगकर्ता मुद्दों पर टिप्पणी करते हैं तो सूचित हो जाओ।',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'जब मुद्दों को अन्य उपयोगकर्ताओं द्वारा फिर से खोला जाता है तो अधिसूचित हो जाओ।',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'जब मुद्दों को अन्य उपयोगकर्ताओं द्वारा हल किया जाता है तो अधिसूचित हो जाओ।',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'जब मुद्दों को नई टिप्पणियां मिलती हैं तो अधिसूचनाएं भेजें।',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'जब मुद्दों की सूचना दी जाती है तो सूचनाएं भेजें।',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'जब मुद्दों को फिर से खोला जाता है तो अधिसूचनाएं भेजें।',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'जब मुद्दों को हल किया जाता है तो अधिसूचनाएं भेजें।',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'जब उपयोगकर्ता नए मीडिया अनुरोधों को प्रस्तुत करते हैं तो सूचनाएं भेजें जो स्वचालित रूप से अनुमोदित हैं।',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'जब मीडिया अनुरोध को मैन्युअल रूप से अनुमोदित किया जाता है तो सूचनाएं भेजें।',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'जब आपकी देखने की सूची के आइटमों के लिए नए मीडिया अनुरोध अपने-आप सबमिट किए जाते हैं, तब आपको सूचित किया जाएगा।',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'जब अनुरोधित मीडिया उपलब्ध हो जाए, तो सूचनाएँ भेजें।',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'जब मीडिया अनुरोध अस्वीकार किए जाएँ, तो सूचनाएँ भेजें।',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'जब मीडिया अनुरोध Radarr, Sonarr, Lidarr या Bookshelf में जोड़ने में विफल हों, तो सूचनाएँ भेजें।',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'जब उपयोगकर्ता नए मीडिया अनुरोधों को जमा करते हैं, तो सूचनाएं भेजें जिन्हें अनुमोदन की आवश्यकता होती है।',
+      'components.NotificationTypeSelector.notificationTypes':
+        'अधिसूचना प्रकार',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        'जब सॉफ़्टवेयर अनुरोध अनुमोदन की प्रतीक्षा में हों, स्वीकृत या अस्वीकृत हों, या विफल हो जाएँ, तो सूचनाएँ भेजें।',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'जब अनुरोधित ROM और PC गेम डाउनलोड के लिए तैयार हों, तो सूचनाएँ भेजें।',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'जब आपका सॉफ़्टवेयर अनुरोध अनुमोदन की प्रतीक्षा कर रहा हो या स्वीकृत, अस्वीकृत अथवा विफल हो जाए, तो आपको सूचना मिलेगी।',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'आपके द्वारा रिपोर्ट की गई समस्याओं पर नई टिप्पणियाँ आने पर आपको सूचना मिलेगी।',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'जब अन्य उपयोगकर्ता मुद्दों की रिपोर्ट करते हैं तो सूचित हो जाओ।',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'जब आपके द्वारा रिपोर्ट की गई समस्याओं को फिर से खोल दिया जाता है तो अधिसूचित हो जाओ।',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'जब आपके द्वारा रिपोर्ट की गई समस्याएँ हल हो जाएँ, तो आपको सूचना मिलेगी।',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'जब अन्य उपयोगकर्ता नए मीडिया अनुरोधों को प्रस्तुत करते हैं, जो स्वचालित रूप से अनुमोदित होते हैं तो सूचित हो जाओ।',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'जब आपके मीडिया अनुरोध को मंजूरी दे दी जाती है तो सूचित हो जाओ।',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'जब आपका मीडिया अनुरोध उपलब्ध हो जाता है तो सूचित हो जाओ।',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'जब आपके मीडिया अनुरोध अस्वीकार किए जाएँ, तो आपको सूचना मिलेगी।',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'जब मीडिया अनुरोध Radarr, Sonarr, Lidarr या Bookshelf में जोड़ने में विफल हों, तो आपको सूचना मिलेगी।',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'जब अन्य उपयोगकर्ता नए मीडिया अनुरोध भेजें जिन्हें स्वीकृति की आवश्यकता हो, तो आपको सूचना मिलेगी।',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'जब आपके द्वारा अनुरोधित ROM और PC गेम डाउनलोड के लिए तैयार हों, तो आपको सूचना मिलेगी।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'सक्रिय सदस्यता',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'ब्राउज़र',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'बनाया गया',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'सदस्यता हटाएं',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'उपकरण',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'निष्क्रिय वेब पुश',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'वेब पुश को निष्क्रिय करते समय कुछ गलत हो गया।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'वेब पुश सक्षम करें',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'वेब पुश को सक्षम करते समय कुछ गलत हो गया।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'इंजन',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'प्रबंधन उपकरण',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'आपके पास दिखाने के लिए कोई वेब पुश सदस्यता नहीं है।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'ऑपरेटिंग सिस्टम',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'सब्सक्रिप्शन हटा दिया गया।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'उपयोगकर्ता की सदस्यता को हटाते समय कुछ गलत हो गया।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'प्रकार',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'अज्ञात',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'वेब पुश को अक्षम कर दिया गया है।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'वेब पुश सक्षम किया गया है।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'वेब पुश अधिसूचना सेटिंग्स को बचाने में विफल रहा।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'वेब पुश अधिसूचना सेटिंग्स सफलतापूर्वक बचाया!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'डिफ़ॉल्ट',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'उपयोगकर्ता ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'यूज़र आईडी जोड़ें',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord यूज़र ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'निकालें',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'The The most of the <FindDiscordIdLink>बहु-अंक आईडी संख्या</FindDiscordIdLink> अपने यूज़र अकाउंट से जुड़ा हुआ है। कई घरेलू खातों के लिए आप एक से अधिक एक Discord उपयोगकर्ता ID जोड़ सकते हैं।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'सर्वर स्वामी ने Discord अधिसूचनाएँ सक्षम नहीं की हैं। इस जानकारी का उपयोग केवल तभी किया जाएगा जब सर्वर स्वामी किसी बाहरी सेवा को कॉन्फ़िगर करता है।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Discord अधिसूचना सेटिंग्स को बचाने में विफल रहा।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord अधिसूचना सेटिंग्स सफलतापूर्वक बचाया!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'ईमेल',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'ईमेल अधिसूचना सेटिंग्स को बचाने में विफल रहा।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'ईमेल अधिसूचना सेटिंग्स सफलतापूर्वक बचाया!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'अधिसूचनाएं',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'PGP सार्वजनिक कुंजी',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'ईमेल संदेशों का उपयोग करके एन्क्रिप्ट करें <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'पहुँच टोकन',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'अपने से टोकन बनाएं <PushbulletSettingsLink>खाता सेटिंग</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'पुशबलेट अधिसूचना सेटिंग्स को बचाने में विफल रहा।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet अधिसूचना सेटिंग्स सफलतापूर्वक बचाया!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'आवेदन API Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>आवेदन रजिस्टर करें</ApplicationRegistrationLink> उपयोग के लिए {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'उपयोगकर्ता या समूह कुंजी',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'आपका 30-character <UsersGroupsLink>उपयोगकर्ता या समूह पहचानकर्ता</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'पुशओवर अधिसूचना सेटिंग्स को बचाने में विफल रहा।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'पुशओवर अधिसूचना सेटिंग्स ने सफलतापूर्वक बचाया!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'चुपचाप भेजें',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'कोई ध्वनि के साथ सूचनाएं भेजना',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'अधिसूचना ध्वनि',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'चैट ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>चैट शुरू करें</TelegramBotLink>, <GetIdBotLink>@get_id_bot</GetIdBotLink> जोड़ें और <code>/my_id</code> कमांड भेजें।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'थ्रेड/टोपिक ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'यदि आपके समूह चैट में विषय सक्षम हैं, तो आप यहां एक थ्रेड / टॉपिक आईडी निर्दिष्ट कर सकते हैं',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'टेलीग्राम अधिसूचना सेटिंग्स को बचाने में विफल रहा।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'टेलीग्राम अधिसूचना सेटिंग्स ने सफलतापूर्वक बचाया!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'हर ID एक मान्य Discord उपयोगकर्ता ID होना चाहिए।',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'आपको एक वैध पीजीपी सार्वजनिक कुंजी प्रदान करनी चाहिए',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'आपको एक एक्सेस टोकन प्रदान करना होगा',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'आपको एक वैध एप्लिकेशन टोकन प्रदान करना होगा',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'आपको एक वैध उपयोगकर्ता या समूह कुंजी प्रदान करनी चाहिए',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'आपको एक वैध चैट आईडी प्रदान करना होगा',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'थ्रेड / टॉपिक आईडी एक सकारात्मक पूर्ण संख्या होना चाहिए',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'वेब पुश',
     },
   },
   {
@@ -11509,6 +15678,199 @@ export const localeData = [
         'Érvényes minimális TTL‑értéket kell megadnia',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Érvényes portot kell megadnia',
+      'components.NotificationTypeSelector.mediarequested':
+        'Kérés elfogadásra vár',
+      'components.NotificationTypeSelector.mediaapproved': 'Kérés elfogadva',
+      'components.NotificationTypeSelector.mediaavailable': 'Kérés elérhető',
+      'components.NotificationTypeSelector.mediafailed':
+        'Kérés feldolgozás sikertelen',
+      'components.NotificationTypeSelector.mediadeclined': 'Kérés elutasítva',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Kérés automatikusan jóváhagyva',
+      'components.NotificationTypeSelector.issuecreated': 'Probléma jelentve',
+      'components.NotificationTypeSelector.issuecomment':
+        'Hozzászólás a hibajegyhez',
+      'components.NotificationTypeSelector.issueresolved': 'Probléma megoldva',
+      'components.NotificationTypeSelector.issuereopened':
+        'Probléma újranyitva',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'A kérelem automatikusan elküldve',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Értesítést kap, ha más felhasználók hozzászólnak a problémákhoz.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Értesítést kap, ha más felhasználók újranyitják a problémákat.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Értesítést kap, ha más felhasználók megoldják a problémákat.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Értesítések küldése, ha a problémákhoz új hozzászólások érkeznek.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Értesítések küldése problémák bejelentésekor.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Értesítések küldése a problémák újranyitásakor.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Értesítések küldése problémák megoldása esetén.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Értesítések küldése amikor a felhasználók olyan új média kéréseket nyújtanak be, amelyek automatikusan jóvá vannak hagyva.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Értesítések küldése kérések manuális elfogadásakor.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Értesítést kap, amikor új médiakérések kerülnek automatikusan továbbításra a Figyelőlistáján szereplő elemekre.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Értesítést küld, amikor a kért tartalom elérhetővé válik.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Értesítést küld a kérések elutasításakor.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Értesítést küld amikor a kérést nem sikerül hozzáadni a menedzser app-okhoz (Radarr/Sonarr).',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Értesítések küldése, amikor a felhasználók olyan új médiakéréseket nyújtanak be, amiknél elfogadásra van szükség.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Értesítési típusok',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Értesítést kap, ha az Ön által jelentett problémákhoz új hozzászólások érkeznek.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Értesítést kap, ha más felhasználók problémákat jelentenek.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Értesítést kap, ha az Ön által bejelentett problémákat újra megnyitják.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Értesítést kap, ha az Ön által bejelentett problémák megoldódnak.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Értesítést kap, amikor más felhasználók új médiakéréseket nyújtanak be, amelyeket a rendszer automatikusan jóváhagy.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Értesítést kap, ha a média kérelmeket jóváhagyják.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Értesítést kap, amikor elérhetővé válnak a kérései.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Értesítést kap, amikor a média kérését visszautasították.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Értesítést kap, ha a média kéréseket nem sikerült hozzáadni a Radarrhoz vagy a Sonarrhoz.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Értesítést kap, ha más felhasználók új médiakéréseket nyújtanak be, amelyek jóváhagyást igényelnek.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Aktív előfizetés',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Böngésző',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Létrehozva',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Előfizetés törlése',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Eszköz',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Web push letiltása',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Valami probléma történt a web push letiltása közben.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Web push engedélyezése',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Valami probléma történt a web push engedélyezése közben.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Motor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Eszközök kezelése',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Nincsenek megjelenítendő web push-értesítés előfizetések.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Operációs rendszer',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Előfizetés törölve.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Valami rosszul sült el a felhasználói előfizetés törlése közben.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'típus',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Ismeretlen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'A webes push-értesítés ki lett kapcsolva.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'A webes push-értesítés engedélyezve.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'A webes push-értesítés beállításait nem sikerült elmenteni.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'A webes push-értesítés beállításai sikeresen mentésre kerültek!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Eszköz alapértelmezett',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Felhasználói azonosítók',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Felhasználói azonosító hozzáadása',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord felhasználói azonosító',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Eltávolítás',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'A felhasználói fiókjához tartozó <FindDiscordIdLink> többjegyű azonosítószám </FindDiscordIdLink> . Több háztartási fiók esetén több Discord‑felhasználói azonosítót is hozzáadhat.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'A szerver tulajdonosa nem engedélyezte a Discord-értesítéseket. Ez az információ csak akkor kerül felhasználásra, ha a szerver tulajdonosa beállít egy külső szolgáltatást.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'A Discord értesítés beállításait nem sikerült elmenteni.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord értesítés beállítások sikeresen mentve!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Az e-mail értesítés beállításait nem sikerült elmenteni.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Az e-mail értesítések beállításai sikeresen mentésre kerültek!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Értesítések',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'PGP nyilvános kulcs',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'E-mail üzenetek titkosítása az <OpenPgpLink>OpenPGP</OpenPgpLink> használatával',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Hozzáférési Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Hozzon létre egy tokent a <PushbulletSettingsLink>Fiókbeállításokban</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'A Pushbullet értesítési beállításait nem sikerült elmenteni.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'A Pushbullet értesítési beállításai sikeresen mentve lettek!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Alkalmazás API Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Alkalmazás regisztrálása</ApplicationRegistrationLink> a(z) {applicationTitle} alkalmazáshoz',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Felhasználói vagy csoportkulcs',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Az Ön 30 karakteres <UsersGroupsLink>felhasználó- vagy csoportazonosítója</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'A Pushover értesítési beállításait nem sikerült elmenteni.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'A Pushover értesítési beállításai sikeresen mentve lettek!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Küldés csendben',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Értesítések küldése hang nélkül',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Értesítési hang',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Chat ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Csevegés indítása</TelegramBotLink>, <GetIdBotLink>@get_id_bot</GetIdBotLink> hozzáadása, és a <code>/my_id</code> parancs kiadása',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Szál/téma azonosító',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Ha a csoportos csevegésében engedélyezve vannak a témák, itt megadhatja egy szál/téma azonosítóját',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'A Telegram-értesítés beállításait nem sikerült elmenteni.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegram értesítés beállítások mentése sikeres!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Minden azonosító érvényes Discord felhasználói azonosító kell legyen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Érvényes PGP- kulcsot kell megadnia',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Meg kell adnia egy hozzáférési tokent',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Érvényes alkalmazás tokent kell megadnia',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Meg kell adnia egy érvényes felhasználói vagy csoportkulcsot',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Meg kell adnia egy érvényes chat azonosítót',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'A szál/téma azonosítójának pozitív egész számnak kell lennie',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -12435,6 +16797,211 @@ export const localeData = [
         'Usaha yang lebih tinggi dapat meningkatkan pemesanan tapi membutuhkan waktu lebih lama dan biaya lebih banyak per dek.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'Opsional bagi server lokal yang tidak memerlukan kunci.',
+      'components.NotificationTypeSelector.mediarequested':
+        'Permintaan Menunggu Persetujuan',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Permintaan Disetujui',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Media yang diminta tersedia',
+      'components.NotificationTypeSelector.mediafailed':
+        'Pemrosesan Permintaan Gagal',
+      'components.NotificationTypeSelector.mediadeclined': 'Permintaan Ditolak',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Permintaan Otomatis Disetujui',
+      'components.NotificationTypeSelector.issuecreated': 'Isu Dilaporkan',
+      'components.NotificationTypeSelector.issuecomment': 'Komentar Isu',
+      'components.NotificationTypeSelector.issueresolved': 'Isu Diselesaikan',
+      'components.NotificationTypeSelector.issuereopened': 'Isu Dibuka Ulang',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Permintaan Otomatis Dikirimkan',
+      'components.NotificationTypeSelector.softwareavailable':
+        'Permintaan Perangkat Lunak Tersedia',
+      'components.NotificationTypeSelector.softwareStatus':
+        'Pemutakhiran Permintaan Perangkat Lunak',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Dapatkan notifikasi saat pengguna lain mengomentari isu.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Dapatkan diberitahu ketika masalah dibuka kembali oleh pengguna lain.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Dapatkan diberitahu ketika masalah diselesaikan oleh pengguna lain.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Kirim pemberitahuan ketika isu menerima komentar baru.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Kirim pemberitahuan ketika masalah dilaporkan.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Kirim pemberitahuan ketika masalah dibuka kembali.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Kirim pemberitahuan ketika masalah diselesaikan.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Kirim pemberitahuan ketika pengguna mengajukan permintaan media baru yang secara otomatis disetujui.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Kirim pemberitahuan ketika permintaan media secara manual disetujui.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Dapatkan pemberitahuan saat permintaan media baru otomatis diajukan untuk item di daftar tontonan Anda.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Kirim pemberitahuan saat media yang diminta tersedia.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Kirim pemberitahuan ketika permintaan media ditolak.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Kirim pemberitahuan saat permintaan media gagal ditambahkan ke Radarr, Sonarr, Lidarr, atau Bookshelf.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Kirim pemberitahuan ketika pengguna mengirimkan permintaan media baru yang membutuhkan persetujuan.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Tipe Pemberitahuan',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        'Kirim pemberitahuan untuk permintaan perangkat lunak menunggu persetujuan atau yang disetujui, ditolak, atau gagal.',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'Kirim pemberitahuan ketika ROM dan game PC yang diminta siap diunduh.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'Dapatkan diberitahu ketika permintaan perangkat lunak Anda sedang menunggu persetujuan atau disetujui, ditolak, atau gagal.',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Dapatkan diberitahu ketika masalah Anda dilaporkan menerima komentar baru.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Dapatkan diberitahu ketika pengguna lain melaporkan masalah.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Dapatkan pemberitahuan saat masalah yang Anda laporkan dibuka kembali.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Dapatkan pemberitahuan saat masalah yang Anda laporkan diselesaikan.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Dapatkan diberitahu ketika pengguna lain mengajukan permintaan media baru yang secara otomatis disetujui.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Dapatkan diberitahu ketika permintaan media Anda disetujui.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Dapatkan diberitahu ketika permintaan media Anda tersedia.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Dapatkan diberitahu ketika permintaan media Anda ditolak.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Dapatkan pemberitahuan saat permintaan media gagal ditambahkan ke Radarr, Sonarr, Lidarr, atau Bookshelf.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Dapatkan diberitahu ketika pengguna lain mengajukan permintaan media baru yang membutuhkan persetujuan.',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'Dapatkan pemberitahuan saat ROM dan game PC yang Anda minta siap diunduh.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Berlangganan Aktif',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Peramban',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Dibuat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Hapus Berlangganan',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Perangkat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Matikan dorongan web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Ada yang salah saat mematikan dorongan web.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Aktifkan push web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Sesuatu yang salah ketika memungkinkan web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Mesin',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Kelola Perangkat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Anda tidak memiliki langganan web push untuk ditampilkan.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Sistem Operasi',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Berlangganan dihapus.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Ada yang salah saat menghapus langganan pengguna.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'jenis',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Tak dikenal',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Dorongan web telah dinonaktifkan.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Dorongan web telah diaktifkan.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Pengaturan pemberitahuan push web gagal disimpan.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Pengaturan dukungan web berhasil disimpan!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Standar Perangkat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID Pengguna',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Tambah ID Pengguna',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord ID Pengguna',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Hapus',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'The <FindDiscordIdLink>nomor ID multidigit</FindDiscordIdLink> terkait dengan akun pengguna anda. Untuk beberapa akun rumah tangga Anda dapat menambahkan lebih dari satu ID pemakai Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'Pemilik server belum mengaktifkan pemberitahuan Discord. Informasi ini hanya akan digunakan jika pemilik server mengatur layanan eksternal.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Pengaturan pemberitahuan Discord gagal disimpan.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Pengaturan pemberitahuan Discord berhasil disimpan!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Surel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Pengaturan pemberitahuan surel gagal disimpan.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Pengaturan pemberitahuan surel berhasil disimpan!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Pemberitahuan',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Kunci Publik PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Mengenkripsi pesan surel menggunakan <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Token Akses',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Membuat token dari Anda <PushbulletSettingsLink>Pengaturan Akun</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Pengaturan pemberitahuan peluru Pushbullet gagal disimpan.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pengaturan pemberitahuan peluru Pushbullet berhasil disimpan!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'API Aplikasi Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Mendaftar aplikasi</ApplicationRegistrationLink> untuk digunakan dengan {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Kunci Pengguna atau Grup',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        '30-karakter Anda <UsersGroupsLink>pengidentifikasi pengguna atau grup</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Pengaturan pemberitahuan Pushover gagal disimpan.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pengaturan pemberitahuan Pushover berhasil disimpan!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Kirim Diam-diam',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Kirim pemberitahuan tanpa suara',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Suara Pemberitahuan',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID Percakapan',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Mulai obrolan</TelegramBotLink>, tambahkan <GetIdBotLink>@get_id_bot</GetIdBotLink>, lalu kirim perintah <code>/my_id</code>.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID Thread / Topik',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Jika pembicaraan anda telah diaktifkan, anda dapat menentukan suatu thread / topik ID di sini',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Pengaturan pemberitahuan Telegram gagal disimpan.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Pengaturan pemberitahuan Telegram berhasil disimpan!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Setiap ID harus berupa ID pengguna Discord yang valid.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Anda harus memberikan kunci publik PGP yang valid',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Anda harus memberikan sebuah token akses',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Anda harus memberikan token aplikasi yang valid',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Anda mesti memberikan kunci pengguna atau grup yang valid',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Anda mesti memberikan ID obrolan yang valid',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'ID thread / topik harus berupa keseluruhan positif',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Push Web',
     },
   },
   {
@@ -12655,6 +17222,194 @@ export const localeData = [
         'Devi fornire un valore TTL minimo valido',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'È necessario fornire una porta valida',
+      'components.NotificationTypeSelector.mediarequested':
+        'Richiesta in attesa di approvazione',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Richiesta approvata',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Richiesta disponibile',
+      'components.NotificationTypeSelector.mediafailed':
+        'Elaborazione della richiesta non riuscita',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Richiesta rifiutata',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Richiesta approvata automaticamente',
+      'components.NotificationTypeSelector.issuecreated': 'Problema Segnalato',
+      'components.NotificationTypeSelector.issuecomment':
+        'Commenti segnalazione',
+      'components.NotificationTypeSelector.issueresolved': 'Problema risolto',
+      'components.NotificationTypeSelector.issuereopened':
+        'Segnalazione Riaperta',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Richiesta inviata automaticamente',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Ricevi una notifica quando altri utenti commentano nella segnalazione.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Ricevi una notifica quanto le segnalazioni vengono riaperte da altri utenti.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Ricevi una notifica quanto le segnalazioni vengono risolte da altri utenti.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Invia notifiche quando le segnalazioni ricevono nuovi commenti.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Invia una notifica quando un problema viene segnalato.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Invia una notifica quando le segnalazioni vengono riaperte.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Invia una notifica quando un problema viene risolto.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Invia notifiche quando gli utenti presentano nuove richieste che vengono approvate automaticamente.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Invia notifiche quando le richieste sono approvate manualmente.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Ricevi notifiche quando nuove richieste di media vengono inviate automaticamente per gli elementi nella tua lista di visione.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Invia notifiche quando i media richiesti diventano disponibili.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Invia notifiche quando i media richiesti vengono rifiutati.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Invia notifiche quando le richieste non vengono aggiunte a Radarr o Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Invia notifiche quando gli utenti presentano nuove richieste di media che richiedono approvazione.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Tipi di Notifica',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Ricevi una notifica quando una segnalazione riceve nuovi commenti.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Ottieni una notifica quando altri utenti segnalano dei problemi.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Ricevi una notifica quanto le tue segnalazioni vengono riaperte.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Ricevi una notifica quando le tue segnalazioni vengono risolte.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Ricevi una notifica quando altri utenti inviano nuove richieste che vengono approvate automaticamente.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Ricevi una notifica quando le tue richieste vengono approvate.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Ricevi una notifica quando le tue richieste diventano disponibili.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Ricevi una notifica quando le tue richieste vengono rifiutate.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Ricevi una notifica quando le richieste non vengono aggiunte a Radarr o Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        "Ricevi una notifica quando altri utenti presentano nuove richieste che richiedono l'approvazione.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Sottoscrizione attiva',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Browser',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Creata',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Cancella sottoscrizione',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Dispositivo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Disabilita web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Qualcosa si è rotto cercando di disabilitare il web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Abilita il web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Qualcosa si è rotto cercando di abilitare il web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Motore',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Gestisci dispositivi',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Non hai alcuna sottoscrizione web push da mostrare.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Sistema Operativo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Sottoscrizione cancellata.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        "Qualcosa si è rotto durante la cancellazione delle sottoscrizioni dell'utente.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'tipo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Sconosciuto',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Web push è stato disabilitato.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Web push è stato abilitato.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Qualcosa si è rotto durante il salvataggio delle impostazioni delle notifiche web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Impostazioni notifiche web push salvate con successo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Predefinito del dispositivo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID utente',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        "Il <FindDiscordIdLink>numero ID a più cifre</FindDiscordIdLink> associato all'account utente",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Impossibile salvare le impostazioni di Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Impostazioni di Discord salvate con successo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Email',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Impossibile salvare le impostazioni Email.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Impostazioni Email salvate con successo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notifiche',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Chiave pubblica PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Crittografa i messaggi di posta elettronica usando <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Token di accesso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Crea un token dalle tue <PushbulletSettingsLink>Impostazioni Account</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Impossibile salvare le impostazioni di Pushbullet.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Impostazioni di Pushbullet salvate con successo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'API Token applicazione',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registra un applicazione</ApplicationRegistrationLink> per usarla con {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Chiave utente o di un gruppo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'La tua stringa di 30 caratteri <UsersGroupsLink>per identificare utente o un gruppo</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Impossibile salvare le impostazioni Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Impostazioni Pushover salvate con successo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Invia silenziosamente',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Invia notifiche senza suono',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Suono di notifica',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID chat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Inizia una chat</TelegramBotLink>, aggiungi <GetIdBotLink>@get_id_bot</GetIdBotLink>, ed esegui il comando <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Thread/ID Argomento',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        "Se nella tua chat di gruppo sono abilitati gli argomenti, puoi specificare qui l'ID di un thread/argomento",
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Impossibile salvare le impostazioni di Telegram.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Impostazioni di Telegram salvate con successo!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'È necessario fornire un ID utente valido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'È necessario fornire una chiave pubblica PGP valida',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Devi fornire un access token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Devi fornire un application token valido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Devi fornire una chiave utente o di gruppo valida',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'È necessario fornire un ID chat valido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        "L'ID del thread/argomento deve essere un numero intero positivo",
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Notifiche Web',
     },
   },
   {
@@ -13571,6 +18326,213 @@ export const localeData = [
         '注文が向上するだけでなく、デッキごとにコストを削減できます。',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'キーを必要としないローカルサーバーのための任意。',
+      'components.NotificationTypeSelector.mediarequested':
+        'リクエストは未承認',
+      'components.NotificationTypeSelector.mediaapproved':
+        'リクエストが承認された',
+      'components.NotificationTypeSelector.mediaavailable':
+        'リクエストしたメディアが利用可能',
+      'components.NotificationTypeSelector.mediafailed':
+        'リクエストの処理が失敗した',
+      'components.NotificationTypeSelector.mediadeclined':
+        'リクエストは拒否された',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        '自動承認されたリクエスト',
+      'components.NotificationTypeSelector.issuecreated':
+        'チケットが報告されました',
+      'components.NotificationTypeSelector.issuecomment': 'チケットのコメント',
+      'components.NotificationTypeSelector.issueresolved': 'チケット解決済み',
+      'components.NotificationTypeSelector.issuereopened':
+        'チケットを再度開いた',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'リクエストが自動的に送信されました',
+      'components.NotificationTypeSelector.softwareavailable':
+        'リクエストされたソフトウェアが利用可能',
+      'components.NotificationTypeSelector.softwareStatus':
+        'ソフトウェア要求の更新',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        '他のユーザーがチケットにコメントすると通知を受け取る。',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        '他のユーザーがチケットを再開したときに通知を受け取ります。',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        '他ユーザーがチケットを解決した際に通知を受ける。',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'チケットにコメントが追加される際に通知を受ける。',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'チケットが報告される際に通知を送信。',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'チケットが再度開く際に通知を受ける。',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'チケットが解決される際に通知を受ける。',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'ユーザーの新メディアリクエストが自動的に承認されると通知する。',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'メディアリクエストが手動で承認されたときに通知を送信します。',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'ウォッチリストのアイテムに対して新しいメディアリクエストが自動的に送信されると通知を受け取ります。',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'リクエストされたメディアが利用可能になったときに通知を送信します。',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'メディアリクエストが拒否されると通知する。',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'メディアリクエストを Radarr、Sonarr、Lidarr、または Bookshelf に追加できなかったときに通知を送信します。',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'ユーザーが承認を必要とする新メディアリクエストをすると通知する。',
+      'components.NotificationTypeSelector.notificationTypes': '通知タイプ',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        '承認待ち、承認済み、却下、または処理に失敗したソフトウェアリクエストの通知を送信します。',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'リクエストされたROMやPCゲームがダウンロードの準備ができたら通知を送信します。',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'ご自身のソフトウェアリクエストが承認待ち、承認済み、却下、または処理に失敗したときに通知を受け取ります。',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        '自分が報告したチケットに新しいコメントが追加されたときに通知を受け取ります。',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        '他ユーザーがチケットを報告する際に通知を受ける。',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        '自ら報告したチケットが再度開いた際に通知を受ける。',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        '自分が報告したチケットが解決された際に通知を受ける。',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        '他のユーザーの新メディアリクエストが自動的に承認されると通知する。',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'メディアリクエストが承認されると通知する。',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'リクエストしたメディアが利用可能になったときに通知を受け取ります。',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'メディアリクエストが拒否されたら通知する。',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'メディアリクエストを Radarr、Sonarr、Lidarr、または Bookshelf に追加できなかったときに通知を受け取ります。',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        '他のユーザーが承認を必要とする新メディアリクエストをすると通知する。',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'リクエストされたROMやPCゲームがダウンロードの準備ができたら、通知を入手してください。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'アクティブなサブスクリプション',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'ブラウザ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        '作成された',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'サブスクリプションの削除',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'デバイス',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Webプッシュを無効にする',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Webプッシュを無効にしているときに問題が発生しました。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Webプッシュを有効にする',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Webプッシュを有効にしているときに問題が発生しました。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'エンジン',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'デバイスの管理',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        '表示するWebプッシュサブスクリプションがありません。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'オペレーティングシステム',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'サブスクリプションが削除されました。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'ユーザーサブスクリプションの削除中に問題が発生しました。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'タイプ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        '不明',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Webプッシュが無効になっています。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Webプッシュが有効になりました。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Webプッシュ通知設定の保存に失敗しました。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Webプッシュ通知設定が保存されました！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'デバイスのデフォルト',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ユーザーID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'ユーザーIDを追加',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'DiscordユーザーID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        '取り除く',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'アカウントに関連付けられた<FindDiscordIdLink>複数桁のID番号</FindDiscordIdLink>。家族など複数のアカウントがある場合は、複数のDiscordユーザーIDを追加できます。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'サーバー所有者はDiscord通知を有効にしていません。この情報は、サーバー所有者が外部サービスを設定した場合にのみ使用されます。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Discord の通知設定の保存に失敗しました。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord の通知設定が保存されました！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'メール',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'メール通知設定の保存に失敗しました。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'メール通知設定が保存されました！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        '通知',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'PGP公開鍵',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'メールを <OpenPgpLink>OpenPGP</OpenPgpLink> で暗号化する',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'アクセストークン',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        '<PushbulletSettingsLink>アカウント設定</PushbulletSettingsLink>からトークンを作成してください',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Pushbullet通知設定を保存できませんでした。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet通知設定が保存されました！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'アプリケーションAPIトークン',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>アプリケーションを登録</ApplicationRegistrationLink>して{applicationTitle}で使用してください',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'ユーザーまたはグループキー',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        '30文字の<UsersGroupsLink>ユーザーまたはグループの識別子</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Pushover通知設定を保存できませんでした。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushover通知設定が保存されました！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'サイレント送信',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        '音を出さずに通知を送信します',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        '通知音',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'チャットID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>チャットを開始</TelegramBotLink>し、<GetIdBotLink>@get_id_bot</GetIdBotLink>を追加して<code>/my_id</code>コマンドを実行してください',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'スレッド/トピック ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'グループチャットでトピックが有効になっている場合ここでスレッド/トピックのIDを指定できます',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Telegram の通知設定の保存に失敗しました。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegram の通知設定が保存されました！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        '各 ID は有効な Discord ユーザー ID である必要があります。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        '有効なPGP公開キーを指定してください',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'アクセストークンを指定してください',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        '有効なアプリケーショントークンを指定してください',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        '有効なユーザーまたはグループキーを指定してください',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        '有効なチャットIDを指定してください',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'スレッド/トピック IDは正の整数にしてください',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Webプッシュ',
     },
   },
   {
@@ -14447,6 +19409,208 @@ export const localeData = [
         '더 높은 노력은 주문 개선을 할 수 있지만 데크 당 더 길고 비용이 들 수 있습니다.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         '키가 필요하지 않은 로컬 서버에 대한 선택.',
+      'components.NotificationTypeSelector.mediarequested':
+        '보류 중인 승인 요청',
+      'components.NotificationTypeSelector.mediaapproved': '요청 승인됨',
+      'components.NotificationTypeSelector.mediaavailable':
+        '요청한 미디어 사용 가능',
+      'components.NotificationTypeSelector.mediafailed': '요청 처리 실패',
+      'components.NotificationTypeSelector.mediadeclined': '요청 거부됨',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        '자동 승인된 요청',
+      'components.NotificationTypeSelector.issuecreated': '보고된 이슈',
+      'components.NotificationTypeSelector.issuecomment': '이슈 댓글',
+      'components.NotificationTypeSelector.issueresolved': '해결된 이슈',
+      'components.NotificationTypeSelector.issuereopened': '재개된 이슈',
+      'components.NotificationTypeSelector.mediaautorequested':
+        '자동으로 제출된 요청',
+      'components.NotificationTypeSelector.softwareavailable':
+        '요청한 소프트웨어 사용 가능',
+      'components.NotificationTypeSelector.softwareStatus':
+        '소프트웨어 요청 업데이트',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        '다른 사용자가 이슈에 댓글을 남길 때 알림을 받습니다.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        '다른 사용자가 이슈를 다시 열 때 알림을 받습니다.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        '다른 사용자가 이슈를 해결했을 때 알림을 받습니다.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        '이슈에 새 댓글이 수신되면 알림을 보냅니다.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        '이슈가 보고되면 알림을 보냅니다.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        '이슈가 다시 열리면 알림을 보냅니다.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        '이슈가 해결되면 알림을 보냅니다.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        '사용자가 자동으로 승인되는 새 미디어 요청을 제출할 때 알림을 보냅니다.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        '미디어 요청이 수동으로 승인되면 알림을 보냅니다.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        '관심 목록 항목에 대한 새 미디어 요청이 자동으로 제출되면 알림을 받습니다.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        '요청한 미디어를 이용할 수 있게 되면 알림을 보냅니다.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        '미디어 요청이 거부되면 알림을 보냅니다.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Radarr, Sonarr, Lidarr 또는 Bookshelf에 미디어 요청을 추가하지 못한 경우 알림을 보냅니다.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        '사용자가 승인이 필요한 새 미디어 요청을 제출할 때 알림을 보냅니다.',
+      'components.NotificationTypeSelector.notificationTypes': '알림 유형',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        '승인을 기다리거나 승인, 거절 또는 처리 실패 상태인 소프트웨어 요청에 대한 알림을 보냅니다.',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        '요청한 ROM과 PC 게임을 다운로드할 수 있게 되면 알림을 보냅니다.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        '소프트웨어 요청이 승인을 기다리거나 승인, 거절 또는 처리 실패 상태가 되면 알림을 받습니다.',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        '신고한 이슈에 새로운 댓글이 도착하면 알림을 받습니다.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        '다른 사용자가 이슈를 보고하면 알림을 받습니다.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        '보고한 이슈가 다시 열릴 때 알림을 받습니다.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        '보고한 이슈가 해결되면 알림을 받습니다.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        '다른 사용자가 자동으로 승인되는 새 미디어 요청을 제출할 때 알림을 받습니다.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        '미디어 요청이 승인되면 알림을 받습니다.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        '미디어 요청을 사용할 수 있게 되면 알림을 받습니다.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        '미디어 요청이 거부되면 알림을 받습니다.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Radarr, Sonarr, Lidarr 또는 Bookshelf에 미디어 요청을 추가하지 못한 경우 알림을 받습니다.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        '다른 사용자가 승인이 필요한 새 미디어 요청을 제출할 때 알림을 받습니다.',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        '요청한 ROM과 PC 게임이 다운로드 할 준비가되면 알림을 얻으십시오.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Active 구독',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        '브라우저',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        '생성됨',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        '구독 삭제',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        '기기',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        '웹 푸시 비활성화',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        '웹 푸시를 비활성화하면서 뭔가 잘못되었습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        '웹 푸시 활성화',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        '웹 푸시를 활성화하면서 뭔가 잘못되었습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        '제품 정보',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        '장치 관리',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        '웹 푸시 구독이 없습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        '운영 체계',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        '구독 삭제.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        '사용자 구독을 삭제하면서 뭔가 잘못되었습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        '유형',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        '알 수 없음',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        '웹 푸시가 비활성화되었습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        '웹 푸시가 활성화되었습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        '웹 푸시 알림 설정은 저장하지 못했습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        '웹 푸시 알림 설정이 성공적으로 저장되었습니다!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        '장치 과태',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        '사용자 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        '사용자 ID 추가',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord 사용자 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        '기타 제품',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '귀하의 사용자 계정과 연결된 <FindDiscordIdLink>여러 자리 ID 번호</FindDiscordIdLink>입니다. 여러 가족 계정의 경우 두 개 이상의 Discord 사용자 ID를 추가할 수 있습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        '서버 소유자는 Discord 알림을 활성화하지 않았습니다. 이 정보는 서버 소유자가 외부 서비스를 구성하는 경우에만 사용됩니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Discord 알림 설정을 저장하지 못했습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord 알림 설정이 성공적으로 저장되었습니다!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        '이메일',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        '이메일 알림 설정을 저장하지 못했습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        '이메일 알림 설정이 성공적으로 저장되었습니다!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        '알림',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'PGP 공개 키',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        '다음을 사용하여 이메일 메시지 암호화 <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        '액세스 토큰',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        '사용자의 토큰 생성 <PushbulletSettingsLink>계정 설정</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Pushbullet 알림 설정을 저장하지 못했습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet 알림 설정이 성공적으로 저장되었습니다!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        '애플리케이션 API 토큰',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>애플리케이션 등록</ApplicationRegistrationLink>을 통해 {applicationTitle}과(와) 함께 사용할 수 있도록 등록해주세요',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        '사용자 또는 그룹 키',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        '30자의 <UsersGroupsLink>사용자 또는 그룹 식별자</UsersGroupsLink>를 입력해주세요',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Pushover 알림 설정을 저장하지 못했습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushover 알림 설정이 성공적으로 저장되었습니다!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        '조용히 전송',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        '소리 없이 알림 보내기',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        '알림 소리',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        '채팅 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>채팅 시작</TelegramBotLink>, <GetIdBotLink>@get_id_bot</GetIdBotLink>, <code>/my_id</code> 명령을 실행하세요',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        '실/토닉 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        '그룹 채팅이 활성화된 경우, 스레드/topic의 ID를 여기에 지정할 수 있습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        '텔레그램 알림 설정을 저장하지 못했습니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        '텔레그램 알림 설정이 성공적으로 저장되었습니다!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        '각 ID는 유효한 Discord 사용자 ID여야 합니다.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        '유효한 PGP 공개 키를 입력해야 합니다',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        '액세스 토큰을 입력해야 합니다',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        '유효한 애플리케이션 토큰을 입력해야 합니다',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        '유효한 사용자 또는 그룹 키를 입력해야 합니다',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        '유효한 Chat ID를 입력해야 합니다',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'thread/topic ID는 긍정적인 전체적인 수이어야 합니다',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        '웹 푸시',
     },
   },
   {
@@ -14527,6 +19691,75 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Viso rezervacijų',
       'components.Settings.SettingsAbout.uptodate': 'Atnaujinta',
       'components.Settings.SettingsAbout.version': 'Versija',
+      'components.NotificationTypeSelector.mediarequested':
+        'Rezervacija laukia patvirtinimo',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Rezervacija patvirtinta',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Rezervacija išpildyta',
+      'components.NotificationTypeSelector.mediafailed':
+        'Rezervacijos procesas nepavyko',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Rezervacija atšaukta',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Rezervacija automatiškai patvirtina',
+      'components.NotificationTypeSelector.issuecreated':
+        'Problema iš naujo atverta',
+      'components.NotificationTypeSelector.issuecomment':
+        'Problemos komentaras',
+      'components.NotificationTypeSelector.issueresolved': 'Problema išspręsta',
+      'components.NotificationTypeSelector.issuereopened':
+        'Problema iš naujo atverta',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Gauti pranešimus kai kiti vartotojai komentuoja problemą.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Gauti pranešimus kai kiti vartotojai atveria problemą.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Gauti pranešimus kai kiti vartotojai uždaro problemą.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Siųsti pranešimus kai problema gauna nauja komentarą.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Siųsti pranešimus, kai problemos iš naujo atveriamos.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Siųsti pranešimus, kai problema iš naujo atveriamos.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Siųsti pranešimus, kai problemos išspręstos.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Siųsti pranešimus, kai vartotojai pateikia naują medijos rezervaciją, kuri automatiškai patvirtina.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Siųsti pranešimus, medijos rezervacijos patvirtinamos ranka.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Siųsti pranešimą, kai medijos rezervacijos tampa prieinamos.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Siųsti pranešimą, kai medijos rezervacijos atmetamos.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Siųsti pranešimą, kai medijos rezervacijos neišeina pridėti Radarr ar Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Siųsti pranešimą, kai vartotojas patiekia naują medijos rezervaciją, kuriai reikalingas patvirtinimas.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Pranešimų tipai',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Gauti pranešimą, kai problemas, kurias tu pateikei naujai pakomentuojamos.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Gauti pranešimą, kai kiti vartotojai pateikia problemą.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Gauti pranešimą, kai problemos, kurias tu pateikei iš naujo atveriamos.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Gauti pranešimą kai problema, kurią tu pateikei išsprendžiama.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Gauti pranešimą, kai kiti vartotojai pateikia naują medijos rezervaciją, kurie automatiškai patvirtinami.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Gauti pranešimą, kai tavo medijos rezervacija patirtinta.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Gauti pranešimą kai tavo medijos rezervacija tampa prieinama.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Gauti rezervaciją, kai tavo medijos rezervacija atšaukiama.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Gauti pranešimą, kai medijos rezervacijos nepavyksta pridėti Radarr ar Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Gauti pranešimą kai kiti vartotojai pateikia naują medijos prašymą, kuriam reikalingas patvirtinimas.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'El. paštas',
     },
   },
   {
@@ -14658,6 +19891,137 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Forespørsler totalt',
       'components.Settings.SettingsAbout.uptodate': 'Oppdatert',
       'components.Settings.SettingsAbout.version': 'Versjon',
+      'components.NotificationTypeSelector.mediarequested':
+        'Forespørsel venter Godkjenning',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Forespørsel Godkjent',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Forespørsel Tilgjengelig',
+      'components.NotificationTypeSelector.mediafailed': 'Forespørsel Feilet',
+      'components.NotificationTypeSelector.mediadeclined': 'Forespørsel Avvist',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Forespørsel Automagisk Godkjent',
+      'components.NotificationTypeSelector.issuecreated': 'Avvik Rapportert',
+      'components.NotificationTypeSelector.issuecomment': 'Avvikskommentar',
+      'components.NotificationTypeSelector.issueresolved': 'Avvik Utbedret',
+      'components.NotificationTypeSelector.issuereopened': 'Avvik gjenåpnet',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Forespørsel Automagisk Forespurt',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Bli varslet når andre brukere kommenterer på avvik.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Bli varslet når avvik blir gjenåpnet av andre brukere.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Bli varslet når avvik blir utbedret av andre brukere.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Bli varslet når avviket får en ny kommentar.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Bli varslet når avvik blir rapportert.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Bli varslet hvis avviket blir gjennåpnet.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Bli varslet når avviket er utbedret.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Bli varslet når nytt matriale blir forespurt og forespørselen blir automagisk godkjent.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Bli varslet når forespurt matriale blir manuelt godkjent.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Få varsler når nye medieforspørsler automatisk sendes inn for elementer på Din Visningsliste.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Bli varslet når forespurt matriale blir tilgjengelig.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Bli varslet når en forespørsel om nytt matriale blir avvist.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Bli varslet når forespurt matriale ikke kan bli lagt til i Radarr eller Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Bli varslet når nytt matriale blir forespurt og krever godkjenning.',
+      'components.NotificationTypeSelector.notificationTypes': 'Varselstyper',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Bli varslet når ditt innsendte avvik får nye kommentarer.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Bli varslet når andre brukere rapporterer avvik.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Bli varslet når avvik du sendte inn blir gjenåpnet.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Bli varslet når avviket du sendte inn er utbedret.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Bli varslet når andre brukere forespør nytt matriale og forespørselen er automagisk godkjent.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Bli varslet når dine forespørsler blir godkjent.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Bli varslet når dine forespørsler blir tilgjengelig.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Bli varslet når dine forespørsler blir avvist.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Bli varslet når dine forespørsler ikke kan bli lagt til Radarr eller Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Bli varslet når andre brukere forespør nytt matriale hvor forespørselen krever godkjenning.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Bruker ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '<FindDiscordIdLink>ID-nummeret</FindDiscordIdLink> til din brukerkonto',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Kunne ikke lagre instillingene for Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Innstillingene for Discord ble lagret!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-post',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Kunne ikke lagre instillingene for E-post.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Innstillingene for E-post ble lagret!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Varsler',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Offentlig PGP-nøkkel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Bruk <OpenPgpLink>OpenPGP</OpenPgpLink> til å kryptere E-post',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Tilgangsnøkkel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Gå til Pushbullet <PushbulletSettingsLink>kontoinnstillinger</PushbulletSettingsLink> for opprette en tilgangsnøkkel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Kunne ikke lagre instillingene for Pushbullet.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Innstillingene for Pushbullet ble lagret!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Applikasjon/API-nøkkel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Register en tjeneste</ApplicationRegistrationLink> til bruk sammen med {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Bruker- eller Gruppe-nøkkel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Din 30-tegns <UsersGroupsLink>bruker- eller gruppe-ID</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Kunne ikke lagre instillingene for Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Innstillingene for Pushover ble lagret!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Send lydløst',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Send varsler uten lyd',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Chat ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Start en prat</TelegramBotLink>, legg til <GetIdBotLink>@get_id_bot</GetIdBotLink> og benytt <code>/my_id</code> kommandoen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Kunne ikke lagre instillingene for Telegram.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Innstillingene for Telegram ble lagret!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Du må oppgi en gyldig bruker ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Du må oppgi en gyldig offentlig PGP-nøkkel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Du må oppgi en tilgangsnøkkel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Du må oppgi en gyldig applikasjon/API-nøkkel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Du må oppgi en gyldig bruker- eller gruppe nøkkel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Du må oppgi en gyldig prat ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -14881,6 +20245,199 @@ export const localeData = [
         'U moet een geldige minimale TTL-waarde opgeven',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Je dient een geldige poort op te geven',
+      'components.NotificationTypeSelector.mediarequested':
+        'Aanvraag in afwachting van goedkeuring',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Aanvraag goedgekeurd',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Aanvraag beschikbaar',
+      'components.NotificationTypeSelector.mediafailed':
+        'Verwerking van aanvraag mislukt',
+      'components.NotificationTypeSelector.mediadeclined': 'Aanvraag geweigerd',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Aanvraag automatisch goedgekeurd',
+      'components.NotificationTypeSelector.issuecreated': 'Probleem gemeld',
+      'components.NotificationTypeSelector.issuecomment': 'Reactie op probleem',
+      'components.NotificationTypeSelector.issueresolved': 'Probleem opgelost',
+      'components.NotificationTypeSelector.issuereopened':
+        'Probleem opnieuw ingediend',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Aanvraag automatisch ingediend',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Ontvang een melding wanneer andere gebruikers reageren op problemen.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Ontvang een melding wanneer problemen door andere gebruikers opnieuw worden ingediend.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Ontvang een melding wanneer problemen worden opgelost door andere gebruikers.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Melding sturen wanneer problemen nieuwe opmerkingen krijgen.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Stuur meldingen wanneer problemen worden gemeld.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Stuur meldingen wanneer problemen opnieuw worden ingediend.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Stuur meldingen wanneer problemen opgelost zijn.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Een melding sturen wanneer een gebruiker nieuwe media aanvraagt die automatisch wordt goedgekeurd.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Een melding sturen wanneer media-aanvragen handmatig worden goedgekeurd.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Ontvang een melding wanneer er automatisch nieuwe media-aanvragen worden ingediend voor items op je kijklijst.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Een melding sturen wanneer een media-aanvraag beschikbaar is.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Een melding sturen wanneer een media-aanvraag wordt afgewezen.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Een melding sturen wanneer een media-aanvraag niet kan worden toegevoegd aan Radarr of Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Een melding sturen wanneer gebruikers een nieuwe media-aanvraag indienen die goedkeuring vereist.',
+      'components.NotificationTypeSelector.notificationTypes': 'Meldingtypes',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Ontvang een melding wanneer er nieuwe reacties komen op problemen die jij hebt gemeld.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Ontvang een melding wanneer andere gebruikers problemen melden.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Ontvang een bericht wanneer problemen die jij hebt gemeld, opnieuw worden ingediend.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Ontvang een melding wanneer problemen die jij hebt gemeld, opgelost zijn.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Een melding ontvangen wanneer andere gebruikers nieuwe media-aanvragen indienen die automatisch worden goedgekeurd.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Een melding ontvangen wanneer je media-aanvragen goedgekeurd zijn.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Een melding ontvangen wanneer je media-aanvragen beschikbaar zijn.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Een melding ontvangen wanneer je media-aanvragen worden geweigerd.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Een melding ontvangen wanneer media-aanvragen niet kunnen worden toegevoegd aan Radarr of Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Een melding ontvangen wanneer andere gebruikers nieuwe media-aanvragen indienen waarvoor goedkeuring vereist is.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Actief abonnement',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Browser',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Aangemaakt',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Abonnement verwijderen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Apparaat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Web-push uitschakelen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Er is iets misgegaan bij het uitschakelen van web-push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Web-push inschakelen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Er is iets misgegaan bij het inschakelen van web-push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Engine',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Apparaten beheren',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Er zijn geen webpush-abonnementen om weer te geven.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Besturingssysteem',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Abonnement verwijderd.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Er is iets misgegaan bij het verwijderen van het abonnement.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'type',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Onbekend',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Web-push is uitgeschakeld.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Web-push is ingeschakeld.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Opslaan instellingen web-pushmeldingen mislukt.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Opslaan instellingen web-pushmeldingen gelukt!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Apparaatstandaard',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        "Gebruikers-ID's",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Gebruikers-ID toevoegen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Gebruikers-ID Discord',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Verwijderen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        "Het <FindDiscordIdLink>meercijferige ID-nummer</FindDiscordIdLink> van je gebruikersaccount. Voor meerdere accounts kun je meerdere gebruikers-id's toevoegen.",
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'De server eigenaar heeft Disorder meldingen niet ingesteld. Deze informatie wordt alleen gebruikt als de server eigenaar de externe service instelt.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Instellingen voor Discord-meldingen konden niet opgeslagen worden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Instellingen voor Discord-meldingen opgeslagen!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Instellingen voor e-mailmeldingen konden niet opgeslagen worden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Instellingen voor e-mailmeldingen opgeslagen!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Meldingen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Openbare PGP-sleutel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'E-mailberichten versleutelen met <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Toegangstoken',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Maak een token aan in je <PushbulletSettingsLink>accountinstellingen</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Instellingen voor Pushbullet-meldingen konden niet opgeslagen worden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Instellingen voor Pushbullet-meldingen opgeslagen!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Token toepassings-API',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Een toepassing registreren</ApplicationRegistrationLink> om te gebruiken met {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Gebruikers- of groepssleutel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Je <UsersGroupsLink>gebruikers- of groepsidentifier</UsersGroupsLink> van 30 tekens',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Instellingen voor Pushover-meldingen konden niet opgeslagen worden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Instellingen voor Pushover-meldingen opgeslagen!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Stil versturen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Meldingen versturen zonder geluid',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Meldingsgeluid',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Chat-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Een chat starten</TelegramBotLink>, <GetIdBotLink>@get_id_bot</GetIdBotLink> toevoegen en de opdracht <code>/my_id</code> geven',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Thread-/topic-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Als je groepschat topics heeft, kun je hier een thread-/topic-ID opgeven',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'De instellingen voor Telegrammeldingen konden niet opgeslagen worden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Instellingen Telegrammeldingen opgeslagen!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Ieder ID moet een geldig Discord-gebruikers-id zijn',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Je moet een geldige openbare PGP-sleutel opgeven',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Je moet een toegangstoken opgeven',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Je moet een geldig toepassingstoken opgeven',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Je moet een geldige gebruikers- of groepssleutel opgeven',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Je moet een geldige chat-ID opgeven',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'Het thread-/topic-ID dient een positief geheel getal te zijn',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web-push',
     },
   },
   {
@@ -15100,6 +20657,200 @@ export const localeData = [
         'Musisz podać prawidłowy minimalny TTL',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Musisz podać prawidłowy port',
+      'components.NotificationTypeSelector.mediarequested':
+        'Prośba o oczekuje na zatwierdzenie',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Prośba zatwierdzona',
+      'components.NotificationTypeSelector.mediaavailable': 'Dostępne',
+      'components.NotificationTypeSelector.mediafailed':
+        'Przetwarzanie żądania nie powiodło się',
+      'components.NotificationTypeSelector.mediadeclined': 'Prośba odrzucona',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Prośba o automatyczne zatwierdzenie',
+      'components.NotificationTypeSelector.issuecreated': 'Zgłoszono problem',
+      'components.NotificationTypeSelector.issuecomment':
+        'Komentarz do problemu',
+      'components.NotificationTypeSelector.issueresolved': 'Problem rozwiązany',
+      'components.NotificationTypeSelector.issuereopened':
+        'Problem ponownie otwarty',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Prośba przesłana automatycznie',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Otrzymuj powiadomienia, gdy inni użytkownicy skomentują problem.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Otrzymuj powiadomienia, gdy problemy zostaną ponownie otwarte przez innych użytkowników.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Otrzymuj powiadomienia, gdy problemy zostaną rozwiązane przez innych użytkowników.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Wysyłaj powiadomienia, gdy problemy otrzymają nowe komentarze.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Wysyłaj powiadomienia, gdy zostaną zgłoszone problemy.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Wysyłaj powiadomienia, gdy problemy zostaną ponownie otwarte.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Wysyłaj powiadomienia, gdy problemy zostaną rozwiązane.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Wysyłaj powiadomienia, gdy użytkownicy składają nowe prośby o media, które są automatycznie zatwierdzane.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Wysyłaj powiadomienia, gdy prośby o multimedia zostaną ręcznie zatwierdzone.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Otrzymuj powiadomienia o automatycznym składaniu nowych próśb o multimedia dla pozycji znajdujących się na liście obserwowanych.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Wysyłaj powiadomienia, gdy prośby o multimedia staną się dostępne.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Wysyłaj powiadomienia, gdy prośby o multimedia zostaną odrzucone.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Wysyłaj powiadomienia, gdy prośby o multimedia nie zostaną dodane do Radarr lub Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Wysyłaj powiadomienia, gdy użytkownicy składają nowe prośby dotyczące multimediów, które wymagają zatwierdzenia.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Typy powiadomień',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Otrzymuj powiadomienia, gdy problemy zgłoszone przez ciebie otrzymają nowe komentarze.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Otrzymuj powiadomienia, gdy inni użytkownicy zgłaszają problemy.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Otrzymuj powiadomienia o ponownym otwarciu zgłoszonych problemów.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Otrzymuj powiadomienia, gdy zgłoszone przez ciebie problemy zostaną rozwiązane.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Wysyłaj powiadomienia, gdy inni użytkownicy składają nowe prośby o multimedia, które są automatycznie zatwierdzane.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Otrzymuj powiadomienia, gdy Twoje prośby o multimedia zostaną zatwierdzone.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Otrzymuj powiadomienia, gdy Twoje prośby o multimedia staną się dostępne.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Otrzymuj powiadomienia, gdy Twoje prośby o multimedia zostaną odrzucone.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Otrzymuj powiadomienia, gdy prośby o multimedia nie zostaną dodane do Radarr lub Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Otrzymuj powiadomienia, gdy inni użytkownicy prześlą nowe prośby o multimedia, które wymagają zatwierdzenia.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Aktywuj subskrypcję',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Przeglądarka',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Utworzono',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Usuń subskrypcję',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Urządzenie',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Wyłącz powiadomienia Web-Push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Coś poszło nie tak przy próbie wyłączenia Web-Push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Włącz powiadomienia Web-Push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Coś poszło nie tak przy próbie włączenia Web-Push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Silnik',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Zarządzaj urządzeniami',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Nie utworzono jeszcze subskrypcji Web-Push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'System operacyjny',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Usunięto subskrypcję.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Cos poszło nie tak przy próbie usunięcia subskrypcji.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'typ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Nieznany',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Powiadomienia web push zostały wyłączone.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Powiadomienia web push zostały włączone.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Nie udało się zapisać ustawień powiadomień web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Ustawienia powiadomień web push zostały pomyślnie zapisane!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Domyślne urządzenie',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Identyfikatory użytkowników',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Dodaj ID użytkownika',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'ID użytkownika Discord',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Usuń',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '<FindDiscordIdLink>Wielocyfrowy numer ID</FindDiscordIdLink> powiązany z Twoim kontem użytkownika. Dla wielu konto domowych, możesz dodać więcej niż jedno konto użytkownika Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'Właściciel serwera nie włączył powiadomień Discord. Informacje te zostaną wykorzystane tylko wtedy, gdy właściciel serwera skonfiguruje usługę zewnętrzną.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Nie udało się zapisać ustawień powiadomień Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Ustawienia powiadomień Discord zostały pomyślnie zapisane!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Nie udało się zapisać ustawień powiadomień e-mail.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Ustawienia powiadomień e-mail zostały zapisane pomyślnie!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Powiadomienia',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Klucz publiczny PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Szyfruj wiadomości e-mail za pomocą <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Token dostępowy',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Utwórz token z poziomu <PushbulletSettingsLink>ustawień konta</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Nie udało się zapisać ustawień powiadomień Pushbullet.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Ustawienia powiadomień pushbullet zostały pomyślnie zapisane!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Token interfejsu API aplikacji',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Zarejestruj aplikację</ApplicationRegistrationLink> do użycia z {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Klucz użytkownika lub grupy',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Twój 30-znakowy <UsersGroupsLink>identyfikator użytkownika lub grupy</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Nie udało się zapisać ustawień powiadomień Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Ustawienia powiadomień pushover zostały pomyślnie zapisane!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Wyślij po cichu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Wysyłaj powiadomienia bez dźwięku',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Dźwięk powiadomień',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Identyfikator czatu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Rozpocznij czat</TelegramBotLink> ze swoim botem, dodaj <GetIdBotLink>@get_id_bot</GetIdBotLink> i wydaj polecenie <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Wątek',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Jeśli w czacie grupowym włączono tematy, możesz tutaj podać ID wątku/tematu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Nie udało się zapisać ustawień powiadomień telegram.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Ustawienia powiadomień Telegram zostały zapisane pomyślnie!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Każde ID użytkownika Discord musi być prawidłowe',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Musisz podać prawidłowy klucz publiczny PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Musisz podać token dostępu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Musisz podać prawidłowy token aplikacji',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Musisz podać prawidłowy klucz użytkownika lub grupy',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Musisz podać prawidłowy identyfikator czatu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'ID wątku/tematu musi być dodatnią liczbą całkowitą',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -16033,6 +21784,213 @@ export const localeData = [
         'Um esforço maior pode melhorar a ordem, mas demora mais e custa mais por deck.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'Opcional para servidores locais que não precisam de uma chave.',
+      'components.NotificationTypeSelector.mediarequested':
+        'Solicitação com Aprovação Pendente',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Solicitação Aprovada',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Mídia solicitada disponível',
+      'components.NotificationTypeSelector.mediafailed':
+        'Falha ao Processar Solicitação',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Solicitação Recusada',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Solicitação Aprovada Automaticamente',
+      'components.NotificationTypeSelector.issuecreated': 'Problema Reportado',
+      'components.NotificationTypeSelector.issuecomment':
+        'Comentário no Problema',
+      'components.NotificationTypeSelector.issueresolved': 'Problema Resolvido',
+      'components.NotificationTypeSelector.issuereopened': 'Problema Re-aberto',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Solicitação Enviada Automaticamente',
+      'components.NotificationTypeSelector.softwareavailable':
+        'Pedido de Software Disponível',
+      'components.NotificationTypeSelector.softwareStatus':
+        'Atualizações de solicitações de software',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Receber notificação quando outros usuários comentarem nos problemas.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Receber notificação quando problemas forem re-abertos por outros usuários.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Receber notificação quando problemas são resolvidos por outros usuários.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Enviar notificações quando problemas receberem novos comentários.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Enviar notificações quando problemas são reportados.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Enviar notificações quando problemas são re-abertos.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Enviar notificações quando problemas são resolvidos.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Envia notificações quando usuários solicitarem mídias que são aprovadas automaticamente.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Enviar notificações quando solicitações de mídia são aprovadas manualmente.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Seja notificado quando novas solicitações de mídia forem enviadas automaticamente para itens em sua lista de observação.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Envia notificações quando mídias solicitadas estiverem disponíveis.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Envia notificações quando solicitações de mídia são recusadas.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Envie notificações quando as solicitações de mídia não forem adicionadas a Radarr, Sonarr, Lidarr ou Bookshelf.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Envie notificações quando os usuários enviarem novas solicitações de mídia que exijam aprovação.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Tipos de Notificação',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        'Envie notificações para pedidos de software aguardando aprovação ou que foram aprovados, recusados ou falhados.',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'Envie notificações quando os ROMs e jogos de PC solicitados estiverem prontos para download.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'Seja notificado quando seu pedido de software aguarda aprovação ou é aprovado, recusado ou falhado.',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Receber notificação quando problemas reportados por você receberem novos comentários.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Receber notificação quando outros usuários reportarem problemas.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Receber notificação quando problemas que você reportou forem re-abertos.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Receber notificação quando problemas que você reportou forem resolvidos.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Seja notificado quando outros usuários solicitarem novas mídias que são automaticamente aprovadas.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Seja notificado quando suas solicitações de mídia são aprovadas.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Seja notificado quando suas solicitações de mídia se tornarem disponíveis.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Seja notificado quando suas solicitações de mídia forem rejeitadas.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Seja notificado quando as solicitações de mídia não forem adicionadas a Radarr, Sonarr, Lidarr ou Bookshelf.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Seja notificado quando outros usuários solicitarem novas mídias que requerem aprovação.',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'Seja notificado quando seus ROMs e jogos de PC estiverem prontos para baixar.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Subscrição Activa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Navegador',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Criada',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Apagar assinatura',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Dispositivo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Desativar web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Algo deu errado enquanto desativava o Web Push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Activar push web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Algo deu errado enquanto permitia o empurrão na web.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Motor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Gerenciar dispositivos',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Você não tem assinaturas para mostrar.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Sistema Operacional',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Assinatura deletada.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Algo deu errado enquanto apagava a assinatura do usuário.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'tipo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Desconhecido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'A Web Push foi desativada.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'A Web Push foi ativada.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'As configurações de notificação da Web push falharam em salvar.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Configurações de notificação da Web push salvas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Dispositivo Padrão',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID do Usuário',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Adicionar ID do usuário',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord ID do usuário',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Remova',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'O número de identificação de vários dígitos <FindDiscordIdLink></FindDiscordIdLink> associado à sua conta de usuário. Para várias contas domésticas, você pode adicionar mais de um ID de usuário Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'O proprietário do servidor não ativou as notificações Discord. Esta informação só será utilizada se o proprietário do servidor configurar um serviço externo.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Falha ao salvar configurações de notificação via Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Configurações de notificação via Discord salvas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Falha ao salvar configurações de notificação via e-mail.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Configurações de notificação via e-mail salvas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notificações',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Chave Pública PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Criptografa mensagens de e-mail usando <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Token de Acesso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Criar um token à partir de sua <PushbulletSettingsLink>Configuração de Conta</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Falha ao salvar configurações de notificação via Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Configurações de notificação via Pushbullet salvas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Token da API do aplicativo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registre uma aplicação</ApplicationRegistrationLink> para uso com {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Chave do Usuário ou Grupo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Seu <UsersGroupsLink>identificador de usuário ou grupo</UsersGroupsLink> contendo 30 caractéres',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Falha ao salvar configurações de notificação via Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Configurações de notificação via Pushover salvas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Enviar Silenciosamente',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Envia notificações sem som',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Som de Notificação',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID de Chat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Inicie uma conversa</TelegramBotLink>, adicione <GetIdBotLink>@get_id_bot</GetIdBotLink>, e envie o comando <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID do Tópico/Tópico',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Se seu grupo tem tópicos ativados, você pode especificar um tópico / tópico ID aqui',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Falha ao salvar configurações de notificação via Telegram.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Configurações de notificação via Telegram salvas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Cada ID deve ser um ID de usuário válido do Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Você deve prover uma chave pública PGP válida',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Você deve prover um token de acesso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Você deve prover uma chave válida de acesso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Você deve prover uma chave válida de usúario ou grupo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Você deve prover um ID válido de chat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'A identificação do tópico deve ser um número inteiro positivo.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push.',
     },
   },
   {
@@ -16257,6 +22215,191 @@ export const localeData = [
         'Deve fornecer um TTL mínimo válido',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Deve fornecer uma porta válida',
+      'components.NotificationTypeSelector.mediarequested': 'Multimédia Pedida',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Multimédia Aprovada',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Multimédia Disponível',
+      'components.NotificationTypeSelector.mediafailed': 'Multimédia Falhou',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Multimédia Rejeitada',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Multimédia Aprovada Automaticamente',
+      'components.NotificationTypeSelector.issuecreated': 'Problema Reportado',
+      'components.NotificationTypeSelector.issuecomment':
+        'Comentário no Problema',
+      'components.NotificationTypeSelector.issueresolved': 'Problema Resolvido',
+      'components.NotificationTypeSelector.issuereopened': 'Problema Re-aberto',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Pedido automaticamente enviado',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Receber notificação quando outros utilizadores comentarem nos problemas.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Receber notificação quando problemas forem re-abertos por outros utilizadores.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Receber notificação quando problemas são resolvidos por outros utilizadores.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Enviar notificações quando problemas receberem novos comentários.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Enviar notificações quando problemas são reportados.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Enviar notificações quando problemas são re-abertos.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Enviar notificações quando problemas são resolvidos.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Enviar notificações quando os utilizadores apresentarem novos pedidos de multimédia que são automaticamente aprovados.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Enviar notificações quando os pedidos de multimédia são aprovados manualmente.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Ser notificado quando novos pedidos de média forem enviados automaticamente para itens na sua lista para ver.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Enviar notificações quando os pedidos da multimédia ficarem disponíveis.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Envia uma notificação quando um pedido de multimédia é rejeitado.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Enviar notificações quando os pedidos de multimédia não forem adicionados ao Radarr ou Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Enviar notificações quando os utilizadores enviam novos pedidos de multimédia que requerem aprovação.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Tipos de Notificação',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Receber notificação quando problemas reportados por receberem novos comentários.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Receber notificação quando outros utilizadores reportarem problemas.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Receber notificação quando problemas que reportou forem re-abertos.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Receber notificação quando problemas que reportou forem resolvidos.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Notificar quando outros utilizadores submeteres novos pedidos de multimédia que são automaticamente aprovados.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Notificar quando os seus pedidos de multimédia forem aprovados.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Notificar quando os seus pedidos de multimédia ficarem disponíveis.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Notificar quando seus pedidos de multimédia forem recusados.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Notificar quando os pedidos de multimédia não forem adicionados ao Radarr ou Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Notificar quando outros utilizadores enviarem novos pedidos de multimédia que requeiram aprovação.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Subscrição ativa',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Navegador',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Criado',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Eliminar subscrição',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Dispositivo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Desativar web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Ocorreu um erro ao desativar web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Ativar web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Ocorreu um erro ao ativar web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Motor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Gerir dispositivos',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Não tem subscrições web push para mostrar.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Sistema operativo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Subscrição eliminada.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Ocorreu um erro ao eliminar a subscrição do utilizador.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'tipo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Desconhecido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Web push foi desativado.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Web push foi ativado.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Não foi possível guardar as definições de notificações web push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Definições de notificações web push guardadas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Dispositivo padrão',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID de Utilizador',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'O número de <FindDiscordIdLink>ID</FindDiscordIdLink> da sua conta de utilizador',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Falha ao gravar as definições de notificação Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Definições de notificação Discord gravadas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-Mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Falha ao gravas as definições de notificação e-mail.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Definições de notificação e-mail gravadas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notificações',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Chave Pública PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Encriptar mensagens de e-mail usando <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Token de acesso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Criar um token da sua <PushbulletSettingsLink>Configuração de Conta</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Falha ao gravar configurações de notificação via Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Configurações de notificação via Pushbullet salvas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Token de Acesso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registe uma aplicação</ApplicationRegistrationLink> para uso com {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Chave do Utilizador ou Grupo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'O seu <UsersGroupsLink>identificador de utilizador ou grupo</UsersGroupsLink> contendo 30 caractéres',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Falha ao gravar configurações de notificação via Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Configurações de notificação via Pushover salvas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Enviar Silenciosamente',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Envia notificações sem som',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Som de notificação',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID do Chat',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Iniciar uma conversa</TelegramBotLink>, adicionar <GetIdBotLink>@get_id_bot</GetIdBotLink>, e enviar o comando <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID de tópico/thread',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Se o seu grupo tiver tópicos ativados, pode especificar o ID do tópico/thread aqui',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Falha ao gravas as definições de notificação Telegram.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Definições de notificação Telegram gravadas com sucesso!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Deve fornecer um ID de utilizador válido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Deve fornecer uma chave pública PGP válida',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Deve prover um token de acesso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Deve prover uma chave válida de acesso',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Deve prover uma chave válida de usúario ou grupo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Deve fornecer um ID de chat válido',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'O ID do tópico/thread deve ser um número inteiro positivo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -16355,6 +22498,76 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Total cereri',
       'components.Settings.SettingsAbout.uptodate': 'La zi',
       'components.Settings.SettingsAbout.version': 'Versiune',
+      'components.NotificationTypeSelector.mediarequested':
+        'Solicitarea Așteptă Aprobare',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Solicitare Aprobată',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Solicitare Disponibilă',
+      'components.NotificationTypeSelector.mediafailed':
+        'Procesarea Solicitării Eșuată',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Solicitare Refuzată',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Solicitare Aprobată Automat',
+      'components.NotificationTypeSelector.issuecreated': 'Problemă Raportată',
+      'components.NotificationTypeSelector.issuecomment':
+        'Comentariu la Problemă',
+      'components.NotificationTypeSelector.issueresolved': 'Problemă Rezolvată',
+      'components.NotificationTypeSelector.issuereopened':
+        'Problemă Redeschisă',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Solicitare Trimisă Automat',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Primiți notificări când alți utilizatori comentează la probleme.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Primiți notificări când problemele sunt redeschise de alți utilizatori.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Primiți notificări când problemele sunt rezolvate de alți utilizatori.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Trimiteți notificări când problemele primesc comentarii noi.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Trimiteți notificări când sunt raportate probleme.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Trimiteți notificări când problemele sunt redeschise.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Trimiteți notificări când problemele sunt rezolvate.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Trimiteți notificări atunci când utilizatorii trimit noi solicitări media care sunt aprobate automat.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Trimiteți notificări când solicitările media sunt aprobate manual.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Primiți notificări atunci când noi solicitări media sunt trimise automat pentru articole din Lista dvs. de Urmărire Plex.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Trimiteți notificări când solicitările media devin disponibile.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Trimiteți notificări atunci când solicitările media sunt refuzate.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Trimiteți notificări atunci când solicitările media nu pot fi adăugate la Radarr sau Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Trimiteți notificări atunci când utilizatorii trimit noi solicitări media care necesită aprobare.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Tipuri de Notificări',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Primiți notificări când problemele pe care le-ați raportat primesc comentarii noi.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Primiți notificări când alți utilizatori raportează probleme.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Primiți notificări când problemele pe care le-ați raportat sunt redeschise.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Primiți notificări când problemele pe care le-ați raportat sunt rezolvate.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Primiți notificări când alți utilizatori trimit solicitări media noi, care sunt aprobate automat.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Primiți notificări când solicitările dvs. media sunt aprobate.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Primiți notificări când solicitările dvs. media devin disponibile.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Primiți notificări când solicitările dvs. media sunt refuzate.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Primiți notificări când solicitările media nu pot fi adăugate la Radarr sau Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Primiți notificări atunci când alți utilizatori trimit noi solicitări media care necesită aprobare.',
     },
   },
   {
@@ -16581,6 +22794,203 @@ export const localeData = [
         'Необходимо ввести корректный минимальный TTL',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Нужно указать корректный порт',
+      'components.NotificationTypeSelector.mediarequested':
+        'Запросы медиафайлов',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Одобрение медиа-запросов',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Доступны новые медиафайлы',
+      'components.NotificationTypeSelector.mediafailed':
+        'Ошибки при добавлении медиа-запросов',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Отклонение медиа-запросов',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Автоматическое одобрение медиа-запросов',
+      'components.NotificationTypeSelector.issuecreated':
+        'Проблема опубликована',
+      'components.NotificationTypeSelector.issuecomment':
+        'Комментарий к проблеме',
+      'components.NotificationTypeSelector.issueresolved': 'Проблема решена',
+      'components.NotificationTypeSelector.issuereopened':
+        'Проблема открыта заново',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Запрос отправлен автоматически',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Получать уведомления, когда другие пользователи остовляют комментарии к проблемам.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Получать уведомления, когда проблемы открыты заново другими пользователями.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Получать уведомления, когда проблемы решены другими пользователями.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Отправлять уведомления, когда к проблемам появляются новые комментарии.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Отправлять уведомления, когда появляются сообщения о проблемах.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Отправлять уведомления, когда проблемы открыты заново.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Отправлять уведомления, когда проблемы получают решение.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Отправлять уведомления, когда пользователи отправляют новые медиа-запросы, которые одобряются автоматически.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Отправлять уведомления, когда медиа-запросы одобряются вручную.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Получайте уведомления, когда новые запросы автоматически отправляются для элементов в вашем списке просмотра Plex.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Отправлять уведомления, когда запрошенные медиафайлы становятся доступны.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Отправлять уведомления, когда медиа-запросы отклоняются.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Отправлять уведомления, когда медиа-запросы не удаётся добавить в Radarr или Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Отправлять уведомления, когда пользователи отправляют новые медиа-запросы, требующие одобрения.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Типы уведомлений',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Получать уведомления, когда к проблемам, о которых вы сообщили, появляются новые комментарии.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Получать уведомления, когда другие пользователи сообщают о проблемах.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Получать уведомления, когда проблемы о которых вы сообщили будут открыты заново.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Получать уведомления, когда проблемы, о которых вы сообщили, получают решение.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Получать уведомления, когда другие пользователи отправляют новые медиа-запросы, которые одобряются автоматически.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Получать уведомления, когда ваши медиа-запросы получают одобрение.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Получать уведомления, когда запрошенные вами медиафайлы становятся доступны.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Получать уведомления, когда ваши медиа-запросы отклоняются.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Получать уведомления, когда медиа-запросы не удаётся добавить в Radarr или Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Получать уведомления, когда другие пользователи отправляют новые медиа-запросы, требующие одобрения.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Активная подписка',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Браузер',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Создано',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Удалить подписку',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Устройство',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Отключить веб-пуш',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Что-то пошло не так при отключении веб-пушей.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Включи веб-пуш',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Что-то пошло не так при включении веб-пушей.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Движок',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Управление устройствами',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'У вас нет активных подписок на веб-пуши.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Операционная система',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Подписка удалена.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Что-то пошло не так при удалении подписки пользователя.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'тип',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Неизвестно',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Веб-пуш деактивирован.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Веб-пуш активирован.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Не удалось сохранить настройки уведомлений через веб-пуш.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Настройки уведомлений через веб-пуш успешно сохранены!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Устройство по умолчанию',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID пользователей',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Добавить ID пользователя',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'ID пользователя Discord',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Удалить',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '<FindDiscordIdLink>ID</FindDiscordIdLink> вашей учётной записи. Для нескольких учетных записей в одной семье можно добавить более одного Discord ID.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'Владелец сервера не включил уведомления Discord. Эта информация будет использована только в том случае, если владелец сервера настроит внешнюю службу.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Не удалось сохранить настройки уведомлений Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Настройки уведомлений Discord успешно сохранены!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Электронная почта',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Не удалось сохранить настройки уведомлений по электронной почте.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Настройки уведомлений по электронной почте успешно сохранены!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Уведомления',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Открытый ключ PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Шифровать сообщения электронной почты с помощью <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Токен доступа',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Создайте токен на странице <PushbulletSettingsLink>настроек вашей учётной записи</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Не удалось сохранить настройки уведомлений Pushbullet.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Настройки уведомлений Pushbullet успешно сохранены!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Токен API приложения',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Зарегистрируйте приложение</ApplicationRegistrationLink> для использования с {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Ключ пользователя или группы',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Ваш 30-значный <UsersGroupsLink>идентификатор пользователя или группы</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Не удалось сохранить настройки уведомлений Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Настройки уведомлений Pushover успешно сохранены!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Отправлять без звука',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Отправлять уведомления без звука',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Звук уведомлений',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID чата',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Начните чат</TelegramBotLink>, добавьте <GetIdBotLink>@get_id_bot</GetIdBotLink> и выполните команду <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID треда/топика',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Если ваш групповой чат использует топики, вы можете указать здесь ID треда/топика',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Не удалось сохранить настройки уведомлений Telegram.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Настройки уведомлений Telegram успешно сохранены!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Каждый ID должен быть корректным ID пользователя в Discord',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Вы должны предоставить действительный открытый ключ PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Вы должны предоставить токен доступа',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Вы должны предоставить действительный токен приложения',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Вы должны предоставить действительный ключ пользователя или группы',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Вы должны предоставить действительный ID чата',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'ID треда/топика должно быть целым положительным числом',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Веб-push',
     },
   },
   {
@@ -16706,6 +23116,139 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Kërkesat totale',
       'components.Settings.SettingsAbout.uptodate': 'E përditësuar',
       'components.Settings.SettingsAbout.version': 'Versioni',
+      'components.NotificationTypeSelector.mediarequested':
+        'Kërkesë në pritje të miratimit',
+      'components.NotificationTypeSelector.mediaapproved': 'Kërkesa u Miratua',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Kërkesa e Disponueshme',
+      'components.NotificationTypeSelector.mediafailed':
+        'Përpunimi i kërkesës dështoi',
+      'components.NotificationTypeSelector.mediadeclined': 'Kërkesa u refuzua',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Kërkesa u Miratua Automatikisht',
+      'components.NotificationTypeSelector.issuecreated':
+        'Problemi i Raportuar',
+      'components.NotificationTypeSelector.issuecomment': 'Komenti i Problemit',
+      'components.NotificationTypeSelector.issueresolved': 'Problemi u Zgjidh',
+      'components.NotificationTypeSelector.issuereopened': 'Problemi u Rihap',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Kërkesa u dorëzua automatikisht',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Lajmërohu kur përdoruesit e tjerë komentojnë mbi problemet.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Njoftohuni kur problemet rihapen nga përdorues të tjerë.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Njoftohuni kur problemet zgjidhen nga përdoruesit e tjerë.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Dërgoni njoftime kur problemet marrin komente të reja.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Dërgoni njoftime kur raportohen probleme.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Dërgo njoftime kur problemet rihapen.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Dërgoni njoftime kur problemet zgjidhen.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Dërgo njoftime kur përdoruesit paraqesin kërkesa të reja për media të cilat miratohen automatikisht.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Dërgo njoftime kur kërkesat për media miratohen manualisht.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Njoftohuni kur kërkesat e reja të medias dorëzohen automatikisht për artikujt në Listën tuaj të Plex Watchlist.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Dërgo njoftime kur të bëhen të disponueshme kërkesat për media.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Dërgoni njoftime kur kërkesat për media refuzohen.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Dërgo njoftime kur kërkesat për media nuk shtohen te Radarr ose Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Dërgo njoftime kur përdoruesit paraqesin kërkesa të reja për media të cilat kërkojnë miratim.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Llojet e njoftimeve',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Njoftohu kur problemet që ke raportuar marrin komente të reja.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Lajmërohu kur përdoruesit e tjerë raportojnë probleme.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Njoftohu kur problemet që keni raportuar rihapen.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Njoftohu kur problemet që keni raportuar zgjidhen.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Njoftohuni kur përdoruesit e tjerë paraqesin kërkesa të reja për media të cilat miratohen automatikisht.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Njoftohuni kur kërkesat tuaja për media miratohen.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Njoftohuni kur kërkesat tuaja për media bëhen të disponueshme.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Njoftohuni kur kërkesat tuaja për media refuzohen.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Njoftohuni kur kërkesat për media nuk shtohen te Radarr ose Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Njoftohuni kur përdoruesit e tjerë paraqesin kërkesa të reja për media që kërkojnë miratim.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID e përdoruesit',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '<FindDiscordIdLink>Numri i identifikimit me shumë shifra</FindDiscordIdLink> i lidhur me llogarinë tuaj të përdoruesit',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Cilësimet e njoftimit të Diskordit nuk u ruajtën.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Cilësimet e njoftimit të Diskordit u ruajtën me sukses!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Email',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Cilësimet e njoftimit me email nuk u ruajtën.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Cilësimet e njoftimit me email u ruajtën me sukses!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Njoftimet',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Çelësi publik PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Kripto mesazhet e emailit duke përdorur <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Token Aksesimi',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Krijo një token nga <PushbulletSettingsLink>Cilësimet e llogarisë</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Cilësimet e njoftimit Pushbullet nuk u ruajtën.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Cilësimet e njoftimit Pushbullet u ruajtën me sukses!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Token API i aplikacionit',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Regjistro një aplikacion</ApplicationRegistrationLink> për përdorim me {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Çelësi i përdoruesit ose i grupit',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        '<UsersGroupsLink>Identifikuesi juaj i grupit ose i përdoruesit</UsersGroupsLink> me 30 karaktere',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Cilësimet e njoftimit të Pushover nuk u ruajtën.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Cilësimet e njoftimit Pushover u ruajtën me sukses!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Dërgo në heshtje',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Dërgo njoftime pa zë',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID e bisedës',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink> Fillo një chat</TelegramBotLink>, shto <GetIdBotLink>@get_id_bot</GetIdBotLink>, dhe lëshoni komandën <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Cilësimet e njoftimit të Telegramit nuk u ruajtën.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Cilësimet e njoftimit të Telegramit u ruajtën me sukses!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Ju duhet të jepni një ID të vlefshme përdoruesi',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Duhet të jepni një çelës publik të vlefshëm PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Duhet të japësh një Token hyrjeje',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Duhet të japësh një token të vlefshëm aplikimi',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Duhet të jepni një çelës të vlefshëm përdoruesi ose grupi',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Duhet të jepni një ID të vlefshme bisede',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -16804,6 +23347,23 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Ukupno zahteva',
       'components.Settings.SettingsAbout.uptodate': 'Najsvežiji',
       'components.Settings.SettingsAbout.version': 'Verzija',
+      'components.NotificationTypeSelector.mediaapproved': 'Zahtev je odobren',
+      'components.NotificationTypeSelector.mediaavailable': 'Zahtev dostupan',
+      'components.NotificationTypeSelector.mediadeclined': 'Zahtev odbijen',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID korisnika',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Email',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Notifikacije',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Enkriptuj email poruke koristeći <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Pošalji tiho',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Pošalji notifikacije bez zvuka',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Chat-ID',
     },
   },
   {
@@ -17022,6 +23582,198 @@ export const localeData = [
         'Du måste ange ett giltigt minimalt TTL-värde',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Du måste ange en giltig port',
+      'components.NotificationTypeSelector.mediarequested':
+        'Förfrågan väntar på godkännande',
+      'components.NotificationTypeSelector.mediaapproved': 'Förfrågan godkänd',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Förfrågan tillgänglig',
+      'components.NotificationTypeSelector.mediafailed':
+        'Bearbetning av förfrågan misslyckades',
+      'components.NotificationTypeSelector.mediadeclined': 'Förfrågan nekad',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Förfrågan automatiskt godkänd',
+      'components.NotificationTypeSelector.issuecreated': 'Ärende skapat',
+      'components.NotificationTypeSelector.issuecomment': 'Ärendekommentar',
+      'components.NotificationTypeSelector.issueresolved': 'Ärende löst',
+      'components.NotificationTypeSelector.issuereopened': 'Ärende återöppnat',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Förfrågan automatiskt skickad',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Få meddelanden när andra användare kommenterar ärenden.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Få meddelanden när ärenden återöppnas av andra användare.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Få meddelanden när ärenden blir lösta av andra användare.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Skicka meddelanden när ärenden får nya kommentarer.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Skicka meddelanden när ärenden skapas.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Skicka meddelanden när ärenden återöppnas.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Skicka meddelanden när ärenden blir lösta.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Skicka meddelanden när användare skickar in nya medieförfrågningar som godkänns automatiskt.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Skicka meddelanden när medieförfrågningar godkänns manuellt.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Få meddelanden när nya medieförfrågningar automatiskt skickas för objekt på din bevakningslista.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Skicka meddelanden när medieförfrågningar blir tillgängliga.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Skicka meddelanden när medieförfrågningar nekas.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Skicka meddelanden när medieförfrågningar misslyckas att läggas till i Radarr eller Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Skicka meddelanden när användare skickar nya medieförfrågningar som kräver godkännande.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Meddelandetyper',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Få meddelanden när ärenden du har skapat får nya kommentarer.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Få meddelanden när andra användare skapar ärenden.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Få meddelanden när ärenden du har skapat återöppnas.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Få meddelande när dina skapade ärenden har blivit lösta.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Få meddelanden när andra användare skickar nya medieförfrågningar som automatiskt godkänns.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Få meddelanden när dina medieförfrågningar godkänns.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Få meddelanden när dina medieförfrågningar blir tillgängliga.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Få meddelanden när dina medieförfrågningar nekas.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Få meddelanden när medieförfrågningar misslyckas att läggas till i Radarr eller Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Få meddelanden när andra användare skickar nya medieförfrågningar som kräver godkännande.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Aktiv prenumeration',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Webbläsare',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Skapad',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Ta bort prenumeration',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Enhet',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Inaktivera web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Något gick fel när web push skulle inaktiveras.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Aktivera web push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Något gick fel när web push skulle aktiveras.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Motor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Hantera enheter',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Du har inga web push-prenumerationer att visa.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Operativsystem',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Tog bort prenumerationer.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Något gick fel när användarens prenumeration skulle tas bort.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'typ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Okänd',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Web push har inaktiverats.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Web push har aktiverats.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Det gick inte att spara inställningarna för web push-meddelanden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Inställningarna för web push-meddelanden har sparats!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Enhetens standard',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Användar-ID:n',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Lägg till användar-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord-användar-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Ta bort',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'Det <FindDiscordIdLink>flersiffriga ID-numret</FindDiscordIdLink> som är kopplat till ditt användarkonto. Du kan lägga till fler än ett Discord-användar-ID om flera konton ska ta emot meddelanden.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'Discord-meddelanden har inte aktiverats av serverägaren. Informationen används bara om serverägaren konfigurerar en extern tjänst.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Discords meddelandeinställningar kunde inte sparas.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discords meddelandeinställningar har sparats!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-post',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'E-postmeddelandeinställningar kunde inte sparas.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'E-postmeddelandeinställningar har sparats!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Meddelanden',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Publik PGP-nyckel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Kryptera e-postmeddelanden med <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Åtkomsttoken',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Skapa en token från dina <PushbulletSettingsLink>kontoinställningar</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Pushbullet-meddelandeinställningar kunde inte sparas.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet-meddelandeinställningar har sparats!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Applikationens API-token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Registrera en applikation</ApplicationRegistrationLink> för användning med {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Användar- eller gruppnyckel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Din 30 tecken långa <UsersGroupsLink>användar- eller gruppidentifierare</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Pushover-meddelandeinställningar kunde inte sparas.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushover-meddelandeinställningar har sparats!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Skicka tyst',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Skicka meddelanden utan ljud',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Meddelandeljud',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Chatt-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Starta en chatt</TelegramBotLink>, lägg till <GetIdBotLink>@get_id_bot</GetIdBotLink>, och kör kommandot <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Tråd-/ämnes-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Om din gruppchatt har ämnen aktiverade kan du ange ett tråd-/ämnes-ID här',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Telegrams meddelandeinställningar kunde inte sparas.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegrams meddelandeinställningar har sparats!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Varje ID måste vara ett giltigt Discord-användar-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Du måste ange en giltig publik PGP-nyckel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Du måste ange en åtkomsttoken',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Du måste ange en giltig applikationstoken',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Du måste ange en giltig användar- eller gruppnyckel',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Du måste ange ett giltigt chatt-ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'Tråd-/ämnes-ID måste vara ett positivt heltal',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Webbpush',
     },
   },
   {
@@ -17236,6 +23988,197 @@ export const localeData = [
         'Geçerli bir minimum TTL girmelisiniz',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Geçerli bir port girmelisiniz',
+      'components.NotificationTypeSelector.mediarequested':
+        'Talep Onay Bekliyor',
+      'components.NotificationTypeSelector.mediaapproved': 'Talep Onaylandı',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Talep Kullanılabilir',
+      'components.NotificationTypeSelector.mediafailed':
+        'Talep İşleme Başarısız',
+      'components.NotificationTypeSelector.mediadeclined': 'Talep Reddedildi',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Talep Otomatik Onaylandı',
+      'components.NotificationTypeSelector.issuecreated': 'Sorun Bildirildi',
+      'components.NotificationTypeSelector.issuecomment': 'Sorun Yorumu',
+      'components.NotificationTypeSelector.issueresolved': 'Sorun Çözüldü',
+      'components.NotificationTypeSelector.issuereopened':
+        'Sorun Yeniden Açıldı',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Talep Otomatik Gönderildi',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Diğer kullanıcılar sorunlara yorum yaptığında bildirim alın.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Diğer kullanıcılar sorunları yeniden açtığında bildirim alın.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Diğer kullanıcılar sorunları çözdüğünde bildirim alın.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Sorunlara yeni yorumlar geldiğinde bildirim gönder.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Sorunlar bildirildiğinde bildirim gönder.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Sorunlar yeniden açıldığında bildirim gönder.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Sorunlar çözüldüğünde bildirim gönder.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Kullanıcılar otomatik olarak onaylanan yeni medya talepleri gönderdiğinde bildirim gönder.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Medya talepleri manuel olarak onaylandığında bildirim gönder.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'İzleme Listenizdeki öğeler için yeni medya talepleri otomatik olarak gönderildiğinde bildirim alın.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Medya talepleri kullanılabilir olduğunda bildirim gönder.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Medya talepleri reddedildiğinde bildirim gönder.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        "Medya talepleri Radarr veya Sonarr'a eklenemediğinde bildirim gönder.",
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Kullanıcılar onay gerektiren yeni medya talepleri gönderdiğinde bildirim gönder.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Bildirim Türleri',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Bildirdiğiniz sorunlara yeni yorumlar geldiğinde bildirim alın.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Diğer kullanıcılar sorun bildirdiğinde bildirim alın.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Bildirdiğiniz sorunlar yeniden açıldığında bildirim alın.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Bildirdiğiniz sorunlar çözüldüğünde bildirim alın.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Diğer kullanıcılar otomatik onaylanan yeni medya talepleri gönderdiğinde bildirim alın.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Medya talepleriniz onaylandığında bildirim alın.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Medya talepleriniz kullanılabilir olduğunda bildirim alın.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Medya talepleriniz reddedildiğinde bildirim alın.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        "Medya talepleri Radarr veya Sonarr'a eklenemediğinde bildirim alın.",
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Diğer kullanıcılar onay gerektiren yeni medya talepleri gönderdiğinde bildirim alın.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Aktif Abonelik',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Tarayıcı',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Oluşturuldu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Aboneliği Sil',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Cihaz',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        "Web push'u devre dışı bırak",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Web push devre dışı bırakılırken bir sorun oluştu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        "Web push'u etkinleştir",
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Web push etkinleştirilirken bir sorun oluştu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Motor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Cihazları Yönet',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Gösterilecek web push aboneliğiniz yok.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'İşletim Sistemi',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Abonelik silindi.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Kullanıcı aboneliği silinirken bir sorun oluştu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'tür',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Bilinmiyor',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Web push devre dışı bırakıldı.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Web push etkinleştirildi.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Web push bildirim ayarları kaydedilemedi.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Web push bildirim ayarları başarıyla kaydedildi!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Cihaz Varsayılanı',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'Kullanıcı Kimlikleri',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Kullanıcı Kimliği Ekle',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord Kullanıcı Kimliği',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Kaldır',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'Hesabınızla ilişkilendirilmiş <FindDiscordIdLink>çok haneli Discord kullanıcı kimlik numarasıdır</FindDiscordIdLink>. Aynı hanede birden fazla hesap kullanılıyorsa, birden fazla Discord kullanıcı kimliği ekleyebilirsiniz.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Discord bildirim ayarları kaydedilemedi.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord bildirim ayarları başarıyla kaydedildi!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-posta',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'E-posta bildirim ayarları kaydedilemedi.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'E-posta bildirim ayarları başarıyla kaydedildi!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Bildirimler',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'PGP Genel Anahtarı',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        '<OpenPgpLink>OpenPGP</OpenPgpLink> kullanarak e-posta mesajlarını şifrele',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Erişim Tokeni',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        "<PushbulletSettingsLink>Hesap Ayarları</PushbulletSettingsLink>'ndan bir token oluşturun",
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Pushbullet bildirim ayarları kaydedilemedi.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet bildirim ayarları başarıyla kaydedildi!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Uygulama API Tokeni',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '{applicationTitle} ile kullanmak için <ApplicationRegistrationLink>bir uygulama kaydedin</ApplicationRegistrationLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Kullanıcı veya Grup Anahtarı',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        '30 karakterli <UsersGroupsLink>kullanıcı veya grup tanımlayıcınız</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Pushover bildirim ayarları kaydedilemedi.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushover bildirim ayarları başarıyla kaydedildi!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Sessizce Gönder',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Bildirimleri ses olmadan gönder',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Bildirim Sesi',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'Sohbet Kimliği',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        "<TelegramBotLink>Bir sohbet başlatın</TelegramBotLink>, <GetIdBotLink>@get_id_bot</GetIdBotLink>'u ekleyin ve <code>/my_id</code> komutunu kullanın",
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'İş Parçacığı/Konu Kimliği',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Grup sohbetinizde konular etkinleştirilmişse burada bir iş parçacığı/konu kimliği belirtebilirsiniz',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Telegram bildirim ayarları kaydedilemedi.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegram bildirim ayarları başarıyla kaydedildi!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Girilen her kimlik, geçerli bir Discord kullanıcı kimliği olmalıdır',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Geçerli bir PGP genel anahtarı girmelisiniz',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Bir erişim tokeni girmelisiniz',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Geçerli bir uygulama tokeni girmelisiniz',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Geçerli bir kullanıcı veya grup anahtarı girmelisiniz',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Geçerli bir sohbet kimliği girmelisiniz',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'İş parçacığı/konu kimliği pozitif tam sayı olmalıdır',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Web Push',
     },
   },
   {
@@ -17444,6 +24387,193 @@ export const localeData = [
         'Дозволити Jellyseerr правильно реєструвати IP-адреси клієнтів за проксі',
       'components.Settings.SettingsNetwork.validationProxyPort':
         'Ви повинні вказати дійсний порт',
+      'components.NotificationTypeSelector.mediarequested':
+        'Запити медіафайлів',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Схвалення медіазапитів',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Доступні нові медіафайли',
+      'components.NotificationTypeSelector.mediafailed':
+        'Помилки при додаванні медіазапитів',
+      'components.NotificationTypeSelector.mediadeclined':
+        'Відхилення медіазапитів',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Автоматичне схвалення медіазапитів',
+      'components.NotificationTypeSelector.issuecreated':
+        'Проблема опублікована',
+      'components.NotificationTypeSelector.issuecomment':
+        'Коментар до проблеми',
+      'components.NotificationTypeSelector.issueresolved': 'Проблема вирішена',
+      'components.NotificationTypeSelector.issuereopened':
+        'Проблема відкрита знову',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Запит надіслано автоматично',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Отримувати повідомлення, коли інші користувачі надсилають коментарі до проблем.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Отримувати повідомлення, коли проблеми відкриті заново іншими користувачами.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Отримувати повідомлення, коли проблеми вирішені іншими користувачами.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        "Надсилати повідомлення, коли до проблем з'являються нові коментарі.",
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        "Надсилати повідомлення, коли з'являються повідомлення про проблеми.",
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Надсилати повідомлення, коли проблеми відкриті заново.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Надсилати повідомлення, коли проблеми отримують рішення.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Надсилати повідомлення, коли користувачі надсилають нові медіазапити, які схвалюються автоматично.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Надсилати повідомлення, коли медіазапити схвалюються вручну.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Отримуйте сповіщення, коли нові медіазапити автоматично надсилаються для елементів у вашому списку перегляду Plex.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Надсилати повідомлення, коли запитані медіафайли стають доступними.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Надсилати повідомлення, коли медіазапити відхиляються.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Відправляти повідомлення, коли медіазапити не вдається додати до Radarr або Sonarr.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Надсилати повідомлення, коли користувачі надсилають нові медіазапити, які вимагають схвалення.',
+      'components.NotificationTypeSelector.notificationTypes':
+        'Типи повідомлень',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        "Отримувати повідомлення, коли до проблем, про які ви повідомили, з'являються нові коментарі.",
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Отримувати повідомлення, коли інші користувачі повідомляють про проблеми.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Отримувати повідомлення, коли проблеми, про які ви повідомили, будуть відкриті заново.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Отримувати повідомлення, коли проблеми, про які ви повідомили, отримують рішення.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Отримувати повідомлення, коли інші користувачі надсилають нові медіазапити, які схвалюються автоматично.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Отримувати повідомлення, коли ваші медіазапити отримують схвалення.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Отримувати сповіщення, коли медіа, на які ви створили запит, стають доступними.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Отримувати повідомлення, коли медіазапити відхиляються.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Отримувати повідомлення, коли медіазапити не вдається додати до Radarr або Sonarr.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Отримувати повідомлення, коли інші користувачі надсилають нові медіазапити, які вимагають схвалення.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Браузер',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Створено',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Видалити підписку',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Пристрій',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Вимкнути веб-push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Щось пішло не так при вимкненні веб-push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Увімкнути веб-push',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Щось пішло не так при вмиканні веб-push.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Рушій',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Керувати пристроями',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'У вас немає підписок на веб-push для відображення.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Операційна система',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Підписку видалено.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Щось пішло не так при видаленні підписки користувача.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'тип',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Невідомо',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Веб-push вимкнено.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Веб-push увімкнено.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Не вдалося зберегти налаштування веб-push сповіщень.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Налаштування веб-push сповіщень успішно збережено!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Пристрій за замовчуванням',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID користувача',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '<FindDiscordIdLink>ID</FindDiscordIdLink> вашого облікового запису',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Не вдалося зберегти налаштування повідомлень Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Налаштування повідомлень Discord успішно збережено!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'Електронна пошта',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Не вдалося зберегти налаштування повідомлень електронною поштою.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Налаштування повідомлень електронною поштою успішно збережено!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Сповіщення',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Відкритий ключ PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Шифрувати повідомлення електронної пошти за допомогою <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Токен доступу',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Створіть токен на сторінці <PushbulletSettingsLink>налаштувань вашого облікового запису</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Не вдалося зберегти налаштування сповіщень Pushbullet.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Налаштування сповіщень Pushbullet успішно збережено!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Токен API програми',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Зареєструйте програму</ApplicationRegistrationLink> для використання з {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Ключ користувача або групи',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Ваш 30-значний <UsersGroupsLink>ідентифікатор користувача або групи</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Не вдалося зберегти налаштування сповіщень Pushover.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Налаштування сповіщень Pushover успішно збережено!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Надсилати без звуку',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Надсилати повідомлення без звуку',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Звук сповіщення',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID чату',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Почніть чат</TelegramBotLink>, додайте <GetIdBotLink>@get_id_bot</GetIdBotLink> і виконайте команду <code>/my_id</code>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'ID теми/гілки',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Якщо у вашому груповому чаті ввімкнено теми, ви можете вказати ID теми/гілки тут',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Не вдалося зберегти налаштування сповіщень Telegram.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Налаштування сповіщень Telegram успішно збережено!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Ви повинні надати дійсний ID користувача',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Ви повинні надати дійсний відкритий ключ PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Ви повинні надати токен доступу',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Ви повинні надати дійсний токен програми',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Ви повинні надати дійсний ключ користувача або групи',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Ви повинні надати дійсний ID чату',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'ID теми/гілки повинен бути цілим додатним числом',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Веб-push',
     },
   },
   {
@@ -18297,6 +25427,205 @@ export const localeData = [
         '更大的努力可以改善订购,但需要更长的时间,每个甲板的成本更高.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         '对不需要密钥的本地服务器可选 。',
+      'components.NotificationTypeSelector.mediarequested': '请求待批准',
+      'components.NotificationTypeSelector.mediaapproved': '请求已获批准',
+      'components.NotificationTypeSelector.mediaavailable':
+        '所请求的媒体已可用',
+      'components.NotificationTypeSelector.mediafailed': '请求处理失败',
+      'components.NotificationTypeSelector.mediadeclined': '请求被拒',
+      'components.NotificationTypeSelector.mediaAutoApproved': '自动批准的请求',
+      'components.NotificationTypeSelector.issuecreated': '问题已报告',
+      'components.NotificationTypeSelector.issuecomment': '问题评论',
+      'components.NotificationTypeSelector.issueresolved': '问题解决',
+      'components.NotificationTypeSelector.issuereopened': '问题重新开启',
+      'components.NotificationTypeSelector.mediaautorequested':
+        '自动提交的请求',
+      'components.NotificationTypeSelector.softwareavailable':
+        '所请求的软件已可用。',
+      'components.NotificationTypeSelector.softwareStatus': '软件请求更新',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        '当其他用户评论时可以获取通知。',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        '当其他用户重新开启问题时获取通知。',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        '当其他用户解决问题时获取通知。',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        '当问题有新评论时发送通知。',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        '当用户报告问题时发送通知。',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        '当问题重新开启时发送通知。',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        '当问题解决时发送通知。',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        '当用户提交新的媒体请求且请求被自动批准时发送通知。',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        '当请求被手动批准时发送通知。',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        '当您的待看列表中的项目自动提交新的媒体请求时，您会收到通知。',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        '当请求的媒体可用时发送通知。',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        '当媒体请求被拒绝时发送通知。',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        '当媒体请求无法添加到 Radarr、Sonarr、Lidarr 或 Bookshelf 时发送通知。',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        '当用户提交新的媒体请求且这些请求需要审批时发送通知。',
+      'components.NotificationTypeSelector.notificationTypes': '通知类型',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        '就等待批准的软件请求或被批准、拒绝或失败的软件请求发出通知。',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        '当请求的 ROM 和 PC 游戏准备好下载时发送通知。',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        '在您的软件申请等待批准或被批准、拒绝或失败时得到通知。',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        '当您报告的问题有新评论时获取通知。',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        '当其他用户报告问题时获取通知。',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        '当您报告的问题重新开启时获取通知。',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        '当您报告的问题解决时获取通知。',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        '当其他用户提交新的媒体请求且这些请求自动获批时，您会收到通知。',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        '当您的媒体请求获批时，您会收到通知。',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        '当你请求的媒体可用时通知你。',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        '当你的请求被拒绝时得到通知。',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        '当媒体请求无法添加到 Radarr、Sonarr、Lidarr 或 Bookshelf 时收到通知。',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        '当其他用户提交新的媒体请求且这些请求需要审批时，您会收到通知。',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        '当您要求的ROM和PC游戏准备下载时通知您。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        '活动订阅',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        '浏览器',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        '已创建',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        '删除订阅',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        '设备',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        '禁用网络推',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        '在破坏网络推力的同时出事了',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        '启用网络推',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        '在启动网络推力时出问题了',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        '发动机',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        '管理设备',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        '您没有网络推订阅可显示 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        '操作系统',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        '订阅已删除。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        '删除用户订阅时出错 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        '类型',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        '未知',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        '网络推力已禁用.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        '网络推力已启用 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Web push 通知设置保存失败 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Web 推动通知设置成功保存 !',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        '设备默认',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        '用户 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        '添加用户代号',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord 用户代号',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        '删除',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '与您的用户帐户关联的 <FindDiscordIdLink> 多位 ID 号</FindDiscordIdLink>。对于多个家庭帐户，您可以添加多个 Discord 用户 ID。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        '服务器所有者未启用 Discord 通知 。 只有在服务器所有者配置外部服务时才会使用此信息 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Discord 通知设置保存失败。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord 通知设置保存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        '电子邮件',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        '电子邮件通知设置保存失败。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        '电子邮件通知设置保存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        '通知',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'PGP 公钥',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        '使用 <OpenPgpLink>OpenPGP</OpenPgpLink> 电子邮件加密',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        '访问托肯',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        '从您创建一个符号 <PushbulletSettingsLink>账户设置</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Pushbullet 通知设置保存失败。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet 通知设置保存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        '应用 API 令牌',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '建立一个 {applicationTitle} 专用的 <ApplicationRegistrationLink>应用</ApplicationRegistrationLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        '用户或群组令牌',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        '您 30 个字符的<UsersGroupsLink>用户或群组ID</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Pushover 通知设置保存失败。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushover 通知设置保存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        '无声通知',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        '发送没有声音警报的通知',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        '通知声音',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        '聊天室 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '先<TelegramBotLink>建立一个聊天室</TelegramBotLink>以及把 <GetIdBotLink>@get_id_bot</GetIdBotLink> 加到聊天室，然后在聊天室里发出 <code>/my_id</code> 命令',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        '线程/主题 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        '如果您的群聊启用了主题，您可以在这里指定线程/主题的ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Telegram 通知设置保存失败。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegram 通知设置保存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        '每个 ID 都必须是有效的 Discord 用户 ID。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        '请输入有效的 PGP 公钥',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        '您必须提供访问符',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        '您必须提供有效的申请符号',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        '请输入有效的用户或群组令牌',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        '请输入聊天室 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        '线程/主题ID必须是正的整数',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        '网络推送',
     },
   },
   {
@@ -19150,6 +26479,204 @@ export const localeData = [
         '更大的努力可以改善訂單,但需要更久,每甲板成本更高。',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         '對不需要金鑰的本地伺服器可選擇 。',
+      'components.NotificationTypeSelector.mediarequested': '請求待批准',
+      'components.NotificationTypeSelector.mediaapproved': '請求獲批准',
+      'components.NotificationTypeSelector.mediaavailable':
+        '所請求的媒體已可用',
+      'components.NotificationTypeSelector.mediafailed': '請求處理失敗',
+      'components.NotificationTypeSelector.mediadeclined': '請求拒絕',
+      'components.NotificationTypeSelector.mediaAutoApproved': '自動核准的請求',
+      'components.NotificationTypeSelector.issuecreated': '問題已回報',
+      'components.NotificationTypeSelector.issuecomment': '問題評論',
+      'components.NotificationTypeSelector.issueresolved': '問題解決',
+      'components.NotificationTypeSelector.issuereopened': '問題重新開啟',
+      'components.NotificationTypeSelector.mediaautorequested': '請求自動提出',
+      'components.NotificationTypeSelector.softwareavailable':
+        '所請求的軟體已可用',
+      'components.NotificationTypeSelector.softwareStatus': '軟體要求更新',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        '當其他使用者加新評論時取得通知。',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        '當其他使用者重新開啟問題時取得通知。',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        '當其他使用者解決問題時取得通知。',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        '當問題有新評論時發送通知。',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        '當使用者報告問題時發送通知。',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        '當問題重新開啟時發送通知。',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        '當問題解決時發送通知。',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        '當使用者提交新的媒體請求且請求獲自動核准時發送通知。',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        '當請求獲手動批准時發送通知。',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        '當您的待看清單中的項目自動送出新的媒體請求時，您會收到通知。',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        '當請求的媒體可觀看時發送通知。',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        '當媒體請求遭拒時傳送通知。',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        '當媒體請求無法新增至 Radarr、Sonarr、Lidarr 或 Bookshelf 時發送通知。',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        '當使用者提交新的媒體請求且這些請求需要核准時傳送通知。',
+      'components.NotificationTypeSelector.notificationTypes': '通知類型',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        '傳送軟體請求的通知：等待核准、已核准、遭拒或處理失敗。',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        '當您請求的 ROM 和 PC 遊戲準備好下載時傳送通知。',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        '當您的軟體請求等待核准、已獲核准、遭拒或處理失敗時，您會收到通知。',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        '當您報告的問題有新評論時取得通知。',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        '當其他使用者報告問題時取得通知。',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        '當您報告的問題重新開啟時取得通知。',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        '當您報告的問題解決時取得通知。',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        '當其他使用者提交新的媒體請求且這些請求自動獲准時，您會收到通知。',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        '當您的媒體請求獲准時，您會收到通知。',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        '當您請求的媒體可供使用時，您會收到通知。',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        '當您的請求被拒絕時取得通知。',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        '當媒體要求無法新增至 Radarr、Sonarr、Lidarr 或 Bookshelf 時收到通知。',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        '當其他使用者提交新的媒體請求且這些請求需要核准時，您會收到通知。',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        '當您的 ROM 和 PC 遊戲準備好下載時, 通知您 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        '正在訂閱',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        '瀏覽器',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        '已建立',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        '刪除訂閱',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        '裝置',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        '禁用網頁推動',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        '網路推力斷裂,',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        '開啟網頁推動',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        '在推動網絡時出事了',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        '引擎',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        '管理裝置',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        '您沒有要顯示的網路推動訂閱 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        '操作系統',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        '訂閱已刪除 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        '刪除使用者訂閱時出錯 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        '型態',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        '未知',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        '已停用網頁推播',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        '已啟用網頁推播',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        '無法儲存網頁推播通知設定',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        '已儲存網頁推播通知設定',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        '預設裝置',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        '使用者 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        '新增使用者代碼',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord 使用者代碼',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        '移除',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        '與您的使用者帳號關聯的 <FindDiscordIdLink>多位數 ID</FindDiscordIdLink>。若有多個家庭帳號，可新增多個 Discord 使用者 ID。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        '伺服器所有者未開啟 Discord 通知 。 此資訊只在伺服器所有者設定外部服務時使用 。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Discord 通知設定儲存失敗。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Discord 通知設定儲存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        '電子郵件',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        '電子郵件通知設定儲存失敗。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        '電子郵件通知設定儲存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        '通知',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'PGP 公鑰',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        '使用 <OpenPgpLink>OpenPGP</OpenPgpLink> 電子郵件加密',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        '访问托肯',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        '从您创建一个符号 <PushbulletSettingsLink>账户设置</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Pushbullet 通知設定儲存失敗。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Pushbullet 通知設定儲存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        '應用程式 API 令牌',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '建立一個 {applicationTitle} 專用的<ApplicationRegistrationLink>應用程式</ApplicationRegistrationLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        '使用者或群組令牌',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        '您 30 個字符的<UsersGroupsLink>使用者或群組識別碼</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Pushover 通知設定儲存失敗。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Pushover 通知設定儲存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        '無聲通知',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        '發送沒有警報音的通知',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        '通知提示聲',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        '聊天室 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '先<TelegramBotLink>建立一個聊天室</TelegramBotLink>以及把 <GetIdBotLink>@get_id_bot</GetIdBotLink> 加到聊天室，然後在聊天室裡發出 <code>/my_id</code> 命令',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        '串/ 圖形代碼',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        '如果您的群組聊天已開啟, 您可以在此指定線/ 專題的ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Telegram 通知設定儲存失敗。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Telegram 通知設定儲存成功！',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        '每個 ID 都必須是有效的 Discord 使用者 ID。',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        '請輸入有效的 PGP 公鑰',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        '您必须提供访问符',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        '您必须提供有效的申请符号',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        '請輸入有效的使用者或群組令牌',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        '請輸入聊天室 ID',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        '線程/ 主题 ID 必須是正整數',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        '網路推送',
     },
   },
   {
@@ -20065,6 +27592,212 @@ export const localeData = [
         'Nỗ lực cao hơn có thể cải thiện trật tự nhưng tốn nhiều thời gian hơn và chi phí hơn cho mỗi khoang.',
       'components.Settings.SettingsSwipe.openAiKeyHelp':
         'Tùy chọn cho máy phục vụ cục bộ không cần thiết khoá.',
+      'components.NotificationTypeSelector.mediarequested':
+        'Yêu cầu đang chờ phê duyệt',
+      'components.NotificationTypeSelector.mediaapproved':
+        'Yêu cầu được chấp nhận',
+      'components.NotificationTypeSelector.mediaavailable':
+        'Nội dung đã yêu cầu đã có sẵn',
+      'components.NotificationTypeSelector.mediafailed':
+        'Việc xử lý yêu cầu bị lỗi',
+      'components.NotificationTypeSelector.mediadeclined': 'Yêu cầu bị từ chối',
+      'components.NotificationTypeSelector.mediaAutoApproved':
+        'Yêu cầu được tự động phê duyệt',
+      'components.NotificationTypeSelector.issuecreated':
+        'Vấn đề đã được báo cáo',
+      'components.NotificationTypeSelector.issuecomment': 'Bình luận về vấn đề',
+      'components.NotificationTypeSelector.issueresolved':
+        'Vấn đề được giải quyết',
+      'components.NotificationTypeSelector.issuereopened': 'Vấn đề được mở lại',
+      'components.NotificationTypeSelector.mediaautorequested':
+        'Yêu cầu được tự động gửi',
+      'components.NotificationTypeSelector.softwareavailable':
+        'Yêu cầu phần mềm sẵn sàng',
+      'components.NotificationTypeSelector.softwareStatus':
+        'Cập nhật về các yêu cầu phần mềm',
+      'components.NotificationTypeSelector.adminissuecommentDescription':
+        'Nhận thông báo khi người dùng khác bình luận về vấn đề.',
+      'components.NotificationTypeSelector.adminissuereopenedDescription':
+        'Nhận thông báo khi vấn đề được mở lại bởi người dùng khác.',
+      'components.NotificationTypeSelector.adminissueresolvedDescription':
+        'Nhận thông báo khi vấn đề được giải quyết bởi người dùng khác.',
+      'components.NotificationTypeSelector.issuecommentDescription':
+        'Gửi thông báo khi có bình luận mới về các vấn đề.',
+      'components.NotificationTypeSelector.issuecreatedDescription':
+        'Gửi thông báo khi có vấn đề được báo cáo.',
+      'components.NotificationTypeSelector.issuereopenedDescription':
+        'Gửi thông báo khi vấn đề được mở lại.',
+      'components.NotificationTypeSelector.issueresolvedDescription':
+        'Gửi thông báo khi vấn đề được giải quyết.',
+      'components.NotificationTypeSelector.mediaAutoApprovedDescription':
+        'Gửi thông báo khi người dùng gửi yêu cầu phương tiện mới được tự động phê duyệt.',
+      'components.NotificationTypeSelector.mediaapprovedDescription':
+        'Gửi thông báo khi các yêu cầu phương tiện được phê duyệt thủ công.',
+      'components.NotificationTypeSelector.mediaautorequestedDescription':
+        'Nhận thông báo khi yêu cầu phương tiện mới được gửi tự động cho các mục trong danh sách theo dõi của bạn.',
+      'components.NotificationTypeSelector.mediaavailableDescription':
+        'Gửi thông báo khi nội dung được yêu cầu có sẵn.',
+      'components.NotificationTypeSelector.mediadeclinedDescription':
+        'Gửi thông báo khi yêu cầu phương tiện bị từ chối.',
+      'components.NotificationTypeSelector.mediafailedDescription':
+        'Gửi thông báo khi yêu cầu phương tiện không được thêm vào Radarr, Sonarr, Lidarr hoặc Bookshelf.',
+      'components.NotificationTypeSelector.mediarequestedDescription':
+        'Gửi thông báo khi người dùng gửi yêu cầu nội dung mới cần được phê duyệt.',
+      'components.NotificationTypeSelector.notificationTypes': 'Loại thông báo',
+      'components.NotificationTypeSelector.softwareStatusDescription':
+        'Gửi thông báo về các yêu cầu phần mềm đang chờ phê duyệt, đã được phê duyệt, bị từ chối hoặc xử lý thất bại.',
+      'components.NotificationTypeSelector.softwareavailableDescription':
+        'Gửi thông báo khi ROM và trò chơi PC bạn yêu cầu đã sẵn sàng để tải xuống.',
+      'components.NotificationTypeSelector.userSoftwareStatusDescription':
+        'Nhận thông báo khi yêu cầu phần mềm của bạn chờ được chấp thuận hoặc được chấp thuận, từ chối hoặc thất bại.',
+      'components.NotificationTypeSelector.userissuecommentDescription':
+        'Nhận được thông báo khi vấn đề bạn báo cáo nhận được bình luận mới.',
+      'components.NotificationTypeSelector.userissuecreatedDescription':
+        'Nhận thông báo khi người dùng khác báo cáo vấn đề.',
+      'components.NotificationTypeSelector.userissuereopenedDescription':
+        'Nhận được thông báo khi các vấn đề bạn báo cáo được mở lại.',
+      'components.NotificationTypeSelector.userissueresolvedDescription':
+        'Nhận được thông báo khi các vấn đề bạn báo cáo được giải quyết.',
+      'components.NotificationTypeSelector.usermediaAutoApprovedDescription':
+        'Nhận thông báo khi người dùng khác gửi yêu cầu nội dung mới và các yêu cầu đó được tự động phê duyệt.',
+      'components.NotificationTypeSelector.usermediaapprovedDescription':
+        'Nhận thông báo khi các yêu cầu nội dung của bạn được phê duyệt.',
+      'components.NotificationTypeSelector.usermediaavailableDescription':
+        'Nhận thông báo khi nội dung bạn yêu cầu có sẵn.',
+      'components.NotificationTypeSelector.usermediadeclinedDescription':
+        'Nhận được thông báo khi yêu cầu truyền thông của bạn bị từ chối.',
+      'components.NotificationTypeSelector.usermediafailedDescription':
+        'Nhận thông báo khi không thể thêm yêu cầu phương tiện vào Radarr, Sonarr, Lidarr hoặc Bookshelf.',
+      'components.NotificationTypeSelector.usermediarequestedDescription':
+        'Nhận thông báo khi người dùng khác gửi yêu cầu nội dung mới cần được phê duyệt.',
+      'components.NotificationTypeSelector.usersoftwareavailableDescription':
+        'Nhận thông báo khi ROM và trò chơi PC bạn yêu cầu đã sẵn sàng để tải xuống.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.activesubscription':
+        'Đăng ký',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.browser':
+        'Bộ duyệt',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.created':
+        'Tạo',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.deletesubscription':
+        'Xoá phục tùng',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.device':
+        'Thiết bị',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablewebpush':
+        'Tắt đẩy web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.disablingwebpusherror':
+        'Có gì đó không ổn trong khi tắt mạng.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablewebpush':
+        'Bật đẩy web',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.enablingwebpusherror':
+        'Có gì đó không ổn trong khi có thể đẩy mạng.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.engine':
+        'Máy',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.managedevices':
+        'Quản lý thiết bị',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.nodevicestoshow':
+        'Bạn không có sự thúc đẩy trên web đăng ký.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.operatingsystem':
+        'Hệ điều hành',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleted':
+        'Đăng ký',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.subscriptiondeleteerror':
+        'Có gì đó không ổn trong khi xóa ký tự người dùng.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.type':
+        'Kiểu',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.unknown':
+        'Không rõ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeendisabled':
+        'Đẩy mạng đã bị vô hiệu hóa.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushhasbeenenabled':
+        'Đã có hiệu lực đẩy mạng.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingsfailed':
+        'Thiết lập đẩy mạng không thể lưu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.UserNotificationsWebPush.webpushsettingssaved':
+        'Thiết lập đẩy mạng đã lưu thành công.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.deviceDefault':
+        'Mặc định',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordId':
+        'ID người dùng',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdAdd':
+        'Thêm ID người dùng',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdPlaceholder':
+        'Discord ID do usuário',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdRemove':
+        'Bỏ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordIdTip':
+        'Hạt <FindDiscordIdLink>Số ID đa số</FindDiscordIdLink> được liên kết với tài khoản người dùng của bạn. Đối với nhiều tài khoản hộ gia đình, bạn có thể thêm nhiều hơn một ID người dùng Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordNotificationsNotEnabled':
+        'Người sở hữu máy phục vụ không bật thông báo Discord. Thông tin này sẽ chỉ được dùng nếu người sở hữu máy phục vụ cấu hình một dịch vụ bên ngoài.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingsfailed':
+        'Không lưu được cài đặt thông báo Discord.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.discordsettingssaved':
+        'Cài đặt thông báo Discord đã được lưu thành công!',
+      'components.UserProfile.UserSettings.UserNotificationSettings.email':
+        'E-mail',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingsfailed':
+        'Thiết lập thư điện tử không thể lưu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.emailsettingssaved':
+        'Thiết lập thư điện tử đã lưu thành công.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.notifications':
+        'Thông báo Hệ thốngComment',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKey':
+        'Khóa công khai PGP',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pgpPublicKeyTip':
+        'Name <OpenPgpLink>OpenPGP</OpenPgpLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessToken':
+        'Truy cập Token',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletAccessTokenTip':
+        'Tạo một vật kỷ niệm từ bạn <PushbulletSettingsLink>Thiết lập tài khoản</PushbulletSettingsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingsfailed':
+        'Thiết lập thông báo đẩy không thể lưu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushbulletsettingssaved':
+        'Thiết lập thông báo đẩy đã được lưu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationToken':
+        'Mã thông báo API ứng dụng',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverApplicationTokenTip':
+        '<ApplicationRegistrationLink>Đăng ký một ứng dụng</ApplicationRegistrationLink> dùng với {applicationTitle}',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKey':
+        'Người dùng hay nhóm khoá',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoverUserKeyTip':
+        'Máy 30 ký tự của bạn <UsersGroupsLink>Bộ nhận diện người dùng hay nhóm</UsersGroupsLink>',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingsfailed':
+        'Thiết lập thông báo bị ép không lưu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.pushoversettingssaved':
+        'Thiết lập thông báo bật lên đã lưu thành công.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilently':
+        'Gửi âm thầm',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sendSilentlyDescription':
+        'Gửi thông báo không có âm thanh',
+      'components.UserProfile.UserSettings.UserNotificationSettings.sound':
+        'Thông báo Hệ thốngComment',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatId':
+        'ID trò chuyện',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramChatIdTipLong':
+        '<TelegramBotLink>Bắt đầu trò chuyện</TelegramBotLink>, thêm <GetIdBotLink>@get_id_bot</GetIdBotLink> rồi gửi lệnh <code>/my_id</code>.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadId':
+        'Mã số Thread/Topic',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramMessageThreadIdTip':
+        'Nếu các chủ đề của nhóm đã bật, ở đây bạn có thể xác định ID của chỉ/topic',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingsfailed':
+        'Thiết lập thông báo điện tử không thể lưu.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.telegramsettingssaved':
+        'Thiết lập điện thoại đã lưu thành công.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationDiscordId':
+        'Mỗi ID phải là ID người dùng Discord hợp lệ.',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPgpPublicKey':
+        'Bạn phải cung cấp một khóa công cộng PGP hợp lệ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushbulletAccessToken':
+        'Bạn phải cung cấp một bảng điều khiển truy cập',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverApplicationToken':
+        'Bạn phải cung cấp một thẻ ứng dụng hợp lệ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationPushoverUserKey':
+        'Bạn phải cung cấp một khóa người dùng hay nhóm hợp lệ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramChatId':
+        'Bạn phải cung cấp một ID chat hợp lệ',
+      'components.UserProfile.UserSettings.UserNotificationSettings.validationTelegramMessageThreadId':
+        'Chứng minh thư chủ chốt phải là một số nguyên dương',
+      'components.UserProfile.UserSettings.UserNotificationSettings.webpush':
+        'Đẩy Mạng',
     },
   },
 ] as const;
