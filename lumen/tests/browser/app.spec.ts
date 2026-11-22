@@ -3817,13 +3817,73 @@ test('Classic music discovery bookmarks retain catalogue filters', async ({
   page,
 }) => {
   await fixtures(page);
+  const locale = ['fr', 'ar'].includes(process.env.LUMEN_MUSIC_LOCALE ?? '')
+    ? (process.env.LUMEN_MUSIC_LOCALE as 'fr' | 'ar')
+    : 'en';
+  const copy = {
+    en: {
+      title: 'Music',
+      subtitle: 'Request an album and it lands in your music library.',
+      search: 'Search albums and artists…',
+      sort: 'Sort',
+      releaseTypes: 'Release Types',
+      anyReleaseType: 'Any Release Type',
+      filters: 'Music Discovery Filters',
+      artist: 'Artist',
+      releasedFrom: 'Released From',
+      releasedThrough: 'Released Through',
+      inLibrary: 'In Library',
+      apply: 'Apply Music Filters',
+      clear: 'Clear Music Filters',
+      done: 'Done',
+      soundtrack: 'Soundtrack',
+      compilation: 'Compilation',
+    },
+    fr: {
+      title: 'Musique',
+      subtitle:
+        'Demandez un album pour l’ajouter à votre bibliothèque musicale.',
+      search: 'Rechercher des albums et des artistes…',
+      sort: 'Trier',
+      releaseTypes: 'Types de sorties',
+      anyReleaseType: 'Tous les types de sorties',
+      filters: 'Filtres de découverte musicale',
+      artist: 'Artiste',
+      releasedFrom: 'Sortie à partir du',
+      releasedThrough: 'Sortie jusqu’au',
+      inLibrary: 'Dans la bibliothèque',
+      apply: 'Appliquer les filtres musicaux',
+      clear: 'Effacer les filtres musicaux',
+      done: 'Terminé',
+      soundtrack: 'Bande originale',
+      compilation: 'Compilation',
+    },
+    ar: {
+      title: 'الموسيقى',
+      subtitle: 'اطلب ألبومًا لإضافته إلى مكتبتك الموسيقية.',
+      search: 'ابحث عن الألبومات والفنانين…',
+      sort: 'الترتيب',
+      releaseTypes: 'أنواع الإصدارات',
+      anyReleaseType: 'أي نوع إصدار',
+      filters: 'فلاتر اكتشاف الموسيقى',
+      artist: 'الفنان',
+      releasedFrom: 'صدر من',
+      releasedThrough: 'صدر حتى',
+      inLibrary: 'في المكتبة',
+      apply: 'تطبيق فلاتر الموسيقى',
+      clear: 'مسح فلاتر الموسيقى',
+      done: 'تم',
+      soundtrack: 'موسيقى تصويرية',
+      compilation: 'تجميعة',
+    },
+  }[locale];
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale, enabledMediaCategories: { music: true } } })
+  );
   await page.route('**/api/v1/settings/public', (route) =>
     route.fulfill({
       json: { musicEnabled: true, enabledMediaCategories: { music: true } },
     })
-  );
-  await page.route('**/api/v1/user/1/settings/main', (route) =>
-    route.fulfill({ json: { enabledMediaCategories: { music: true } } })
   );
   const artistId = '5b36cb67-befa-41ca-a91d-a6dcf1f68062';
   const filters = {
@@ -3847,13 +3907,14 @@ test('Classic music discovery bookmarks retain catalogue filters', async ({
     search: query,
     releaseType: 'EP,Soundtrack',
   });
-  await page.goto('/music?' + params);
-  await expect(page.getByPlaceholder('Search albums and artists…')).toHaveValue(
-    query
-  );
+  await page.goto(testAppPath('/music?' + params));
+  await expect(page.getByRole('heading', { name: copy.title })).toBeVisible();
+  await expect(page.getByText(copy.subtitle)).toBeVisible();
+  await expect(page.getByPlaceholder(copy.search)).toHaveValue(query);
   await expect(
-    page.getByRole('combobox', { name: 'Sort', exact: true })
+    page.getByRole('combobox', { name: copy.sort, exact: true })
   ).toHaveValue(filters.sortBy);
+  await expect(page.getByRole('form', { name: copy.filters })).toBeVisible();
   await expect
     .poll(() =>
       observed.some(
@@ -3865,39 +3926,41 @@ test('Classic music discovery bookmarks retain catalogue filters', async ({
       )
     )
     .toBe(true);
-  await page
-    .getByRole('button', { name: 'Release Types: EP + 1', exact: true })
-    .click();
-  const releaseTypes = page.getByRole('dialog', { name: 'Release Types' });
+  await page.getByRole('button', { name: /EP \+ 1$/ }).click();
+  const releaseTypes = page.getByRole('dialog', { name: copy.releaseTypes });
   await expect(
     releaseTypes.getByRole('button', { name: 'EP', exact: true })
   ).toHaveAttribute('aria-pressed', 'true');
   await expect(
-    releaseTypes.getByRole('button', { name: 'Soundtrack', exact: true })
+    releaseTypes.getByRole('button', { name: copy.soundtrack, exact: true })
   ).toHaveAttribute('aria-pressed', 'true');
   await releaseTypes
-    .getByRole('button', { name: 'Compilation', exact: true })
+    .getByRole('button', { name: copy.compilation, exact: true })
     .click();
   await expect
     .poll(() => observed.at(-1)?.get('releaseType'))
     .toBe('ep,soundtrack,compilation');
   await releaseTypes
-    .getByRole('button', { name: 'Any Release Type', exact: true })
+    .getByRole('button', { name: copy.anyReleaseType, exact: true })
     .click();
   await expect.poll(() => observed.at(-1)?.get('releaseType')).toBeNull();
-  await releaseTypes.getByRole('button', { name: 'Done', exact: true }).click();
-  const form = page.getByRole('form', { name: 'Music Discovery Filters' });
-  await expect(form.getByRole('searchbox', { name: 'Artist' })).toHaveValue(
+  await releaseTypes
+    .getByRole('button', { name: copy.done, exact: true })
+    .click();
+  const form = page.getByRole('form', { name: copy.filters });
+  await expect(form.getByRole('searchbox', { name: copy.artist })).toHaveValue(
     filters.artist
   );
-  await expect(form.getByRole('combobox', { name: 'In Library' })).toHaveValue(
-    'flac'
-  );
-  await form.getByRole('searchbox', { name: 'Artist' }).fill('New Artist');
-  await form.getByLabel('Released From').fill('2001-01-01');
-  await form.getByLabel('Released Through').fill('2010-12-31');
-  await form.getByRole('combobox', { name: 'In Library' }).selectOption('mp3');
-  await form.getByRole('button', { name: 'Apply Music Filters' }).click();
+  await expect(
+    form.getByRole('combobox', { name: copy.inLibrary })
+  ).toHaveValue('flac');
+  await form.getByRole('searchbox', { name: copy.artist }).fill('New Artist');
+  await form.getByLabel(copy.releasedFrom).fill('2001-01-01');
+  await form.getByLabel(copy.releasedThrough).fill('2010-12-31');
+  await form
+    .getByRole('combobox', { name: copy.inLibrary })
+    .selectOption('mp3');
+  await form.getByRole('button', { name: copy.apply }).click();
   await expect
     .poll(() => Object.fromEntries(observed.at(-1) ?? []))
     .toMatchObject({
@@ -3908,9 +3971,260 @@ test('Classic music discovery bookmarks retain catalogue filters', async ({
       query,
     });
   expect(observed.at(-1)?.has('artistId')).toBe(false);
-  await form.getByRole('button', { name: 'Clear Music Filters' }).click();
+  await form.getByRole('button', { name: copy.clear }).click();
   await expect.poll(() => observed.at(-1)?.has('availability')).toBe(false);
   expect(observed.at(-1)?.get('query')).toBe(query);
+  if (process.env.LUMEN_MUSIC_BASELINE_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_MUSIC_BASELINE_CAPTURE}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  if (process.env.LUMEN_MUSIC_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_MUSIC_CAPTURE}-${locale}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+});
+
+test('Music discovery localizes provider failure and empty recovery states', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const locale = ['fr', 'ar'].includes(process.env.LUMEN_MUSIC_LOCALE ?? '')
+    ? (process.env.LUMEN_MUSIC_LOCALE as 'fr' | 'ar')
+    : 'en';
+  const copy = {
+    en: {
+      title: 'Could not load music',
+      loadMore: 'Couldn’t load more.',
+      retry: 'Retry',
+      empty: 'Nothing here',
+    },
+    fr: {
+      title: 'Impossible de charger la musique',
+      loadMore: 'Impossible de charger la suite.',
+      retry: 'Réessayer',
+      empty: 'Aucun résultat',
+    },
+    ar: {
+      title: 'تعذر تحميل الموسيقى',
+      loadMore: 'تعذر تحميل المزيد.',
+      retry: 'إعادة المحاولة',
+      empty: 'لا توجد نتائج',
+    },
+  }[locale];
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale, enabledMediaCategories: { music: true } } })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+    })
+  );
+  let attempts = 0;
+  await page.route('**/api/v1/discover/music?*', (route) =>
+    ++attempts === 1
+      ? route.fulfill({ status: 503, json: { message: 'temporary failure' } })
+      : route.fulfill({ json: paged([]) })
+  );
+  await page.goto(testAppPath('/music'));
+  await expect(page.getByText(copy.title)).toBeVisible();
+  const recovery = page.getByRole('alert').filter({ hasText: copy.loadMore });
+  await expect(recovery).toBeVisible();
+  await recovery.getByRole('button', { name: copy.retry }).click();
+  await expect(page.getByText(copy.empty)).toBeVisible();
+  expect(attempts).toBe(2);
+});
+
+test('Music album and artist details localize their controls and metadata', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const locale = ['fr', 'ar'].includes(
+    process.env.LUMEN_MUSIC_DETAIL_LOCALE ?? ''
+  )
+    ? (process.env.LUMEN_MUSIC_DETAIL_LOCALE as 'fr' | 'ar')
+    : 'en';
+  const copy = {
+    en: {
+      request: 'Request album',
+      discography: 'View Discography',
+      tracks: 'Tracks',
+      plays: '1K plays',
+      trackCount: '1 track',
+      artist: 'Artist',
+      released: 'Released',
+      label: 'Label',
+      type: 'Type',
+      albums: 'Albums',
+      since: 'Since 1990',
+      releaseCount: '1 release',
+      filter: 'Filter Music by Artist',
+      search: 'Search Prowlarr',
+      associations: 'Explore Associations',
+      blocklist: 'Add to Blocklist',
+      blocklistQuestion: 'Add to the Blocklist?',
+    },
+    fr: {
+      request: 'Demander l’album',
+      discography: 'Voir la discographie',
+      tracks: 'Pistes',
+      plays: '1K écoutes',
+      trackCount: '1 piste',
+      artist: 'Artiste',
+      released: 'Date de sortie',
+      label: 'Label',
+      type: 'Type',
+      albums: 'Albums',
+      since: 'Depuis 1990',
+      releaseCount: '1 sortie',
+      filter: 'Filtrer la musique par artiste',
+      search: 'Rechercher avec Prowlarr',
+      associations: 'Explorer les associations',
+      blocklist: 'Ajouter à la liste de blocage',
+      blocklistQuestion: 'Ajouter à la liste de blocage ?',
+    },
+    ar: {
+      request: 'طلب الألبوم',
+      discography: 'عرض تسجيلات الفنان',
+      tracks: 'المقاطع',
+      plays: '1K استماع',
+      trackCount: '1 مقطع',
+      artist: 'الفنان',
+      released: 'تاريخ الإصدار',
+      label: 'شركة الإنتاج',
+      type: 'النوع',
+      albums: 'الألبومات',
+      since: 'منذ 1990',
+      releaseCount: '1 إصدار',
+      filter: 'تصفية الموسيقى حسب الفنان',
+      search: 'البحث في Prowlarr',
+      associations: 'استكشاف الارتباطات',
+      blocklist: 'إضافة إلى قائمة الحظر',
+      blocklistQuestion: 'إضافة إلى قائمة الحظر؟',
+    },
+  }[locale];
+  const album = '397b4ce9-89a1-41f8-9599-68983ee4a767';
+  const artist = '934ebb1e-9e64-4a2d-abc2-8aea39d7b50c';
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale, enabledMediaCategories: { music: true } } })
+  );
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({ json: { id: 1, permissions: 268435474 } })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+    })
+  );
+  await page.route(`**/api/v1/music/${album}`, (route) =>
+    route.fulfill({
+      json: {
+        id: album,
+        title: 'Fixture Album',
+        artist: { id: artist, name: 'Fixture Artist' },
+        releaseDate: '2024-02-03',
+        recordLabel: 'Fixture Records',
+        type: 'Album',
+        stats: { totalListenCount: 1200 },
+        tracks: [
+          {
+            position: 1,
+            name: 'Fixture Track',
+            length: 180,
+            totalListenCount: 120,
+          },
+        ],
+      },
+    })
+  );
+  await page.route(`**/api/v1/blocklist/${album}?mediaType=music`, (route) =>
+    route.fulfill({ status: 404, json: { message: 'Not blocklisted' } })
+  );
+  await page.route(`**/api/v1/artist/${artist}`, (route) =>
+    route.fulfill({
+      json: {
+        artist: {
+          id: artist,
+          name: 'Fixture Artist',
+          type: 'Person',
+          area: 'Fixture City',
+          beginYear: 1990,
+        },
+        releaseGroups: [
+          {
+            id: album,
+            title: 'Fixture Album',
+            'primary-type': 'Album',
+            posterPath: '/qa-poster.png',
+            artist: { id: artist, name: 'Fixture Artist' },
+          },
+        ],
+      },
+    })
+  );
+
+  await page.goto(testAppPath(`/music/${album}`));
+  await expect(
+    page.getByRole('heading', { name: 'Fixture Album' })
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: copy.request })).toBeVisible();
+  await expect(page.getByRole('link', { name: copy.search })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: copy.associations })
+  ).toBeVisible();
+  const blocklist = page.getByRole('button', { name: copy.blocklist });
+  await expect(blocklist).toBeVisible();
+  await blocklist.click();
+  await expect(page.getByRole('alertdialog')).toContainText(
+    copy.blocklistQuestion
+  );
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Keep it' })
+    .click();
+  await expect(
+    page.getByRole('link', { name: copy.discography })
+  ).toBeVisible();
+  await expect(page.getByText(copy.tracks, { exact: true })).toBeVisible();
+  await expect(page.getByText(copy.plays, { exact: true })).toBeVisible();
+  await expect(page.getByText(copy.trackCount, { exact: true })).toBeVisible();
+  for (const label of [copy.artist, copy.released, copy.label, copy.type])
+    await expect(page.getByText(label, { exact: true })).toBeVisible();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth)
+  ).toBeLessThanOrEqual(test.info().project.use.viewport?.width ?? 1440);
+  if (process.env.LUMEN_MUSIC_DETAIL_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_MUSIC_DETAIL_CAPTURE}-album-${locale}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+
+  await page.goto(testAppPath(`/artist/${artist}`));
+  await expect(
+    page.getByRole('heading', { name: 'Fixture Artist' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: copy.discography })
+  ).toBeVisible();
+  await expect(page.getByRole('link', { name: copy.filter })).toBeVisible();
+  await expect(page.getByRole('heading', { name: copy.albums })).toBeVisible();
+  await expect(page.getByText(copy.since, { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(copy.releaseCount, { exact: true })
+  ).toBeVisible();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth)
+  ).toBeLessThanOrEqual(test.info().project.use.viewport?.width ?? 1440);
+  if (process.env.LUMEN_MUSIC_DETAIL_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_MUSIC_DETAIL_CAPTURE}-artist-${locale}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
 });
 
 test('configured music shelves preserve genre and yearly chart in Music', async ({
@@ -4041,17 +4355,17 @@ test('movie associations preserve related identities and explanations', async ({
         },
       })
   );
-  await page.goto('/movie/101');
+  await page.goto(testAppPath('/movie/101'));
   await page.getByRole('link', { name: 'Explore Associations' }).click();
   await expect(
     page.getByRole('heading', { name: 'Associations for The Test Film' })
   ).toBeVisible();
   await expect(
     page.getByRole('link', { name: 'Related Series' })
-  ).toHaveAttribute('href', '/tv/101');
+  ).toHaveAttribute('href', testAppPath('/tv/101'));
   await expect(
     page.getByRole('link', { name: 'Related Person' })
-  ).toHaveAttribute('href', '/person/101');
+  ).toHaveAttribute('href', testAppPath('/person/101'));
   await page.getByLabel('Relationship').selectOption('shared-person');
   await expect(page.getByRole('link', { name: 'Related Series' })).toHaveCount(
     0
@@ -4070,7 +4384,7 @@ test('movie associations preserve related identities and explanations', async ({
     await expect(node).toHaveAttribute('aria-pressed', 'true');
     await expect(
       graph.getByRole('link', { name: 'Related Person' })
-    ).toHaveAttribute('href', '/person/101');
+    ).toHaveAttribute('href', testAppPath('/person/101'));
     await expect(graph.getByText('Worked on the soundtrack')).toBeVisible();
     await page.getByRole('button', { name: 'List', exact: true }).click();
     await expect(graph).toHaveCount(0);
@@ -4081,11 +4395,278 @@ test('movie associations preserve related identities and explanations', async ({
     await expect(
       page.getByRole('button', { name: 'Graph', exact: true })
     ).toHaveCount(0);
-    await page.goto('/associations/movie/101?view=graph');
+    await page.goto(testAppPath('/associations/movie/101?view=graph'));
     await expect(
       page.getByRole('link', { name: 'Related Person' })
     ).toBeVisible();
   }
+});
+
+test('Associations localize relationship filters, graph controls, and generated reasons', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const locale = ['fr', 'ar'].includes(
+    process.env.LUMEN_ASSOCIATIONS_LOCALE ?? ''
+  )
+    ? (process.env.LUMEN_ASSOCIATIONS_LOCALE as 'fr' | 'ar')
+    : 'en';
+  const copy = {
+    en: {
+      title: 'Associations for The Test Film',
+      back: 'Back to Details',
+      relationship: 'Relationship',
+      all: 'All Relationships',
+      similar: 'Similar',
+      sharedPerson: 'Shared People',
+      graph: 'Graph',
+      graphRegion: 'Association Graph',
+      list: 'List',
+      selectNode: 'Select a node to see why it’s related.',
+      personReason: 'Nora scored this',
+      invalid: 'Invalid association title.',
+      loadFailed: 'Couldn’t load associations',
+      loadError: 'Could not load associations. Try again.',
+      retry: 'Retry',
+      empty: 'No associations found.',
+    },
+    fr: {
+      title: 'Associations pour The Test Film',
+      back: 'Retour aux détails',
+      relationship: 'Relation',
+      all: 'Toutes les relations',
+      similar: 'Similaire',
+      sharedPerson: 'Personnes en commun',
+      graph: 'Graphe',
+      graphRegion: 'Graphe des associations',
+      list: 'Liste',
+      selectNode: 'Sélectionnez un nœud pour voir la raison de cette relation.',
+      personReason: 'Nora a composé la musique',
+      invalid: 'Titre invalide pour les associations.',
+      loadFailed: 'Impossible de charger les associations',
+      loadError: 'Impossible de charger les associations. Réessayez.',
+      retry: 'Réessayer',
+      empty: 'Aucune association trouvée.',
+    },
+    ar: {
+      title: 'ارتباطات The Test Film',
+      back: 'العودة إلى التفاصيل',
+      relationship: 'العلاقة',
+      all: 'كل العلاقات',
+      similar: 'مشابه',
+      sharedPerson: 'أشخاص مشتركون',
+      graph: 'رسم بياني',
+      graphRegion: 'الرسم البياني للارتباطات',
+      list: 'قائمة',
+      selectNode: 'اختر عقدة لمعرفة سبب ارتباطها.',
+      personReason: 'ألّف Nora موسيقى هذا العمل',
+      invalid: 'عنوان غير صالح لعرض الارتباطات.',
+      loadFailed: 'تعذر تحميل الارتباطات',
+      loadError: 'تعذر تحميل الارتباطات. حاول مرة أخرى.',
+      retry: 'إعادة المحاولة',
+      empty: 'لم يتم العثور على ارتباطات.',
+    },
+  }[locale];
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale, enabledMediaCategories: { movie: true } } })
+  );
+  await page.route(
+    '**/api/v1/association/movie/101?includeWeak=true',
+    (route) =>
+      route.fulfill({
+        json: {
+          root: { title: 'The Test Film' },
+          edges: [
+            {
+              type: 'similar',
+              reason: 'Similar tone and audience',
+              reasonKey: 'similarToneAudience',
+              node: { mediaType: 'movie', id: 102, title: 'Similar Film' },
+            },
+            {
+              type: 'shared-person',
+              reason: 'Nora scored this',
+              reasonKey: 'personScoredThis',
+              reasonValues: { personName: 'Nora' },
+              node: { mediaType: 'person', id: 103, name: 'Nora' },
+            },
+            {
+              type: 'shared-person',
+              reason: 'A provider-specific explanation',
+              reasonKey: 'constructor',
+              node: { mediaType: 'book', id: 'OL123W', title: 'Related Book' },
+            },
+          ],
+        },
+      })
+  );
+  let allowRetry = false;
+  await page.route(
+    '**/api/v1/association/movie/104?includeWeak=true',
+    (route) => {
+      if (!allowRetry) {
+        return route.fulfill({ status: 404, json: { message: 'Not found' } });
+      }
+      return route.fulfill({
+        json: { root: { title: 'The Test Film' }, edges: [] },
+      });
+    }
+  );
+
+  await page.goto(testAppPath('/associations/movie/101'));
+  await expect(page.getByRole('heading', { name: copy.title })).toBeVisible();
+  await expect(page.getByRole('link', { name: copy.back })).toHaveAttribute(
+    'href',
+    testAppPath('/movie/101')
+  );
+  const relationship = page.getByRole('combobox', {
+    name: copy.relationship,
+  });
+  await expect(relationship.locator('option').first()).toHaveText(copy.all);
+  await expect(
+    relationship.locator('option', { hasText: copy.similar })
+  ).toHaveCount(1);
+  await expect(
+    relationship.locator('option', { hasText: copy.sharedPerson })
+  ).toHaveCount(1);
+  await expect(page.getByText(copy.personReason)).toBeVisible();
+  await expect(page.getByText('A provider-specific explanation')).toBeVisible();
+  if (process.env.LUMEN_ASSOCIATIONS_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_ASSOCIATIONS_CAPTURE}-list-${locale}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  await relationship.selectOption('shared-person');
+  await expect(page.getByRole('link', { name: 'Similar Film' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Nora' })).toBeVisible();
+
+  if ((page.viewportSize()?.width ?? 0) >= 640) {
+    await page.getByRole('button', { name: copy.graph, exact: true }).click();
+    const graph = page.getByRole('region', { name: copy.graphRegion });
+    await expect(graph.getByText(copy.selectNode)).toBeVisible();
+    const node = graph.getByRole('button', {
+      name: `Nora, ${copy.sharedPerson}`,
+    });
+    await node.focus();
+    await page.keyboard.press('Enter');
+    await expect(node).toHaveAttribute('aria-pressed', 'true');
+    await expect(graph.getByText(copy.personReason)).toBeVisible();
+    if (process.env.LUMEN_ASSOCIATIONS_CAPTURE) {
+      await page.screenshot({
+        path: `${process.env.LUMEN_ASSOCIATIONS_CAPTURE}-graph-${locale}-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+    }
+    await page.getByRole('button', { name: copy.list, exact: true }).click();
+    await expect(page.getByRole('link', { name: 'Nora' })).toBeVisible();
+  } else {
+    await expect(
+      page.getByRole('button', { name: copy.graph, exact: true })
+    ).toHaveCount(0);
+  }
+  await page.goto(testAppPath('/associations/movie/not-a-number'));
+  await expect(page.getByText(copy.invalid)).toBeVisible();
+  await page.goto(testAppPath('/associations/movie/104'));
+  await expect(page.getByText(copy.loadFailed, { exact: true })).toBeVisible();
+  await expect(page.getByText(copy.loadError)).toBeVisible();
+  allowRetry = true;
+  await page.getByRole('button', { name: copy.retry }).click();
+  await expect(page.getByText(copy.empty)).toBeVisible();
+});
+
+test('Collection Associations localize partial-load recovery and retry', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const locale = ['fr', 'ar'].includes(
+    process.env.LUMEN_ASSOCIATIONS_LOCALE ?? ''
+  )
+    ? (process.env.LUMEN_ASSOCIATIONS_LOCALE as 'fr' | 'ar')
+    : 'en';
+  const copy = {
+    en: {
+      disclosure: 'Collection Associations',
+      failedTitle: 'Some associations could not be loaded.',
+      failed: 'Some collection items could not be checked. Retry to try again.',
+      retry: 'Retry',
+      relationship: 'Relationship',
+      related: 'Related Film',
+      reason: 'Often recommended with this',
+    },
+    fr: {
+      disclosure: 'Associations de la collection',
+      failedTitle: 'Certaines associations n’ont pas pu être chargées.',
+      failed:
+        'Certains éléments de la collection n’ont pas pu être vérifiés. Réessayez.',
+      retry: 'Réessayer',
+      relationship: 'Relation',
+      related: 'Related Film',
+      reason: 'Souvent recommandé avec ce titre',
+    },
+    ar: {
+      disclosure: 'ارتباطات المجموعة',
+      failedTitle: 'تعذر تحميل بعض الارتباطات.',
+      failed: 'تعذر التحقق من بعض عناصر المجموعة. حاول مرة أخرى.',
+      retry: 'إعادة المحاولة',
+      relationship: 'العلاقة',
+      related: 'Related Film',
+      reason: 'يُوصى به غالبًا مع هذا العنوان',
+    },
+  }[locale];
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale, enabledMediaCategories: { movie: true } } })
+  );
+  await page.route('**/api/v1/collection/55', (route) =>
+    route.fulfill({
+      json: {
+        id: 55,
+        name: 'Fixture Collection',
+        parts: [
+          { id: 101, title: 'First Member', mediaType: 'movie' },
+          { id: 102, title: 'Second Member', mediaType: 'movie' },
+        ],
+      },
+    })
+  );
+  let failed = false;
+  await page.route('**/api/v1/association/movie/*', (route) => {
+    const id = new URL(route.request().url()).pathname.split('/').at(-1);
+    if (id === '101' && !failed) {
+      failed = true;
+      return route.fulfill({
+        status: 503,
+        json: { message: 'temporary failure' },
+      });
+    }
+    return route.fulfill({
+      json: {
+        root: { title: 'Fixture Collection' },
+        edges:
+          id === '102'
+            ? [
+                {
+                  type: 'recommended',
+                  reason: 'Often recommended with this',
+                  reasonKey: 'oftenRecommended',
+                  node: { mediaType: 'movie', id: 103, title: 'Related Film' },
+                },
+              ]
+            : [],
+      },
+    });
+  });
+
+  await page.goto(testAppPath('/collection/55'));
+  await page.getByText(copy.disclosure, { exact: true }).click();
+  const partial = page.getByRole('alert').filter({ hasText: copy.failedTitle });
+  await expect(partial).toContainText(copy.failed);
+  await partial.getByRole('button', { name: copy.retry }).click();
+  await expect(page.getByRole('link', { name: copy.related })).toBeVisible();
+  await expect(page.getByText(copy.reason)).toBeVisible();
+  await expect(
+    page.getByRole('combobox', { name: copy.relationship })
+  ).toBeVisible();
 });
 
 test('music and Open Library book details open Associations with exact identity', async ({
@@ -4111,14 +4692,42 @@ test('music and Open Library book details open Associations with exact identity'
       json: {
         id: album,
         title: 'Fixture Album',
-        artist: { id: artist, name: 'Fixture Artist' },
-        tracks: [],
+        artist: { id: artist, name: 'Fixture Artist', area: 'Fixture City' },
+        releaseDate: '2024-02-03',
+        recordLabel: 'Fixture Records',
+        type: 'Album',
+        stats: { totalListenCount: 1200 },
+        tracks: [
+          {
+            position: 1,
+            name: 'Fixture Track',
+            length: 180,
+            totalListenCount: 120,
+          },
+        ],
       },
     })
   );
   await page.route(`**/api/v1/artist/${artist}`, (route) =>
     route.fulfill({
-      json: { artist: { name: 'Fixture Artist' }, releaseGroups: [] },
+      json: {
+        artist: {
+          id: artist,
+          name: 'Fixture Artist',
+          type: 'Person',
+          area: 'Fixture City',
+          beginYear: 1990,
+        },
+        releaseGroups: [
+          {
+            id: album,
+            title: 'Fixture Album',
+            'primary-type': 'Album',
+            posterPath: '/qa-poster.png',
+            artist: { id: artist, name: 'Fixture Artist' },
+          },
+        ],
+      },
     })
   );
   await page.route('**/api/v1/book/OL123W', (route) =>
@@ -4144,17 +4753,23 @@ test('music and Open Library book details open Associations with exact identity'
   );
 
   const association = page.getByRole('link', { name: 'Explore Associations' });
-  await page.goto(`/music/${album}`);
+  await page.goto(testAppPath(`/music/${album}`));
+  await expect(
+    page.getByRole('heading', { name: 'Fixture Album' })
+  ).toBeVisible();
   await expect(association).toHaveAttribute(
     'href',
-    `/associations/album/${album}`
+    testAppPath(`/associations/album/${album}`)
   );
-  await page.goto(`/artist/${artist}`);
+  await page.goto(testAppPath(`/artist/${artist}`));
+  await expect(
+    page.getByRole('heading', { name: 'Fixture Artist' })
+  ).toBeVisible();
   await expect(association).toHaveAttribute(
     'href',
-    `/associations/artist/${artist}`
+    testAppPath(`/associations/artist/${artist}`)
   );
-  await page.goto('/book/OL123W?format=audiobook');
+  await page.goto(testAppPath('/book/OL123W?format=audiobook'));
   await association.click();
   await expect(
     page.getByRole('heading', { name: 'Associations for Fixture Book' })
@@ -4162,7 +4777,7 @@ test('music and Open Library book details open Associations with exact identity'
   await page.getByLabel('Relationship').selectOption('recommended');
   await expect(
     page.getByRole('link', { name: 'Back to Details' })
-  ).toHaveAttribute('href', '/book/OL123W?f=audio');
+  ).toHaveAttribute('href', testAppPath('/book/OL123W?f=audio'));
   await page.route('**/api/v1/book/bookshelf%3A1%3Afixture', (route) =>
     route.fulfill({
       json: {
@@ -4172,10 +4787,10 @@ test('music and Open Library book details open Associations with exact identity'
       },
     })
   );
-  await page.goto('/book/bookshelf%3A1%3Afixture');
+  await page.goto(testAppPath('/book/bookshelf%3A1%3Afixture'));
   await expect(page.getByRole('link', { name: /^Audiobook / })).toHaveAttribute(
     'href',
-    '/book/bookshelf%3A1%3Afixture?f=audio&lookupTitle=Local+Book'
+    testAppPath('/book/bookshelf%3A1%3Afixture?f=audio&lookupTitle=Local+Book')
   );
   await page.route(
     '**/api/v1/book/bookshelf%3A1%3Afixture/ratings?lookupTitle=Local+Book',
@@ -4189,7 +4804,9 @@ test('music and Open Library book details open Associations with exact identity'
         },
       })
   );
-  await page.goto('/book/bookshelf%3A1%3Afixture?lookupTitle=Local+Book');
+  await page.goto(
+    testAppPath('/book/bookshelf%3A1%3Afixture?lookupTitle=Local+Book')
+  );
   await expect(page.getByRole('heading', { name: 'Local Book' })).toBeVisible();
   await expect(
     page.getByRole('link', { name: '4.2/5 · Open Library' })
@@ -4488,7 +5105,7 @@ test('Franchise opens related titles and confirms a server-authorized relationsh
     page.getByRole('link', { name: 'Fixture Sequel' })
   ).toHaveAttribute('href', '/tv/203');
   await page.getByRole('button', { name: 'Confirm', exact: true }).click();
-  await expect(page.getByText('tv · Verified')).toBeVisible();
+  await expect(page.getByText('Series · Verified')).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Confirm', exact: true })
   ).toHaveCount(0);
@@ -5133,6 +5750,14 @@ test('Track Requests scopes the queue and confirms manager approval and cancella
   page,
 }) => {
   await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: {
+        applicationTitle: 'SeerrNG',
+        enabledMediaCategories: { music: true },
+      },
+    })
+  );
   let approved = false;
   let cancelled = false;
   await page.route('**/api/v1/soulseek/status', (route) =>
@@ -5205,11 +5830,77 @@ test('Song identification polls and requests the exact recording', async ({
   page,
 }) => {
   await fixtures(page);
-  const empty = { id: 'run-1', albums: [], tracks: [] };
-  let submitted: unknown;
-  await page.route('**/api/v1/soulseek/status', (route) =>
-    route.fulfill({ json: { configured: true, canRequest: true } })
+  const locale = ['fr', 'ar'].includes(process.env.LUMEN_SONG_LOCALE ?? '')
+    ? (process.env.LUMEN_SONG_LOCALE as 'fr' | 'ar')
+    : 'en';
+  const copyByLocale = {
+    en: {
+      title: 'Identify a Song',
+      source: 'Link or Description',
+      identify: 'Identify',
+      queue: 'Waiting in queue (position 2)',
+      albums: 'Albums',
+      tracks: 'Tracks',
+      exact: 'Exact match',
+      open: 'Open Album',
+      request: 'Request Track',
+      requested: 'Track Requested',
+    },
+    fr: {
+      title: 'Identifier un titre',
+      source: 'Lien ou description',
+      identify: 'Identifier',
+      queue: 'En attente dans la file (position 2)',
+      albums: 'Albums',
+      tracks: 'Titres',
+      exact: 'Correspondance exacte',
+      open: 'Ouvrir l’album',
+      request: 'Demander le titre',
+      requested: 'Titre demandé',
+    },
+    ar: {
+      title: 'التعرّف على أغنية',
+      source: 'رابط أو وصف',
+      identify: 'تعرّف',
+      queue: 'بانتظارك في قائمة الانتظار (الموضع 2)',
+      albums: 'الألبومات',
+      tracks: 'المقاطع',
+      exact: 'تطابق تام',
+      open: 'فتح الألبوم',
+      request: 'طلب المقطع',
+      requested: 'تم طلب المقطع',
+    },
+  };
+  const copy = process.env.LUMEN_SONG_BASELINE
+    ? copyByLocale.en
+    : copyByLocale[locale];
+  let statusChecks = 0;
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale, enabledMediaCategories: { music: true } } })
   );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+    })
+  );
+  const empty = {
+    id: 'run-1',
+    albums: [
+      {
+        releaseId: 'release-1',
+        releaseGroupId: 'album-group',
+        title: 'An album',
+        artist: 'An artist',
+        isExact: true,
+      },
+    ],
+    tracks: [],
+  };
+  let submitted: unknown;
+  await page.route('**/api/v1/soulseek/status', (route) => {
+    statusChecks += 1;
+    return route.fulfill({ json: { configured: true, canRequest: true } });
+  });
   await page.route('**/api/v1/soulseek/songid', (route) => {
     expect(route.request().postDataJSON()).toEqual({
       source: 'A song description',
@@ -5239,17 +5930,46 @@ test('Song identification polls and requests the exact recording', async ({
     submitted = route.request().postDataJSON();
     return route.fulfill({ json: { results: [] } });
   });
-  await page.goto('/identify?source=A+song+description');
-  await expect(page.getByLabel('Link or Description')).toHaveValue(
-    'A song description'
-  );
-  await page.getByRole('button', { name: 'Identify', exact: true }).click();
-  await expect(page.getByText('Waiting in queue (position 2)')).toBeVisible();
-  await page
-    .getByRole('button', { name: 'Request Track', exact: true })
-    .click();
+  await page.goto(testAppPath('/identify?source=A+song+description'));
+  await expect(page.getByRole('heading', { name: copy.title })).toBeVisible();
+  await expect(page.getByLabel(copy.source)).toHaveValue('A song description');
+  await page.getByRole('button', { name: copy.identify, exact: true }).click();
+  await expect(page.getByText(copy.queue)).toBeVisible();
+  await expect(page.getByRole('heading', { name: copy.albums })).toBeVisible();
+  await expect(page.getByRole('heading', { name: copy.tracks })).toBeVisible();
   await expect(
-    page.getByRole('button', { name: 'Track Requested' })
+    page.locator('small').filter({ hasText: copy.exact })
+  ).toHaveCount(2);
+  await expect(page.getByRole('link', { name: copy.open })).toHaveAttribute(
+    'href',
+    testAppPath('/music/album-group')
+  );
+  const requestButton = page.getByRole('button', {
+    name: copy.request,
+    exact: true,
+  });
+  const tabbar = page.locator('.tabbar');
+  if (await tabbar.isVisible()) {
+    await requestButton.scrollIntoViewIfNeeded();
+    const [actionBounds, tabbarBounds] = await Promise.all([
+      requestButton.boundingBox(),
+      tabbar.boundingBox(),
+    ]);
+    expect(actionBounds).not.toBeNull();
+    expect(tabbarBounds).not.toBeNull();
+    expect(actionBounds!.y + actionBounds!.height).toBeLessThanOrEqual(
+      tabbarBounds!.y
+    );
+  }
+  if (process.env.LUMEN_SONG_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_SONG_CAPTURE}-${process.env.LUMEN_SONG_BASELINE ? `baseline-${locale}` : locale}-${test.info().project.name}.png`,
+      fullPage: false,
+    });
+  }
+  await requestButton.click();
+  await expect(
+    page.getByRole('button', { name: copy.requested })
   ).toBeDisabled();
   expect(submitted).toEqual({
     tracks: [
@@ -5261,12 +5981,129 @@ test('Song identification polls and requests the exact recording', async ({
       },
     ],
   });
+  expect(statusChecks).toBe(1);
+});
+
+test('Song identification localizes provider failure and retry states', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const locale = ['fr', 'ar'].includes(process.env.LUMEN_SONG_LOCALE ?? '')
+    ? (process.env.LUMEN_SONG_LOCALE as 'fr' | 'ar')
+    : 'en';
+  const copyByLocale = {
+    en: {
+      title: 'Identify a Song',
+      source: 'Link or Description',
+      identify: 'Identify',
+      failure: 'The server had a problem. Try again in a moment.',
+      noMatches: 'No matching recordings were found.',
+    },
+    fr: {
+      title: 'Identifier un titre',
+      source: 'Lien ou description',
+      identify: 'Identifier',
+      failure: 'Le serveur a rencontré un problème. Réessayez dans un instant.',
+      noMatches: 'Aucun enregistrement correspondant n’a été trouvé.',
+    },
+    ar: {
+      title: 'التعرّف على أغنية',
+      source: 'رابط أو وصف',
+      identify: 'تعرّف',
+      failure: 'حدثت مشكلة في الخادم. حاول مجددًا بعد قليل.',
+      noMatches: 'لم يتم العثور على تسجيلات مطابقة.',
+    },
+  };
+  const copy = copyByLocale[locale];
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale, enabledMediaCategories: { music: true } } })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+    })
+  );
+  let statusChecks = 0;
+  await page.route('**/api/v1/soulseek/status', (route) => {
+    statusChecks += 1;
+    return route.fulfill({ json: { configured: true, canRequest: true } });
+  });
+  let attempts = 0;
+  await page.route('**/api/v1/soulseek/songid', (route) => {
+    if (++attempts === 1) return route.fulfill({ status: 503, json: {} });
+    return route.fulfill({
+      json: { id: 'run-2', status: 'completed', albums: [], tracks: [] },
+    });
+  });
+  await page.goto(testAppPath('/identify'));
+  await expect(page.getByRole('heading', { name: copy.title })).toBeVisible();
+  await page.getByLabel(copy.source).fill('A song description');
+  await page.getByRole('button', { name: copy.identify }).click();
+  await expect(page.getByRole('alert')).toContainText(copy.failure);
+  if (process.env.LUMEN_SONG_ERROR_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_SONG_ERROR_CAPTURE}-${locale}-${test.info().project.name}.png`,
+    });
+  }
+  await page.getByRole('button', { name: copy.identify }).click();
+  await expect(page.getByText(copy.noMatches, { exact: true })).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  expect(statusChecks).toBe(1);
 });
 
 test('Playlist Import reviews matches and retries only failed requests', async ({
   page,
 }) => {
   await fixtures(page);
+  const locale = ['fr', 'ar'].includes(process.env.LUMEN_PLAYLIST_LOCALE ?? '')
+    ? (process.env.LUMEN_PLAYLIST_LOCALE as 'fr' | 'ar')
+    : 'en';
+  const copy = {
+    en: {
+      title: 'Import Playlist',
+      url: 'Spotify or YouTube Playlist URL',
+      preview: 'Preview Matches',
+      matched: 'Matched',
+      unmatched: 'Unmatched',
+      album: 'Request Album',
+      track: 'Request Track',
+      selected: (count: number) => `Request Selected (${count})`,
+      requested: 'Requested',
+      failure: 'The server had a problem. Try again in a moment.',
+    },
+    fr: {
+      title: 'Importer une playlist',
+      url: 'URL de playlist Spotify ou YouTube',
+      preview: 'Aperçu des correspondances',
+      matched: 'Correspondance trouvée',
+      unmatched: 'Sans correspondance',
+      album: 'Demander l’album',
+      track: 'Demander le titre',
+      selected: (count: number) => `Demander la sélection (${count})`,
+      requested: 'Demandé',
+      failure: 'Le serveur a rencontré un problème. Réessayez dans un instant.',
+    },
+    ar: {
+      title: 'استيراد قائمة تشغيل',
+      url: 'رابط قائمة تشغيل Spotify أو YouTube',
+      preview: 'معاينة التطابقات',
+      matched: 'متطابق',
+      unmatched: 'غير متطابق',
+      album: 'طلب الألبوم',
+      track: 'طلب المقطع',
+      selected: (count: number) => `طلب المحدد (${count})`,
+      requested: 'تم الطلب',
+      failure: 'حدثت مشكلة في الخادم. حاول مجددًا بعد قليل.',
+    },
+  }[locale];
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale, enabledMediaCategories: { music: true } } })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+    })
+  );
   const submitted: unknown[] = [];
   let trackAttempts = 0;
   await page.route('**/api/v1/playlist/spotify/status', (route) =>
@@ -5306,32 +6143,40 @@ test('Playlist Import reviews matches and retries only failed requests', async (
         route.request().url().endsWith('/track-requests') &&
         ++trackAttempts === 1
       ) {
-        return route.fulfill({
-          status: 503,
-          json: { message: 'Track service temporarily unavailable.' },
-        });
+        return route.fulfill({ status: 503, json: {} });
       }
       return route.fulfill({ json: {} });
     }
   );
-  await page.goto('/music/playlist-import');
+  await page.goto(testAppPath('/music/playlist-import'));
+  await expect(page.getByRole('heading', { name: copy.title })).toBeVisible();
   await page
-    .getByLabel('Spotify or YouTube Playlist URL')
+    .getByLabel(copy.url)
     .fill('https://www.youtube.com/playlist?list=fixture');
-  await page.getByRole('button', { name: 'Preview Matches' }).click();
-  await page.getByRole('checkbox', { name: 'Request Album' }).check();
-  await page.getByRole('checkbox', { name: 'Request Track' }).check();
+  await page.getByRole('button', { name: copy.preview }).click();
+  await expect(page.getByText(copy.matched, { exact: true })).toBeVisible();
+  await expect(page.getByText(copy.unmatched, { exact: true })).toBeVisible();
+  if (process.env.LUMEN_PLAYLIST_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_PLAYLIST_CAPTURE}-${locale}-${test.info().project.name}-preview.png`,
+      fullPage: true,
+    });
+  }
+  await page.getByRole('checkbox', { name: copy.album }).check();
+  await page.getByRole('checkbox', { name: copy.track }).check();
   expect(submitted).toEqual([]);
-  await page.getByRole('button', { name: 'Request Selected (2)' }).click();
-  await expect(page.getByRole('alert')).toContainText(
-    'Track service temporarily unavailable.'
-  );
-  await expect(page.getByText('Requested', { exact: true })).toHaveCount(1);
-  await expect(
-    page.getByRole('checkbox', { name: 'Request Track' })
-  ).toBeChecked();
-  await page.getByRole('button', { name: 'Request Selected (1)' }).click();
-  await expect(page.getByText('Requested', { exact: true })).toHaveCount(2);
+  await page.getByRole('button', { name: copy.selected(2) }).click();
+  await expect(page.getByRole('alert')).toContainText(copy.failure);
+  if (process.env.LUMEN_PLAYLIST_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_PLAYLIST_CAPTURE}-${locale}-${test.info().project.name}-retry.png`,
+      fullPage: true,
+    });
+  }
+  await expect(page.getByText(copy.requested, { exact: true })).toHaveCount(1);
+  await expect(page.getByRole('checkbox', { name: copy.track })).toBeChecked();
+  await page.getByRole('button', { name: copy.selected(1) }).click();
+  await expect(page.getByText(copy.requested, { exact: true })).toHaveCount(2);
   await expect(page.getByRole('alert')).toHaveCount(0);
   expect(submitted).toEqual([
     { mediaType: 'music', mediaId: 'album-id' },
@@ -5348,6 +6193,45 @@ test('Playlist Import reflects Spotify callback and disconnects the account', as
   page,
 }) => {
   await fixtures(page);
+  const locale = ['fr', 'ar'].includes(process.env.LUMEN_PLAYLIST_LOCALE ?? '')
+    ? (process.env.LUMEN_PLAYLIST_LOCALE as 'fr' | 'ar')
+    : 'en';
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({
+      json: { locale, enabledMediaCategories: { music: true } },
+    })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+    })
+  );
+  const copy = {
+    en: {
+      connected: 'Spotify connected.',
+      reconnect: 'Reconnect Spotify',
+      disconnect: 'Disconnect Spotify',
+      disconnected: 'Spotify disconnected.',
+      connect: 'Connect Spotify',
+      title: 'Import Playlist',
+    },
+    fr: {
+      connected: 'Spotify est connecté.',
+      reconnect: 'Reconnecter Spotify',
+      disconnect: 'Déconnecter Spotify',
+      disconnected: 'Spotify a été déconnecté.',
+      connect: 'Connecter Spotify',
+      title: 'Importer une playlist',
+    },
+    ar: {
+      connected: 'تم الاتصال بـ Spotify.',
+      reconnect: 'إعادة الاتصال بـ Spotify',
+      disconnect: 'قطع الاتصال بـ Spotify',
+      disconnected: 'تم قطع الاتصال بـ Spotify.',
+      connect: 'اتصال بـ Spotify',
+      title: 'استيراد قائمة تشغيل',
+    },
+  }[locale];
   let connected = true;
   await page.route('**/api/v1/soulseek/status', (route) =>
     route.fulfill({ json: { configured: false } })
@@ -5362,30 +6246,44 @@ test('Playlist Import reflects Spotify callback and disconnects the account', as
     connected = false;
     return route.fulfill({ status: 204 });
   });
-  await page.goto('/music/playlist-import?playlist=connected');
+  await page.goto(testAppPath('/music/playlist-import?playlist=connected'));
+  await expect(page.getByRole('heading', { name: copy.title })).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
+  await expect(page.getByText(copy.connected, { exact: true })).toBeVisible();
   await expect(
-    page.getByText('Spotify connected.', { exact: true })
-  ).toBeVisible();
-  await expect(
-    page.getByRole('link', { name: 'Reconnect Spotify' })
+    page.getByRole('link', { name: copy.reconnect })
   ).toHaveAttribute(
     'href',
-    '/api/v1/playlist/spotify/connect?frontend=companion'
+    `/api/v1/playlist/spotify/connect?frontend=${process.env.LUMEN_TEST_MOUNT === '/lumen' ? 'bundled' : 'companion'}`
   );
-  await page.getByRole('button', { name: 'Disconnect Spotify' }).click();
+  await page.getByRole('button', { name: copy.disconnect }).click();
   await expect(
-    page.getByText('Spotify disconnected.', { exact: true })
+    page.getByText(copy.disconnected, { exact: true })
   ).toBeVisible();
   await expect(
-    page.getByRole('link', { name: 'Connect Spotify', exact: true })
+    page.getByRole('link', { name: copy.connect, exact: true })
   ).toBeVisible();
-  await expect(page).toHaveURL(/\/music\/playlist-import$/);
+  expect(new URL(page.url()).pathname).toBe(
+    testAppPath('/music/playlist-import')
+  );
 });
 
 test('Track Requests can browse history beyond the first page', async ({
   page,
 }) => {
   await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: {
+        applicationTitle: 'SeerrNG',
+        enabledMediaCategories: { music: true },
+      },
+    })
+  );
   await page.route('**/api/v1/soulseek/status', (route) =>
     route.fulfill({ json: { configured: true } })
   );
@@ -6562,10 +7460,14 @@ test('General Settings confirms default permissions and preserves higher permiss
     });
   });
   await page.goto('/admin/requests#default-request-quotas');
-  await page.getByRole('link', { name: 'Autorisations par défaut des utilisateurs' }).click();
+  await page
+    .getByRole('link', { name: 'Autorisations par défaut des utilisateurs' })
+    .click();
   await expect(page).toHaveURL(/#default-user-permissions$/);
   await expect(
-    page.getByRole('heading', { name: 'Autorisations par défaut des utilisateurs' })
+    page.getByRole('heading', {
+      name: 'Autorisations par défaut des utilisateurs',
+    })
   ).toBeInViewport();
   if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
     await page.screenshot({
@@ -6586,13 +7488,17 @@ test('General Settings confirms default permissions and preserves higher permiss
   await page
     .getByRole('checkbox', { name: 'Demande de livres', exact: true })
     .check();
-  await page.getByRole('button', { name: 'Enregistrer les autorisations par défaut' }).click();
+  await page
+    .getByRole('button', { name: 'Enregistrer les autorisations par défaut' })
+    .click();
   expect(writes).toEqual([]);
   await page
     .getByRole('alertdialog')
     .getByRole('button', { name: 'Enregistrer les autorisations par défaut' })
     .click();
-  await expect(page.getByText('Autorisations par défaut enregistrées.')).toBeVisible();
+  await expect(
+    page.getByText('Autorisations par défaut enregistrées.')
+  ).toBeVisible();
   expect(writes).toEqual([
     { defaultPermissions: 4398046511104 + 34359738368 + 32 },
   ]);

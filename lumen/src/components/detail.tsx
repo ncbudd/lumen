@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../auth';
 import { friendlyError } from '../errors';
 import { useApi } from '../hooks';
+import { useLumenLocale } from '../i18n';
 import { Icon, type IconName } from '../icons';
 import { sessionGeneration } from '../sessionState';
 import { Glyph, type Stat } from './cards';
@@ -39,6 +40,7 @@ export const fmtHrs = (sec?: number | null) =>
   !sec ? '' : fmtRun(Math.round(sec / 60));
 
 export function TrailerButton({ href }: { href: string }) {
+  const { t } = useLumenLocale();
   return (
     <a
       className="btn btn-quiet"
@@ -47,7 +49,7 @@ export function TrailerButton({ href }: { href: string }) {
       rel="noopener noreferrer"
     >
       <Icon name="play" />
-      Trailer
+      {t('lumen.detail.trailer', 'Trailer')}
     </a>
   );
 }
@@ -76,6 +78,7 @@ export function People({
   list: Person[];
   full?: boolean;
 }) {
+  const { t } = useLumenLocale();
   const listId = useId();
   const [expanded, setExpanded] = useState(false);
   const visible = full || expanded ? list : list.slice(0, 10);
@@ -127,8 +130,10 @@ export function People({
             onClick={() => setExpanded(!expanded)}
           >
             {expanded
-              ? 'Show Fewer Credits'
-              : `Show All ${list.length} Credits`}
+              ? t('lumen.detail.showFewerCredits', 'Show Fewer Credits')
+              : t('lumen.detail.showAllCredits', 'Show All {count} Credits', {
+                  count: list.length,
+                })}
           </button>
         </div>
       )}
@@ -145,6 +150,7 @@ export function CreditsDisclosure({
   credit: 'cast' | 'crew';
   people?: Person[];
 }) {
+  const { t } = useLumenLocale();
   const { hash } = useLocation();
   const { id } = useParams();
   if (!people?.length && hash !== `#${credit}`) return null;
@@ -153,13 +159,23 @@ export function CreditsDisclosure({
     <VideoDisclosure
       media={media}
       panel={credit}
-      label={credit === 'cast' ? 'Starring' : 'Crew'}
+      label={
+        credit === 'cast'
+          ? t('lumen.detail.starring', 'Starring')
+          : t('lumen.detail.crew', 'Crew')
+      }
     >
-      {people?.length ? <People list={people} /> : <p>No credits available.</p>}
+      {people?.length ? (
+        <People list={people} />
+      ) : (
+        <p>{t('lumen.detail.noCredits', 'No credits available.')}</p>
+      )}
       {id && !!people?.length && (
         <div className="toolbar">
           <Link className="chip" to={`/${media}/${id}/${credit}`}>
-            {credit === 'cast' ? 'Open Full Cast' : 'Open Full Crew'}
+            {credit === 'cast'
+              ? t('lumen.detail.openFullCast', 'Open Full Cast')
+              : t('lumen.detail.openFullCrew', 'Open Full Crew')}
           </Link>
         </div>
       )}
@@ -174,6 +190,7 @@ export function SubjectTagsDisclosure({
   media: 'movie' | 'tv';
   tags?: SubjectTag[];
 }) {
+  const { t } = useLumenLocale();
   const { user } = useAuth();
   const contentId = useId();
   const storageKey = `seerr.subjectTagVisibility:${user?.id ?? 'anonymous'}`;
@@ -196,7 +213,11 @@ export function SubjectTagsDisclosure({
   }
 
   return (
-    <VideoDisclosure media={media} panel="subjectTags" label="Subject Tags">
+    <VideoDisclosure
+      media={media}
+      panel="subjectTags"
+      label={t('lumen.detail.subjectTags', 'Subject Tags')}
+    >
       {tags?.length ? (
         <>
           <div className="toolbar">
@@ -207,7 +228,7 @@ export function SubjectTagsDisclosure({
               aria-controls={contentId}
               onClick={toggleVisibility}
             >
-              Show Subject Tags
+              {t('lumen.detail.showSubjectTags', 'Show Subject Tags')}
             </button>
           </div>
           <div id={contentId} hidden={!visible}>
@@ -225,7 +246,9 @@ export function SubjectTagsDisclosure({
           </div>
         </>
       ) : (
-        <p className="note">No subject tags.</p>
+        <p className="note">
+          {t('lumen.detail.noSubjectTags', 'No subject tags.')}
+        </p>
       )}
     </VideoDisclosure>
   );
@@ -242,6 +265,7 @@ function VideoDisclosure({
   label: string;
   children: ReactNode;
 }) {
+  const { t } = useLumenLocale();
   const { user, refresh } = useAuth();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
@@ -266,7 +290,10 @@ function VideoDisclosure({
   const pinned =
     user?.settings?.detailDisclosurePins?.[media]?.[panel] ??
     (media === 'movie' && legacy[panel] === true);
-  const preference = panel === 'subjectTags' ? 'subject tag' : 'credit';
+  const preference =
+    panel === 'subjectTags'
+      ? t('lumen.detail.subjectTagPreference', 'subject tag')
+      : t('lumen.detail.creditPreference', 'credit');
 
   async function togglePin() {
     if (!user || pending.current) return;
@@ -280,13 +307,25 @@ function VideoDisclosure({
       );
       if (generation !== sessionGeneration()) return;
       if (result[panel] !== !pinned) {
-        toast(`Could not confirm the saved ${preference} preference.`);
+        toast(
+          t(
+            'lumen.detail.confirmPinFailure',
+            'Could not confirm the saved {preference} preference.',
+            { preference }
+          )
+        );
         return;
       }
       await refresh();
     } catch {
       if (generation === sessionGeneration())
-        toast(`Could not save the ${preference} preference. Try again.`);
+        toast(
+          t(
+            'lumen.detail.savePinFailure',
+            'Could not save the {preference} preference. Try again.',
+            { preference }
+          )
+        );
     } finally {
       pending.current = false;
       setBusy(false);
@@ -309,7 +348,7 @@ function VideoDisclosure({
             disabled={busy}
             onClick={() => void togglePin()}
           >
-            Keep {label} Open
+            {t('lumen.detail.keepOpen', 'Keep {label} Open', { label })}
           </button>
         </div>
       )}
@@ -565,6 +604,7 @@ export function AdvancedOptions({
   inline?: boolean; // always open, no "Advanced" toggle (the quick-request sheet)
   onReady?: (ready: boolean) => void;
 }) {
+  const { t } = useLumenLocale();
   const { user } = useAuth();
   const allowed = canChooseRequestOptions(user?.permissions);
   const svc = kind === 'movie' ? 'radarr' : 'sonarr';
@@ -801,18 +841,29 @@ export function AdvancedOptions({
   const body = (
     <>
       {err && <p className="note">{err}</p>}
-      {!servers && !err && open && <p className="note">Loading servers…</p>}
+      {!servers && !err && open && (
+        <p className="note">
+          {t('lumen.detail.loadingServers', 'Loading servers…')}
+        </p>
+      )}
       {none && !err && (
         <p className="note">
-          No {svc === 'radarr' ? 'Radarr' : 'Sonarr'} server to choose; SeerrNG
-          uses its defaults.
+          {t(
+            'lumen.detail.noServer',
+            'No {service} server to choose; SeerrNG uses its defaults.',
+            {
+              service: svc === 'radarr' ? 'Radarr' : 'Sonarr',
+            }
+          )}
         </p>
       )}
       {servers && !none && (
         <div className="adv-grid">
           {asAllowed && !!people?.length && user && (
             <label className="sel">
-              <span className="lbl">Request as</span>
+              <span className="lbl">
+                {t('lumen.detail.requestAs', 'Request as')}
+              </span>
               <select
                 value={asUser ?? user.id}
                 onChange={(e) => {
@@ -820,7 +871,9 @@ export function AdvancedOptions({
                   setAsUser(Number(e.target.value));
                 }}
               >
-                <option value={user.id}>Me ({user.displayName})</option>
+                <option value={user.id}>
+                  {t('lumen.detail.me', 'Me')} ({user.displayName})
+                </option>
                 {people
                   .filter((x) => x.id !== user.id)
                   .map((x) => (
@@ -832,7 +885,7 @@ export function AdvancedOptions({
             </label>
           )}
           <label className="sel">
-            <span className="lbl">Server</span>
+            <span className="lbl">{t('lumen.detail.server', 'Server')}</span>
             <select
               value={o.serverId ?? ''}
               onChange={(e) => {
@@ -845,7 +898,9 @@ export function AdvancedOptions({
                 <option key={s.id} value={s.id}>
                   {s.name}
                   {allow4k && s.is4k && !/4k/i.test(s.name) ? ' · 4K' : ''}
-                  {s.isDefault ? ' (default)' : ''}
+                  {s.isDefault
+                    ? ` (${t('lumen.detail.default', 'default')})`
+                    : ''}
                 </option>
               ))}
             </select>
@@ -853,7 +908,9 @@ export function AdvancedOptions({
           {detail && (
             <>
               <label className="sel">
-                <span className="lbl">Quality</span>
+                <span className="lbl">
+                  {t('lumen.detail.quality', 'Quality')}
+                </span>
                 <select
                   value={o.profileId ?? ''}
                   onChange={(e) =>
@@ -868,7 +925,9 @@ export function AdvancedOptions({
                 </select>
               </label>
               <label className="sel">
-                <span className="lbl">Folder</span>
+                <span className="lbl">
+                  {t('lumen.detail.folder', 'Folder')}
+                </span>
                 <select
                   value={o.rootFolder ?? ''}
                   onChange={(e) =>
@@ -884,7 +943,9 @@ export function AdvancedOptions({
               </label>
               {kind === 'tv' && !!detail.languageProfiles?.length && (
                 <label className="sel">
-                  <span className="lbl">Language Profile</span>
+                  <span className="lbl">
+                    {t('lumen.detail.languageProfile', 'Language Profile')}
+                  </span>
                   <select
                     value={o.languageProfileId ?? ''}
                     onChange={(event) => {
@@ -897,7 +958,7 @@ export function AdvancedOptions({
                     }}
                   >
                     <option value="" disabled>
-                      Sonarr Default
+                      {t('lumen.detail.sonarrDefault', 'Sonarr Default')}
                     </option>
                     {detail.languageProfiles.map(({ id, name }) => (
                       <option key={id} value={id}>
@@ -909,7 +970,9 @@ export function AdvancedOptions({
               )}
               {kind === 'tv' && !!detail.metadataLanguages?.length && (
                 <label className="sel">
-                  <span className="lbl">Metadata Language</span>
+                  <span className="lbl">
+                    {t('lumen.detail.metadataLanguage', 'Metadata Language')}
+                  </span>
                   <select
                     value={o.metadataLanguageId ?? ''}
                     onChange={(event) => {
@@ -921,7 +984,9 @@ export function AdvancedOptions({
                       }));
                     }}
                   >
-                    <option value="">Sonarr Default</option>
+                    <option value="">
+                      {t('lumen.detail.sonarrDefault', 'Sonarr Default')}
+                    </option>
                     {detail.metadataLanguages.map(({ id, name }) => (
                       <option key={id} value={id}>
                         {name}
@@ -932,14 +997,18 @@ export function AdvancedOptions({
               )}
               {lookupPath && seasonTypes.length > 1 && (
                 <label className="sel">
-                  <span className="lbl">Season Order</span>
+                  <span className="lbl">
+                    {t('lumen.detail.seasonOrder', 'Season Order')}
+                  </span>
                   <select
                     value={selectedOrder ?? ''}
                     onChange={(event) =>
                       setOrder({ path: lookupPath, type: event.target.value })
                     }
                   >
-                    <option value="">Sonarr Default</option>
+                    <option value="">
+                      {t('lumen.detail.sonarrDefault', 'Sonarr Default')}
+                    </option>
                     {seasonTypes.map(({ type, name }) => (
                       <option key={type} value={type}>
                         {name === type ? name : `${name} (${type})`}
@@ -955,7 +1024,7 @@ export function AdvancedOptions({
       {canOverrideQuota && (
         <div className="setlist">
           <label className="set cfg-row">
-            <span>Ignore Request Quota</span>
+            <span>{t('lumen.detail.ignoreQuota', 'Ignore Request Quota')}</span>
             <input
               type="checkbox"
               checked={ignoreQuota}
@@ -965,8 +1034,13 @@ export function AdvancedOptions({
         </div>
       )}
       {!!detail?.tags?.length && (
-        <div role="group" aria-label="Request Tags">
-          <p className="note">Request Tags</p>
+        <div
+          role="group"
+          aria-label={t('lumen.detail.requestTags', 'Request Tags')}
+        >
+          <p className="note">
+            {t('lumen.detail.requestTags', 'Request Tags')}
+          </p>
           <div className="setlist">
             {detail.tags.map(({ id, label }) => (
               <label key={id} className="set cfg-row">
@@ -1002,7 +1076,7 @@ export function AdvancedOptions({
     >
       <summary>
         <Icon name="info" size="sm" />
-        Advanced Request Options
+        {t('lumen.detail.advancedOptions', 'Advanced Request Options')}
       </summary>
       {body}
     </details>

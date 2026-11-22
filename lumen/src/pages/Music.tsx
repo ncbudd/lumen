@@ -37,23 +37,40 @@ import {
   type ArtistDetails,
 } from '../extras';
 import { useApi, usePaged, usePublicSettings } from '../hooks';
+import { useLumenLocale } from '../i18n';
 import { Icon } from '../icons';
 import { useLiveMediaProgress } from '../useLiveDownloadProgress';
 import { AssociationLink } from './Associations';
 
 const SORTS = [
-  ['ranked', 'Recommended'],
-  ['popular.week', 'This week'],
-  ['popular.month', 'This month'],
-  ['popular.year', 'This year'],
-  ['listen_count.desc', 'Most played'],
-  ['release_date.desc', 'Newest'],
-  ['release_date.asc', 'Oldest'],
-  ['listen_count.asc', 'Least played'],
-  ['ranked.asc', 'Recommended (ascending)'],
-  ['popular.week.asc', 'This week (ascending)'],
-  ['popular.month.asc', 'This month (ascending)'],
-  ['popular.year.asc', 'This year (ascending)'],
+  ['ranked', 'lumen.music.sort.recommended', 'Recommended'],
+  ['popular.week', 'lumen.music.sort.week', 'This week'],
+  ['popular.month', 'lumen.music.sort.month', 'This month'],
+  ['popular.year', 'lumen.music.sort.year', 'This year'],
+  ['listen_count.desc', 'lumen.music.sort.mostPlayed', 'Most played'],
+  ['release_date.desc', 'lumen.music.sort.newest', 'Newest'],
+  ['release_date.asc', 'lumen.music.sort.oldest', 'Oldest'],
+  ['listen_count.asc', 'lumen.music.sort.leastPlayed', 'Least played'],
+  [
+    'ranked.asc',
+    'lumen.music.sort.recommendedAscending',
+    'Recommended (ascending)',
+  ],
+  [
+    'popular.week.asc',
+    'lumen.music.sort.weekAscending',
+    'This week (ascending)',
+  ],
+  [
+    'popular.month.asc',
+    'lumen.music.sort.monthAscending',
+    'This month (ascending)',
+  ],
+  [
+    'popular.year.asc',
+    'lumen.music.sort.yearAscending',
+    'This year (ascending)',
+  ],
 ] as const;
 // Keep these MusicBrainz labels aligned with the server's release type filters.
 const RELEASE_TYPES = [
@@ -76,10 +93,30 @@ const RELEASE_TYPES = [
   'Field recording',
 ].map((label) => ({ value: label.toLowerCase(), label }));
 const MUSIC_FILTERS = [
-  { key: 'genre', label: 'Genre', type: 'search' },
-  { key: 'artist', label: 'Artist', type: 'search' },
-  { key: 'primaryReleaseDateGte', label: 'Released From', type: 'date' },
-  { key: 'primaryReleaseDateLte', label: 'Released Through', type: 'date' },
+  {
+    key: 'genre',
+    label: 'lumen.music.filter.genre',
+    fallback: 'Genre',
+    type: 'search',
+  },
+  {
+    key: 'artist',
+    label: 'lumen.music.filter.artist',
+    fallback: 'Artist',
+    type: 'search',
+  },
+  {
+    key: 'primaryReleaseDateGte',
+    label: 'lumen.music.filter.releasedFrom',
+    fallback: 'Released From',
+    type: 'date',
+  },
+  {
+    key: 'primaryReleaseDateLte',
+    label: 'lumen.music.filter.releasedThrough',
+    fallback: 'Released Through',
+    type: 'date',
+  },
 ] as const;
 
 function MusicArtistFilter({
@@ -89,6 +126,7 @@ function MusicArtistFilter({
   artist: string;
   artistId: string;
 }) {
+  const { t } = useLumenLocale();
   const [name, setName] = useState(artist);
   const [selectedId, setSelectedId] = useState(artistId);
   const [term, setTerm] = useState('');
@@ -115,7 +153,7 @@ function MusicArtistFilter({
   return (
     <>
       <label className="sel">
-        <span className="lbl">Artist</span>
+        <span className="lbl">{t('lumen.music.filter.artist', 'Artist')}</span>
         <input
           className="cfg-input"
           type="search"
@@ -132,7 +170,9 @@ function MusicArtistFilter({
       <input type="hidden" name="artistId" value={selectedId} />
       {matches.length > 0 && (
         <label className="sel">
-          <span className="lbl">Artist Match</span>
+          <span className="lbl">
+            {t('lumen.music.artistMatch', 'Artist Match')}
+          </span>
           <select
             value={selectedId}
             onChange={(event) => {
@@ -143,7 +183,9 @@ function MusicArtistFilter({
               if (match) setName(match.name);
             }}
           >
-            <option value="">Use Artist Text</option>
+            <option value="">
+              {t('lumen.music.useArtistText', 'Use Artist Text')}
+            </option>
             {matches.map((match) => (
               <option key={match.id} value={match.id}>
                 {match.name}
@@ -159,12 +201,12 @@ function MusicArtistFilter({
           type="button"
           onClick={lookup.reload}
         >
-          Retry Artist Lookup
+          {t('lumen.music.retryArtistLookup', 'Retry Artist Lookup')}
         </button>
       )}
       {lookup.data && matches.length === 0 && (
         <span className="note" role="status">
-          No matching artists.
+          {t('lumen.music.noMatchingArtists', 'No matching artists.')}
         </span>
       )}
     </>
@@ -198,6 +240,11 @@ export const AlbumCard = ({ a }: { a: Album }) => (
 
 // Music: albums from MusicBrainz and ListenBrainz charts; requests go to Lidarr
 export function Music() {
+  const { t } = useLumenLocale();
+  const releaseTypeOptions = RELEASE_TYPES.map(({ value, label }) => ({
+    value,
+    label: t(`lumen.music.releaseType.${value}`, label),
+  }));
   const [p, setP] = useSearchParams();
   const query = p.get('q') || p.get('search') || '';
   const [q, setQ] = useState(query);
@@ -262,47 +309,59 @@ export function Music() {
   return (
     <ExtraGate k="music">
       <ExtraHeader
-        title="Music"
-        sub="Request an album and it lands in your music library."
+        title={t('lumen.music.title', 'Music')}
+        sub={t(
+          'lumen.music.subtitle',
+          'Request an album and it lands in your music library.'
+        )}
       >
         <ExtraSearch
           value={q}
           onChange={setQ}
-          placeholder="Search albums and artists…"
+          placeholder={t(
+            'lumen.music.searchPlaceholder',
+            'Search albums and artists…'
+          )}
         />
       </ExtraHeader>
       <div className="toolbar">
         <Link className="btn btn-quiet btn-sm" to="/track-requests">
-          Track Requests
+          {t('lumen.music.trackRequests', 'Track Requests')}
         </Link>
         <Link className="btn btn-quiet btn-sm" to="/music/playlist-import">
-          Import Playlist
+          {t('lumen.music.importPlaylist', 'Import Playlist')}
         </Link>
         {canUseRequestAccess(user?.permissions) && (
           <Link className="btn btn-quiet btn-sm" to="/music/collectors">
-            Collector Picks
+            {t('lumen.music.collectorPicks', 'Collector Picks')}
           </Link>
         )}
         <label className="sel">
-          <span className="lbl">Sort</span>
+          <span className="lbl">{t('lumen.music.sort', 'Sort')}</span>
           <select value={sort} onChange={(e) => upd('sort', e.target.value)}>
-            {SORTS.map(([v, t]) => (
+            {SORTS.map(([v, key, fallback]) => (
               <option key={v} value={v}>
-                {t}
+                {t(key, fallback)}
               </option>
             ))}
           </select>
         </label>
         <GenrePicker
-          labels={{ title: 'Release Types', all: 'Any Release Type' }}
-          options={RELEASE_TYPES}
+          labels={{
+            title: t('lumen.music.releaseTypes', 'Release Types'),
+            all: t('lumen.music.anyReleaseType', 'Any Release Type'),
+          }}
+          options={releaseTypeOptions}
           picked={types}
           onChange={(value) => upd('type', value.join(','))}
         />
       </div>
       <form
         className="toolbar"
-        aria-label="Music Discovery Filters"
+        aria-label={t(
+          'lumen.music.discoveryFilters',
+          'Music Discovery Filters'
+        )}
         key={filters.toString()}
         onSubmit={(event) => {
           event.preventDefault();
@@ -320,7 +379,7 @@ export function Music() {
           setP(next, { replace: true });
         }}
       >
-        {MUSIC_FILTERS.map(({ key, label, type }) =>
+        {MUSIC_FILTERS.map(({ key, label, fallback, type }) =>
           key === 'artist' ? (
             <MusicArtistFilter
               key={key}
@@ -329,7 +388,7 @@ export function Music() {
             />
           ) : (
             <label className="sel" key={key}>
-              <span className="lbl">{label}</span>
+              <span className="lbl">{t(label, fallback)}</span>
               <input
                 className="cfg-input"
                 type={type}
@@ -341,18 +400,22 @@ export function Music() {
           )
         )}
         <label className="sel">
-          <span className="lbl">In Library</span>
+          <span className="lbl">
+            {t('lumen.music.inLibrary', 'In Library')}
+          </span>
           <select
             name="availability"
             defaultValue={filters.get('availability') ?? ''}
           >
-            <option value="">Any Quality</option>
+            <option value="">
+              {t('lumen.music.anyQuality', 'Any Quality')}
+            </option>
             <option value="mp3">MP3</option>
             <option value="flac">FLAC</option>
           </select>
         </label>
         <button className="btn btn-tonal btn-sm" type="submit">
-          Apply Music Filters
+          {t('lumen.music.applyFilters', 'Apply Music Filters')}
         </button>
         {filters.has('genre') && (
           <button
@@ -360,7 +423,9 @@ export function Music() {
             type="button"
             onClick={() => upd('genre', '')}
           >
-            Clear Genre: {filters.get('genre')}
+            {t('lumen.music.clearGenre', 'Clear Genre: {genre}', {
+              genre: filters.get('genre') ?? '',
+            })}
           </button>
         )}
         {filters.has('artistId') && (
@@ -369,7 +434,7 @@ export function Music() {
             type="button"
             onClick={() => upd('artistId', '')}
           >
-            Clear Exact Artist
+            {t('lumen.music.clearExactArtist', 'Clear Exact Artist')}
           </button>
         )}
         {filters.size > 0 && (
@@ -382,17 +447,24 @@ export function Music() {
               setP(next, { replace: true });
             }}
           >
-            Clear Music Filters
+            {t('lumen.music.clearFilters', 'Clear Music Filters')}
           </button>
         )}
       </form>
-      <ServiceNote error={list.items.length ? null : list.error} what="music" />
+      <ServiceNote
+        error={list.items.length ? null : list.error}
+        what="music"
+        title={t('lumen.music.loadFailureTitle', 'Could not load music')}
+      />
       {!list.error && !items.length && !list.loading && list.done && (
         <div className="empty">
-          <b>Nothing here</b>
+          <b>{t('lumen.music.nothingHere', 'Nothing here')}</b>
           {query
-            ? 'Try fewer words, or just the artist.'
-            : 'Try another release type.'}
+            ? t(
+                'lumen.music.searchHint',
+                'Try fewer words, or just the artist.'
+              )
+            : t('lumen.music.releaseTypeHint', 'Try another release type.')}
         </div>
       )}
       <div className="sqg grid">
@@ -407,7 +479,9 @@ export function Music() {
             disabled={list.loading}
             onClick={list.more}
           >
-            {list.loading ? 'Loading…' : 'Show More Music'}
+            {list.loading
+              ? t('lumen.music.loading', 'Loading…')
+              : t('lumen.music.showMore', 'Show More Music')}
           </button>
         </div>
       )}
@@ -417,6 +491,11 @@ export function Music() {
         more={list.more}
         error={list.error}
         retry={list.retry}
+        labels={{
+          error: t('lumen.music.loadMoreFailure', 'Couldn’t load more.'),
+          retry: t('lumen.music.retry', 'Retry'),
+          loading: t('lumen.music.loadingMore', 'Loading more…'),
+        }}
       />
     </ExtraGate>
   );
@@ -424,6 +503,7 @@ export function Music() {
 
 export function AlbumDetail() {
   const { id } = useParams();
+  const { t } = useLumenLocale();
   const { user } = useAuth();
   const { data: a, error, refresh } = useApi<AlbumDetails>(`/music/${id}`);
   const progressMedia = useLiveMediaProgress(
@@ -434,7 +514,7 @@ export function AlbumDetail() {
     return (
       <ExtraGate k="music">
         <div className="empty">
-          <b>Couldn’t load this album</b>
+          <b>{t('lumen.music.albumLoadFailure', 'Couldn’t load this album')}</b>
           {error}
         </div>
       </ExtraGate>
@@ -451,7 +531,7 @@ export function AlbumDetail() {
   const main = canRequestMusic(user?.permissions) ? (
     <RequestButton
       stat={s}
-      label="Request album"
+      label={t('lumen.music.requestAlbum', 'Request album')}
       request={() => requestExtra('music', a.id)}
     />
   ) : null;
@@ -468,8 +548,20 @@ export function AlbumDetail() {
           line={[
             (a.releaseDate || '').slice(0, 4),
             a.type,
-            a.tracks?.length ? `${a.tracks.length} tracks` : '',
-            total ? fmtTrack(total).replace(/:\d+$/, ' min') : '',
+            a.tracks?.length
+              ? a.tracks.length === 1
+                ? t('lumen.music.trackCountOne', '{count} track', {
+                    count: a.tracks.length,
+                  })
+                : t('lumen.music.trackCountMany', '{count} tracks', {
+                    count: a.tracks.length,
+                  })
+              : '',
+            total
+              ? t('lumen.music.durationMinutes', '{duration} min', {
+                  duration: fmtTrack(total).replace(/:\d+$/, ''),
+                })
+              : '',
             tags.join(', '),
           ]}
         />
@@ -478,14 +570,16 @@ export function AlbumDetail() {
             <StatPill s={s} />
             {!!a.stats?.totalListenCount && (
               <Pill k="neutral" icon="headphones">
-                {big(a.stats.totalListenCount)} plays
+                {t('lumen.music.plays', '{count} plays', {
+                  count: big(a.stats.totalListenCount),
+                })}
               </Pill>
             )}
             <Link
               className="btn btn-tonal btn-sm"
               to={`/collections/music/${encodeURIComponent(a.artist.id)}?view=discography&albumId=${encodeURIComponent(a.id)}`}
             >
-              View Discography
+              {t('lumen.music.viewDiscography', 'View Discography')}
             </Link>
             <IndexerSearchLink category="music" title={a.title} />
             <AssociationLink mediaType="album" id={id} />
@@ -508,18 +602,22 @@ export function AlbumDetail() {
             <div>
               {!!a.tracks?.length && (
                 <>
-                  <div className="h2">Tracks</div>
+                  <div className="h2">{t('lumen.music.tracks', 'Tracks')}</div>
                   <ol className="slist tlist">
-                    {a.tracks.map((t) => (
-                      <li key={t.position} className="trow">
-                        <span className="tn">{t.position}</span>
+                    {a.tracks.map((track) => (
+                      <li key={track.position} className="trow">
+                        <span className="tn">{track.position}</span>
                         <span>
-                          <b>{t.name}</b>
-                          {!!t.totalListenCount && (
-                            <small>{big(t.totalListenCount)} plays</small>
+                          <b>{track.name}</b>
+                          {!!track.totalListenCount && (
+                            <small>
+                              {t('lumen.music.plays', '{count} plays', {
+                                count: big(track.totalListenCount),
+                              })}
+                            </small>
                           )}
                         </span>
-                        <span className="tl">{fmtTrack(t.length)}</span>
+                        <span className="tl">{fmtTrack(track.length)}</span>
                       </li>
                     ))}
                   </ol>
@@ -530,15 +628,15 @@ export function AlbumDetail() {
               <Facts
                 rows={[
                   [
-                    'Artist',
+                    t('lumen.music.fact.artist', 'Artist'),
                     <Link key="a" to={`/artist/${a.artist.id}`}>
                       {a.artist.name}
                     </Link>,
                   ],
-                  ['Released', a.releaseDate],
-                  ['Label', a.recordLabel],
-                  ['From', a.artist.area],
-                  ['Type', a.type],
+                  [t('lumen.music.fact.released', 'Released'), a.releaseDate],
+                  [t('lumen.music.fact.label', 'Label'), a.recordLabel],
+                  [t('lumen.music.fact.from', 'From'), a.artist.area],
+                  [t('lumen.music.fact.type', 'Type'), a.type],
                 ]}
               />
             </aside>
@@ -558,21 +656,24 @@ export function AlbumDetail() {
 
 export function Artist() {
   const { id = '' } = useParams();
+  const { t } = useLumenLocale();
   const { data: a, error } = useApi<ArtistDetails>(`/artist/${id}`);
   if (error)
     return (
       <ExtraGate k="music">
         <div className="empty">
-          <b>Couldn’t load this artist</b>
+          <b>
+            {t('lumen.music.artistLoadFailure', 'Couldn’t load this artist')}
+          </b>
           {error}
         </div>
       </ExtraGate>
     );
   if (!a) return <div className="detail-loading" aria-busy="true" />;
   const groups = [
-    ['Album', 'Albums'],
-    ['EP', 'EPs'],
-    ['Single', 'Singles'],
+    ['Album', t('lumen.music.albums', 'Albums')],
+    ['EP', t('lumen.music.eps', 'EPs')],
+    ['Single', t('lumen.music.singles', 'Singles')],
   ] as const;
   return (
     <ExtraGate k="music">
@@ -585,8 +686,18 @@ export function Artist() {
           line={[
             a.artist.type,
             a.artist.area,
-            a.artist.beginYear ? `Since ${a.artist.beginYear}` : '',
-            `${a.releaseGroups.length} releases`,
+            a.artist.beginYear
+              ? t('lumen.music.sinceYear', 'Since {year}', {
+                  year: a.artist.beginYear,
+                })
+              : '',
+            a.releaseGroups.length === 1
+              ? t('lumen.music.releaseCountOne', '{count} release', {
+                  count: a.releaseGroups.length,
+                })
+              : t('lumen.music.releaseCountMany', '{count} releases', {
+                  count: a.releaseGroups.length,
+                }),
           ]}
         />
         <div className="dbody">
@@ -595,7 +706,7 @@ export function Artist() {
               className="btn btn-tonal btn-sm"
               to={`/collections/music/${encodeURIComponent(id)}?view=discography`}
             >
-              View Discography
+              {t('lumen.music.viewDiscography', 'View Discography')}
             </Link>
             <Link
               className="btn btn-tonal btn-sm"
@@ -607,7 +718,7 @@ export function Artist() {
                 }).toString(),
               }}
             >
-              Filter Music by Artist
+              {t('lumen.music.filterByArtist', 'Filter Music by Artist')}
             </Link>
             <IndexerSearchLink category="music" title={a.artist.name} />
             <AssociationLink mediaType="artist" id={id} />
@@ -629,7 +740,7 @@ export function Artist() {
           })}
           {!a.releaseGroups.length && (
             <div className="empty">
-              <b>No releases listed</b>
+              <b>{t('lumen.music.noReleases', 'No releases listed')}</b>
               <Icon name="music" />
             </div>
           )}
