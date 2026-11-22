@@ -1,4 +1,6 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { mkdir } from 'node:fs/promises';
+import { basename, dirname, join } from 'node:path';
 
 const testMount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
 const appPath = (path: string) => `${testMount}${path}`;
@@ -489,19 +491,27 @@ test('TV detail can request missing episodes from a partly requested season', as
     undefined,
     { partialRequestsEnabled: true }
   );
-  await page.route('**/api/v1/tv/84773/season/1', (route) =>
+  await page.route('**/api/v1/tv/84773/seasons?*', (route) =>
     route.fulfill({
-      json: {
-        episodes: [
-          {
-            episodeNumber: 1,
-            name: 'Owned',
-            availabilitySources: [{ hd: true, fourK: false }],
-          },
-          { episodeNumber: 2, name: 'Pending' },
-          { episodeNumber: 3, name: 'Missing' },
-        ],
-      },
+      json: new URL(route.request().url()).searchParams
+        .get('seasonNumbers')!
+        .split(',')
+        .map(Number)
+        .map((seasonNumber) => ({
+          seasonNumber,
+          episodes:
+            seasonNumber === 1
+              ? [
+                  {
+                    episodeNumber: 1,
+                    name: 'Owned',
+                    availabilitySources: [{ hd: true, fourK: false }],
+                  },
+                  { episodeNumber: 2, name: 'Pending' },
+                  { episodeNumber: 3, name: 'Missing' },
+                ]
+              : [],
+        })),
     })
   );
   await page.route('**/api/v1/request', (route) => {
@@ -589,7 +599,7 @@ test('TV detail can request missing episodes from a partly requested season', as
   ]);
 });
 
-test('large-series episode metadata recovers failed seasons without losing the deep-linked episode', async ({
+test('large-series episode metadata uses small bounded batches and preserves deep-linked selection on retry', async ({
   page,
 }) => {
   const posts: RecordedPost[] = [];
@@ -608,30 +618,27 @@ test('large-series episode metadata recovers failed seasons without losing the d
     largeSeriesSeasons
   );
   await page.goto(appPath('/tv/84773?episode=3#season-15'));
-  const loadedSeasons: string[] = [];
-  await page.route('**/api/v1/tv/84773/season/*', (route) => {
-    const seasonNumber = new URL(route.request().url()).pathname
-      .split('/')
-      .at(-1)!;
-    loadedSeasons.push(seasonNumber);
-    if (
-      seasonNumber === '15' &&
-      loadedSeasons.filter((n) => n === '15').length === 1
-    )
-      return route.fulfill({
-        status: 503,
-        json: { message: 'Temporary metadata failure' },
-      });
+  const batchQueries: string[] = [];
+  let retrying = false;
+  await page.route('**/api/v1/tv/84773/seasons?*', (route) => {
+    const requested =
+      new URL(route.request().url()).searchParams.get('seasonNumbers') ?? '';
+    batchQueries.push(requested);
     return route.fulfill({
-      json: {
-        episodes:
-          seasonNumber === '15'
-            ? [
-                { episodeNumber: 1, name: 'First episode' },
-                { episodeNumber: 3, name: 'Deep-linked episode' },
-              ]
-            : [],
-      },
+      json: requested
+        .split(',')
+        .map(Number)
+        .filter((seasonNumber) => retrying || seasonNumber !== 15)
+        .map((seasonNumber) => ({
+          seasonNumber,
+          episodes:
+            seasonNumber === 15
+              ? [
+                  { episodeNumber: 1, name: 'First episode' },
+                  { episodeNumber: 3, name: 'Deep-linked episode' },
+                ]
+              : [],
+        })),
     });
   });
   const open = page.getByRole('button', {
@@ -640,6 +647,11 @@ test('large-series episode metadata recovers failed seasons without losing the d
   });
   await open.click();
   const sheet = page.getByRole('dialog', { name: 'Request Episodes' });
+  await expect(sheet.getByText('Could not load episodes')).toBeVisible();
+  expect(batchQueries).toEqual(['1,2,3,4,5', '6,7,8,9,10', '11,12,13,14,15']);
+  const initialBatchCount = batchQueries.length;
+  retrying = true;
+  await sheet.getByRole('button', { name: 'Retry' }).click();
   await expect(
     sheet.getByRole('button', { name: 'Request Selected Episodes' })
   ).toBeEnabled();
@@ -649,13 +661,7 @@ test('large-series episode metadata recovers failed seasons without losing the d
     exact: true,
   });
   await expect(selectedEpisode).toBeChecked();
-  expect(loadedSeasons.filter((number) => number === '15')).toEqual([
-    '15',
-    '15',
-  ]);
-  expect(new Set(loadedSeasons)).toEqual(
-    new Set(largeSeriesSeasons.map(({ seasonNumber }) => String(seasonNumber)))
-  );
+  expect(batchQueries.slice(initialBatchCount)).toEqual(['15']);
   await sheet
     .getByRole('button', { name: 'Request Selected Episodes' })
     .click();
@@ -676,6 +682,203 @@ test('large-series episode metadata recovers failed seasons without losing the d
   ]);
 });
 
+test('loaded episodes remain selectable while the final large-series batch is pending', async ({
+  page,
+}) => {
+  const posts: RecordedPost[] = [];
+  const largeSeriesSeasons = Array.from({ length: 15 }, (_, index) => ({
+    seasonNumber: index + 1,
+    episodeCount: 20,
+    name: `Season ${index + 1}`,
+  }));
+  const batchQueries: string[] = [];
+  const baselineCapture = process.env.LUMEN_TV_BATCH_BASELINE_CAPTURE === '1';
+  const allSeasons = Array.from({ length: 15 }, (_, index) => index + 1).join(
+    ','
+  );
+  const pendingBatch = baselineCapture ? allSeasons : '11,12,13,14,15';
+  let releaseLastBatch!: () => void;
+  let lastBatchStarted = false;
+  const lastBatchGate = new Promise<void>((resolve) => {
+    releaseLastBatch = resolve;
+  });
+  await show(
+    page,
+    {},
+    posts,
+    32,
+    undefined,
+    { partialRequestsEnabled: true },
+    largeSeriesSeasons
+  );
+  await page.route('**/api/v1/tv/84773/seasons?*', async (route) => {
+    const requested =
+      new URL(route.request().url()).searchParams.get('seasonNumbers') ?? '';
+    batchQueries.push(requested);
+    const numbers = requested.split(',').map(Number);
+    if (requested === pendingBatch) {
+      lastBatchStarted = true;
+      await lastBatchGate;
+    }
+    return route.fulfill({
+      json: numbers
+        .filter((seasonNumber) => seasonNumber !== 15)
+        .map((seasonNumber) => ({
+          seasonNumber,
+          episodes: [
+            { episodeNumber: 1, name: `Loaded Season ${seasonNumber}` },
+          ],
+        })),
+    });
+  });
+
+  await page
+    .getByRole('button', { name: 'Request Episodes', exact: true })
+    .click();
+  const sheet = page.getByRole('dialog', { name: 'Request Episodes' });
+  await expect.poll(() => lastBatchStarted).toBe(true);
+  await expect(sheet.getByText('Loading episodes…')).toBeVisible();
+  await expect
+    .poll(() => batchQueries)
+    .toEqual(
+      baselineCapture
+        ? [allSeasons]
+        : ['1,2,3,4,5', '6,7,8,9,10', '11,12,13,14,15']
+    );
+  if (baselineCapture) {
+    await expect(sheet.getByRole('checkbox')).toHaveCount(0);
+  } else {
+    await sheet.getByText('Season 1', { exact: true }).click();
+    const episode = sheet.getByRole('checkbox', {
+      name: 'E1 Loaded Season 1',
+      exact: true,
+    });
+    await expect(episode).toBeEnabled();
+    await episode.check();
+    await expect(sheet.getByText('Selected: 1')).toBeVisible();
+    await expect(
+      sheet.getByRole('button', { name: 'Request Selected Episodes' })
+    ).toBeDisabled();
+  }
+  const capture = process.env.LUMEN_TV_BATCH_CAPTURE;
+  if (capture) {
+    await sheet.evaluate((element) => element.scrollTo({ top: 0 }));
+    await page.waitForTimeout(400);
+    await mkdir(dirname(capture), { recursive: true });
+    await page.screenshot({
+      path: join(
+        dirname(capture),
+        `${basename(capture, '.png')}-${test.info().project.name}.png`
+      ),
+      fullPage: false,
+    });
+  }
+
+  releaseLastBatch();
+  await expect(sheet.getByRole('alert')).toContainText(
+    'Episodes from loaded seasons are still shown'
+  );
+  if (baselineCapture) {
+    await sheet.getByText('Season 1', { exact: true }).click();
+    await sheet
+      .getByRole('checkbox', { name: 'E1 Loaded Season 1', exact: true })
+      .check();
+    await expect(sheet.getByText('Selected: 1')).toBeVisible();
+  }
+  await expect(
+    sheet.getByRole('button', { name: 'Request Selected Episodes' })
+  ).toBeEnabled();
+  await sheet
+    .getByRole('button', { name: 'Request Selected Episodes' })
+    .click();
+  await expect.poll(() => posts.length).toBe(1);
+  expect(posts[0].body).toMatchObject({
+    seasons: [1],
+    seasonRequests: [{ seasonNumber: 1, episodeNumbers: [1] }],
+  });
+});
+
+test('partial large-series metadata still permits exact requests from loaded seasons', async ({
+  page,
+}, info) => {
+  const posts: RecordedPost[] = [];
+  const largeSeriesSeasons = Array.from({ length: 15 }, (_, index) => ({
+    seasonNumber: index + 1,
+    episodeCount: 20,
+    name: `Season ${index + 1}`,
+  }));
+  const batchQueries: string[] = [];
+  await show(
+    page,
+    {},
+    posts,
+    32,
+    undefined,
+    { partialRequestsEnabled: true },
+    largeSeriesSeasons
+  );
+  await page.route('**/api/v1/tv/84773/seasons?*', (route) => {
+    const requested =
+      new URL(route.request().url()).searchParams.get('seasonNumbers') ?? '';
+    batchQueries.push(requested);
+    return route.fulfill({
+      json: requested
+        .split(',')
+        .map(Number)
+        .filter((seasonNumber) => seasonNumber !== 15)
+        .map((seasonNumber) => ({
+          seasonNumber,
+          episodes: [
+            {
+              episodeNumber: 1,
+              name: `Loaded Season ${seasonNumber} Episode`,
+            },
+          ],
+        })),
+    });
+  });
+  await page
+    .getByRole('button', { name: 'Request Episodes', exact: true })
+    .click();
+  const sheet = page.getByRole('dialog', { name: 'Request Episodes' });
+  await expect(sheet.getByRole('alert')).toContainText(
+    'Episodes from loaded seasons are still shown'
+  );
+  await sheet.getByText('Season 14', { exact: true }).click();
+  const loadedEpisode = sheet.getByRole('checkbox', {
+    name: 'E1 Loaded Season 14 Episode',
+    exact: true,
+  });
+  await expect(loadedEpisode).toBeEnabled();
+  await loadedEpisode.check();
+  const submit = sheet.getByRole('button', {
+    name: 'Request Selected Episodes',
+    exact: true,
+  });
+  await expect(submit).toBeEnabled();
+  if (process.env.LUMEN_TV_PARTIAL_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_TV_PARTIAL_CAPTURE}-${info.project.name}.png`,
+      fullPage: true,
+    });
+  }
+  expect(batchQueries).toEqual(['1,2,3,4,5', '6,7,8,9,10', '11,12,13,14,15']);
+  await submit.click();
+  await expect.poll(() => posts.length).toBe(1);
+  expect(posts).toEqual([
+    {
+      path: '/request',
+      body: {
+        mediaType: 'tv',
+        mediaId: 84773,
+        is4k: false,
+        seasons: [14],
+        seasonRequests: [{ seasonNumber: 14, episodeNumbers: [1] }],
+      },
+    },
+  ]);
+});
+
 test('the episode picker submits selections from multiple seasons together', async ({
   page,
 }) => {
@@ -689,19 +892,21 @@ test('the episode picker submits selections from multiple seasons together', asy
     { partialRequestsEnabled: true },
     seasons.filter(({ seasonNumber }) => seasonNumber > 0).slice(0, 2)
   );
-  await page.route('**/api/v1/tv/84773/season/*', (route) => {
-    const seasonNumber = Number(
-      new URL(route.request().url()).pathname.split('/').at(-1)
-    );
+  await page.route('**/api/v1/tv/84773/seasons?*', (route) => {
+    const seasonNumbers = new URL(route.request().url()).searchParams
+      .get('seasonNumbers')!
+      .split(',')
+      .map(Number);
     return route.fulfill({
-      json: {
+      json: seasonNumbers.map((seasonNumber) => ({
+        seasonNumber,
         episodes: [
           {
             episodeNumber: seasonNumber,
             name: `Season ${seasonNumber} episode`,
           },
         ],
-      },
+      })),
     });
   });
   await page
@@ -840,20 +1045,28 @@ for (const scenario of ['eligible', 'owned season', 'owned episode']) {
       undefined,
       { partialRequestsEnabled: true }
     );
-    await page.route(`**/api/v1/tv/84773/season/${expected}`, (route) =>
+    await page.route('**/api/v1/tv/84773/seasons?*', (route) =>
       route.fulfill({
-        json: {
-          episodes: [
-            {
-              episodeNumber: 3,
-              name: 'Bookmarked Episode',
-              sonarrAvailability: {
-                hd: scenario === 'owned episode',
-                fourK: false,
-              },
-            },
-          ],
-        },
+        json: new URL(route.request().url()).searchParams
+          .get('seasonNumbers')!
+          .split(',')
+          .map(Number)
+          .map((seasonNumber) => ({
+            seasonNumber,
+            episodes:
+              seasonNumber === expected
+                ? [
+                    {
+                      episodeNumber: 3,
+                      name: 'Bookmarked Episode',
+                      sonarrAvailability: {
+                        hd: scenario === 'owned episode',
+                        fourK: false,
+                      },
+                    },
+                  ]
+                : [],
+          })),
       })
     );
     await page.goto(appPath('/tv/84773?episode=3#season-2'));

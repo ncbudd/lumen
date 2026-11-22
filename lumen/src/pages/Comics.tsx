@@ -55,6 +55,7 @@ import {
   type Magazine,
 } from '../extras';
 import { useApi, usePaged } from '../hooks';
+import { useLumenLocale } from '../i18n';
 import { Icon } from '../icons';
 import { usePrefs } from '../settings';
 
@@ -154,6 +155,7 @@ function catalogComicWork(volume: Comic | ComicWork): ComicWork {
 // ---- comics and manga: manga from AniList, Western comics from ComicVine; one card per
 // work with its editions inside; searching is the top search bar's job ----
 export function Comics() {
+  const { t } = useLumenLocale();
   const [p, setP] = useSearchParams();
   const type = (['manga', 'comic'] as const).find((t) => t === p.get('type'));
   // All / In library / Not yet, as on Books: Not yet is the browse feed minus owned works
@@ -248,44 +250,66 @@ export function Comics() {
   const mangaOnly = (changes: Record<string, string | null>) =>
     upd({ ...changes, ...(type ? {} : { type: 'manga' }) });
   const noKey = landing.data?.comicVineConfigured === false;
-  const sorts = kind === 'comic' ? COMIC_SORTS : MANGA_SORTS;
+  const sorts = (kind === 'comic' ? COMIC_SORTS : MANGA_SORTS).map(
+    ([value, label]) => [value, t(`lumen.comics.sort.${value}`, label)] as const
+  );
   const gridTitle = catalogMode
-    ? 'Comics Catalogue'
+    ? t('lumen.comics.catalogue', 'Comics Catalogue')
     : show === 'library'
-      ? 'In your library'
+      ? t('lumen.comics.libraryGrid', 'In your library')
       : show === 'not'
-        ? 'Not in your library yet'
+        ? t('lumen.comics.notYetGrid', 'Not in your library yet')
         : kind === 'comic'
-          ? 'Western comics'
+          ? t('lumen.comics.western', 'Western comics')
           : picked.length || status || sort
-            ? 'Manga'
-            : 'Popular manga';
+            ? t('lumen.comics.manga', 'Manga')
+            : t('lumen.comics.popularManga', 'Popular manga');
 
   return (
     <ExtraGate k="comic">
       <ExtraHeader
-        title="Comics/Manga"
-        sub="Request a manga or comic series. New volumes and issues arrive as they come out; manga comes in its English edition unless you pick another."
+        title={t('lumen.comics.title', 'Comics and Manga')}
+        sub={t(
+          'lumen.comics.guidance',
+          'Request manga or comic series. New volumes and issues arrive as they are released; manga uses its English edition unless you choose another.'
+        )}
       >
         <Link className="search search-ph" to="/search?f=comic">
           <Icon name="search" />
-          <span className="ph-text">Search comics and manga…</span>
+          <span className="ph-text">
+            {t('lumen.comics.search', 'Search comics and manga…')}
+          </span>
         </Link>
       </ExtraHeader>
       {noKey && (
         <div className="empty">
-          <b>Requests need a ComicVine key</b>An admin can add one in SeerrNG
-          under Settings › General. You can still browse manga.
+          <b>
+            {t(
+              'components.Discover.DiscoverComics.noComicVineKey',
+              'Comic discovery requires a ComicVine API key configured in settings.'
+            )}
+          </b>
+          {t(
+            'lumen.comics.keyHelp',
+            'An admin can add one in SeerrNG under Settings › General. You can still browse manga.'
+          )}
         </div>
       )}
       {!catalogMode && (
         <div className="toolbar">
-          <div className="seg" role="group" aria-label="Type">
+          <div
+            className="seg"
+            role="group"
+            aria-label={t('lumen.comics.type', 'Type')}
+          >
             {(
               [
-                ['', 'All'],
-                ['manga', 'Manga'],
-                ['comic', 'Comics'],
+                ['', t('lumen.comics.all', 'All')],
+                ['manga', t('lumen.comics.manga', 'Manga')],
+                [
+                  'comic',
+                  t('components.Discover.DiscoverComics.comics', 'Comics'),
+                ],
               ] as const
             ).map(([v, t]) => (
               <button
@@ -305,12 +329,16 @@ export function Comics() {
               </button>
             ))}
           </div>
-          <div className="seg" role="group" aria-label="Library">
+          <div
+            className="seg"
+            role="group"
+            aria-label={t('lumen.comics.library', 'Library')}
+          >
             {(
               [
-                ['', 'All'],
-                ['library', 'In library'],
-                ['not', 'Not yet'],
+                ['', t('lumen.comics.all', 'All')],
+                ['library', t('lumen.comics.inLibrary', 'In library')],
+                ['not', t('lumen.comics.notYet', 'Not yet')],
               ] as const
             ).map(([v, t]) => (
               <button
@@ -324,7 +352,7 @@ export function Comics() {
           </div>
           {show !== 'library' && (
             <label className="sel">
-              <span className="lbl">Sort</span>
+              <span className="lbl">{t('lumen.comics.sort', 'Sort')}</span>
               <select
                 value={sort || sorts[0][0]}
                 onChange={(e) =>
@@ -351,25 +379,31 @@ export function Comics() {
           )}
           {kind === 'manga' && show !== 'library' && (
             <label className="sel">
-              <span className="lbl">Status</span>
+              <span className="lbl">{t('lumen.comics.status', 'Status')}</span>
               <select
                 value={status}
                 onChange={(e) => mangaOnly({ status: e.target.value || null })}
               >
-                <option value="">Any</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="finished">Finished</option>
+                <option value="">{t('lumen.comics.any', 'Any')}</option>
+                <option value="ongoing">
+                  {t('lumen.comics.ongoing', 'Ongoing')}
+                </option>
+                <option value="finished">
+                  {t('lumen.comics.finished', 'Finished')}
+                </option>
               </select>
             </label>
           )}
           {kind === 'comic' && !!publishers.length && (
             <label className="sel">
-              <span className="lbl">Publisher</span>
+              <span className="lbl">
+                {t('components.Discover.DiscoverComics.publisher', 'Publisher')}
+              </span>
               <select
                 value={publisher}
                 onChange={(e) => upd({ publisher: e.target.value || null })}
               >
-                <option value="">All</option>
+                <option value="">{t('lumen.comics.all', 'All')}</option>
                 {publishers.map((x) => (
                   <option key={x} value={x}>
                     {x}
@@ -393,11 +427,16 @@ export function Comics() {
         </div>
       )}
       <details className="adv more-filters" open={catalogMode || undefined}>
-        <summary>Search the Comics Catalogue</summary>
+        <summary>
+          {t('lumen.comics.searchCatalogue', 'Search the Comics Catalogue')}
+        </summary>
         <div className="filter-grid">
           <form
             className="toolbar range-filter"
-            aria-label="Comics Catalogue Filters"
+            aria-label={t(
+              'lumen.comics.catalogueFilters',
+              'Comics Catalogue Filters'
+            )}
             key={catalogFilters.toString()}
             onSubmit={(event) => {
               event.preventDefault();
@@ -412,7 +451,34 @@ export function Comics() {
           >
             {COMIC_CATALOG_FIELDS.map((field) => (
               <label className="sel" key={field.key}>
-                <span className="lbl">{field.label}</span>
+                <span className="lbl">
+                  {field.key === 'query'
+                    ? t(
+                        'components.Discover.DiscoverComics.search',
+                        field.label
+                      )
+                    : field.key === 'publisher'
+                      ? t(
+                          'components.Discover.DiscoverComics.publisher',
+                          field.label
+                        )
+                      : field.key === 'startYear'
+                        ? t(
+                            'components.Discover.DiscoverComics.startYear',
+                            field.label
+                          )
+                        : field.key === 'minIssues'
+                          ? t(
+                              'components.Discover.DiscoverComics.minIssues',
+                              field.label
+                            )
+                          : field.key === 'maxIssues'
+                            ? t(
+                                'components.Discover.DiscoverComics.maxIssues',
+                                field.label
+                              )
+                            : ''}
+                </span>
                 <input
                   className="cfg-input"
                   type={'min' in field ? 'number' : 'search'}
@@ -425,8 +491,18 @@ export function Comics() {
               </label>
             ))}
             <button type="submit" className="btn btn-tonal btn-sm">
-              <span aria-hidden="true">Search Catalogue</span>
-              <span className="sr-only">Search Comics Catalogue</span>
+              <span aria-hidden="true">
+                {t(
+                  'components.Discover.DiscoverComics.applyFilters',
+                  'Apply filters'
+                )}
+              </span>
+              <span className="sr-only">
+                {t(
+                  'components.Discover.DiscoverComics.searchComics',
+                  'Search Comics'
+                )}
+              </span>
             </button>
             {catalogMode && (
               <button
@@ -434,7 +510,7 @@ export function Comics() {
                 className="chip"
                 onClick={() => setP({}, { replace: true })}
               >
-                Back to Comics and Manga
+                {t('lumen.comics.back', 'Back to Comics and Manga')}
               </button>
             )}
           </form>
@@ -443,28 +519,34 @@ export function Comics() {
       {!filtered && (
         <>
           <ComicRail
-            title="Your comics & manga"
+            title={t('lumen.comics.yourLibrary', 'Your comics and manga')}
             works={landing.data?.library}
             loading={false}
-            link={['See all', '/comics?show=library']}
+            link={[t('lumen.comics.seeAll', 'See all'), '/comics?show=library']}
           />
           <ComicRail
-            title="Trending manga"
+            title={t('lumen.comics.trendingManga', 'Trending manga')}
             works={landing.data?.trending}
             loading={!landing.data && !landing.error}
-            link={['See all', '/comics?type=manga&sort=trending']}
+            link={[
+              t('lumen.comics.seeAll', 'See all'),
+              '/comics?type=manga&sort=trending',
+            ]}
           />
           <ComicRail
-            title="New manga"
+            title={t('lumen.comics.newManga', 'New manga')}
             works={landing.data?.newest}
             loading={!landing.data && !landing.error}
-            link={['See all', '/comics?type=manga&sort=newest']}
+            link={[
+              t('lumen.comics.seeAll', 'See all'),
+              '/comics?type=manga&sort=newest',
+            ]}
           />
           <ComicRail
-            title="Western comics"
+            title={t('lumen.comics.western', 'Western comics')}
             works={landing.data?.western}
             loading={false}
-            link={['See all', '/comics?type=comic']}
+            link={[t('lumen.comics.seeAll', 'See all'), '/comics?type=comic']}
           />
         </>
       )}
@@ -477,20 +559,34 @@ export function Comics() {
         )}
         {indexing && (
           <div className="empty" role="status">
-            <b>Comic catalogue indexing</b>
+            <b>
+              {t(
+                'components.Discover.DiscoverComics.indexing',
+                'Building comic index'
+              )}
+            </b>
             {typeof catalogueStatus.indexedResults === 'number' &&
               (catalogueStatus.expectedResults
-                ? `${catalogueStatus.indexedResults} of ${catalogueStatus.expectedResults} volumes indexed.`
-                : `${catalogueStatus.indexedResults} volumes indexed.`)}
+                ? t(
+                    'lumen.comics.indexedOf',
+                    '{indexed} of {expected} volumes indexed.',
+                    {
+                      indexed: catalogueStatus.indexedResults,
+                      expected: catalogueStatus.expectedResults,
+                    }
+                  )
+                : t('lumen.comics.indexed', '{indexed} volumes indexed.', {
+                    indexed: catalogueStatus.indexedResults,
+                  }))}
             {catalogueStatus.indexError &&
-              ' Indexing encountered a problem. SeerrNG will retry.'}
+              ` ${t('components.Discover.DiscoverComics.indexingRetry', 'The index is retrying after a provider response. Already indexed volumes are saved.')}`}
             <button
               className="btn btn-tonal btn-sm"
               type="button"
               onClick={recheckEmptyFirstPage}
               disabled={catalog.loading || catalog.page === 0}
             >
-              Check Again
+              {t('lumen.comics.checkAgain', 'Check again')}
             </button>
           </div>
         )}
@@ -502,31 +598,71 @@ export function Comics() {
           (catalogMode || show !== 'not' || list.done) && (
             <div className="empty">
               {catalogueStatus?.comicVineConfigured === false ? (
-                <b>The comic catalogue needs a ComicVine key</b>
+                <b>
+                  {t(
+                    'components.Discover.DiscoverComics.noComicVineKey',
+                    'Comic discovery requires a ComicVine API key configured in settings.'
+                  )}
+                </b>
               ) : catalogMode ? (
                 <>
-                  <b>No comics found</b>Try different filters or check whether
-                  the catalogue has finished indexing.
+                  <>
+                    <b>{t('lumen.comics.noComics', 'No comics found')}</b>
+                    {t(
+                      'lumen.comics.tryFilters',
+                      'Try different filters or check whether the catalogue has finished indexing.'
+                    )}
+                  </>
                 </>
               ) : show === 'library' ? (
                 <>
-                  <b>Nothing in the library yet</b>
-                  Request a series and it shows up here.
+                  <>
+                    <b>
+                      {t(
+                        'lumen.comics.libraryEmpty',
+                        'Nothing in the library yet'
+                      )}
+                    </b>
+                    {t(
+                      'lumen.comics.requestSeries',
+                      'Request a series and it will show up here.'
+                    )}
+                  </>
                 </>
               ) : show === 'not' ? (
                 <>
-                  <b>You have all of these</b>Try another genre, or switch to
-                  All.
+                  <>
+                    <b>{t('lumen.comics.allOwned', 'You have all of these')}</b>
+                    {t(
+                      'lumen.comics.tryGenre',
+                      'Try another genre, or switch to All.'
+                    )}
+                  </>
                 </>
               ) : kind === 'comic' ? (
                 <>
-                  <b>Western comics are still being catalogued</b>
-                  SeerrNG is reading ComicVine’s catalogue in the background.
-                  Use the search bar to find a series meanwhile.
+                  <>
+                    <b>
+                      {t(
+                        'lumen.comics.cataloguing',
+                        'Western comics are still being catalogued'
+                      )}
+                    </b>
+                    {t(
+                      'lumen.comics.cataloguingHint',
+                      'SeerrNG is reading ComicVine’s catalogue in the background. Use search to find a series meanwhile.'
+                    )}
+                  </>
                 </>
               ) : (
                 <>
-                  <b>Nothing here</b>Try another genre, or switch to All.
+                  <>
+                    <b>{t('lumen.comics.nothingHere', 'Nothing here')}</b>
+                    {t(
+                      'lumen.comics.tryGenre',
+                      'Try another genre, or switch to All.'
+                    )}
+                  </>
                 </>
               )}
             </div>
@@ -553,28 +689,37 @@ export function Comics() {
 
 // the chosen edition's volumes or issues, as ComicVine lists them
 function ComicIssues({ id, manga }: { id: string; manga: boolean }) {
+  const { t } = useLumenLocale();
   const issues = usePaged<ComicIssue>(`/comic/${id}/issues`);
+  const heading = manga
+    ? t('lumen.comicDetail.volumes', 'Volumes')
+    : t('lumen.comicDetail.issues', 'Issues');
   if (!issues.items.length)
     return issues.error ? (
       <div>
-        <div className="h2">{manga ? 'Volumes' : 'Issues'}</div>
+        <div className="h2">{heading}</div>
         <ServiceNote
           error={issues.error}
-          what={manga ? 'the volumes' : 'the issues'}
+          what={
+            manga
+              ? t('lumen.comicDetail.theVolumes', 'the volumes')
+              : t('lumen.comicDetail.theIssues', 'the issues')
+          }
           retry={issues.retry}
         />
       </div>
     ) : null;
   return (
     <div>
-      <div className="h2">{manga ? 'Volumes' : 'Issues'}</div>
+      <div className="h2">{heading}</div>
       <ol className="slist tlist">
         {issues.items.map((i) => (
           <li key={i.id} className="trow">
             <span className="tn">#{i.issueNumber || '?'}</span>
             <span>
               <b>
-                {i.name || `${manga ? 'Volume' : 'Issue'} #${i.issueNumber}`}
+                {i.name ||
+                  `${manga ? t('lumen.comicDetail.volume', 'Volume') : t('lumen.comicDetail.issue', 'Issue')} #${i.issueNumber}`}
               </b>
               {i.coverDate && (
                 <small>
@@ -600,6 +745,7 @@ function ComicIssues({ id, manga }: { id: string; manga: boolean }) {
 // ---- one work: its editions to choose from (English recommended), then the chosen
 // edition's description and volumes ----
 export function ComicDetail() {
+  const { t } = useLumenLocale();
   const { id = '' } = useParams();
   const toast = useToast();
   const { kavitaUrl } = usePrefs();
@@ -665,12 +811,18 @@ export function ComicDetail() {
   if (workError)
     return (
       <ExtraGate k="comic">
-        <ServiceNote error={workError} what="this comic" retry={reload} />
+        <ServiceNote
+          error={workError}
+          what={t('lumen.comicDetail.thisComic', 'this comic')}
+          retry={reload}
+        />
       </ExtraGate>
     );
   if (!work) return <div className="detail-loading" aria-busy="true" />;
   const manga = work.kind === 'manga';
-  const unit = manga ? 'vol' : 'issue';
+  const unit = manga
+    ? t('lumen.comicDetail.volUnit', 'vol')
+    : t('lumen.comicDetail.issueUnit', 'issue');
   const cs = comicState(shown);
   const s = chosen ? stateOf(chosen.id) : cs.stat;
   const about = work.description
@@ -688,7 +840,9 @@ export function ComicDetail() {
       setAsked((x) => new Set(x).add(chosen.id));
       refresh();
     } catch (e) {
-      toast(friendlyError(e, 'Request failed'));
+      toast(
+        friendlyError(e, t('lumen.comicDetail.requestFailed', 'Request failed'))
+      );
     } finally {
       sending.current = false;
       setBusy(false);
@@ -706,21 +860,21 @@ export function ComicDetail() {
       rel="noopener"
     >
       <Icon name="book" />
-      Read in Kavita
+      {t('lumen.comicDetail.readInKavita', 'Read in Kavita')}
     </a>
   ) : null;
   const alsoRead = complete ? null : read;
   const main =
     c?.mediaInfo?.status === MediaStatus.BLOCKLISTED ? (
       <button className="btn btn-tonal" disabled>
-        Blocklisted
+        {t('lumen.status.blocklisted', 'Blocklisted')}
       </button>
     ) : !chosen ? (
       <button className="btn btn-tonal" disabled>
         <Icon name="clock" />
         {work.editionsResolved
-          ? 'No edition to request yet'
-          : 'Looking up editions…'}
+          ? t('lumen.comicDetail.noEdition', 'No edition to request yet')
+          : t('lumen.comicDetail.lookingUpEditions', 'Looking up editions…')}
       </button>
     ) : complete && read ? (
       read
@@ -733,10 +887,12 @@ export function ComicDetail() {
       <button className="btn btn-primary" disabled={busy} onClick={request}>
         <Icon name="plus" />
         {editions.length > 1
-          ? `Request · ${editionLabel(chosen)}`
+          ? t('lumen.comicDetail.requestEdition', 'Request · {edition}', {
+              edition: editionLabel(chosen),
+            })
           : manga
-            ? 'Request manga'
-            : 'Request series'}
+            ? t('lumen.comicDetail.requestManga', 'Request manga')
+            : t('lumen.comicDetail.requestSeries', 'Request series')}
       </button>
     );
   return (
@@ -749,9 +905,13 @@ export function ComicDetail() {
           title={work.title}
           line={[
             work.startYear,
-            manga ? 'Manga' : 'Comic',
+            manga
+              ? t('lumen.comicDetail.manga', 'Manga')
+              : t('lumen.comicDetail.comic', 'Comic'),
             chosen?.publisher || work.publisher,
-            chosen?.issueCount ? `${chosen.issueCount} ${unit}s` : '',
+            chosen?.issueCount
+              ? `${chosen.issueCount} ${manga ? t('lumen.comicDetail.volumeUnitPlural', 'vols') : t('lumen.comicDetail.issueUnitPlural', 'issues')}`
+              : '',
           ]}
         />
         <div className="dbody">
@@ -812,7 +972,10 @@ export function ComicDetail() {
             <div
               className="progress"
               role="progressbar"
-              aria-label="Download progress"
+              aria-label={t(
+                'lumen.comicDetail.downloadProgress',
+                'Download progress'
+              )}
               aria-valuenow={cs.pct}
               aria-valuemin={0}
               aria-valuemax={100}
@@ -833,24 +996,43 @@ export function ComicDetail() {
               <div id="editions">
                 <div className="sec-head">
                   <h2>
-                    {editions.length > 1 ? 'Choose an edition' : 'Edition'}
+                    {editions.length > 1
+                      ? t(
+                          'lumen.comicDetail.chooseEdition',
+                          'Choose an edition'
+                        )
+                      : t('lumen.comicDetail.edition', 'Edition')}
                   </h2>
                   <span className="note">
-                    {editions.length > 1 ? `${editions.length} editions` : ''}
+                    {editions.length > 1
+                      ? t(
+                          'lumen.comicDetail.editionCount',
+                          '{count} editions',
+                          {
+                            count: editions.length,
+                          }
+                        )
+                      : ''}
                   </span>
                 </div>
                 {!editions.length && (
                   <p className="note">
                     {work.editionsResolved
-                      ? 'ComicVine has no edition of this series yet, so it can’t be requested.'
-                      : 'Couldn’t look up the editions right now. Try again in a minute.'}
+                      ? t(
+                          'lumen.comicDetail.noComicVineEdition',
+                          'ComicVine has no edition of this series yet, so it can’t be requested.'
+                        )
+                      : t(
+                          'lumen.comicDetail.editionLookupFailed',
+                          'Couldn’t look up the editions right now. Try again in a minute.'
+                        )}
                   </p>
                 )}
                 {!!editions.length && (
                   <div
                     className="nlist"
                     role="radiogroup"
-                    aria-label="Editions"
+                    aria-label={t('lumen.comicDetail.editions', 'Editions')}
                   >
                     {editions.map((e) => {
                       const st = stateOf(e.id);
@@ -897,7 +1079,23 @@ export function ComicDetail() {
                                 e.title !== work.title ? e.title : '',
                                 e.startYear,
                                 e.issueCount
-                                  ? `${e.issueCount} ${unit}${e.issueCount === 1 ? '' : 's'}`
+                                  ? t(
+                                      manga
+                                        ? e.issueCount === 1
+                                          ? 'lumen.comicDetail.oneVolume'
+                                          : 'lumen.comicDetail.volumeCount'
+                                        : e.issueCount === 1
+                                          ? 'lumen.comicDetail.oneIssue'
+                                          : 'lumen.comicDetail.issueCount',
+                                      manga
+                                        ? e.issueCount === 1
+                                          ? '1 volume'
+                                          : '{count} volumes'
+                                        : e.issueCount === 1
+                                          ? '1 issue'
+                                          : '{count} issues',
+                                      { count: e.issueCount }
+                                    )
                                   : '',
                               ]
                                 .filter(Boolean)
@@ -907,7 +1105,10 @@ export function ComicDetail() {
                               {e.recommended && (
                                 <span className="tag rec">
                                   <Icon name="star" />
-                                  Recommended
+                                  {t(
+                                    'lumen.comicDetail.recommended',
+                                    'Recommended'
+                                  )}
                                 </span>
                               )}
                               {st?.k === 'ok' && (
@@ -940,36 +1141,52 @@ export function ComicDetail() {
               <Facts
                 rows={[
                   [
-                    'Type',
+                    t('lumen.comicDetail.type', 'Type'),
                     manga
                       ? chosen?.languageName
-                        ? `Manga, ${chosen.languageName} edition`
-                        : 'Manga'
+                        ? t(
+                            'lumen.comicDetail.mangaLanguageEdition',
+                            'Manga, {language} edition',
+                            { language: chosen.languageName }
+                          )
+                        : t('lumen.comicDetail.manga', 'Manga')
                       : chosen?.languageName &&
                           chosen.languageName !== 'English'
-                        ? `Comic, ${chosen.languageName} edition`
-                        : 'Comic',
+                        ? t(
+                            'lumen.comicDetail.comicLanguageEdition',
+                            'Comic, {language} edition',
+                            { language: chosen.languageName }
+                          )
+                        : t('lumen.comicDetail.comic', 'Comic'),
                   ],
-                  ['Publisher', chosen?.publisher || work.publisher],
-                  ['Started', chosen?.startYear || work.startYear],
                   [
-                    manga ? 'Volumes' : 'Issues',
+                    t('lumen.comicDetail.publisher', 'Publisher'),
+                    chosen?.publisher || work.publisher,
+                  ],
+                  [
+                    t('lumen.comicDetail.started', 'Started'),
+                    chosen?.startYear || work.startYear,
+                  ],
+                  [
+                    manga
+                      ? t('lumen.comicDetail.volumes', 'Volumes')
+                      : t('lumen.comicDetail.issues', 'Issues'),
                     chosen?.issueCount ? String(chosen.issueCount) : '',
                   ],
                   [
-                    'Status',
+                    t('lumen.comicDetail.status', 'Status'),
                     work.status === 'ongoing'
-                      ? 'Ongoing'
+                      ? t('lumen.comicDetail.ongoing', 'Ongoing')
                       : work.status === 'finished'
-                        ? 'Finished'
+                        ? t('lumen.comicDetail.finished', 'Finished')
                         : work.status === 'hiatus'
-                          ? 'On hiatus'
+                          ? t('lumen.comicDetail.onHiatus', 'On hiatus')
                           : work.status === 'cancelled'
-                            ? 'Cancelled'
+                            ? t('lumen.comicDetail.cancelled', 'Cancelled')
                             : '',
                   ],
                   [
-                    'In library',
+                    t('lumen.comicDetail.inLibrary', 'In library'),
                     chosen?.mediaInfo?.comicProgress?.total
                       ? `${Math.min(chosen.mediaInfo.comicProgress.owned, chosen.mediaInfo.comicProgress.total)} of ${chosen.mediaInfo.comicProgress.total}`
                       : '',
@@ -1023,6 +1240,7 @@ function MagazineRequestSheet({
   onClose: () => void;
   onRequested: () => void;
 }) {
+  const { t } = useLumenLocale();
   const { user } = useAuth();
   const toast = useToast();
   const [sending, setSending] = useState(false);
@@ -1052,13 +1270,19 @@ function MagazineRequestSheet({
     media?.requests?.some(({ status }) => status === 1 || status === 2);
   const unavailable = existing.data?.requestable === false;
   const requestStatus = available
-    ? 'Already in the library'
+    ? t('lumen.magazineRequest.alreadyAvailable', 'Already in the Library')
     : blocked
-      ? 'This magazine is blocklisted'
+      ? t('lumen.magazineRequest.blocklisted', 'This Magazine Is Blocklisted')
       : covered
-        ? 'This magazine has already been requested'
+        ? t(
+            'lumen.magazineRequest.alreadyRequested',
+            'This Magazine Has Already Been Requested'
+          )
         : unavailable
-          ? 'This magazine is unavailable for requests'
+          ? t(
+              'lumen.magazineRequest.unavailable',
+              'This Magazine Is Unavailable for Requests'
+            )
           : undefined;
   const magazineQuota = quota.data?.magazine;
   // Admin, Manage Requests, Auto Approve, or Auto Approve Magazines.
@@ -1069,26 +1293,36 @@ function MagazineRequestSheet({
   const advanced = canChooseRequestOptions(permissions);
   const [serviceId, setServiceId] = useState<number>();
   const services = useApi<{ id: number; name: string; isDefault?: boolean }[]>(
-    advanced ? '/service/magazine' : null,
+    '/service/magazine',
     { currentPathOnly: true }
   );
   const selectedService =
     advanced && services.data?.some(({ id }) => id === serviceId)
       ? serviceId
       : undefined;
+  const selectedServiceDetails = services.data?.find(
+    ({ id }) => id === selectedService
+  );
+  const defaultService = services.data?.find(({ isDefault }) => isDefault);
+  const serviceUnavailable = !!services.data && services.data.length === 0;
+  const canSelectService = advanced && (services.data?.length ?? 0) > 1;
+  const displayedStatus = requestStatus
+    ? requestStatus
+    : t('lumen.magazineRequest.ready', 'Ready to Request');
   return (
     <ConfirmSheet
-      title="Request Magazine"
+      title={t('lumen.magazineRequest.title', 'Request Magazine')}
       body={requestTitle}
-      confirm="Send Request"
-      cancel="Cancel"
+      confirm={t('lumen.magazineRequest.send', 'Send Request')}
+      cancel={t('lumen.magazineRequest.cancel', 'Cancel')}
       busy={sending}
       confirmDisabled={
         (!quota.data && !quota.error) ||
         (!existing.data && !existing.error) ||
+        (!services.data && !services.error) ||
         !!requestStatus ||
         magazineQuota?.restricted ||
-        (advanced && services.data?.length === 0)
+        serviceUnavailable
       }
       onClose={() => {
         if (!activeRequest.current) onClose();
@@ -1104,46 +1338,88 @@ function MagazineRequestSheet({
             selectedService
           );
           if ((result as { status?: number } | null)?.status === 4)
-            throw new Error('The magazine request failed.');
+            throw new Error(
+              t(
+                'lumen.magazineRequest.backendFailure',
+                'The Magazine Request Failed.'
+              )
+            );
           onRequested();
-          toast('Magazine requested');
+          toast(t('lumen.magazineRequest.requested', 'Magazine Requested'));
         } catch (error) {
-          toast(friendlyError(error, 'Request failed'));
+          toast(
+            friendlyError(
+              error,
+              t('lumen.magazineRequest.requestFailure', 'Request Failed')
+            )
+          );
         } finally {
           activeRequest.current = false;
           setSending(false);
         }
       }}
     >
-      {requestStatus ? (
-        <p className="sub" role="status">
-          {requestStatus}
-        </p>
-      ) : (
-        <p className="sub">
-          {autoApprove ? 'Automatically approved' : 'Approval required'}
-        </p>
-      )}
+      <Facts
+        rows={[
+          [
+            t('lumen.magazineRequest.latestIssue', 'Latest Issue'),
+            existing.data?.latestIssue ??
+              t('lumen.magazineRequest.notAvailable', 'Not Available'),
+          ],
+          [t('lumen.magazineRequest.status', 'Status'), displayedStatus],
+          [
+            t('lumen.magazineRequest.service', 'Service'),
+            selectedServiceDetails?.name ??
+              defaultService?.name ??
+              t('lumen.magazineRequest.notAvailable', 'Not Available'),
+          ],
+          [
+            t('lumen.magazineRequest.approval', 'Approval'),
+            autoApprove
+              ? t(
+                  'lumen.magazineRequest.autoApproved',
+                  'Automatically Approved'
+                )
+              : t(
+                  'lumen.magazineRequest.approvalRequired',
+                  'Approval Required'
+                ),
+          ],
+        ]}
+      />
       {!!magazineQuota?.limit && (
         <p
           className="sub"
           role={magazineQuota.restricted ? 'status' : undefined}
         >
           {magazineQuota.restricted
-            ? 'Magazine request quota reached.'
-            : `${magazineQuota.remaining ?? 0} of ${magazineQuota.limit} magazine requests remaining.`}
-          {!!magazineQuota.days && ` Quota period: ${magazineQuota.days} days.`}
+            ? t(
+                'lumen.magazineRequest.quotaReached',
+                'Magazine Request Quota Reached.'
+              )
+            : t(
+                'lumen.magazineRequest.quotaRemaining',
+                '{remaining} of {limit} magazine requests remaining.',
+                {
+                  remaining: magazineQuota.remaining ?? 0,
+                  limit: magazineQuota.limit,
+                }
+              )}
+          {!!magazineQuota.days &&
+            ` ${t('lumen.magazineRequest.quotaPeriod', 'Quota Period: {days} Days.', { days: magazineQuota.days })}`}
         </p>
       )}
       {magazineQuota?.restricted && (
         <button className="chip" type="button" onClick={quota.reload}>
-          Recheck Quota
+          {t('lumen.magazineRequest.recheckQuota', 'Recheck Quota')}
         </button>
       )}
-      {advanced && !!services.data?.length && (
+      {canSelectService && services.data && (
         <div className="toolbar">
           <label className="sel">
-            <span className="lbl">Magazine Service</span>
+            <span className="lbl">
+              {t('lumen.magazineRequest.service', 'Service')}
+            </span>
             <select
               value={selectedService ?? ''}
               disabled={sending}
@@ -1153,7 +1429,17 @@ function MagazineRequestSheet({
                 )
               }
             >
-              <option value="">Default Service</option>
+              <option value="">
+                {defaultService
+                  ? t(
+                      'lumen.magazineRequest.defaultService',
+                      'Default ({name})',
+                      {
+                        name: defaultService.name,
+                      }
+                    )
+                  : t('lumen.magazineRequest.notAvailable', 'Not Available')}
+              </option>
               {services.data.map(({ id, name, isDefault }) => (
                 <option key={id} value={id}>
                   {name}
@@ -1164,14 +1450,20 @@ function MagazineRequestSheet({
           </label>
         </div>
       )}
-      {advanced && services.data?.length === 0 && (
-        <p role="status">No magazine service is configured.</p>
+      {serviceUnavailable && (
+        <p role="status">
+          {t(
+            'lumen.magazineRequest.noService',
+            'No magazine service is configured. Magazine requests are unavailable.'
+          )}
+        </p>
       )}
     </ConfirmSheet>
   );
 }
 
 export function Magazines() {
+  const { t } = useLumenLocale();
   const [params, setParams] = useSearchParams();
   const query = params.get('q') ?? params.get('query') ?? '';
   const [q, setQ] = useState(query);
@@ -1212,27 +1504,43 @@ export function Magazines() {
   return (
     <ExtraGate k="magazine">
       <ExtraHeader
-        title="Magazines"
+        title={t('lumen.magazines.title', 'Magazines')}
         sub={
           query
-            ? 'Search results. Request a title to start getting new issues.'
+            ? t(
+                'lumen.magazines.searchResultsGuidance',
+                'Search results. Request a title to start getting new issues.'
+              )
             : catalog === 'public'
-              ? 'Search Google Books for magazine titles.'
-              : 'Titles the library follows.'
+              ? t(
+                  'lumen.magazines.publicGuidance',
+                  'Search Google Books for magazine titles.'
+                )
+              : t(
+                  'lumen.magazines.trackedGuidance',
+                  'Titles the library follows.'
+                )
         }
       >
         <ExtraSearch
           value={q}
           onChange={setQ}
-          placeholder="Search magazines…"
+          placeholder={t('lumen.magazines.search', 'Search magazines…')}
         />
       </ExtraHeader>
       <div className="toolbar">
-        <div className="seg" role="group" aria-label="Magazine Catalogue">
+        <div
+          className="seg"
+          role="group"
+          aria-label={t('lumen.magazines.catalogue', 'Magazine Catalogue')}
+        >
           {(
             [
-              ['tracked', 'Tracked Titles'],
-              ['public', 'Public Catalogue'],
+              ['tracked', t('lumen.magazines.trackedTitles', 'Tracked Titles')],
+              [
+                'public',
+                t('lumen.magazines.publicCatalogue', 'Public Catalogue'),
+              ],
             ] as const
           ).map(([value, label]) => (
             <button
@@ -1254,7 +1562,10 @@ export function Magazines() {
         <div
           className="toolbar"
           role="group"
-          aria-label="Suggested Magazine Searches"
+          aria-label={t(
+            'lumen.magazines.suggestedSearches',
+            'Suggested Magazine Searches'
+          )}
         >
           {MAGAZINE_SEARCH_SUGGESTIONS.map((suggestion) => (
             <button
@@ -1282,7 +1593,13 @@ export function Magazines() {
             disabled={title === requested}
             onClick={() => setRequestTitle(title)}
           >
-            {title === requested ? `Requested ${title}` : `Request “${title}”`}
+            {title === requested
+              ? t('lumen.magazines.requestedTitle', 'Requested {title}', {
+                  title,
+                })
+              : t('lumen.magazines.requestTitle', 'Request “{title}”', {
+                  title,
+                })}
           </button>
         </div>
       )}
@@ -1298,7 +1615,7 @@ export function Magazines() {
       )}
       <ServiceNote
         error={list.items.length ? null : list.error}
-        what="magazines"
+        what={t('lumen.magazines.magazines', 'magazines')}
         retry={list.retry}
       />
       {!needsPublicQuery &&
@@ -1306,10 +1623,20 @@ export function Magazines() {
         !list.items.length &&
         !list.loading && (
           <div className="empty">
-            <b>{query ? 'No magazines found' : 'No magazines yet'}</b>
+            <b>
+              {query
+                ? t('lumen.magazines.noResults', 'No magazines found')
+                : t('lumen.magazines.noTracked', 'No magazines yet')}
+            </b>
             {query
-              ? 'Try the magazine’s full title.'
-              : 'Search for a title to request it.'}
+              ? t(
+                  'lumen.magazines.tryFullTitle',
+                  'Try the magazine’s full title.'
+                )
+              : t(
+                  'lumen.magazines.searchToRequest',
+                  'Search for a title to request it.'
+                )}
           </div>
         )}
       <div className="grid">
@@ -1329,6 +1656,7 @@ export function Magazines() {
 }
 
 export function MagazineDetail() {
+  const { t } = useLumenLocale();
   const { title = '' } = useParams();
   const { user } = useAuth();
   const [requestTitle, setRequestTitle] = useState('');
@@ -1343,7 +1671,11 @@ export function MagazineDetail() {
   if (error)
     return (
       <ExtraGate k="magazine">
-        <ServiceNote error={error} what="this magazine" retry={reload} />
+        <ServiceNote
+          error={error}
+          what={t('lumen.magazines.thisMagazine', 'this magazine')}
+          retry={reload}
+        />
       </ExtraGate>
     );
   if (!m) return <div className="detail-loading" aria-busy="true" />;
@@ -1361,7 +1693,7 @@ export function MagazineDetail() {
         onClick={() => setRequestTitle(m.title)}
       >
         <Icon name="plus" />
-        Request magazine
+        {t('lumen.magazines.requestMagazine', 'Request magazine')}
       </button>
     ) : null;
   return (
@@ -1385,7 +1717,11 @@ export function MagazineDetail() {
           line={[
             m.publisher,
             m.firstPublishYear,
-            m.issueCount ? `${m.issueCount} issues` : '',
+            m.issueCount
+              ? t('lumen.magazines.issueCount', '{count} issues', {
+                  count: m.issueCount,
+                })
+              : '',
           ]}
         />
         <div className="dbody">
@@ -1393,7 +1729,13 @@ export function MagazineDetail() {
             <StatPill s={s} />
             {have > 0 && (
               <Pill k="ok" icon="check">
-                {have} issue{have === 1 ? '' : 's'} in library
+                {t(
+                  'lumen.magazines.issuesInLibrary',
+                  '{count} issues in library',
+                  {
+                    count: have,
+                  }
+                )}
               </Pill>
             )}
             <IndexerSearchLink category="magazine" title={m.title} />
@@ -1422,7 +1764,9 @@ export function MagazineDetail() {
             <div>
               {!!m.issues?.length && (
                 <>
-                  <div className="h2">Issues</div>
+                  <div className="h2">
+                    {t('lumen.comicDetail.issues', 'Issues')}
+                  </div>
                   <ol className="slist tlist">
                     {m.issues.map((i) => (
                       <li key={i.id} className="trow">
@@ -1432,10 +1776,12 @@ export function MagazineDetail() {
                         </span>
                         {i.available ? (
                           <Pill k="ok" icon="check">
-                            In library
+                            {t('lumen.comicDetail.inLibrary', 'In library')}
                           </Pill>
                         ) : (
-                          <span className="tl">Not yet</span>
+                          <span className="tl">
+                            {t('lumen.magazines.notYet', 'Not yet')}
+                          </span>
                         )}
                       </li>
                     ))}
@@ -1446,11 +1792,14 @@ export function MagazineDetail() {
             <aside>
               <Facts
                 rows={[
-                  ['Publisher', m.publisher],
-                  ['Latest issue', m.latestIssue],
-                  ['Status', m.status],
+                  [t('lumen.comicDetail.publisher', 'Publisher'), m.publisher],
                   [
-                    'Source',
+                    t('lumen.magazines.latestIssue', 'Latest issue'),
+                    m.latestIssue,
+                  ],
+                  [t('lumen.comicDetail.status', 'Status'), m.status],
+                  [
+                    t('lumen.magazines.source', 'Source'),
                     m.provider === 'googlebooks'
                       ? 'Google Books'
                       : 'LazyLibrarian',

@@ -30,10 +30,12 @@ import { ServiceNote } from '../components/extra';
 import { useToast } from '../components/toast';
 import { friendlyError } from '../errors';
 import { useApi, usePublicSettings } from '../hooks';
+import { useLumenLocale } from '../i18n';
 import { sessionGeneration } from '../sessionState';
 import { CollectionAssociations } from './Associations';
 
 function CollectionContent({ id }: { id: number }) {
+  const { t } = useLumenLocale();
   const { user } = useAuth();
   const toast = useToast();
   const { data, error, reload, refresh } = useApi<MovieCollection>(
@@ -230,7 +232,7 @@ function CollectionContent({ id }: { id: number }) {
                 className="btn btn-tonal btn-sm"
                 onClick={() => setPlayOpen(true)}
               >
-                Play Collection
+                {t('lumen.collectionPlayback.title', 'Play Collection')}
               </button>
             )}
             {qualities.length > 0 && (
@@ -238,14 +240,14 @@ function CollectionContent({ id }: { id: number }) {
                 className="btn btn-tonal btn-sm"
                 onClick={() => setRequestOpen(true)}
               >
-                Request Collection
+                {t('lumen.collectionRequest.title', 'Request Collection')}
               </button>
             )}
             <button
               className="btn btn-quiet btn-sm"
               onClick={() => setQueueOpen(true)}
             >
-              Queue Collection
+              {t('lumen.collectionQueue.title', 'Queue Collection')}
             </button>
             {blocked > 0 && (
               <span className="dnote">

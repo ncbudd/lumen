@@ -51,15 +51,26 @@ import { useApi } from '../hooks';
 import { useLumenLocale } from '../i18n';
 import { Icon } from '../icons';
 
-const statOf = (g: Game): Stat => {
+type Translate = ReturnType<typeof useLumenLocale>['t'];
+
+const categoryMessages = {
+  game: 'lumen.gameLibrary.pcGames',
+  retro: 'lumen.gameLibrary.retroConsoles',
+  modern: 'lumen.gameLibrary.modernConsoles',
+} as const;
+
+const categoryLabel = (category: GameCategory, t: Translate) =>
+  t(categoryMessages[category], GAME_LABEL[category]);
+
+const statOf = (g: Game, t: Translate): Stat => {
   const w = gameState(g);
   return !w
     ? null
     : w === 'In library'
-      ? { k: 'ok', word: w, ico: 'check' }
+      ? { k: 'ok', word: t('lumen.status.inLibrary', w), ico: 'check' }
       : w === 'Downloading'
-        ? { k: 'dl', word: w, ico: 'down' }
-        : { k: 'wait', word: w, ico: 'clock' };
+        ? { k: 'dl', word: t('lumen.status.downloading', w), ico: 'down' }
+        : { k: 'wait', word: t('lumen.status.requested', w), ico: 'clock' };
 };
 
 // the software catalogue pages by offset when browsing and by cursor when searching
@@ -183,6 +194,7 @@ export function SoftwareBookmark() {
 
 export function Games() {
   const { user } = useAuth();
+  const { t } = useLumenLocale();
   const x = useExtras();
   const [p, setP] = useSearchParams();
   const { key: locationKey } = useLocation();
@@ -220,39 +232,52 @@ export function Games() {
   return (
     <ExtraGate k="game">
       <ExtraHeader
-        title="Games"
+        title={t('lumen.games.catalogTitle', 'Games')}
         sub={
           cat === 'game'
-            ? 'PC games. Pick your system when you request.'
-            : 'Pick the console when you request; it arrives ready for your emulator.'
+            ? t(
+                'lumen.games.pcRequestHint',
+                'PC games. Pick your system when you request.'
+              )
+            : t(
+                'lumen.games.consoleRequestHint',
+                'Pick the console when you request; it arrives ready for your emulator.'
+              )
         }
       >
         <div className="toolbar">
           {canUseRequestAccess(user?.permissions) && (
             <>
               <Link className="chip" to="/patches">
-                Translations and Hacks
+                {t(
+                  'lumen.games.translationsAndHacks',
+                  'Translations and Hacks'
+                )}
               </Link>
               {x.games.includes('game') && (
                 <Link className="chip" to="/games/discovery">
-                  Game Finder
+                  {t('lumen.gameFinder.title', 'Game Finder')}
                 </Link>
               )}
             </>
           )}
           <Link className="chip" to="/game-library">
-            My Games
+            {t('lumen.gameLibrary.myGames', 'My Games')}
           </Link>
         </div>
         {x.games.length > 1 && (
-          <div className="seg wide" role="group" aria-label="Platform">
+          <div
+            className="seg wide"
+            role="group"
+            aria-label={t('lumen.games.platformGroup', 'Platform')}
+          >
             {x.games.map((c) => (
               <button
                 key={c}
                 aria-pressed={cat === c}
                 onClick={() => setCat(c)}
               >
-                {GAME_LABEL[c]}
+                {categoryLabel(c, t)}
               </button>
             ))}
           </div>
@@ -264,9 +289,9 @@ export function Games() {
           }
           placeholder={
             {
-              game: 'Search PC games…',
-              retro: 'Search retro games…',
-              modern: 'Search console games…',
+              game: t('lumen.games.searchPc', 'Search PC games…'),
+              retro: t('lumen.games.searchRetro', 'Search retro games…'),
+              modern: t('lumen.games.searchConsole', 'Search console games…'),
             }[cat || 'game']
           }
         />
@@ -276,8 +301,11 @@ export function Games() {
         <GridSkeleton />
       ) : !cat ? (
         <ServiceNote
-          error="None of the game catalogues answered."
-          what="games"
+          error={t(
+            'lumen.games.catalogueUnavailable',
+            'None of the game catalogues answered.'
+          )}
+          what={t('lumen.games.catalogueWhat', 'games')}
           retry={x.recheckGames}
         />
       ) : (
@@ -289,7 +317,8 @@ export function Games() {
           />
           {!list.error && !list.items.length && !list.loading && (
             <div className="empty">
-              <b>No games found</b>Try the game’s full title.
+              <b>{t('lumen.games.noGamesFound', 'No games found')}</b>
+              {t('lumen.games.tryFullTitle', 'Try the game’s full title.')}
             </div>
           )}
         </>
@@ -302,7 +331,7 @@ export function Games() {
             img={g.coverUrl}
             title={g.title}
             icon="game"
-            stat={statOf(g)}
+            stat={statOf(g, t)}
             meta={[(g.releaseDate || '').slice(0, 4), g.genres?.[0]]
               .filter(Boolean)
               .join(' · ')}
@@ -404,7 +433,11 @@ function GameDetailView({
   if (error)
     return (
       <ExtraGate k="game">
-        <ServiceNote what="this game" error={error} retry={reload} />
+        <ServiceNote
+          what={t('lumen.games.gameWhat', 'this game')}
+          error={error}
+          retry={reload}
+        />
       </ExtraGate>
     );
   if (!g) return <div className="detail-loading" aria-busy="true" />;
@@ -452,7 +485,7 @@ function GameDetailView({
       setAddingToLibrary(false);
     }
   };
-  const s = statOf(g);
+  const s = statOf(g, t);
   const systems = (g.emulationSystems || []).filter((x) => x.group === cat);
   const sys = system
     ? (systems.find(({ slug }) => slug === system)?.slug ?? '')
@@ -490,16 +523,25 @@ function GameDetailView({
         selection: selection ?? undefined,
       });
       setDone(
-        r.request.status === 'pending' ? 'Waiting for approval' : 'Requested'
+        r.request.status === 'pending'
+          ? t('lumen.games.waitingApproval', 'Waiting for approval')
+          : t('lumen.status.requested', 'Requested')
       );
       setRequestId(r.request.id);
-      toast(`Requested ${g.title}`);
+      toast(
+        t('lumen.games.requestedTitle', 'Requested {title}', {
+          title: g.title,
+        })
+      );
     } catch (e) {
       const m = e instanceof Error ? e.message : '';
       toast(
         m === 'SOFTWARE_QUOTA_EXCEEDED'
-          ? 'You’ve reached your game request limit.'
-          : m || 'Request failed'
+          ? t(
+              'lumen.games.quotaReached',
+              'You’ve reached your game request limit.'
+            )
+          : m || t('lumen.common.requestFailed', 'Request failed')
       );
     } finally {
       pending.current = false;
@@ -519,7 +561,7 @@ function GameDetailView({
         onClick={go}
       >
         <Icon name="plus" />
-        Request
+        {t('lumen.games.requestAction', 'Request')}
       </button>
     )
   ) : null;
@@ -555,7 +597,7 @@ function GameDetailView({
           title={g.title}
           line={[
             (g.releaseDate || '').slice(0, 4),
-            GAME_LABEL[cat],
+            categoryLabel(cat, t),
             g.genres.slice(0, 3).join(', '),
           ]}
         />
@@ -568,7 +610,10 @@ function GameDetailView({
                 className="btn btn-quiet btn-sm"
                 to={`/patches?${patchSearch}`}
               >
-                Translations and Hacks for This Game
+                {t(
+                  'lumen.games.translationsForGame',
+                  'Translations and Hacks for This Game'
+                )}
               </Link>
             )}
             {cat === 'game' &&
@@ -613,9 +658,13 @@ function GameDetailView({
               {cat === 'game' ? (
                 <>
                   <label className="sel">
-                    <span className="lbl">System</span>
+                    <span className="lbl">
+                      {t('lumen.games.systemLabel', 'System')}
+                    </span>
                     <select value={os} onChange={(e) => setOs(e.target.value)}>
-                      <option value="">Choose…</option>
+                      <option value="">
+                        {t('lumen.games.chooseOption', 'Choose…')}
+                      </option>
                       {PC_OS.map(([v, t]) => (
                         <option key={v} value={v}>
                           {t}
@@ -624,12 +673,16 @@ function GameDetailView({
                     </select>
                   </label>
                   <label className="sel">
-                    <span className="lbl">Build</span>
+                    <span className="lbl">
+                      {t('lumen.games.buildLabel', 'Build')}
+                    </span>
                     <select
                       value={arch}
                       onChange={(e) => setArch(e.target.value)}
                     >
-                      <option value="">Choose…</option>
+                      <option value="">
+                        {t('lumen.games.chooseOption', 'Choose…')}
+                      </option>
                       {PC_ARCH.map(([v, t]) => (
                         <option key={v} value={v}>
                           {t}
@@ -640,12 +693,18 @@ function GameDetailView({
                 </>
               ) : systems.length ? (
                 <label className="sel">
-                  <span className="lbl">Console</span>
+                  <span className="lbl">
+                    {t('lumen.games.consoleLabel', 'Console')}
+                  </span>
                   <select
                     value={sys}
                     onChange={(e) => setSystem(e.target.value)}
                   >
-                    {!sys && <option value="">Choose a console</option>}
+                    {!sys && (
+                      <option value="">
+                        {t('lumen.games.chooseConsole', 'Choose a console')}
+                      </option>
+                    )}
                     {systems.map((x) => (
                       <option key={x.slug} value={x.slug}>
                         {x.name}
@@ -655,9 +714,15 @@ function GameDetailView({
                 </label>
               ) : (
                 <p className="note">
-                  This game isn’t listed for any{' '}
-                  {cat === 'retro' ? 'retro' : 'modern'} console this server
-                  supports.
+                  {cat === 'retro'
+                    ? t(
+                        'lumen.games.noRetroConsole',
+                        'This game isn’t listed for any retro console this server supports.'
+                      )
+                    : t(
+                        'lumen.games.noModernConsole',
+                        'This game isn’t listed for any modern console this server supports.'
+                      )}
                 </p>
               )}
             </div>
@@ -752,7 +817,7 @@ function GameDetailView({
                   className="chip"
                   to={`/requests?softwareRequestId=${requestId}`}
                 >
-                  Request History
+                  {t('lumen.gameLibrary.requestHistory', 'Request History')}
                 </Link>
               </div>
             )}
@@ -838,7 +903,7 @@ function GameDetailView({
         <div className="actionbar">
           <span className="ab-meta">
             <b>{g.title}</b>
-            {GAME_LABEL[cat]}
+            {categoryLabel(cat, t)}
           </span>
           {main}
         </div>

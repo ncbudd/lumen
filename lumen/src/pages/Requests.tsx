@@ -93,16 +93,36 @@ interface Row {
 
 // Everyone tab: SeerrNG's request filters, and how many requests load at a time
 const EVERYONE_FILTERS = [
-  ['all', 'All', 'total'],
-  ['pending', 'Waiting', 'pending'],
-  ['processing', 'Downloading', 'processing'],
-  ['incomplete', 'Incomplete', 'incomplete'],
-  ['attention', 'Needs attention', 'attention'],
-  ['unavailable', 'Unavailable', 'unavailable'],
-  ['failed', 'Failed', 'failed'],
-  ['completed', 'Completed', 'completed'],
-  ['available', 'Available', 'available'],
-  ['software', 'Software', 'software'],
+  ['all', 'All', 'total', 'lumen.requests.filter.all'],
+  ['pending', 'Waiting', 'pending', 'lumen.requests.filter.pending'],
+  [
+    'processing',
+    'Downloading',
+    'processing',
+    'lumen.requests.filter.processing',
+  ],
+  [
+    'incomplete',
+    'Incomplete',
+    'incomplete',
+    'lumen.requests.filter.incomplete',
+  ],
+  [
+    'attention',
+    'Needs attention',
+    'attention',
+    'lumen.requests.filter.attention',
+  ],
+  [
+    'unavailable',
+    'Unavailable',
+    'unavailable',
+    'lumen.requests.filter.unavailable',
+  ],
+  ['failed', 'Failed', 'failed', 'lumen.requests.filter.failed'],
+  ['completed', 'Completed', 'completed', 'lumen.requests.filter.completed'],
+  ['available', 'Available', 'available', 'lumen.requests.filter.available'],
+  ['software', 'Software', 'software', 'lumen.requests.filter.software'],
 ] as const;
 const PAGE = 20;
 
@@ -229,14 +249,37 @@ async function requestListOnce(path: string): Promise<RequestListPage> {
 
 // what a request looks like to the person who made it, in plain words
 // "00:03:03" -> "About 3 min left"
-function eta(t?: string) {
+type Translate = (
+  id: string,
+  fallback?: string,
+  values?: Record<string, string | number>
+) => string;
+
+function eta(t?: string, translate?: Translate) {
   const m = /^(?:(\d+)\.)?(\d+):(\d+):(\d+)/.exec(t || '');
   if (!m) return '';
   const mins = +(m[1] || 0) * 1440 + +m[2] * 60 + +m[3] + (+m[4] >= 30 ? 1 : 0);
-  if (mins < 1) return 'Almost done';
-  return mins < 60
-    ? `About ${mins} min left`
-    : `About ${Math.round(mins / 60)} hr${Math.round(mins / 60) === 1 ? '' : 's'} left`;
+  if (mins < 1)
+    return (
+      translate?.('lumen.requests.row.etaAlmostDone', 'Almost done') ??
+      'Almost done'
+    );
+  if (mins < 60)
+    return (
+      translate?.('lumen.requests.row.etaMinutes', 'About {count} min left', {
+        count: mins,
+      }) ?? `About ${mins} min left`
+    );
+  const hours = Math.round(mins / 60);
+  return (
+    translate?.(
+      hours === 1
+        ? 'lumen.requests.row.etaHours'
+        : 'lumen.requests.row.etaHoursPlural',
+      hours === 1 ? 'About {count} hr left' : 'About {count} hrs left',
+      { count: hours }
+    ) ?? `About ${hours} hr${hours === 1 ? '' : 's'} left`
+  );
 }
 
 // a series request is done once every requested season that has aired is at least partly on
@@ -259,7 +302,7 @@ function seasonsMissing(x: Row) {
     .sort((a, b) => a - b);
 }
 // [10, 11, 12, 13, 15] -> "Seasons 10–13, 15"
-function seasonList(ns: number[]) {
+function seasonList(ns: number[], translate?: Translate) {
   const runs: string[] = [];
   for (let i = 0; i < ns.length;) {
     let j = i;
@@ -267,7 +310,16 @@ function seasonList(ns: number[]) {
     runs.push(j > i ? `${ns[i]}–${ns[j]}` : `${ns[i]}`);
     i = j + 1;
   }
-  return `${ns.length === 1 ? 'Season' : 'Seasons'} ${runs.join(', ')}`;
+  const seasons = runs.join(', ');
+  const id =
+    ns.length === 1
+      ? 'lumen.requests.row.season'
+      : 'lumen.requests.row.seasons';
+  const fallback = `${ns.length === 1 ? 'Season' : 'Seasons'} {seasons}`;
+  return (
+    translate?.(id, fallback, { seasons }) ??
+    fallback.replace('{seasons}', seasons)
+  );
 }
 
 // an edition id that names a specific edition rather than just "this book" (Open Library work ids
@@ -300,13 +352,14 @@ export function RequestStatusPills({
   request: RequestItem;
   status: ReturnType<typeof requestRowStatus>;
 }) {
+  const { t } = useLumenLocale();
   return (
     <>
       <Pill k={status.k} icon={status.ico}>
         <StatLabel s={status} />
       </Pill>
       {request.status === 1 && request.quotaException && (
-        <Pill k="wait">Over Quota</Pill>
+        <Pill k="wait">{t('lumen.status.overQuota', 'Over quota')}</Pill>
       )}
     </>
   );
@@ -326,7 +379,8 @@ export function requestRowStatus(
   x: Row,
   serverName = 'Plex',
   live?: ReadonlyMap<string, LiveDownload>,
-  allowRawHashes = false
+  allowRawHashes = false,
+  translate?: Translate
 ): {
   k: 'ok' | 'dl' | 'wait' | 'bad';
   word: string;
@@ -505,7 +559,7 @@ export function requestRowStatus(
       ico: 'down',
       active: true,
       pct,
-      detail: eta(dls[0]?.timeLeft),
+      detail: eta(dls[0]?.timeLeft, translate),
     };
   if (ms === MediaStatus.PARTIAL) {
     const missing = seasonsMissing(x);
@@ -519,8 +573,14 @@ export function requestRowStatus(
             x.airing == null
               ? undefined // title not looked up yet
               : x.airing
-                ? 'New episodes added as they air'
-                : 'A few episodes missing',
+                ? (translate?.(
+                    'lumen.requests.row.newEpisodesAsTheyAir',
+                    'New episodes added as they air'
+                  ) ?? 'New episodes added as they air')
+                : (translate?.(
+                    'lumen.requests.row.fewEpisodesMissing',
+                    'A few episodes missing'
+                  ) ?? 'A few episodes missing'),
         }
       : {
           k: 'ok',
@@ -528,7 +588,13 @@ export function requestRowStatus(
           ico: 'check',
           active: true,
           detail: missing?.length
-            ? `${seasonList(missing)} not found yet`
+            ? (translate?.(
+                missing.length === 1
+                  ? 'lumen.requests.row.seasonNotFound'
+                  : 'lumen.requests.row.seasonsNotFound',
+                '{seasons} not found yet',
+                { seasons: seasonList(missing, translate) }
+              ) ?? `${seasonList(missing)} not found yet`)
             : undefined,
         };
   }
@@ -980,32 +1046,56 @@ function gameRow(g: SoftwareRequest): Row {
 }
 
 const REQUEST_SORTS = [
-  ['priority', 'Request priority', 'added', 'desc'],
-  ['newest', 'Newest first', 'added', 'desc'],
-  ['oldest', 'Oldest first', 'added', 'asc'],
-  ['updated', 'Recently updated', 'modified', 'desc'],
-  ['title-asc', 'Title A–Z', 'title', 'asc'],
-  ['title-desc', 'Title Z–A', 'title', 'desc'],
+  [
+    'priority',
+    'Request priority',
+    'lumen.requests.sort.priority',
+    'added',
+    'desc',
+  ],
+  ['newest', 'Newest first', 'lumen.requests.sort.newest', 'added', 'desc'],
+  ['oldest', 'Oldest first', 'lumen.requests.sort.oldest', 'added', 'asc'],
+  [
+    'updated',
+    'Recently updated',
+    'lumen.requests.sort.updated',
+    'modified',
+    'desc',
+  ],
+  [
+    'title-asc',
+    'Title A–Z',
+    'lumen.requests.sort.titleAscending',
+    'title',
+    'asc',
+  ],
+  [
+    'title-desc',
+    'Title Z–A',
+    'lumen.requests.sort.titleDescending',
+    'title',
+    'desc',
+  ],
 ] as const;
 
 const REQUEST_TIME_FRAMES = [
-  ['all', 'All time'],
-  ['7d', 'Last 7 days'],
-  ['14d', 'Last 14 days'],
-  ['30d', 'Last 30 days'],
-  ['6m', 'Last 6 months'],
+  ['all', 'All time', 'components.Requests.allTime'],
+  ['7d', 'Last 7 days', 'components.Requests.last7Days'],
+  ['14d', 'Last 14 days', 'components.Requests.last14Days'],
+  ['30d', 'Last 30 days', 'components.Requests.last30Days'],
+  ['6m', 'Last 6 months', 'components.Requests.last6Months'],
 ] as const;
 
 const REQUEST_MEDIA_TYPES = [
-  ['all', 'All media'],
-  ['movie', 'Movies'],
-  ['tv', 'Series'],
-  ['music', 'Music'],
-  ['book', 'Books and audiobooks'],
-  ['comic', 'Comics'],
-  ['magazine', 'Magazines'],
-  ['sports', 'Sports'],
-  ['adult', 'Adult'],
+  ['all', 'All media', 'components.Requests.allMedia'],
+  ['movie', 'Movies', 'components.Requests.movies'],
+  ['tv', 'Series', 'components.Requests.series'],
+  ['music', 'Music', 'components.Requests.music'],
+  ['book', 'Books and audiobooks', 'lumen.requests.filters.booksAndAudiobooks'],
+  ['comic', 'Comics', 'components.Requests.comics'],
+  ['magazine', 'Magazines', 'components.Requests.magazines'],
+  ['sports', 'Sports', 'components.Requests.sports'],
+  ['adult', 'Adult', 'components.Requests.adult'],
 ] as const;
 
 const SOFTWARE_CATEGORIES = [
@@ -1037,6 +1127,7 @@ function RequesterFilter({
   value: string;
   change: (value: string) => void;
 }) {
+  const { t } = useLumenLocale();
   const [page, setPage] = useState(0);
   const { data, error, reload } = useApi<{
     results: { id: number; displayName: string }[];
@@ -1046,9 +1137,13 @@ function RequesterFilter({
   return (
     <>
       <label className="sel">
-        <span className="lbl">Requester</span>
+        <span className="lbl">
+          {t('lumen.requests.filters.requester', 'Requester')}
+        </span>
         <select value={value} onChange={(event) => change(event.target.value)}>
-          <option value="all">Everyone</option>
+          <option value="all">
+            {t('components.Requests.allUsers', 'All Users')}
+          </option>
           {value !== 'all' && !users.some(({ id }) => String(id) === value) && (
             <option value={value}>User #{value}</option>
           )}
@@ -1064,7 +1159,7 @@ function RequesterFilter({
           className="btn btn-quiet btn-sm"
           onClick={() => setPage(page - 1)}
         >
-          Previous Users
+          {t('lumen.requests.filters.previousUsers', 'Previous Users')}
         </button>
       )}
       {!!data &&
@@ -1074,12 +1169,12 @@ function RequesterFilter({
             className="btn btn-quiet btn-sm"
             onClick={() => setPage(page + 1)}
           >
-            More Users
+            {t('lumen.requests.filters.moreUsers', 'More Users')}
           </button>
         )}
       {error && (
         <button className="btn btn-quiet btn-sm" onClick={reload}>
-          Retry Loading Users
+          {t('lumen.requests.filters.retryUsers', 'Retry Loading Users')}
         </button>
       )}
     </>
@@ -1260,7 +1355,7 @@ export default function Requests() {
     REQUEST_TIME_FRAMES.find(([value]) => value === timeFrameParam)?.[0] ??
     'all';
   const search = (p.get('search') ?? '').trim().slice(0, 200);
-  const [sortMode, , sortField, sortDirection] =
+  const [sortMode, , , sortField, sortDirection] =
     REQUEST_SORTS.find(([value]) => value === p.get('order')) ??
     REQUEST_SORTS[0];
   const priorityOrder = sortMode === 'priority';
@@ -1608,14 +1703,25 @@ export default function Requests() {
     try {
       if (how === 'remove') await api(`/request/${id}`, { method: 'DELETE' });
       else await api(`/request/${id}/${how}`, { method: 'POST', body: '{}' });
-      toast(
-        {
-          approve: 'Request approved',
-          decline: 'Request declined',
-          retry: 'Request sent again',
-          remove: 'Request removed',
-        }[how]
-      );
+      const successCopy = {
+        approve: {
+          key: 'lumen.requests.actions.approvedToast',
+          fallback: 'Request approved',
+        },
+        decline: {
+          key: 'lumen.requests.actions.declinedToast',
+          fallback: 'Request declined',
+        },
+        retry: {
+          key: 'lumen.requests.actions.retriedToast',
+          fallback: 'Request sent again',
+        },
+        remove: {
+          key: 'lumen.requests.actions.removedToast',
+          fallback: 'Request removed',
+        },
+      }[how];
+      toast(t(successCopy.key, successCopy.fallback));
       forget(`/request/status/${id}`);
       if (requestKey === 'requestId' && focusedId === id) {
         if (how === 'remove') closeHistory();
@@ -1623,7 +1729,15 @@ export default function Requests() {
       }
       setTick((t) => t + 1);
     } catch (e) {
-      toast(friendlyError(e, 'Couldn’t update the request'));
+      toast(
+        friendlyError(
+          e,
+          t(
+            'lumen.requests.actions.updateFailed',
+            'Couldn’t update the request'
+          )
+        )
+      );
     } finally {
       mutationInFlight.current = false;
       setActing(null);
@@ -1641,14 +1755,19 @@ export default function Requests() {
         });
       else await cancelRequest(id);
       if (id > 0) forget(`/request/status/${id}`);
-      toast('Request cancelled');
+      toast(t('lumen.requests.actions.cancelledToast', 'Request cancelled'));
       if (requestKey === 'requestId' && focusedId === id) closeHistory();
       // gone now, not after the list has refreshed
       const updateRows = ownSoftware ? setOthers : setRows;
       updateRows((list) => list && list.filter((x) => x.r.id !== id));
       setTick((t) => t + 1);
     } catch (e) {
-      toast(friendlyError(e, 'Couldn’t cancel'));
+      toast(
+        friendlyError(
+          e,
+          t('lumen.requests.actions.cancelFailed', 'Couldn’t cancel')
+        )
+      );
     } finally {
       mutationInFlight.current = false;
       setActing(null);
@@ -1815,8 +1934,12 @@ export default function Requests() {
           >
             <Icon name="play" size="sm" />
             {x.r.type === 'music'
-              ? `Listen on ${serverName}`
-              : `Watch on ${serverName}`}
+              ? t('lumen.music.listenOn', 'Listen on {server}', {
+                  server: serverName,
+                })
+              : t('lumen.tv.watchOn', 'Watch on {server}', {
+                  server: serverName,
+                })}
           </a>
         ) : (x.r.id < 0 ? !everyone : x.r.requestedBy?.id === user?.id) &&
           x.r.status === 1 ? (
@@ -1831,7 +1954,7 @@ export default function Requests() {
               })
             }
           >
-            Cancel
+            {t('lumen.requests.actions.cancel', 'Cancel')}
           </button>
         ) : null}
       </>
@@ -1842,24 +1965,42 @@ export default function Requests() {
     <>
       <header className="ph">
         <div className="ph-row">
-          <h1>Requests</h1>
+          <h1>{t('lumen.requests.page.title', 'Requests')}</h1>
           <Link className="chip" to="/book-series/requests">
-            Book Series Requests
+            {t('lumen.requests.page.bookSeries', 'Book Series Requests')}
           </Link>
           <Avatar className="avatar ph-only-avatar" />
         </div>
         <p className="sub">
           {ownSoftware
-            ? 'Your software and game requests, newest first.'
+            ? t(
+                'lumen.requests.page.softwareSubtitle',
+                'Your software and game requests, newest first.'
+              )
             : everyone
               ? show === 'software'
-                ? 'Software and game requests from everyone, newest first.'
+                ? t(
+                    'lumen.requests.page.softwareEveryoneSubtitle',
+                    'Software and game requests from everyone, newest first.'
+                  )
                 : !priorityOrder
-                  ? 'Everyone’s requests in the selected order.'
+                  ? t(
+                      'lumen.requests.page.selectedOrderSubtitle',
+                      'Everyone’s requests in the selected order.'
+                    )
                   : show === 'all'
-                    ? 'Everyone’s requests: waiting ones first, then downloads, then the newest.'
-                    : 'Everyone’s requests, newest first.'
-              : 'Everything you’ve asked for, newest first.'}
+                    ? t(
+                        'lumen.requests.page.prioritySubtitle',
+                        'Everyone’s requests: waiting ones first, then downloads, then the newest.'
+                      )
+                    : t(
+                        'lumen.requests.page.everyoneSubtitle',
+                        'Everyone’s requests, newest first.'
+                      )
+              : t(
+                  'lumen.requests.page.ownSubtitle',
+                  'Everything you’ve asked for, newest first.'
+                )}
         </p>
       </header>
       {/* pull-to-refresh pill: fixed, so it never shifts the page layout */}
@@ -1873,17 +2014,29 @@ export default function Requests() {
       >
         <Icon name="refresh" size="sm" />
         {refreshing
-          ? 'Refreshing…'
+          ? t('lumen.requests.page.refreshing', 'Refreshing…')
           : pull.state === 'armed'
-            ? 'Release to refresh'
-            : 'Pull to refresh'}
+            ? t('lumen.requests.page.releaseToRefresh', 'Release to refresh')
+            : t('lumen.requests.page.pullToRefresh', 'Pull to refresh')}
       </div>
-      <div className="seg" role="group" aria-label="Show">
+      <div
+        className="seg"
+        role="group"
+        aria-label={t('lumen.requests.page.show', 'Show')}
+      >
         {[
-          ['active', 'Active', act.length],
-          ['ready', 'Ready', ready.length],
-          ['all', 'All', all.length],
-          ...(viewAll ? [['everyone', 'Everyone', waiting ?? '']] : []),
+          ['active', t('lumen.requests.page.active', 'Active'), act.length],
+          ['ready', t('lumen.requests.page.ready', 'Ready'), ready.length],
+          ['all', t('lumen.requests.page.all', 'All'), all.length],
+          ...(viewAll
+            ? [
+                [
+                  'everyone',
+                  t('lumen.requests.page.everyone', 'Everyone'),
+                  waiting ?? '',
+                ],
+              ]
+            : []),
         ].map(([v, t, n]) => (
           <button
             key={v as string}
@@ -1910,41 +2063,56 @@ export default function Requests() {
               setP(ownSoftware ? {} : { tab: 'software' }, { replace: true })
             }
           >
-            My Software
+            {t('lumen.requests.page.mySoftware', 'My Software')}
           </button>
         </div>
       )}
       {!shown && !(browseRequests ? othersError : ownError) && (
         <p className="note">
-          {everyone ? 'Loading everyone’s requests…' : 'Loading your requests…'}
+          {everyone
+            ? t(
+                'lumen.requests.page.loadingEveryone',
+                'Loading everyone’s requests…'
+              )
+            : t('lumen.requests.page.loadingOwn', 'Loading your requests…')}
         </p>
       )}
       {(browseRequests ? othersError : ownError) && (
         <div className="empty" role="alert">
-          <b>Couldn’t load requests</b>
+          <b>{t('lumen.requests.page.loadFailed', 'Couldn’t load requests')}</b>
           <p>
             {everyone
-              ? 'Try again to check everyone’s request history.'
-              : 'Try again to check your request history.'}
+              ? t(
+                  'lumen.requests.page.loadEveryoneFailed',
+                  'Try again to check everyone’s request history.'
+                )
+              : t(
+                  'lumen.requests.page.loadOwnFailed',
+                  'Try again to check your request history.'
+                )}
           </p>
           <button
             className="btn btn-tonal"
             onClick={() => setTick((t) => t + 1)}
           >
-            Retry
+            {t('lumen.requests.page.retry', 'Retry')}
           </button>
         </div>
       )}
       {everyone && (
-        <div className="chips wrap" role="group" aria-label="Which requests">
-          {EVERYONE_FILTERS.map(([v, t, key]) => (
+        <div
+          className="chips wrap"
+          role="group"
+          aria-label={t('lumen.requests.page.whichRequests', 'Which requests')}
+        >
+          {EVERYONE_FILTERS.map(([v, label, key, translationKey]) => (
             <button
               key={v}
               className="chip"
               aria-pressed={show === v}
               onClick={() => setRequestFilter('show', v)}
             >
-              {t}
+              {t(translationKey, label)}
               {!mediaQuery && counts?.[key] != null && (
                 <span className="n">{counts[key]}</span>
               )}
@@ -1953,7 +2121,11 @@ export default function Requests() {
         </div>
       )}
       {everyone && (
-        <div className="toolbar" role="group" aria-label="Request filters">
+        <div
+          className="toolbar"
+          role="group"
+          aria-label={t('components.Requests.mediaFilters', 'Media Filters')}
+        >
           <RequesterFilter
             value={requester}
             change={(value) => setRequestFilter('requestedBy', value)}
@@ -1961,68 +2133,85 @@ export default function Requests() {
           {show !== 'software' && (
             <>
               <label className="sel">
-                <span className="lbl">Media Type</span>
+                <span className="lbl">
+                  {t('components.Requests.mediaType', 'Media Type')}
+                </span>
                 <select
                   value={mediaType}
                   onChange={(event) =>
                     setRequestFilter('mediaType', event.target.value)
                   }
                 >
-                  {mediaTypes.map(([value, label]) => (
+                  {mediaTypes.map(([value, label, message]) => (
                     <option key={value} value={value}>
-                      {label}
+                      {t(message, label)}
                     </option>
                   ))}
                 </select>
               </label>
               {mediaType === 'book' && (
                 <label className="sel">
-                  <span className="lbl">Book Format</span>
+                  <span className="lbl">
+                    {t('components.Requests.format', 'Format')}
+                  </span>
                   <select
                     value={bookFormat}
                     onChange={(event) =>
                       setRequestFilter('bookFormat', event.target.value)
                     }
                   >
-                    <option value="all">All formats</option>
-                    <option value="ebook">Ebook</option>
-                    <option value="audiobook">Audiobook</option>
+                    <option value="all">
+                      {t('lumen.requests.filters.allFormats', 'All formats')}
+                    </option>
+                    <option value="ebook">
+                      {t('components.Requests.ebook', 'Book')}
+                    </option>
+                    <option value="audiobook">
+                      {t('lumen.requests.filters.audiobook', 'Audiobook')}
+                    </option>
                   </select>
                 </label>
               )}
               <label className="sel">
-                <span className="lbl">Sort</span>
+                <span className="lbl">
+                  {t('components.Requests.sortBy', 'Sort By')}
+                </span>
                 <select
                   value={sortMode}
                   onChange={(event) =>
                     setRequestFilter('order', event.target.value)
                   }
                 >
-                  {REQUEST_SORTS.map(([value, label]) => (
+                  {REQUEST_SORTS.map(([value, label, message]) => (
                     <option key={value} value={value}>
-                      {label}
+                      {t(message, label)}
                     </option>
                   ))}
                 </select>
               </label>
               <label className="sel">
-                <span className="lbl">Date Added</span>
+                <span className="lbl">
+                  {t('lumen.requests.filters.dateAdded', 'Date Added')}
+                </span>
                 <select
                   value={timeFrame}
                   onChange={(event) =>
                     setRequestFilter('timeFrame', event.target.value)
                   }
                 >
-                  {REQUEST_TIME_FRAMES.map(([value, label]) => (
+                  {REQUEST_TIME_FRAMES.map(([value, label, message]) => (
                     <option key={value} value={value}>
-                      {label}
+                      {t(message, label)}
                     </option>
                   ))}
                 </select>
               </label>
               <form
                 className="toolbar-search"
-                aria-label="Search media requests"
+                aria-label={t(
+                  'components.Requests.searchRequests',
+                  'Search Requests'
+                )}
                 onSubmit={(event) => {
                   event.preventDefault();
                   const value = new FormData(event.currentTarget).get('search');
@@ -2037,20 +2226,31 @@ export default function Requests() {
                     key={search}
                     name="search"
                     type="search"
-                    aria-label="Search media requests"
-                    placeholder="Search media requests"
+                    aria-label={t(
+                      'components.Requests.searchRequests',
+                      'Search Requests'
+                    )}
+                    placeholder={t(
+                      'components.Requests.searchRequests',
+                      'Search Requests'
+                    )}
                     maxLength={200}
                     defaultValue={search}
                   />
                 </label>
-                <button className="btn btn-tonal btn-sm">Search</button>
+                <button className="btn btn-tonal btn-sm">
+                  {t('components.BookSeriesSearch.search', 'Search')}
+                </button>
                 {search && (
                   <button
                     type="button"
                     className="btn btn-quiet btn-sm"
                     onClick={() => setRequestFilter('search', '')}
                   >
-                    Clear Search
+                    {t(
+                      'components.Discover.DiscoverAdult.clearSearch',
+                      'Clear Search'
+                    )}
                   </button>
                 )}
               </form>
@@ -2062,10 +2262,15 @@ export default function Requests() {
         <div
           className="toolbar"
           role="group"
-          aria-label="Software request filters"
+          aria-label={t(
+            'lumen.requests.page.softwareFilters',
+            'Software request filters'
+          )}
         >
           <label className="sel">
-            <span className="lbl">Category</span>
+            <span className="lbl">
+              {t('lumen.requests.page.category', 'Category')}
+            </span>
             <select
               value={softwareCategory}
               onChange={(event) =>
@@ -2080,7 +2285,9 @@ export default function Requests() {
             </select>
           </label>
           <label className="sel">
-            <span className="lbl">Status</span>
+            <span className="lbl">
+              {t('lumen.requests.page.status', 'Status')}
+            </span>
             <select
               value={softwareStatus}
               onChange={(event) =>
@@ -2100,22 +2307,32 @@ export default function Requests() {
         <div className="empty">
           <b>
             {!softwareView && show === 'all'
-              ? 'No requests yet'
-              : 'Nothing here'}
+              ? t('lumen.requests.page.noRequestsYet', 'No requests yet')
+              : t('lumen.requests.page.nothingHere', 'Nothing here')}
           </b>
           {!softwareView && show === 'all'
-            ? 'Nobody has asked for anything.'
-            : 'No requests match this filter right now.'}
+            ? t(
+                'lumen.requests.page.nobodyRequested',
+                'Nobody has asked for anything.'
+              )
+            : t(
+                'lumen.requests.page.noFilterMatches',
+                'No requests match this filter right now.'
+              )}
         </div>
       )}
       {shown && !list.length && !browseRequests && (
         <div className="empty">
-          <b>{tab === 'ready' ? 'Nothing ready yet' : 'No active requests'}</b>
-          Find something on{' '}
+          <b>
+            {tab === 'ready'
+              ? t('lumen.requests.page.nothingReady', 'Nothing ready yet')
+              : t('lumen.requests.page.noActiveRequests', 'No active requests')}
+          </b>
+          {t('lumen.requests.page.findSomething', 'Find something on')}{' '}
           <Link to="/" style={{ color: 'var(--accent)' }}>
-            Discover
+            {t('lumen.requests.page.discover', 'Discover')}
           </Link>
-          .
+          {t('lumen.requests.page.period', '.')}
         </div>
       )}
       <div className="rqlist">
@@ -2124,7 +2341,8 @@ export default function Requests() {
             x,
             serverName,
             liveDownloads,
-            allowRawHashes
+            allowRawHashes,
+            t
           );
           const detail = requestFailureMessage(x.r) ?? st.detail;
           const artwork = artUrl(x.art);
@@ -2175,10 +2393,16 @@ export default function Requests() {
                 <div className="st">
                   <RequestStatusPills request={x.r} status={st} />
                   {x.r.watchAheadParentRequestId ? (
-                    <span className="d">Auto-Queued</span>
+                    <span className="d">
+                      {t('lumen.requests.row.autoQueued', 'Auto-Queued')}
+                    </span>
                   ) : (x.r.watchAheadEpisodeCount ?? 0) > 0 ? (
                     <span className="d">
-                      Episode Queue · {x.r.watchAheadEpisodeCount} ahead
+                      {t(
+                        'lumen.requests.row.episodeQueueAhead',
+                        'Episode Queue · {count} ahead',
+                        { count: x.r.watchAheadEpisodeCount ?? 0 }
+                      )}
                     </span>
                   ) : null}
                   {detail && <span className="d">{detail}</span>}
@@ -2189,7 +2413,7 @@ export default function Requests() {
                       className="btn btn-sm btn-quiet"
                       onClick={() => setP(historyParams(x.r.id))}
                     >
-                      History
+                      {t('lumen.requests.actions.history', 'History')}
                     </button>
                   )}
                   {renderRequestActions(x, everyone && manage)}
@@ -2209,7 +2433,9 @@ export default function Requests() {
               setPages((n) => n + 1);
             }}
           >
-            {loadingMore ? 'Loading…' : 'Show more'}
+            {loadingMore
+              ? t('lumen.requests.page.loadingMore', 'Loading…')
+              : t('lumen.requests.page.showMore', 'Show more')}
           </button>
         </div>
       )}
@@ -2217,31 +2443,92 @@ export default function Requests() {
         <ConfirmSheet
           title={
             confirming.how === 'cancel'
-              ? 'Cancel this request?'
+              ? t('lumen.requests.actions.cancelTitle', 'Cancel this request?')
               : confirming.how === 'remove'
-                ? `Remove ${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')}?`
+                ? t(
+                    'lumen.requests.actions.removeRequestTitle',
+                    'Remove {title}?',
+                    {
+                      title:
+                        confirming.title.trim() ||
+                        t('lumen.requestHistory.unknownTitle', 'this item'),
+                    }
+                  )
                 : confirming.how === 'removeMedia'
-                  ? `Remove ${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')} from the service?`
-                  : 'Decline this request?'
+                  ? t(
+                      'lumen.requests.actions.removeMediaTitle',
+                      'Remove {title} from the service?',
+                      {
+                        title:
+                          confirming.title.trim() ||
+                          t('lumen.requestHistory.unknownTitle', 'this item'),
+                      }
+                    )
+                  : t(
+                      'lumen.requests.actions.declineTitle',
+                      'Decline this request?'
+                    )
           }
           body={
             confirming.how === 'cancel'
-              ? `${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')} won’t be fetched. You can ask for it again later.`
+              ? t(
+                  'lumen.requests.actions.cancelBody',
+                  '{title} won’t be fetched. You can ask for it again later.',
+                  {
+                    title:
+                      confirming.title.trim() ||
+                      t('lumen.requestHistory.unknownTitle', 'this item'),
+                  }
+                )
               : confirming.how === 'remove'
-                ? `This deletes the request for ${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')} for good. It can’t be undone.`
+                ? t(
+                    'lumen.requests.actions.removeRequestBody',
+                    'This deletes the request for {title} for good. It can’t be undone.',
+                    {
+                      title:
+                        confirming.title.trim() ||
+                        t('lumen.requestHistory.unknownTitle', 'this item'),
+                    }
+                  )
                 : confirming.how === 'removeMedia'
-                  ? `This removes the managed copy of ${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')}. Its SeerrNG request and history will remain.`
-                  : `${confirming.title.trim() || t('lumen.requestHistory.unknownTitle', 'this item')} won’t be fetched, and the person who asked will see it was declined.`
+                  ? t(
+                      'lumen.requests.actions.removeMediaBody',
+                      'This removes the managed copy of {title}. Its SeerrNG request and history will remain.',
+                      {
+                        title:
+                          confirming.title.trim() ||
+                          t('lumen.requestHistory.unknownTitle', 'this item'),
+                      }
+                    )
+                  : t(
+                      'lumen.requests.actions.declineBody',
+                      '{title} won’t be fetched, and the person who asked will see it was declined.',
+                      {
+                        title:
+                          confirming.title.trim() ||
+                          t('lumen.requestHistory.unknownTitle', 'this item'),
+                      }
+                    )
           }
           confirm={
             confirming.how === 'cancel'
-              ? 'Cancel request'
+              ? t('lumen.requests.actions.confirmCancel', 'Cancel request')
               : confirming.how === 'remove'
-                ? 'Remove request'
+                ? t(
+                    'lumen.requests.actions.confirmRemoveRequest',
+                    'Remove request'
+                  )
                 : confirming.how === 'removeMedia'
-                  ? 'Remove from Service'
-                  : 'Decline request'
+                  ? t(
+                      'lumen.requests.actions.confirmRemoveMedia',
+                      'Remove from Service'
+                    )
+                  : t(
+                      'lumen.requests.actions.confirmDecline',
+                      'Decline request'
+                    )
           }
+          cancel={t('lumen.requests.actions.keep', 'Keep it')}
           onClose={() => setConfirming(null)}
           onConfirm={() => {
             const { id, how, request } = confirming;
@@ -2255,7 +2542,7 @@ export default function Requests() {
       )}
       {requestParam !== null && !validRequestLink && (
         <p className="note" role="alert">
-          This request link is invalid.
+          {t('lumen.requests.invalidLink', 'This request link is invalid.')}
         </p>
       )}
       {validRequestLink && requestKey === 'softwareRequestId' && (
@@ -2318,7 +2605,9 @@ export default function Requests() {
             setRows(patch);
             setOthers(patch);
             setQueueEdit(null);
-            toast('Episode Queue saved.');
+            toast(
+              t('lumen.requests.episodeQueue.saved', 'Episode Queue saved.')
+            );
             setTick((t) => t + 1);
           }}
         />

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../api';
+import { isAdministrator, useAuth } from '../auth';
 import { ServiceNote } from '../components/extra';
 import { useApi } from '../hooks';
 import { useLumenLocale } from '../i18n';
@@ -158,7 +159,13 @@ function ReleaseRow({
   );
 }
 
-function SearchForm({ configuration }: { configuration: Configuration }) {
+function SearchForm({
+  configuration,
+  canConfigure,
+}: {
+  configuration: Configuration;
+  canConfigure: boolean;
+}) {
   const { locale, t } = useLumenLocale();
   const [params] = useSearchParams();
   const categories = configuration.categories.filter(
@@ -258,6 +265,16 @@ function SearchForm({ configuration }: { configuration: Configuration }) {
             'Ask an administrator to connect Prowlarr under Settings > Services.'
           )}
         </p>
+        {canConfigure && (
+          <p>
+            <Link className="btn btn-tonal btn-sm" to="/admin/prowlarr">
+              {t(
+                'components.IndexerSearch.configure',
+                'Open Prowlarr settings'
+              )}
+            </Link>
+          </p>
+        )}
       </div>
     );
   if (!selected)
@@ -284,6 +301,12 @@ function SearchForm({ configuration }: { configuration: Configuration }) {
           'Search results are separate from SeerrNG requests. You can send a result to a download client configured in Prowlarr.'
         )}
       </p>
+      <p className="note">
+        {t(
+          'components.IndexerSearch.requestStillUsesManager',
+          'Sending a result does not change a SeerrNG request. Prowlarr handles the handoff to its configured download client.'
+        )}
+      </p>
       <form
         className="toolbar"
         onSubmit={(event) => {
@@ -297,8 +320,15 @@ function SearchForm({ configuration }: { configuration: Configuration }) {
               'components.IndexerSearch.category',
               'Media category'
             )}
+            disabled={searching}
             value={selected}
-            onChange={(event) => setCategory(event.target.value)}
+            onChange={(event) => {
+              setCategory(event.target.value);
+              setResults([]);
+              setSubmitted(undefined);
+              setNextOffset(undefined);
+              setError('');
+            }}
           >
             {categories.map((item) => (
               <option key={item.category} value={item.category}>
@@ -320,6 +350,7 @@ function SearchForm({ configuration }: { configuration: Configuration }) {
             )}
             maxLength={256}
             value={query}
+            disabled={searching}
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
@@ -390,6 +421,8 @@ function SearchForm({ configuration }: { configuration: Configuration }) {
 
 export default function IndexerSearch({ allowed }: { allowed: boolean }) {
   const { t } = useLumenLocale();
+  const { user } = useAuth();
+  const canConfigure = isAdministrator(user?.permissions);
   const { data, error, reload } = useApi<Configuration>(
     allowed ? PATH + '/configuration' : null
   );
@@ -418,7 +451,11 @@ export default function IndexerSearch({ allowed }: { allowed: boolean }) {
         </p>
       )}
       {allowed && data && (
-        <SearchForm key={params.toString()} configuration={data} />
+        <SearchForm
+          key={params.toString()}
+          configuration={data}
+          canConfigure={canConfigure}
+        />
       )}
     </>
   );

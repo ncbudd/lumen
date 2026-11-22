@@ -67,6 +67,99 @@ test('Indexer Search is absent from the You menu without permission', async ({
   ).toHaveCount(0);
 });
 
+test('unconfigured Prowlarr state exposes settings only to administrators', async ({
+  page,
+}, info) => {
+  const baseline = process.env.LUMEN_CAPTURE_MODE === 'baseline';
+  const locale = ['en', 'fr', 'ar'].includes(
+    process.env.LUMEN_INDEXER_LOCALE ?? ''
+  )
+    ? (process.env.LUMEN_INDEXER_LOCALE as 'en' | 'fr' | 'ar')
+    : 'en';
+  const configureLabels = {
+    en: 'Open Prowlarr settings',
+    fr: 'Ouvrir les paramètres Prowlarr',
+    ar: 'افتح إعدادات Prowlarr',
+  } as const;
+  const connectionLabels = {
+    en: 'Prowlarr is not connected.',
+    fr: "Prowlarr n'est pas connecté.",
+    ar: 'Prowlarr غير متصل.',
+  } as const;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const path = new URL(route.request().url()).pathname.slice(
+      '/api/v1'.length
+    );
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 1, displayName: 'Administrator', permissions: 2 },
+      });
+    if (path === '/indexer-search/configuration')
+      return route.fulfill({ json: { configured: false, categories: [] } });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({ json: { locale } });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/indexer-search'));
+  await expect(
+    page.getByText(connectionLabels[locale], { exact: true })
+  ).toBeVisible();
+  const settingsLink = page.getByRole('link', {
+    name: configureLabels[locale],
+    exact: true,
+  });
+  if (baseline) await expect(settingsLink).toHaveCount(0);
+  else {
+    await expect(settingsLink).toBeVisible();
+    await expect(settingsLink).toHaveAttribute(
+      'href',
+      appPath('/admin/prowlarr')
+    );
+  }
+  const captureDir = process.env.LUMEN_VISUAL_CAPTURE_DIR;
+  if (captureDir && ['desktop', 'iphone'].includes(info.project.name))
+    await page.screenshot({
+      path: `${captureDir}/indexer-unconfigured-${baseline ? 'baseline' : 'candidate'}-${info.project.name}.png`,
+      fullPage: true,
+    });
+});
+
+test('Indexer Search does not expose Prowlarr settings to request managers', async ({
+  page,
+}) => {
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const path = new URL(route.request().url()).pathname.slice(
+      '/api/v1'.length
+    );
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 1, displayName: 'Requester', permissions: 16 },
+      });
+    if (path === '/indexer-search/configuration')
+      return route.fulfill({ json: { configured: false, categories: [] } });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/indexer-search'));
+  await expect(
+    page.getByText('Prowlarr is not connected.', { exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', {
+      name:
+        process.env.LUMEN_INDEXER_LOCALE === 'fr'
+          ? 'Ouvrir les paramètres Prowlarr'
+          : process.env.LUMEN_INDEXER_LOCALE === 'ar'
+            ? 'افتح إعدادات Prowlarr'
+            : 'Open Prowlarr settings',
+      exact: true,
+    })
+  ).toHaveCount(0);
+});
+
 test('indexer search honors enabled categories, submitted pagination and one-use handoff', async ({
   page,
 }) => {
@@ -158,6 +251,99 @@ test('indexer search honors enabled categories, submitted pagination and one-use
   ]);
 });
 
+test('changing indexer category clears stale results and is disabled while searching', async ({
+  page,
+}) => {
+  const searches: unknown[] = [];
+  let completeSearch!: () => void;
+  const searchGate = new Promise<void>((resolve) => {
+    completeSearch = resolve;
+  });
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', async (route) => {
+    const path = new URL(route.request().url()).pathname.slice(
+      '/api/v1'.length
+    );
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 1, displayName: 'Operator', permissions: 16 },
+      });
+    if (path === '/indexer-search/configuration')
+      return route.fulfill({
+        json: {
+          configured: true,
+          categories: [
+            { category: 'movie', categoryIds: [2000], enabled: true },
+            { category: 'tv', categoryIds: [5000], enabled: true },
+          ],
+        },
+      });
+    if (path === '/indexer-search/search') {
+      const body = route.request().postDataJSON();
+      searches.push(body);
+      if (body.category === 'movie') {
+        await searchGate;
+      }
+      return route.fulfill({
+        json: {
+          limit: 50,
+          hasMore: false,
+          results: [
+            {
+              title: `${body.category} result`,
+              protocol: 'usenet',
+              size: null,
+              seeders: null,
+              leechers: null,
+              grabs: null,
+              publishDate: null,
+              infoUrl: null,
+              grabId: null,
+              categories: [],
+            },
+          ],
+        },
+      });
+    }
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/indexer-search'));
+  const category = page.getByRole('combobox', { name: 'Media category' });
+  await page.getByRole('searchbox', { name: 'Search terms' }).fill('Dune');
+  await page.getByRole('button', { name: 'Search indexers' }).click();
+  await expect(category).toBeDisabled();
+  const query = page.getByRole('searchbox', { name: 'Search terms' });
+  const baseline = process.env.LUMEN_CAPTURE_MODE === 'baseline';
+  if (baseline) await expect(query).toBeEnabled();
+  else await expect(query).toBeDisabled();
+  const captureDir = process.env.LUMEN_VISUAL_CAPTURE_DIR;
+  if (captureDir && ['desktop', 'iphone'].includes(test.info().project.name))
+    await page.screenshot({
+      path: `${captureDir}/indexer-searching-${baseline ? 'baseline' : 'candidate'}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  completeSearch();
+  await expect(page.getByText('movie result')).toBeVisible();
+  await expect(category).toBeEnabled();
+  await expect(query).toBeEnabled();
+
+  await category.selectOption('tv');
+  await expect(page.getByText('movie result')).toHaveCount(0);
+  await expect(page.getByText('Results returned by Prowlarr: 1.')).toHaveCount(
+    0
+  );
+  await expect(
+    page.getByRole('button', { name: 'Load more results' })
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: 'Search indexers' }).click();
+  await expect(page.getByText('tv result')).toBeVisible();
+  expect(searches).toEqual([
+    { category: 'movie', query: 'Dune', offset: 0 },
+    { category: 'tv', query: 'Dune', offset: 0 },
+  ]);
+});
+
 test('indexer search rejects a direct route without Manage Requests', async ({
   page,
 }) => {
@@ -198,6 +384,8 @@ test('Indexer Search follows the saved locale and localizes results and handoff'
       sent: 'Sent to Prowlarr’s configured download client.',
       failure:
         'Handoff could not be confirmed. Check the client before searching and trying again.',
+      requestPolicy:
+        'Sending a result does not change a SeerrNG request. Prowlarr handles the handoff to its configured download client.',
     },
     fr: {
       title: 'Recherche d’indexeurs',
@@ -208,6 +396,8 @@ test('Indexer Search follows the saved locale and localizes results and handoff'
       sent: 'Envoyé au client de téléchargement configuré par Prowlarr.',
       failure:
         'Le résultat a peut-être été envoyé. Vérifiez le client avant de rechercher ou de réessayer.',
+      requestPolicy:
+        'L’envoi d’un résultat ne modifie pas une demande SeerrNG. Prowlarr le transmet au client de téléchargement configuré.',
     },
     ar: {
       title: 'البحث عن المفهرسات',
@@ -218,6 +408,8 @@ test('Indexer Search follows the saved locale and localizes results and handoff'
       sent: 'تم الإرسال إلى عميل التحميل المُهيأ لدى Prowlarr.',
       failure:
         'تعذّر التأكد من إرسال النتيجة. تحقّق من عميل التنزيل قبل البحث أو إعادة المحاولة.',
+      requestPolicy:
+        'إرسال نتيجة لا يغيّر طلب SeerrNG. يتولى Prowlarr إرسال النتيجة إلى عميل التنزيل المُعدّ لديه.',
     },
   } as const;
   const expected =
@@ -306,6 +498,8 @@ test('Indexer Search follows the saved locale and localizes results and handoff'
   await expect(
     page.getByRole('searchbox', { name: expected.query })
   ).toBeVisible();
+  if (process.env.LUMEN_CAPTURE_MODE !== 'baseline')
+    await expect(page.getByText(labels[locale].requestPolicy)).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute(
     'dir',
     locale === 'ar' ? 'rtl' : 'ltr'

@@ -134,7 +134,7 @@ test('progressive requests start, stop, and restart the selected quality', async
   await expect(
     sheet.getByRole('button', { name: 'Start Queue' })
   ).toBeDisabled();
-  await sheet.getByLabel('Queue Quality').selectOption('4k');
+  await sheet.getByLabel('Quality').selectOption('4k');
   await sheet.getByLabel('Movies Ahead').selectOption('2');
   await sheet.getByRole('button', { name: 'Start Queue' }).click();
   await expect(
@@ -148,6 +148,103 @@ test('progressive requests start, stop, and restart the selected quality', async
     { bufferSize: 2, is4k: true },
     '?is4k=true',
     { bufferSize: 2, is4k: true },
+  ]);
+});
+
+test('collection queue controls and lifecycle feedback follow the saved locale', async ({
+  page,
+}, info) => {
+  let status: 'waiting' | 'stopped' | null = null;
+  const mutations: unknown[] = [];
+  const queue = (is4k: boolean) =>
+    status
+      ? {
+          collectionId: 30,
+          is4k,
+          bufferSize: 1,
+          status,
+          reason: null,
+          requested: 0,
+          watched: 1,
+          total: 1,
+        }
+      : null;
+
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const path = url.pathname.slice('/api/v1'.length);
+    if (path === '/auth/me')
+      return route.fulfill({ json: { id: 1, permissions: 2080 } });
+    if (path === '/settings/public')
+      return route.fulfill({ json: { movie4kEnabled: true } });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({ json: { locale: 'fr' } });
+    if (path === '/collection/30')
+      return route.fulfill({
+        json: {
+          id: 30,
+          name: 'Collection exemple',
+          parts: [{ id: 20, mediaType: 'movie', title: 'Film exemple' }],
+        },
+      });
+    if (path === '/collection/30/queue') {
+      if (request.method() === 'POST') {
+        const body = request.postDataJSON();
+        mutations.push(body);
+        const is4k = body.is4k === true;
+        status = 'waiting';
+        return route.fulfill({ status: 202, json: { queue: queue(is4k) } });
+      }
+      const is4k = url.searchParams.get('is4k') === 'true';
+      if (request.method() === 'DELETE') {
+        mutations.push(url.search);
+        status = 'stopped';
+        return route.fulfill({ status: 204 });
+      }
+      return route.fulfill({ json: { queue: queue(is4k) } });
+    }
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(`${mount}/collection/30`);
+  await page
+    .getByRole('button', {
+      name: /Queue Collection|Mettre la collection en file/,
+    })
+    .click();
+  const sheet = page.getByRole('dialog');
+  await page.screenshot({
+    path: info.outputPath('collection-queue-setup.png'),
+    animations: 'disabled',
+  });
+  await expect(sheet).toHaveAttribute(
+    'aria-label',
+    'Mettre la collection en file d’attente'
+  );
+  await expect(sheet.getByLabel('Qualité')).toHaveValue('hd');
+  await expect(sheet.getByLabel('Films d’avance')).toHaveValue('1');
+  await expect(
+    sheet.getByRole('button', { name: 'Démarrer la file' })
+  ).toBeEnabled();
+  await sheet.getByRole('button', { name: 'Démarrer la file' }).click();
+  await expect(sheet.getByText('En attente', { exact: true })).toBeVisible();
+  await expect(
+    sheet.getByText('Vus : 1 · demandes de la file : 0 · total : 1')
+  ).toBeVisible();
+  await page.screenshot({
+    path: info.outputPath('collection-queue-waiting.png'),
+    animations: 'disabled',
+  });
+  await sheet.getByRole('button', { name: 'Arrêter la file' }).click();
+  await expect(sheet.getByText('File arrêtée', { exact: true })).toBeVisible();
+  await sheet.getByRole('button', { name: 'Redémarrer la file' }).click();
+  await expect(sheet.getByText('En attente', { exact: true })).toBeVisible();
+  expect(mutations).toEqual([
+    { bufferSize: 1, is4k: false },
+    '?is4k=false',
+    { bufferSize: 1, is4k: false },
   ]);
 });
 
@@ -275,6 +372,130 @@ test('bulk collection requests exclude blocked titles and show partial results',
   ]);
 });
 
+test('collection request sheet localizes eligibility and submission feedback', async ({
+  page,
+}, info) => {
+  const submitted: unknown[] = [];
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const path = url.pathname.slice('/api/v1'.length);
+    if (path === '/auth/me')
+      return route.fulfill({ json: { id: 1, permissions: 32 } });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({ json: { locale: 'fr' } });
+    if (path === '/settings/public')
+      return route.fulfill({ json: { movie4kEnabled: false } });
+    if (path === '/collection/30')
+      return route.fulfill({
+        json: {
+          id: 30,
+          name: 'Collection exemple',
+          parts: [
+            { id: 20, mediaType: 'movie', title: 'Film admissible' },
+            {
+              id: 21,
+              mediaType: 'movie',
+              title: 'Film bloqué',
+              mediaInfo: { status: 6 },
+            },
+            {
+              id: 22,
+              mediaType: 'movie',
+              title: 'Film demandé',
+              mediaInfo: { status: 3 },
+            },
+            {
+              id: 23,
+              mediaType: 'movie',
+              title: 'Film en bibliothèque',
+              mediaInfo: { status: 5 },
+            },
+          ],
+        },
+      });
+    if (path === '/request' && request.method() === 'POST') {
+      const body = request.postDataJSON();
+      submitted.push(body);
+      return body.bypassStreamingRequestPolicy
+        ? route.fulfill({ status: 201, json: { id: 8 } })
+        : route.fulfill({
+            status: 403,
+            json: {
+              code: 'STREAMING_REQUEST_POLICY_REJECTED',
+              message: 'Available on your streaming service.',
+              allowOverride: true,
+            },
+          });
+    }
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(`${mount}/collection/30`);
+  await page
+    .getByRole('button', { name: /Request Collection|Demander la collection/ })
+    .click();
+  const sheet = page.getByRole('dialog');
+  await page.screenshot({
+    path: info.outputPath('collection-request-sheet.png'),
+    animations: 'disabled',
+  });
+  await expect(sheet).toHaveAttribute('aria-label', 'Demander la collection');
+  const filters = sheet.getByRole('group', { name: 'Filtres de collection' });
+  await expect(
+    filters.getByRole('combobox', { name: 'Année de sortie' })
+  ).toHaveValue('');
+  await expect(filters.getByRole('combobox', { name: 'Genre' })).toHaveValue(
+    ''
+  );
+  await expect(
+    filters.getByRole('combobox', { name: 'Note minimale' })
+  ).toHaveValue('');
+  await expect(filters.getByRole('combobox', { name: 'Langue' })).toHaveValue(
+    ''
+  );
+  await expect(
+    filters.getByRole('button', { name: 'Effacer les filtres' })
+  ).toBeDisabled();
+  await expect(
+    sheet.getByRole('checkbox', { name: 'Film bloqué Bloqué' })
+  ).toBeDisabled();
+  await expect(
+    sheet.getByRole('checkbox', { name: 'Film demandé Déjà demandé' })
+  ).toBeDisabled();
+  await expect(
+    sheet.getByRole('checkbox', {
+      name: 'Film en bibliothèque Dans la bibliothèque',
+    })
+  ).toBeDisabled();
+  await sheet
+    .getByRole('button', { name: 'Sélectionner les films admissibles' })
+    .click();
+  await sheet
+    .getByRole('button', { name: 'Demander la sélection (1)' })
+    .click();
+  await expect(
+    sheet.getByText('Disponible sur votre service de streaming.', {
+      exact: true,
+    })
+  ).toBeVisible();
+  await sheet.getByRole('button', { name: 'Demander quand même (1)' }).click();
+  await expect(sheet.getByText('Demandes envoyées : 1/1.')).toBeVisible();
+  await expect(
+    sheet.getByText('Demande envoyée', { exact: true })
+  ).toBeVisible();
+  expect(submitted).toEqual([
+    { mediaId: 20, mediaType: 'movie', is4k: false },
+    {
+      mediaId: 20,
+      mediaType: 'movie',
+      is4k: false,
+      bypassStreamingRequestPolicy: true,
+    },
+  ]);
+});
+
 test('collection playback uses ordered internal IDs, skips shared copies, and opens a safe playlist link', async ({
   page,
 }) => {
@@ -350,6 +571,86 @@ test('collection playback uses ordered internal IDs, skips shared copies, and op
   expect(writes).toEqual([
     { mediaIds: [99, 70], is4k: false, deviceId: 'player-1' },
     { mediaIds: [70], is4k: false },
+  ]);
+});
+
+test('collection playback follows the saved French locale', async ({
+  page,
+}, testInfo) => {
+  const writes: unknown[] = [];
+  let locale = 'en';
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname.slice('/api/v1'.length);
+    if (path === '/auth/me')
+      return route.fulfill({ json: { id: 1, permissions: 32 } });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({ json: { locale } });
+    if (path === '/settings/public')
+      return route.fulfill({ json: { otherUsersAvailability: 'show' } });
+    if (path === '/collection/30')
+      return route.fulfill({
+        json: {
+          id: 30,
+          name: 'Example Collection',
+          parts: [
+            {
+              id: 20,
+              mediaType: 'movie',
+              title: 'First Movie',
+              mediaInfo: { id: 99, status: 5 },
+            },
+          ],
+        },
+      });
+    if (path === '/playback/devices')
+      return route.fulfill({
+        json: [{ id: 'player-1', name: 'TV', client: 'Plex' }],
+      });
+    if (path === '/playback/collection/play') {
+      writes.push(request.postDataJSON());
+      return route.fulfill({ status: 204 });
+    }
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(`${mount}/collection/30`);
+  await page.getByRole('button', { name: 'Play Collection' }).click();
+  const englishSheet = page.getByRole('dialog', { name: 'Play Collection' });
+  await expect(englishSheet.getByLabel('Playback Device')).toBeVisible();
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: testInfo.outputPath('playback-english.png') });
+
+  locale = 'fr';
+  await page.reload();
+  await page.getByRole('button', { name: 'Lire la collection' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Lire la collection' });
+  await expect(sheet.getByLabel('Appareil de lecture')).toBeVisible();
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: testInfo.outputPath('playback-french.png') });
+  const geometry = await sheet.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return {
+      left: rect.left,
+      right: rect.right,
+      viewport: document.documentElement.clientWidth,
+      overflow:
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
+    };
+  });
+  expect(geometry.left).toBeGreaterThanOrEqual(0);
+  expect(geometry.right).toBeLessThanOrEqual(geometry.viewport);
+  expect(geometry.overflow).toBe(false);
+  await sheet.getByLabel('Appareil de lecture').selectOption('player-1');
+  await sheet.getByRole('button', { name: 'Lire sur l’appareil' }).click();
+  await expect(sheet.getByText('Lecture lancée sur TV.')).toBeVisible();
+  await expect(
+    sheet.getByRole('button', { name: 'Créer une liste de lecture' })
+  ).toBeVisible();
+  expect(writes).toEqual([
+    { mediaIds: [99], is4k: false, deviceId: 'player-1' },
   ]);
 });
 

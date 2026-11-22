@@ -33,6 +33,8 @@ test('book details reach the author and series and send the exact shelf target',
   };
   const targets: unknown[] = [];
   const creations: unknown[] = [];
+  const associationReads: string[] = [];
+  const narratorPreferences: unknown[] = [];
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/lumen-config.json', (route) =>
     route.fulfill({ json: {} })
@@ -43,6 +45,14 @@ test('book details reach the author and series and send the exact shelf target',
     const path = decodeURIComponent(url.pathname.slice(7));
     if (path === '/auth/me')
       return route.fulfill({ json: { id: 1, permissions: 2 } });
+    if (path === '/settings/public')
+      return route.fulfill({
+        json: { enabledMediaCategories: { audiobook: true } },
+      });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({
+        json: { enabledMediaCategories: { audiobook: true } },
+      });
     if (path === '/book/OL11W') return route.fulfill({ json: first });
     if (path === '/author/OL42A') {
       const offset = Number(url.searchParams.get('offset'));
@@ -60,6 +70,54 @@ test('book details reach the author and series and send the exact shelf target',
       return route.fulfill({
         json: { id: seriesId, title: 'Fixture Series', books: [second, first] },
       });
+    if (path === '/editions/series-narrators')
+      return route.fulfill({
+        json: {
+          supported: true,
+          matrix: { books: [{ bookId: 11, title: 'Another Fixture Book' }] },
+          plans: [
+            {
+              narrator: 'Jane Narrator',
+              production: 'solo',
+              covered: [11],
+              missing: [],
+              owned: [],
+              totalBooks: 1,
+              complete: true,
+              otherPerformanceOnly: [],
+            },
+          ],
+        },
+      });
+    if (
+      path === '/editions/series-narrators/prefer' &&
+      request.method() === 'POST'
+    ) {
+      narratorPreferences.push(request.postDataJSON());
+      return route.fulfill({ json: { success: true } });
+    }
+    if (
+      path === '/association/book/OL11W' ||
+      path === '/association/book/OL22W'
+    ) {
+      associationReads.push(path);
+      return route.fulfill({
+        json: {
+          root: { title: path.endsWith('OL11W') ? first.title : second.title },
+          edges: [
+            {
+              type: 'shared-person',
+              reason: 'Also by Fixture Author',
+              node: {
+                id: 'OL33W',
+                mediaType: 'book',
+                title: 'Another Related Book',
+              },
+            },
+          ],
+        },
+      });
+    }
     if (path === '/settings/reader-delivery')
       return route.fulfill({
         json: {
@@ -131,11 +189,39 @@ test('book details reach the author and series and send the exact shelf target',
   await expect(
     page.getByRole('heading', { name: 'Fixture Series' })
   ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Collect This Series With One Narrator' })
+  ).toBeVisible();
+  await expect(page.getByText('1 of 1 volumes')).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Collect With Jane Narrator' })
+    .click();
+  await expect(page.getByRole('status')).toContainText(
+    'The series now prefers Jane Narrator.'
+  );
+  expect(narratorPreferences).toEqual([
+    { title: 'Fixture Series', narrator: 'Jane Narrator' },
+  ]);
   await expect(page.locator('.grid a.hit').first()).toHaveAttribute(
     'href',
     appPath('/book/OL11W')
   );
   await page.screenshot({ path: info.outputPath('series.png') });
+  await page.getByText('Collection Associations', { exact: true }).click();
+  await expect(
+    page.getByRole('link', { name: 'Another Related Book' })
+  ).toHaveAttribute('href', appPath('/book/OL33W'));
+  expect(associationReads.sort()).toEqual([
+    '/association/book/OL11W',
+    '/association/book/OL22W',
+  ]);
+  await page.screenshot({ path: info.outputPath('series-associations.png') });
+  await page.getByRole('link', { name: 'Another Related Book' }).click();
+  await expect(page).toHaveURL(new RegExp(`${appPath('/book/OL33W')}$`));
+  await page.goto(appPath(`/book-series/${seriesId}`));
+  await expect(
+    page.getByRole('heading', { name: 'Fixture Series' })
+  ).toBeVisible();
   const filters = page.getByRole('group', { name: 'Book Series Filters' });
   const cards = page.locator('.grid a.hit');
   await filters.getByLabel('Format').selectOption('audiobook');

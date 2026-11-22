@@ -209,6 +209,8 @@ async function fixtures(
     mine = undefined as Record<string, boolean> | undefined,
     permissions = 2,
     config = {} as Record<string, unknown>,
+    locale = 'en',
+    magazinesEnabled = false,
   } = {}
 ) {
   const requested: unknown[] = [];
@@ -228,18 +230,21 @@ async function fixtures(
       });
     if (path === '/user/1/settings/main')
       return r.fulfill({
-        json: mine ? { enabledMediaCategories: mine } : {},
+        json: { ...(mine ? { enabledMediaCategories: mine } : {}), locale },
       });
     if (path === '/settings/public')
       return r.fulfill({
         json: {
           applicationTitle: 'SeerrNG',
           comicsEnabled: true,
-          enabledMediaCategories: { comic: true },
+          magazinesEnabled,
+          enabledMediaCategories: { comic: true, magazine: magazinesEnabled },
         },
       });
     if (path === '/genres/tv') return r.fulfill({ json: [] });
     if (path.startsWith('/discover/tv')) return r.fulfill({ json: paged([]) });
+    if (path.startsWith('/discover/magazines'))
+      return r.fulfill({ json: paged([]) });
     if (path === '/discover/comics/landing')
       return r.fulfill({
         json: {
@@ -327,6 +332,106 @@ async function fixtures(
 const hoverable = (name: string) =>
   name === 'desktop' || name === 'tablet-mouse';
 
+for (const locale of ['en', 'fr', 'ar'] as const) {
+  const baseline = process.env.LUMEN_MAGAZINES_BASELINE === 'true';
+  test(`magazine discovery localizes catalogue and empty states in ${locale}`, async ({
+    page,
+  }, info) => {
+    await fixtures(page, { locale, magazinesEnabled: true });
+    const copy = {
+      en: {
+        title: 'Magazines',
+        public: 'Public Catalogue',
+        search: 'Search magazines…',
+        noResults: 'No magazines found',
+        request: 'Request “Time”',
+      },
+      fr: {
+        title: 'Magazines',
+        public: 'Catalogue public',
+        search: 'Rechercher des magazines…',
+        noResults: 'Aucun magazine trouvé',
+        request: 'Demander « Time »',
+      },
+      ar: {
+        title: 'المجلات',
+        public: 'الكتالوج العام',
+        search: 'ابحث عن المجلات…',
+        noResults: 'لم يتم العثور على مجلات',
+        request: 'اطلب «Time»',
+      },
+    }[baseline ? 'en' : locale];
+    await page.goto('/magazines');
+    await expect(page.getByRole('heading', { name: copy.title })).toBeVisible();
+    const captureDirectory = process.env.LUMEN_MAGAZINES_CAPTURE_DIR;
+    if (captureDirectory && ['desktop', 'iphone'].includes(info.project.name))
+      await page.screenshot({
+        path: `${captureDirectory}/${locale}-${info.project.name}.png`,
+        fullPage: true,
+      });
+    await expect(page.getByPlaceholder(copy.search)).toBeVisible();
+    await page.getByRole('button', { name: copy.public }).click();
+    await page.getByRole('button', { name: 'Time', exact: true }).click();
+    await expect(page.getByText(copy.noResults, { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: copy.request })
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+  });
+}
+
+for (const locale of ['en', 'fr', 'ar'] as const) {
+  test(`the Comics catalogue uses ${locale} copy without changing its filters`, async ({
+    page,
+  }, info) => {
+    await fixtures(page, { locale });
+    await page.goto('/comics');
+    const copy = {
+      en: {
+        title: 'Comics/Manga',
+        catalogue: 'Search the Comics Catalogue',
+        type: 'Type',
+        sort: 'Sort',
+      },
+      fr: {
+        title: 'BD et mangas',
+        catalogue: 'Rechercher dans le catalogue de BD',
+        type: 'Type',
+        sort: 'Trier',
+      },
+      ar: {
+        title: 'القصص المصورة والمانغا',
+        catalogue: 'ابحث في فهرس القصص المصورة',
+        type: 'النوع',
+        sort: 'الترتيب',
+      },
+    }[locale];
+    await expect(page.locator('h1')).toHaveText(copy.title);
+    await expect(page.getByText(copy.catalogue)).toBeVisible();
+    await expect(page.getByRole('group', { name: copy.type })).toBeVisible();
+    await expect(page.getByText(copy.sort, { exact: true })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.dir)).toBe(
+      locale === 'ar' ? 'rtl' : 'ltr'
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+    const captureDirectory = process.env.LUMEN_COMICS_CAPTURE_DIR;
+    if (captureDirectory && ['desktop', 'iphone'].includes(info.project.name)) {
+      await writeFile(
+        `${captureDirectory}/${locale}-${info.project.name}.png`,
+        await page.screenshot({ fullPage: true })
+      );
+    }
+  });
+}
+
 test('the Comics page opens populated, with no search box of its own', async ({
   page,
 }) => {
@@ -409,7 +514,7 @@ test('the edition picker defaults to the recommended English edition', async ({
   await expect(rows.first()).toContainText('Recommended');
   await expect(rows.nth(5)).toContainText('Spanish');
   await expect(rows.nth(5)).toContainText('Norma Editorial');
-  await expect(rows.nth(5)).toContainText('21 vols');
+  await expect(rows.nth(5)).toContainText('21 volumes');
   const button = page
     .getByRole('button', { name: 'Request · Viz, English' })
     .filter({ visible: true })
@@ -427,6 +532,71 @@ test('the edition picker defaults to the recommended English edition', async ({
   expect(requested[0]).toEqual({ mediaType: 'comic', mediaId: 155485 });
   await expect(rows.nth(5)).toContainText('Requested');
 });
+
+for (const locale of ['en', 'fr', 'ar'] as const) {
+  const baseline = process.env.LUMEN_COMIC_DETAIL_BASELINE === 'true';
+  const copy = {
+    en: {
+      picker: 'Choose an edition',
+      recommended: 'Recommended',
+      volumes: 'Volumes',
+      readerShelf: 'Manage Reader Shelf',
+    },
+    fr: {
+      picker: 'Choisir une édition',
+      recommended: 'Recommandée',
+      volumes: 'Volumes',
+      readerShelf: 'Gérer l’étagère de lecture',
+    },
+    ar: {
+      picker: 'اختر نسخة',
+      recommended: 'موصى بها',
+      volumes: 'المجلدات',
+      readerShelf: 'إدارة رف القراءة',
+    },
+  }[baseline ? 'en' : locale];
+  test(`comic detail localizes edition and issue controls in ${locale}`, async ({
+    page,
+  }, info) => {
+    await fixtures(page, { locale });
+    await page.goto('/comic/al-105778');
+    await expect(
+      page.getByRole('button', { name: copy.readerShelf })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: copy.picker })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('radiogroup', {
+        name:
+          copy.picker === 'Choose an edition'
+            ? 'Editions'
+            : locale === 'fr'
+              ? 'Éditions'
+              : 'النسخ',
+      })
+    ).toBeVisible();
+    await expect(
+      page.getByText(copy.recommended, { exact: true })
+    ).toBeVisible();
+    await expect(
+      page.getByText(copy.volumes, { exact: true }).last()
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+    if (info.project.name === 'desktop' || info.project.name === 'iphone') {
+      const captureDirectory = process.env.LUMEN_COMIC_DETAIL_CAPTURE_DIR;
+      if (captureDirectory)
+        await page.screenshot({
+          path: `${captureDirectory}/${locale}-${info.project.name}.png`,
+          fullPage: true,
+        });
+    }
+  });
+}
 
 test('an edition already in the library shows on the work and in the picker', async ({
   page,

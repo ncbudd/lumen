@@ -13,6 +13,16 @@ interface Episode {
   sonarrAvailability?: { hd: boolean; fourK: boolean };
 }
 
+interface SeasonEpisodes {
+  seasonNumber: number;
+  episodes: Episode[];
+}
+
+// The server fetches provider metadata with concurrency three. Keep client
+// batches small so one slow upstream season cannot hold a long series behind
+// a single proxy request; failed seasons are retried independently.
+const SEASON_BATCH_SIZE = 5;
+
 export default function TvEpisodeRequestSheet({
   tvId,
   seasons,
@@ -82,49 +92,39 @@ export default function TvEpisodeRequestSheet({
         (number) => !episodesRef.current.has(number)
       );
       const failed: number[] = [];
-      const accept = (number: number, value: { episodes: Episode[] }) => {
-        if (!Array.isArray(value?.episodes)) {
-          failed.push(number);
-          return;
-        }
-        episodesRef.current = new Map(episodesRef.current).set(
-          number,
-          value.episodes
-        );
-        if (active) setEpisodesBySeason(new Map(episodesRef.current));
-      };
-      for (let index = 0; index < missing.length; index += 3) {
-        const batch = missing.slice(index, index + 3);
-        await Promise.all(
-          batch.map(async (number) => {
-            try {
-              accept(
-                number,
-                await api<{ episodes: Episode[] }>(
-                  `/tv/${tvId}/season/${number}`
-                )
-              );
-            } catch {
-              failed.push(number);
-            }
-          })
-        );
-      }
-      // Providers that reject parallel season lookups get one serial recovery pass.
-      const unresolved = [...new Set(failed)];
-      const stillMissing: number[] = [];
-      for (const number of unresolved) {
+      for (let index = 0; index < missing.length; index += SEASON_BATCH_SIZE) {
+        const batch = missing.slice(index, index + SEASON_BATCH_SIZE);
+        const query = new URLSearchParams({
+          seasonNumbers: batch.join(','),
+        });
         try {
-          accept(
-            number,
-            await api<{ episodes: Episode[] }>(`/tv/${tvId}/season/${number}`)
+          const values = await api<SeasonEpisodes[]>(
+            `/tv/${tvId}/seasons?${query}`
           );
+          const returned = new Map(
+            (Array.isArray(values) ? values : []).map((season) => [
+              season.seasonNumber,
+              season.episodes,
+            ])
+          );
+          for (const number of batch) {
+            const episodes = returned.get(number);
+            if (!Array.isArray(episodes)) {
+              failed.push(number);
+              continue;
+            }
+            episodesRef.current = new Map(episodesRef.current).set(
+              number,
+              episodes
+            );
+          }
+          if (active) setEpisodesBySeason(new Map(episodesRef.current));
         } catch {
-          stillMissing.push(number);
+          failed.push(...batch);
         }
       }
       if (active) {
-        setLoadError(stillMissing.length > 0);
+        setLoadError(failed.length > 0);
         setLoading(false);
       }
     };
@@ -134,10 +134,10 @@ export default function TvEpisodeRequestSheet({
     };
   }, [retryCount, seasonKey, seasonNumbers, tvId]);
   const quality = is4k ? 'fourK' : 'hd';
-  const complete =
-    !loading &&
-    !loadError &&
-    seasons.every(({ seasonNumber }) => episodesBySeason.has(seasonNumber));
+  const hasLoadedSeasons = seasons.some(({ seasonNumber }) =>
+    episodesBySeason.has(seasonNumber)
+  );
+  const canSelectLoadedEpisodes = hasLoadedSeasons;
   const eligible = (seasonNumber: number, episode: Episode) =>
     Number.isSafeInteger(episode.episodeNumber) &&
     episode.episodeNumber > 0 &&
@@ -177,7 +177,7 @@ export default function TvEpisodeRequestSheet({
             <button
               className="btn btn-tonal btn-sm"
               type="button"
-              disabled={!complete || busy || !!streamingOverride}
+              disabled={!canSelectLoadedEpisodes || busy || !!streamingOverride}
               onClick={() =>
                 setOpenSeasons(
                   new Set(seasons.map(({ seasonNumber }) => seasonNumber))
@@ -196,7 +196,7 @@ export default function TvEpisodeRequestSheet({
             <button
               className="btn btn-quiet btn-sm"
               type="button"
-              disabled={busy || !complete || !picked.size}
+              disabled={busy || !picked.size}
               onClick={() => setPicked(new Map())}
             >
               {t('lumen.tvEpisodeRequest.clearSelection', 'Clear Selection')}
@@ -219,10 +219,15 @@ export default function TvEpisodeRequestSheet({
             retryLabel={t('lumen.account.retry', 'Retry')}
             error={
               loadError
-                ? t(
-                    'lumen.tvEpisodeRequest.loadFailureBody',
-                    'Some season details could not be loaded.'
-                  )
+                ? hasLoadedSeasons
+                  ? t(
+                      'lumen.tvEpisodeRequest.loadFailurePartialBody',
+                      'Some season details remain unavailable. Episodes from loaded seasons are still shown; retry to load the missing details.'
+                    )
+                  : t(
+                      'lumen.tvEpisodeRequest.loadFailureBody',
+                      'Some season details could not be loaded.'
+                    )
                 : null
             }
             retry={() => setRetryCount((count) => count + 1)}
@@ -299,10 +304,7 @@ export default function TvEpisodeRequestSheet({
                             <input
                               type="checkbox"
                               disabled={
-                                busy ||
-                                !!streamingOverride ||
-                                !complete ||
-                                !available
+                                busy || !!streamingOverride || !available
                               }
                               checked={
                                 available &&
@@ -349,7 +351,7 @@ export default function TvEpisodeRequestSheet({
             <button
               type="button"
               className="btn btn-primary"
-              disabled={busy || !complete || !selections.length}
+              disabled={busy || loading || !selections.length}
               onClick={() =>
                 streamingOverride
                   ? void streamingOverride.confirm()
