@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { api, type Season, type SeasonRequestSelection } from '../api';
 import { useLumenLocale } from '../i18n';
+import { Icon } from '../icons';
 import { ServiceNote } from './extra';
 import { useBackCloses } from './requestSheet';
 import { useDialog } from './useDialog';
@@ -22,6 +23,7 @@ interface SeasonEpisodes {
 // batches small so one slow upstream season cannot hold a long series behind
 // a single proxy request; failed seasons are retried independently.
 const SEASON_BATCH_SIZE = 5;
+const SEASON_BATCH_ATTEMPTS = 2;
 
 export default function TvEpisodeRequestSheet({
   tvId,
@@ -93,35 +95,45 @@ export default function TvEpisodeRequestSheet({
       );
       const failed: number[] = [];
       for (let index = 0; index < missing.length; index += SEASON_BATCH_SIZE) {
-        const batch = missing.slice(index, index + SEASON_BATCH_SIZE);
-        const query = new URLSearchParams({
-          seasonNumbers: batch.join(','),
-        });
-        try {
-          const values = await api<SeasonEpisodes[]>(
-            `/tv/${tvId}/seasons?${query}`
-          );
-          const returned = new Map(
-            (Array.isArray(values) ? values : []).map((season) => [
-              season.seasonNumber,
-              season.episodes,
-            ])
-          );
-          for (const number of batch) {
-            const episodes = returned.get(number);
-            if (!Array.isArray(episodes)) {
-              failed.push(number);
-              continue;
-            }
-            episodesRef.current = new Map(episodesRef.current).set(
-              number,
-              episodes
+        let pending = missing.slice(index, index + SEASON_BATCH_SIZE);
+        for (
+          let attempt = 0;
+          attempt < SEASON_BATCH_ATTEMPTS && pending.length > 0;
+          attempt += 1
+        ) {
+          try {
+            const query = new URLSearchParams({
+              seasonNumbers: pending.join(','),
+            });
+            const values = await api<SeasonEpisodes[]>(
+              `/tv/${tvId}/seasons?${query}`
             );
+            const returned = new Map(
+              (Array.isArray(values) ? values : []).map((season) => [
+                season.seasonNumber,
+                season.episodes,
+              ])
+            );
+            for (const number of pending) {
+              const episodes = returned.get(number);
+              if (!Array.isArray(episodes)) continue;
+              episodesRef.current = new Map(episodesRef.current).set(
+                number,
+                episodes
+              );
+            }
+            pending = pending.filter(
+              (number) => !episodesRef.current.has(number)
+            );
+            if (active) setEpisodesBySeason(new Map(episodesRef.current));
+          } catch {
+            // Retry this batch once, then continue with later seasons.
           }
-          if (active) setEpisodesBySeason(new Map(episodesRef.current));
-        } catch {
-          failed.push(...batch);
+          if (pending.length > 0 && attempt === 0) {
+            await new Promise((resolve) => setTimeout(resolve, 250));
+          }
         }
+        failed.push(...pending);
       }
       if (active) {
         setLoadError(failed.length > 0);
@@ -144,6 +156,72 @@ export default function TvEpisodeRequestSheet({
     !pending.get(seasonNumber)?.has(episode.episodeNumber) &&
     !episode.sonarrAvailability?.[quality] &&
     !episode.availabilitySources?.some((source) => source[quality]);
+  const selectableEpisodeNumbers = (seasonNumber: number) =>
+    (episodesBySeason.get(seasonNumber) ?? [])
+      .filter((episode) => eligible(seasonNumber, episode))
+      .map((episode) => episode.episodeNumber);
+  const allSelectableEpisodes = seasons.flatMap(({ seasonNumber }) =>
+    selectableEpisodeNumbers(seasonNumber).map((episodeNumber) => ({
+      seasonNumber,
+      episodeNumber,
+    }))
+  );
+  const latestSelectableSeasonNumber = seasons.reduce(
+    (latest, { seasonNumber }) =>
+      seasonNumber > latest && selectableEpisodeNumbers(seasonNumber).length
+        ? seasonNumber
+        : latest,
+    0
+  );
+  const selectedSelectableCount = allSelectableEpisodes.filter(
+    ({ seasonNumber, episodeNumber }) =>
+      picked.get(seasonNumber)?.has(episodeNumber)
+  ).length;
+  const allSelectable =
+    allSelectableEpisodes.length > 0 &&
+    selectedSelectableCount === allSelectableEpisodes.length;
+  const selectAll = () => {
+    if (allSelectable) {
+      setPicked(new Map());
+      return;
+    }
+    setPicked((previous) => {
+      const next = new Map(
+        [...previous].filter(
+          ([seasonNumber]) => !episodesBySeason.has(seasonNumber)
+        )
+      );
+      for (const { seasonNumber } of seasons) {
+        const episodeNumbers = selectableEpisodeNumbers(seasonNumber);
+        if (episodeNumbers.length)
+          next.set(seasonNumber, new Set(episodeNumbers));
+      }
+      return next;
+    });
+  };
+  const selectLatestSeason = () => {
+    if (latestSelectableSeasonNumber <= 0) return;
+    const episodeNumbers = selectableEpisodeNumbers(
+      latestSelectableSeasonNumber
+    );
+    if (episodeNumbers.length)
+      setPicked(
+        new Map([[latestSelectableSeasonNumber, new Set(episodeNumbers)]])
+      );
+  };
+  const toggleSeasonSelection = (seasonNumber: number) => {
+    const episodeNumbers = selectableEpisodeNumbers(seasonNumber);
+    const selected = picked.get(seasonNumber);
+    const allSelected =
+      episodeNumbers.length > 0 &&
+      episodeNumbers.every((episodeNumber) => selected?.has(episodeNumber));
+    setPicked((previous) => {
+      const next = new Map(previous);
+      if (allSelected || !episodeNumbers.length) next.delete(seasonNumber);
+      else next.set(seasonNumber, new Set(episodeNumbers));
+      return next;
+    });
+  };
   const selections = seasons.flatMap(({ seasonNumber }) => {
     const episodeNumbers = (episodesBySeason.get(seasonNumber) ?? [])
       .filter(
@@ -174,6 +252,47 @@ export default function TvEpisodeRequestSheet({
             </h3>
           </header>
           <div className="toolbar">
+            <button
+              className={`btn btn-sm ${allSelectable ? 'btn-primary' : 'btn-tonal'}`}
+              data-testid="select-all-requestable-episodes"
+              type="button"
+              role="checkbox"
+              aria-checked={allSelectable}
+              aria-label={t(
+                allSelectable
+                  ? 'lumen.tvEpisodeRequest.deselectAll'
+                  : 'lumen.tvEpisodeRequest.selectAll',
+                allSelectable
+                  ? 'Deselect all requestable episodes'
+                  : 'Select all requestable episodes'
+              )}
+              disabled={
+                !allSelectableEpisodes.length || busy || !!streamingOverride
+              }
+              onClick={selectAll}
+            >
+              <Icon name={allSelectable ? 'check' : 'plus'} />
+              {t('lumen.tvEpisodeRequest.selectAllShort', 'Select All')}
+            </button>
+            <button
+              className="btn btn-tonal btn-sm"
+              type="button"
+              data-testid="select-latest-requestable-season"
+              aria-label={t(
+                'lumen.tvEpisodeRequest.selectLatestSeason',
+                'Select all requestable episodes in the latest season'
+              )}
+              disabled={
+                latestSelectableSeasonNumber <= 0 ||
+                loading ||
+                loadError ||
+                busy ||
+                !!streamingOverride
+              }
+              onClick={selectLatestSeason}
+            >
+              {t('lumen.tvEpisodeRequest.latestSeason', 'Latest Season')}
+            </button>
             <button
               className="btn btn-tonal btn-sm"
               type="button"
@@ -252,7 +371,14 @@ export default function TvEpisodeRequestSheet({
                         number: seasonNumber,
                       }
                     ));
-              const selectedCount = picked.get(seasonNumber)?.size ?? 0;
+              const selectableNumbers = selectableEpisodeNumbers(seasonNumber);
+              const selectedCount = selectableNumbers.filter((number) =>
+                picked.get(seasonNumber)?.has(number)
+              ).length;
+              const allSelected =
+                selectableNumbers.length > 0 &&
+                selectedCount === selectableNumbers.length;
+              const partiallySelected = selectedCount > 0 && !allSelected;
               return (
                 <details
                   key={seasonNumber}
@@ -282,6 +408,40 @@ export default function TvEpisodeRequestSheet({
                             { count: item.episodeCount }
                           )}
                     </small>
+                    <button
+                      className={`btn btn-sm ${allSelected ? 'btn-primary' : 'btn-tonal'}`}
+                      type="button"
+                      role="checkbox"
+                      aria-checked={
+                        allSelected ? true : partiallySelected ? 'mixed' : false
+                      }
+                      aria-label={t(
+                        allSelected
+                          ? 'lumen.tvEpisodeRequest.deselectSeason'
+                          : 'lumen.tvEpisodeRequest.selectSeason',
+                        allSelected
+                          ? 'Deselect all requestable episodes in {season}'
+                          : 'Select all requestable episodes in {season}',
+                        { season: label }
+                      )}
+                      disabled={
+                        !selectableNumbers.length || busy || !!streamingOverride
+                      }
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        toggleSeasonSelection(seasonNumber);
+                      }}
+                    >
+                      <Icon
+                        name={
+                          allSelected
+                            ? 'check'
+                            : partiallySelected
+                              ? 'minus'
+                              : 'plus'
+                        }
+                      />
+                    </button>
                   </summary>
                   {episodes.length ? (
                     <div className="setlist">

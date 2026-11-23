@@ -1,22 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   Link,
   useNavigate,
   useParams,
   useSearchParams,
 } from 'react-router-dom';
-import { api } from '../api';
+import { isIssueSubtypeForMediaType } from '../../../server/constants/issue';
+import { api, artUrl, tmdbImg, type DetailDisclosurePins } from '../api';
 import { useAuth } from '../auth';
 import { ConfirmSheet } from '../components/ConfirmSheet';
 import { Pill } from '../components/detail';
 import { ServiceNote } from '../components/extra';
+import { useToast } from '../components/toast';
 import { useApi } from '../hooks';
 import { useLumenLocale } from '../i18n';
 import {
   canCreateIssues,
   canManageIssues,
   canReadIssues,
+  canViewIssueReporter,
 } from '../issuePermissions';
+import { sessionGeneration } from '../sessionState';
 
 interface Reporter {
   id: number;
@@ -26,16 +30,25 @@ interface IssueMedia {
   mediaType: string;
   tmdbId?: number;
   mbId?: string | null;
+  title?: string;
+  name?: string;
+  posterPath?: string;
   identifiers?: { provider: string; value: string }[];
 }
 
 interface IssueMediaTitle {
+  mediaType?: string;
   title?: string;
   name?: string;
+  posterPath?: string;
   releaseDate?: string;
   firstAirDate?: string;
   firstPublishYear?: number;
   startYear?: string;
+  runtime?: number;
+  episodeRunTime?: number[];
+  numberOfPages?: number;
+  issueCount?: number;
 }
 
 function issueTitleLink(media?: IssueMedia) {
@@ -75,13 +88,20 @@ function issueTitleLink(media?: IssueMedia) {
   };
 }
 
-function IssueMediaTitle({ media }: { media?: IssueMedia }) {
-  const { t } = useLumenLocale();
-  const anchor = useRef<HTMLSpanElement>(null);
+function IssueMediaTitle({
+  media,
+  is4k = false,
+}: {
+  media?: IssueMedia;
+  is4k?: boolean;
+}) {
+  const { locale, t } = useLumenLocale();
+  const anchor = useRef<HTMLDivElement>(null);
   const [nearView, setNearView] = useState(false);
   const destination = issueTitleLink(media);
+  const destinationPath = destination?.path;
   useEffect(() => {
-    if (!destination || nearView || !anchor.current) return;
+    if (!destinationPath || nearView || !anchor.current) return;
     if (typeof IntersectionObserver === 'undefined') {
       setNearView(true);
       return;
@@ -97,30 +117,112 @@ function IssueMediaTitle({ media }: { media?: IssueMedia }) {
     );
     observer.observe(anchor.current);
     return () => observer.disconnect();
-  }, [destination?.path, nearView]);
+  }, [destinationPath, nearView]);
   const { data, error } = useApi<IssueMediaTitle>(
     nearView && destination ? destination.path : null,
     { currentPathOnly: true }
   );
-  const title = data?.title || data?.name;
+  const title = data?.title || data?.name || media?.title || media?.name;
   const year =
     (data?.releaseDate || data?.firstAirDate || '').match(/\d{4}/)?.[0] ||
     data?.firstPublishYear ||
     data?.startYear;
-  if (!destination || error) return null;
+  const mediaType = media?.mediaType;
+  const poster =
+    mediaType === 'book' || mediaType === 'comic' || mediaType === 'magazine'
+      ? artUrl(data?.posterPath)
+      : mediaType === 'music'
+        ? artUrl(data?.posterPath)
+        : tmdbImg(data?.posterPath, 'w92');
+  const minutes = data?.runtime || data?.episodeRunTime?.[0];
+  const runtime = minutes
+    ? t('lumen.issues.runtimeMinutes', '{value} min', {
+        value: minutes,
+      })
+    : data?.numberOfPages
+      ? t('lumen.issues.pageCount', '{value} pages', {
+          value: data.numberOfPages,
+        })
+      : data?.issueCount
+        ? t('lumen.issues.issueCount', '{value} issues', {
+            value: data.issueCount,
+          })
+        : undefined;
+  const mediaLabel = mediaType
+    ? t(
+        `lumen.issues.media.${mediaType === 'tv' ? 'series' : mediaType}`,
+        destination?.label ?? 'Media'
+      )
+    : undefined;
+  const releaseDateLabel =
+    mediaType === 'book' || mediaType === 'comic'
+      ? t('lumen.issues.field.firstPublished', 'First Published')
+      : mediaType === 'magazine'
+        ? t('lumen.issues.field.latestIssue', 'Latest Issue')
+        : t('lumen.issues.field.releaseDate', 'Release Date');
+  const runtimeLabel =
+    mediaType === 'book'
+      ? t('lumen.issues.field.pages', 'Pages')
+      : mediaType === 'comic'
+        ? t('lumen.issues.field.issues', 'Issues')
+        : t('lumen.issues.field.runtime', 'Runtime');
+  const displayDate = (value?: string | number) => {
+    if (value === undefined || value === '') return undefined;
+    const text = String(value);
+    if (/^\d{4}$/.test(text)) return text;
+    const date = new Date(text);
+    return Number.isFinite(date.valueOf())
+      ? new Intl.DateTimeFormat(locale, {
+          dateStyle: 'medium',
+          timeZone: 'UTC',
+        }).format(date)
+      : text;
+  };
+  if (!destination) return null;
   return (
-    <small ref={anchor}>
-      {title ? (
-        <Link to={destination.path}>
-          {title}
-          {year ? ` (${year})` : ''}
-        </Link>
-      ) : nearView ? (
-        t('lumen.issues.loadingTitle', 'Loading title…')
-      ) : (
-        ' '
-      )}
-    </small>
+    <div className="issue-media-summary" ref={anchor}>
+      <Link to={destination.path} aria-label={title ?? mediaLabel}>
+        <img
+          src={poster || '/images/seerr_poster_not_found.png'}
+          alt=""
+          loading="lazy"
+        />
+      </Link>
+      <div>
+        <strong className="issue-media-title">
+          {title ? (
+            <Link to={destination.path}>
+              {title}
+              {year ? ` (${year})` : ''}
+            </Link>
+          ) : error ? (
+            t('lumen.issues.mediaUnavailable', 'Media information unavailable')
+          ) : nearView ? (
+            t('lumen.issues.loadingTitle', 'Loading title…')
+          ) : (
+            ' '
+          )}
+        </strong>
+        <small className="issue-media-format">
+          {mediaLabel}
+          {(mediaType === 'movie' || mediaType === 'tv') &&
+            ` · ${is4k ? '4K' : 'HD'}`}
+        </small>
+        <dl className="issue-card-media-facts">
+          <dt>{releaseDateLabel}:</dt>
+          <dd>
+            {displayDate(
+              data?.releaseDate ||
+                data?.firstAirDate ||
+                data?.startYear ||
+                data?.firstPublishYear
+            ) || t('lumen.issues.unavailable', 'Not available')}
+          </dd>
+          <dt>{runtimeLabel}:</dt>
+          <dd>{runtime || t('lumen.issues.unavailable', 'Not available')}</dd>
+        </dl>
+      </div>
+    </div>
   );
 }
 
@@ -146,6 +248,118 @@ interface Issue {
     user?: Reporter;
     createdAt: string;
   }[];
+}
+
+function issueReasonTranslationKey(issue?: Issue) {
+  return issue?.media?.mediaType &&
+    issue.issueSubtype &&
+    isIssueSubtypeForMediaType(issue.media.mediaType, issue.issueSubtype)
+    ? `lumen.issueReport.reason.${issue.issueSubtype}`
+    : undefined;
+}
+
+function issueAffectedScope(
+  issue: Issue,
+  t: ReturnType<typeof useLumenLocale>['t']
+) {
+  if (issue.problemEpisodeSelections?.length) {
+    return issue.problemEpisodeSelections
+      .map(({ seasonNumber, episodeNumbers }) => {
+        const season = t('lumen.issues.season', 'Season {season}', {
+          season: seasonNumber,
+        });
+        return episodeNumbers?.length
+          ? `${season} · ${t('lumen.issues.episodes', 'Episodes {episodes}', { episodes: episodeNumbers.join(', ') })}`
+          : season;
+      })
+      .join(', ');
+  }
+  if (
+    issue.problemSeason === undefined &&
+    issue.problemEpisode === undefined &&
+    !issue.problemEpisodes?.length
+  )
+    return undefined;
+  const season = t('lumen.issues.season', 'Season {season}', {
+    season: issue.problemSeason ?? 0,
+  });
+  if (issue.problemEpisodes?.length)
+    return `${season} · ${t('lumen.issues.episodes', 'Episodes {episodes}', { episodes: issue.problemEpisodes.join(', ') })}`;
+  if (issue.problemEpisode)
+    return `${season} · ${t('lumen.issues.episode', 'Episode {episode}', { episode: issue.problemEpisode })}`;
+  return season;
+}
+
+interface IssueSeason {
+  seasonNumber: number;
+  episodes: { episodeNumber: number; name: string }[];
+}
+
+function AffectedSeason({
+  tvId,
+  seasonNumber,
+  episodeNumbers,
+}: {
+  tvId: number;
+  seasonNumber: number;
+  episodeNumbers?: number[];
+}) {
+  const { t } = useLumenLocale();
+  const { data, error, reload } = useApi<IssueSeason>(
+    `/tv/${tvId}/season/${seasonNumber}`
+  );
+  const episodes =
+    data?.episodes.filter(
+      (episode) =>
+        episodeNumbers === undefined ||
+        episodeNumbers.includes(episode.episodeNumber)
+    ) ?? [];
+  const seasonLabel = t('lumen.issues.season', 'Season {season}', {
+    season: seasonNumber,
+  });
+
+  return (
+    <section aria-label={seasonLabel}>
+      <b>{seasonLabel}</b>
+      {error ? (
+        <p className="note" role="alert">
+          {t(
+            'lumen.issues.episodesLoadError',
+            'Episode details could not be loaded.'
+          )}{' '}
+          <button className="btn btn-quiet btn-sm" onClick={reload}>
+            {t('lumen.issues.retryEpisodes', 'Retry')}
+          </button>
+        </p>
+      ) : !data ? (
+        <p className="note" role="status">
+          {t('lumen.issues.loadingEpisodes', 'Loading episode details…')}
+        </p>
+      ) : episodes.length ? (
+        <ul className="request-summary">
+          {episodes.map((episode) => (
+            <li key={episode.episodeNumber}>
+              <small>
+                {t('lumen.issues.episode', 'Episode {episode}', {
+                  episode: episode.episodeNumber,
+                })}
+                {' · '}
+                {episode.name ||
+                  t('lumen.issues.untitledEpisode', 'Untitled episode')}
+              </small>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="note">
+          {t(
+            'lumen.issues.noEpisodeDetails',
+            'No matching episodes were found.'
+          )}
+        </p>
+      )}
+    </section>
+  );
 }
 interface IssuePage {
   results: Issue[];
@@ -173,6 +387,47 @@ function IssueStatus({ status }: { status: number }) {
         ? t('lumen.issues.resolved', 'Resolved')
         : t('lumen.issues.open', 'Open')}
     </Pill>
+  );
+}
+
+type IssueFilterPin = 'taskFilters' | 'mediaFilters' | 'filters' | 'sortBy';
+type IssuePinMedia = 'movie' | 'tv' | 'music' | 'book';
+
+function IssueFilterDisclosure({
+  label,
+  pinned,
+  onTogglePin,
+  busy,
+  children,
+}: {
+  label: string;
+  pinned: boolean;
+  onTogglePin: () => void;
+  busy: boolean;
+  children: ReactNode;
+}) {
+  const { t } = useLumenLocale();
+  const [open, setOpen] = useState(pinned);
+  useEffect(() => setOpen(pinned), [pinned]);
+  return (
+    <details
+      open={open}
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
+      <summary className="sel">{label}</summary>
+      <div className="toolbar">
+        {children}
+        <button
+          className="btn btn-quiet btn-sm"
+          type="button"
+          aria-pressed={pinned}
+          disabled={busy}
+          onClick={onTogglePin}
+        >
+          {t('lumen.detail.keepOpen', 'Keep {label} Open', { label })}
+        </button>
+      </div>
+    </details>
   );
 }
 
@@ -247,7 +502,15 @@ const issueMetadata = [
 
 function IssueList() {
   const { locale, t } = useLumenLocale();
+  const { user, refresh } = useAuth();
+  const toast = useToast();
   const [bookmark, setBookmark] = useSearchParams();
+  const [expandedIssue, setExpandedIssue] = useState<number>();
+  const [pinBusy, setPinBusy] = useState<IssueFilterPin>();
+  const [pinOverrides, setPinOverrides] = useState<
+    Record<string, DetailDisclosurePins>
+  >({});
+  const pinPending = useRef(false);
   const submitted = (bookmark.get('search') ?? '').trim().slice(0, 512);
   const parsedPage = Number(bookmark.get('page'));
   const page =
@@ -267,6 +530,42 @@ function IssueList() {
       params.set(key, value);
   }
   const media = params.get('mediaType') ?? 'all';
+  const pinMedia: IssuePinMedia =
+    media === 'tv' || media === 'music' || media === 'book' ? media : 'movie';
+  const pinKey = `${user?.id ?? 'anonymous'}:${pinMedia}`;
+  const pins = {
+    ...user?.settings?.detailDisclosurePins?.[pinMedia],
+    ...pinOverrides[pinKey],
+  };
+  async function togglePin(section: IssueFilterPin) {
+    if (!user || pinPending.current) return;
+    const nextPinned = pins[section] !== true;
+    const generation = sessionGeneration();
+    pinPending.current = true;
+    setPinBusy(section);
+    try {
+      const saved = await api<DetailDisclosurePins>(
+        `/user/${user.id}/settings/detail-disclosures/${pinMedia}`,
+        { method: 'POST', body: JSON.stringify({ [section]: nextPinned }) }
+      );
+      if (generation !== sessionGeneration()) return;
+      if (saved[section] !== nextPinned)
+        throw new Error('Saved preference could not be confirmed.');
+      setPinOverrides((current) => ({ ...current, [pinKey]: saved }));
+      await refresh();
+    } catch {
+      if (generation === sessionGeneration())
+        toast(
+          t(
+            'lumen.issues.pinSaveFailed',
+            'Could not save this filter display preference. Try again.'
+          )
+        );
+    } finally {
+      pinPending.current = false;
+      setPinBusy(undefined);
+    }
+  }
   const metadata = issueMetadata.filter(({ media: types }) =>
     (types as readonly string[]).includes(media)
   );
@@ -308,7 +607,6 @@ function IssueList() {
   return (
     <>
       <form
-        className="toolbar"
         onSubmit={(event) => {
           event.preventDefault();
           const form = new FormData(event.currentTarget);
@@ -322,76 +620,172 @@ function IssueList() {
           setBookmark(next);
         }}
       >
-        {issueFilters.map(({ key, label, options }) => (
-          <label className="sel" key={key}>
-            <select
-              aria-label={t(`lumen.issues.filter.${key}`, label)}
-              value={params.get(key) ?? 'all'}
-              onChange={(event) =>
-                update(
-                  key,
-                  event.target.value === 'all' ? '' : event.target.value
-                )
-              }
-            >
-              {Object.entries(options).map(([value, name]) => (
-                <option key={value} value={value}>
-                  {t(`lumen.issues.option.${key}.${value}`, name)}
-                </option>
-              ))}
-            </select>
+        <IssueFilterDisclosure
+          label={t('lumen.issues.group.task', 'Task Filters')}
+          pinned={pins.taskFilters === true}
+          busy={pinBusy === 'taskFilters'}
+          onTogglePin={() => void togglePin('taskFilters')}
+        >
+          {issueFilters
+            .filter(({ key }) => key === 'filter' || key === 'issueType')
+            .map(({ key, label, options }) => (
+              <label className="sel" key={key}>
+                <select
+                  aria-label={t(`lumen.issues.filter.${key}`, label)}
+                  value={params.get(key) ?? 'all'}
+                  onChange={(event) =>
+                    update(
+                      key,
+                      event.target.value === 'all' ? '' : event.target.value
+                    )
+                  }
+                >
+                  {Object.entries(options).map(([value, name]) => (
+                    <option key={value} value={value}>
+                      {t(`lumen.issues.option.${key}.${value}`, name)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+        </IssueFilterDisclosure>
+        <IssueFilterDisclosure
+          label={t('lumen.issues.group.media', 'Media Filters')}
+          pinned={pins.mediaFilters === true}
+          busy={pinBusy === 'mediaFilters'}
+          onTogglePin={() => void togglePin('mediaFilters')}
+        >
+          {issueFilters
+            .filter(({ key }) => key === 'mediaType')
+            .map(({ key, label, options }) => (
+              <label className="sel" key={key}>
+                <select
+                  aria-label={t(`lumen.issues.filter.${key}`, label)}
+                  value={params.get(key) ?? 'all'}
+                  onChange={(event) =>
+                    update(
+                      key,
+                      event.target.value === 'all' ? '' : event.target.value
+                    )
+                  }
+                >
+                  {Object.entries(options).map(([value, name]) => (
+                    <option key={value} value={value}>
+                      {t(`lumen.issues.option.${key}.${value}`, name)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+        </IssueFilterDisclosure>
+        <IssueFilterDisclosure
+          label={t('lumen.issues.group.filters', 'Filters')}
+          pinned={pins.filters === true}
+          busy={pinBusy === 'filters'}
+          onTogglePin={() => void togglePin('filters')}
+        >
+          {issueFilters
+            .filter(({ key }) => key === 'timeFrame')
+            .map(({ key, label, options }) => (
+              <label className="sel" key={key}>
+                <select
+                  aria-label={t(`lumen.issues.filter.${key}`, label)}
+                  value={params.get(key) ?? 'all'}
+                  onChange={(event) =>
+                    update(
+                      key,
+                      event.target.value === 'all' ? '' : event.target.value
+                    )
+                  }
+                >
+                  {Object.entries(options).map(([value, name]) => (
+                    <option key={value} value={value}>
+                      {t(`lumen.issues.option.${key}.${value}`, name)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          <label className="search">
+            <input
+              type="search"
+              aria-label={t('lumen.issues.searchLabel', 'Search Issues')}
+              placeholder={t('lumen.issues.searchPlaceholder', 'Search issues')}
+              maxLength={512}
+              key={submitted}
+              name="search"
+              defaultValue={submitted}
+            />
           </label>
-        ))}
-        <label className="search">
-          <input
-            type="search"
-            aria-label={t('lumen.issues.searchLabel', 'Search Issues')}
-            placeholder={t('lumen.issues.searchPlaceholder', 'Search issues')}
-            maxLength={512}
-            key={submitted}
-            name="search"
-            defaultValue={submitted}
-          />
-        </label>
-        {metadata.map(({ key, label }) => (
-          <label className="sel" key={`${key}:${bookmark.get(key) ?? ''}`}>
-            <span className="lbl">
-              {t(`lumen.issues.metadata.${key}`, label)}
-            </span>
-            {key === 'albumType' ? (
-              <select name={key} defaultValue={params.get(key) ?? ''}>
-                <option value="">
-                  {t('lumen.issues.anyAlbumType', 'Any Album Type')}
-                </option>
-                <option value="album">
-                  {t('lumen.issues.album', 'Album')}
-                </option>
-                <option value="ep">{t('lumen.issues.ep', 'EP')}</option>
-                <option value="single">
-                  {t('lumen.issues.single', 'Single')}
-                </option>
-              </select>
-            ) : (
-              <input
-                className="cfg-json"
-                name={key}
-                defaultValue={params.get(key) ?? ''}
-                maxLength={key === 'releaseYear' ? 11 : 128}
-                pattern={
-                  key === 'releaseYear' ? '[0-9]{4}|before-1970' : undefined
-                }
-                placeholder={
-                  key === 'releaseYear'
-                    ? t('lumen.issues.yearPlaceholder', 'YYYY or before-1970')
-                    : undefined
-                }
-              />
-            )}
-          </label>
-        ))}
-        <button className="btn btn-tonal btn-sm">
-          {t('lumen.issues.search', 'Search')}
-        </button>
+          {metadata.map(({ key, label }) => (
+            <label className="sel" key={`${key}:${bookmark.get(key) ?? ''}`}>
+              <span className="lbl">
+                {t(`lumen.issues.metadata.${key}`, label)}
+              </span>
+              {key === 'albumType' ? (
+                <select name={key} defaultValue={params.get(key) ?? ''}>
+                  <option value="">
+                    {t('lumen.issues.anyAlbumType', 'Any Album Type')}
+                  </option>
+                  <option value="album">
+                    {t('lumen.issues.album', 'Album')}
+                  </option>
+                  <option value="ep">{t('lumen.issues.ep', 'EP')}</option>
+                  <option value="single">
+                    {t('lumen.issues.single', 'Single')}
+                  </option>
+                </select>
+              ) : (
+                <input
+                  className="cfg-json"
+                  name={key}
+                  defaultValue={params.get(key) ?? ''}
+                  maxLength={key === 'releaseYear' ? 11 : 128}
+                  pattern={
+                    key === 'releaseYear' ? '[0-9]{4}|before-1970' : undefined
+                  }
+                  placeholder={
+                    key === 'releaseYear'
+                      ? t('lumen.issues.yearPlaceholder', 'YYYY or before-1970')
+                      : undefined
+                  }
+                />
+              )}
+            </label>
+          ))}
+          <button className="btn btn-tonal btn-sm">
+            {t('lumen.issues.search', 'Search')}
+          </button>
+        </IssueFilterDisclosure>
+        <IssueFilterDisclosure
+          label={t('lumen.issues.group.sort', 'Sort By')}
+          pinned={pins.sortBy === true}
+          busy={pinBusy === 'sortBy'}
+          onTogglePin={() => void togglePin('sortBy')}
+        >
+          {issueFilters
+            .filter(({ key }) => key === 'sort' || key === 'sortDirection')
+            .map(({ key, label, options }) => (
+              <label className="sel" key={key}>
+                <select
+                  aria-label={t(`lumen.issues.filter.${key}`, label)}
+                  value={params.get(key) ?? 'all'}
+                  onChange={(event) =>
+                    update(
+                      key,
+                      event.target.value === 'all' ? '' : event.target.value
+                    )
+                  }
+                >
+                  {Object.entries(options).map(([value, name]) => (
+                    <option key={value} value={value}>
+                      {t(`lumen.issues.option.${key}.${value}`, name)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+        </IssueFilterDisclosure>
       </form>
       <ServiceNote error={error} what="issues" retry={reload} />
       {!data && !error && (
@@ -407,33 +801,112 @@ function IssueList() {
       {!!data?.results.length && (
         <ul className="setlist">
           {data.results.map((issue) => (
-            <li className="set" key={issue.id}>
-              <div>
-                <IssueMediaTitle media={issue.media} />
-                <Link
-                  to={{
-                    pathname: `/issues/${issue.id}`,
-                    search: bookmark.toString(),
-                  }}
+            <li
+              className={`set issue-card${expandedIssue === issue.id ? 'set-expanded' : ''}`}
+              key={issue.id}
+            >
+              <div className="issue-card-content">
+                <IssueMediaTitle media={issue.media} is4k={issue.is4k} />
+                <dl className="issue-card-created-facts">
+                  <dt>{t('lumen.issues.field.createdBy', 'Created By')}:</dt>
+                  <dd>
+                    {canViewIssueReporter(user?.permissions)
+                      ? (issue.createdBy.displayName ??
+                        t('lumen.issues.reporter', 'Reporter'))
+                      : t('lumen.issues.unavailable', 'Not available')}
+                  </dd>
+                  <dt>
+                    {t('lumen.issues.field.createdDate', 'Created Date')}:
+                  </dt>
+                  <dd>{timestamp(issue.createdAt, locale)}</dd>
+                  <dt>{t('lumen.issues.field.description', 'Description')}:</dt>
+                  <dd>
+                    {issue.comments?.[0]?.message ||
+                      t('lumen.issues.unavailable', 'Not available')}
+                  </dd>
+                </dl>
+                <dl className="issue-card-type-facts">
+                  <dt>{t('lumen.issues.field.type', 'Type')}:</dt>
+                  <dd>
+                    <Link
+                      to={{
+                        pathname: `/issues/${issue.id}`,
+                        search: bookmark.toString(),
+                      }}
+                    >
+                      {t(
+                        `lumen.issues.type.${issue.issueType}`,
+                        TYPES[issue.issueType] ?? 'Issue'
+                      )}{' '}
+                      #{issue.id}
+                    </Link>
+                  </dd>
+                  {issueReasonTranslationKey(issue) && (
+                    <>
+                      <dt>{t('lumen.issueReport.reason', 'Reason')}:</dt>
+                      <dd>
+                        {t(
+                          issueReasonTranslationKey(issue)!,
+                          issue.issueSubtype!.replaceAll('_', ' ')
+                        )}
+                      </dd>
+                    </>
+                  )}
+                  {issueAffectedScope(issue, t) ? (
+                    <>
+                      <dt>
+                        {t(
+                          'lumen.issues.field.affectedSeasons',
+                          'Affected Seasons'
+                        )}
+                        :
+                      </dt>
+                      <dd>{issueAffectedScope(issue, t)}</dd>
+                    </>
+                  ) : null}
+                  <dt>{t('lumen.issues.field.status', 'Status')}:</dt>
+                  <dd>
+                    <IssueStatus status={issue.status} />
+                  </dd>
+                  <dt>{t('lumen.issues.field.details', 'Details')}:</dt>
+                  <dd>
+                    <Link
+                      className="btn btn-quiet btn-sm"
+                      to={{
+                        pathname: `/issues/${issue.id}`,
+                        search: bookmark.toString(),
+                      }}
+                    >
+                      {t('lumen.issues.viewDetails', 'View Details')}
+                    </Link>
+                  </dd>
+                </dl>
+                <button
+                  className="btn btn-quiet btn-sm issue-card-discussion"
+                  type="button"
+                  aria-expanded={expandedIssue === issue.id}
+                  aria-controls={`issue-inline-${issue.id}`}
+                  onClick={() =>
+                    setExpandedIssue((current) =>
+                      current === issue.id ? undefined : issue.id
+                    )
+                  }
                 >
-                  <b>
-                    {t(
-                      `lumen.issues.type.${issue.issueType}`,
-                      TYPES[issue.issueType] ?? 'Issue'
-                    )}{' '}
-                    #{issue.id}
-                  </b>
-                </Link>
-                {issue.comments?.[0] && (
-                  <small>{issue.comments[0].message.slice(0, 160)}</small>
-                )}
-                <small>
-                  {issue.createdBy.displayName ??
-                    t('lumen.issues.reporter', 'Reporter')}{' '}
-                  · {timestamp(issue.createdAt, locale)}
-                </small>
+                  {expandedIssue === issue.id
+                    ? t('lumen.issues.hideDetails', 'Hide Details')
+                    : t('lumen.issues.viewDiscussion', 'View Discussion')}
+                </button>
+                <section
+                  id={`issue-inline-${issue.id}`}
+                  className="setlist"
+                  aria-label={t('lumen.issues.issueDetails', 'Issue Details')}
+                  hidden={expandedIssue !== issue.id}
+                >
+                  {expandedIssue === issue.id && (
+                    <Discussion id={issue.id} embedded />
+                  )}
+                </section>
               </div>
-              <IssueStatus status={issue.status} />
             </li>
           ))}
         </ul>
@@ -468,7 +941,13 @@ type IssueAction =
   | { kind: 'comment' | 'resolved' | 'open' | 'delete-issue' }
   | { kind: 'edit-comment' | 'delete-comment'; commentId: number };
 
-function Discussion({ id }: { id: number }) {
+function Discussion({
+  id,
+  embedded = false,
+}: {
+  id: number;
+  embedded?: boolean;
+}) {
   const { locale, t } = useLumenLocale();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -492,9 +971,12 @@ function Discussion({ id }: { id: number }) {
   const editable =
     !!data && (manager || (canCreate && data.createdBy.id === user?.id));
   const canDeleteIssue =
+    !embedded &&
     !!data &&
     (manager ||
       (editable && Array.isArray(data.comments) && data.comments.length <= 1));
+  const affectedTvId =
+    data?.media?.mediaType === 'tv' ? data.media.tmdbId : undefined;
 
   async function submit(action: IssueAction) {
     if (!data || submitting.current) return;
@@ -574,13 +1056,15 @@ function Discussion({ id }: { id: number }) {
 
   return (
     <>
-      <div className="toolbar">
-        <Link className="btn btn-quiet btn-sm" to={issueList}>
-          {listSearch
-            ? t('lumen.issues.backToIssues', 'Back to Issues')
-            : t('lumen.issues.allIssues', 'All Issues')}
-        </Link>
-      </div>
+      {!embedded && (
+        <div className="toolbar">
+          <Link className="btn btn-quiet btn-sm" to={issueList}>
+            {listSearch
+              ? t('lumen.issues.backToIssues', 'Back to Issues')
+              : t('lumen.issues.allIssues', 'All Issues')}
+          </Link>
+        </div>
+      )}
       <ServiceNote error={error} what="the issue" retry={reload} />
       {!data && !error && (
         <p className="note" role="status">
@@ -631,8 +1115,12 @@ function Discussion({ id }: { id: number }) {
                 `lumen.issues.type.${data.issueType}`,
                 TYPES[data.issueType] ?? 'Issue'
               )}
-              {data.issueSubtype
-                ? ' · ' + data.issueSubtype.replaceAll('_', ' ')
+              {issueReasonTranslationKey(data)
+                ? ' · ' +
+                  t(
+                    issueReasonTranslationKey(data)!,
+                    data.issueSubtype!.replaceAll('_', ' ')
+                  )
                 : ''}
               {data.is4k ? ' · 4K' : ''}
             </span>
@@ -669,20 +1157,47 @@ function Discussion({ id }: { id: number }) {
               </button>
             )}
           </div>
-          {data.problemEpisodeSelections?.length ? (
+          {affectedTvId &&
+          !data.problemEpisodeSelections?.length &&
+          data.problemSeason === 0 &&
+          data.problemEpisode === 0 &&
+          !data.problemEpisodes?.length ? (
+            <p className="note">
+              {t('lumen.issues.allSeasons', 'All Seasons')} ·{' '}
+              {t('lumen.issues.entireSeries', 'Entire Series')}
+            </p>
+          ) : data.problemEpisodeSelections?.length && affectedTvId ? (
             <ul className="setlist">
               {data.problemEpisodeSelections.map(
                 ({ seasonNumber, episodeNumbers }) => (
                   <li className="set" key={seasonNumber}>
-                    {t('lumen.issues.season', 'Season {season}', {
-                      season: seasonNumber,
-                    })}
-                    {episodeNumbers?.length
-                      ? ` · ${t('lumen.issues.episodes', 'Episodes {episodes}', { episodes: episodeNumbers.join(', ') })}`
-                      : ''}
+                    <AffectedSeason
+                      tvId={affectedTvId}
+                      seasonNumber={seasonNumber}
+                      episodeNumbers={episodeNumbers}
+                    />
                   </li>
                 )
               )}
+            </ul>
+          ) : affectedTvId &&
+            (data.problemSeason ||
+              data.problemEpisode ||
+              data.problemEpisodes?.length) ? (
+            <ul className="setlist">
+              <li className="set">
+                <AffectedSeason
+                  tvId={affectedTvId}
+                  seasonNumber={data.problemSeason ?? 0}
+                  episodeNumbers={
+                    data.problemEpisodes?.length
+                      ? data.problemEpisodes
+                      : data.problemEpisode
+                        ? [data.problemEpisode]
+                        : undefined
+                  }
+                />
+              </li>
             </ul>
           ) : (
             !!(
@@ -844,6 +1359,10 @@ function Discussion({ id }: { id: number }) {
       )}
     </>
   );
+}
+
+export function EmbeddedIssueDiscussion({ id }: { id: number }) {
+  return <Discussion id={id} embedded />;
 }
 
 export default function Issues() {

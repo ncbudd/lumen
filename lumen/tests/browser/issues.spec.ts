@@ -1,15 +1,46 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const testMount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
 const testAppPath = (path: string) => `${testMount}${path}`;
 const testApiPath = (url: string) =>
   new URL(url).pathname.replace(/^\/lumen(?=\/)/, '').replace(/^\/api\/v1/, '');
 
+async function authenticateNativeComparison(page: Page, baseURL: string) {
+  if (process.env.LUMEN_TEST_NATIVE_SESSION !== 'true') return;
+  const response = await page
+    .context()
+    .request.post(`${baseURL}/api/v1/auth/local`, {
+      data: { email: 'admin@seerr.dev', password: 'test1234' },
+      headers: { 'X-Forwarded-Proto': 'https' },
+    });
+  expect(response.status()).toBe(200);
+  const sessionId = response
+    .headersArray()
+    .find((header) => header.name.toLowerCase() === 'set-cookie')
+    ?.value.match(/^connect\.sid=([^;]+)/)?.[1];
+  expect(sessionId).toBeTruthy();
+  await page.context().addCookies([
+    {
+      name: 'connect.sid',
+      value: sessionId!,
+      url: baseURL,
+      httpOnly: true,
+      secure: false,
+      sameSite: 'Lax',
+    },
+  ]);
+}
+
+test.beforeEach(async ({ page, baseURL }) => {
+  await authenticateNativeComparison(page, baseURL!);
+});
+
 for (const permissions of [4194304, 2097152, 32]) {
   test(`issue discussion follows account permissions ${permissions}`, async ({
     page,
   }) => {
     let reads = 0;
+    let season3Reads = 0;
     let status = 1;
     const comments = [
       { id: 1, message: 'Playback freezes', createdAt: '2026-11-12T00:00:00Z' },
@@ -18,7 +49,24 @@ for (const permissions of [4194304, 2097152, 32]) {
       id: 7,
       status,
       issueType: 1,
-      createdBy: { id: 2, displayName: 'Viewer' },
+      media: {
+        mediaType: 'tv',
+        tmdbId: 123,
+        identifiers: [],
+        seasons: [
+          { seasonNumber: 1 },
+          { seasonNumber: 2 },
+          { seasonNumber: 3 },
+          { seasonNumber: 4 },
+        ],
+        posterPath: '/images/default-poster.png',
+        title: 'Test Series',
+      },
+      createdBy: {
+        id: 2,
+        displayName: 'Viewer',
+        avatar: '/images/default.png',
+      },
       createdAt: '2026-11-12T00:00:00Z',
       comments,
       problemEpisodeSelections: [
@@ -30,7 +78,30 @@ for (const permissions of [4194304, 2097152, 32]) {
     await page.route('**/api/v1/**', (route) => {
       const path = testApiPath(route.request().url());
       if (path === '/auth/me')
-        return route.fulfill({ json: { id: 2, permissions } });
+        return route.fulfill({
+          json: {
+            id: 2,
+            permissions,
+            avatar: '/images/default.png',
+          },
+        });
+      if (path === '/tv/123')
+        return route.fulfill({
+          json: {
+            mediaType: 'tv',
+            tmdbId: 123,
+            title: 'Test Series',
+            posterPath: '/images/default-poster.png',
+            firstAirDate: '2005-09-13',
+            episodeRunTime: [42],
+            seasons: [
+              { seasonNumber: 1 },
+              { seasonNumber: 2 },
+              { seasonNumber: 3 },
+              { seasonNumber: 4 },
+            ],
+          },
+        });
       if (path === '/issue') {
         reads++;
         return route.fulfill({
@@ -38,6 +109,30 @@ for (const permissions of [4194304, 2097152, 32]) {
         });
       }
       if (path === '/issue/7') return route.fulfill({ json: issue() });
+      if (path === '/tv/123/season/2')
+        return route.fulfill({
+          json: {
+            seasonNumber: 2,
+            episodes: [{ episodeNumber: 1, name: 'Season two premiere' }],
+          },
+        });
+      if (path === '/tv/123/season/3')
+        if (permissions === 4194304 && season3Reads++ === 0)
+          return route.fulfill({
+            status: 503,
+            json: { message: 'Temporarily unavailable' },
+          });
+      if (path === '/tv/123/season/3')
+        return route.fulfill({
+          json: {
+            seasonNumber: 3,
+            episodes: [
+              { episodeNumber: 4, name: 'The fourth episode' },
+              { episodeNumber: 5, name: 'The fifth episode' },
+              { episodeNumber: 6, name: 'Not selected' },
+            ],
+          },
+        });
       if (path === '/issue/7/comment') {
         expect(route.request().postDataJSON()).toEqual({
           message: 'Tested again',
@@ -63,7 +158,29 @@ for (const permissions of [4194304, 2097152, 32]) {
       expect(reads).toBe(0);
       return;
     }
-    await expect(page.getByRole('link', { name: 'Video #7' })).toBeVisible();
+    const nativeComparison = process.env.LUMEN_TEST_NATIVE_SESSION === 'true';
+    if (nativeComparison) {
+      await expect(
+        page.getByRole('link', { name: 'Test Series' })
+      ).toBeVisible();
+    } else {
+      await expect(page.getByRole('link', { name: 'Video #7' })).toBeVisible();
+      await expect(
+        page.getByText('Season 2, Season 3 · Episodes 4, 5')
+      ).toBeVisible();
+      await expect(
+        page.getByText('Created By:', { exact: true })
+      ).toBeVisible();
+      await expect(
+        page.getByText(permissions === 2097152 ? 'Viewer' : 'Not available', {
+          exact: true,
+        })
+      ).toBeVisible();
+      await expect(
+        page.getByText('Playback freezes', { exact: true })
+      ).toBeVisible();
+      await expect(page.getByText('42 min', { exact: true })).toBeVisible();
+    }
     const captureDir = process.env.LUMEN_CAPTURE_DIR;
     if (
       captureDir &&
@@ -74,9 +191,31 @@ for (const permissions of [4194304, 2097152, 32]) {
         path: `${captureDir}/issues-list-${test.info().project.name}.png`,
         fullPage: true,
       });
-    await page.getByRole('link', { name: 'Video #7' }).click();
-    await expect(page.getByText('Season 2', { exact: true })).toBeVisible();
-    await expect(page.getByText('Season 3 · Episodes 4, 5')).toBeVisible();
+    if (nativeComparison) {
+      await page.getByRole('button', { name: 'View Details' }).click();
+    } else {
+      await page.getByRole('link', { name: 'Video #7' }).click();
+    }
+    if (nativeComparison) {
+      await expect(
+        page.getByRole('heading', { name: 'Affected Episodes' })
+      ).toBeVisible();
+      await expect(
+        page.getByRole('textbox', { name: 'Add Comment' })
+      ).toBeVisible();
+    } else {
+      await expect(page.getByText('Season 2', { exact: true })).toBeVisible();
+      await expect(page.getByText('Season two premiere')).toBeVisible();
+      if (permissions === 4194304) {
+        await expect(page.getByRole('alert')).toContainText(
+          'Episode details could not be loaded.'
+        );
+        await page.getByRole('button', { name: 'Retry' }).click();
+      }
+      await expect(page.getByText('The fourth episode')).toBeVisible();
+      await expect(page.getByText('The fifth episode')).toBeVisible();
+      await expect(page.getByText('Not selected')).toHaveCount(0);
+    }
     if (
       captureDir &&
       permissions === 4194304 &&
@@ -86,6 +225,7 @@ for (const permissions of [4194304, 2097152, 32]) {
         path: `${captureDir}/issue-detail-${test.info().project.name}.png`,
         fullPage: true,
       });
+    if (nativeComparison) return;
     const resolve = page.getByRole('button', { name: 'Resolve Issue' });
     if (permissions === 2097152) {
       await expect(resolve).toHaveCount(0);
@@ -122,6 +262,19 @@ test('issue list resolves affected media titles from visible rows', async ({
   page,
 }) => {
   await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/imageproxy/**', (route) =>
+    route.fulfill({
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="96"><rect width="64" height="96" fill="#30405c"/></svg>',
+    })
+  );
+  await page.route('**/imageproxy/**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"/>',
+    })
+  );
   await page.route('**/api/v1/**', (route) => {
     const path = testApiPath(route.request().url());
     if (path === '/auth/me')
@@ -145,14 +298,298 @@ test('issue list resolves affected media titles from visible rows', async ({
       });
     if (path === '/movie/20')
       return route.fulfill({
-        json: { title: 'Example Film', releaseDate: '2023-04-17' },
+        json: {
+          title: 'Example Film',
+          releaseDate: '2023-04-17',
+          posterPath: '/poster.jpg',
+          runtime: 112,
+        },
       });
     return route.fulfill({ json: { results: [] } });
   });
   await page.goto(testAppPath('/issues'));
   const media = page.getByRole('link', { name: 'Example Film (2023)' });
   await expect(media).toHaveAttribute('href', testAppPath('/movie/20'));
+  await expect(page.getByText('112 min')).toBeVisible();
+  await expect(page.getByText('Movie · HD')).toBeVisible();
+  await expect(
+    page.locator('.issue-media-summary img').first()
+  ).toHaveAttribute('src', '/imageproxy/tmdb/t/p/w342/poster.jpg');
   await expect(page.getByRole('link', { name: 'Video #7' })).toBeVisible();
+  const posterBox = await page
+    .locator('.issue-media-summary img')
+    .first()
+    .boundingBox();
+  expect(posterBox?.height).toBe(96);
+  if (['iphone', 'android'].includes(test.info().project.name)) {
+    const discussionButton = page.getByRole('button', {
+      name: 'View Discussion',
+    });
+    await discussionButton.scrollIntoViewIfNeeded();
+    const buttonBox = await discussionButton.boundingBox();
+    const tabbarBox = await page.locator('.tabbar').boundingBox();
+    expect(buttonBox).not.toBeNull();
+    expect(tabbarBox).not.toBeNull();
+    expect(buttonBox!.y + buttonBox!.height).toBeLessThanOrEqual(tabbarBox!.y);
+  }
+  if (
+    process.env.LUMEN_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(test.info().project.name)
+  )
+    await page.screenshot({
+      path: `${process.env.LUMEN_CAPTURE_DIR}/issues-metadata-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+});
+
+for (const { locale, label, reason } of [
+  { locale: 'en', label: 'Reason', reason: 'Wrong edition or variant' },
+  { locale: 'fr', label: 'Motif', reason: 'Mauvaise édition ou variante' },
+  { locale: 'ar', label: 'السبب', reason: 'إصدار أو نسخة غير صحيحة' },
+]) {
+  test(`issue rows show media-specific reasons in ${locale}`, async ({
+    page,
+  }, testInfo) => {
+    await page.route('https://**/*', (route) => route.abort());
+    await page.route('**/api/v1/**', (route) => {
+      const path = testApiPath(route.request().url());
+      if (path === '/auth/me')
+        return route.fulfill({ json: { id: 1, permissions: 2097152 } });
+      if (path === '/user/1/settings/main')
+        return route.fulfill({ json: { locale } });
+      if (path === '/issue/29')
+        return route.fulfill({
+          json: {
+            id: 29,
+            status: 1,
+            issueType: 4,
+            issueSubtype: 'wrong_edition',
+            media: {
+              mediaType: 'book',
+              identifiers: [{ provider: 'openlibrary', value: 'OL123W' }],
+            },
+            createdBy: { id: 1, displayName: 'Reporter' },
+            createdAt: '2026-11-12T00:00:00Z',
+            comments: [{ id: 1, message: 'Incorrect edition' }],
+          },
+        });
+      if (path === '/issue')
+        return route.fulfill({
+          json: {
+            results: [
+              {
+                id: 29,
+                status: 1,
+                issueType: 4,
+                issueSubtype: 'wrong_edition',
+                media: {
+                  mediaType: 'book',
+                  identifiers: [{ provider: 'openlibrary', value: 'OL123W' }],
+                },
+                createdBy: { id: 1, displayName: 'Reporter' },
+                createdAt: '2026-11-12T00:00:00Z',
+                comments: [{ id: 1, message: 'Incorrect edition' }],
+              },
+              {
+                id: 30,
+                status: 1,
+                issueType: 1,
+                issueSubtype: 'wrong_edition',
+                media: { mediaType: 'movie', tmdbId: 20 },
+                createdBy: { id: 1, displayName: 'Reporter' },
+                createdAt: '2026-11-12T00:00:00Z',
+                comments: [{ id: 1, message: 'Incorrect edition' }],
+              },
+            ],
+            pageInfo: { page: 1, pages: 1 },
+          },
+        });
+      if (path === '/book/OL123W')
+        return route.fulfill({
+          json: {
+            title: 'Example Book',
+            firstPublishYear: 2020,
+            numberOfPages: 320,
+          },
+        });
+      if (path === '/movie/20')
+        return route.fulfill({
+          json: {
+            title: 'Example Film',
+            releaseDate: '2020-01-01',
+            runtime: 90,
+          },
+        });
+      return route.fulfill({ json: {} });
+    });
+
+    await page.goto(testAppPath('/issues'));
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    const bookCard = page
+      .getByRole('listitem')
+      .filter({ hasText: 'Example Book' });
+    await expect(
+      bookCard.getByText(`${label}:`, { exact: true })
+    ).toBeVisible();
+    await expect(bookCard.getByText(reason, { exact: true })).toBeVisible();
+    const movieCard = page
+      .getByRole('listitem')
+      .filter({ hasText: 'Example Film' });
+    await expect(movieCard.getByText(`${label}:`, { exact: true })).toHaveCount(
+      0
+    );
+
+    if (
+      locale === 'en' &&
+      process.env.LUMEN_ISSUE_REASON_CAPTURE &&
+      ['desktop', 'iphone'].includes(testInfo.project.name)
+    ) {
+      const { mkdir } = await import('node:fs/promises');
+      const { join } = await import('node:path');
+      await mkdir(process.env.LUMEN_ISSUE_REASON_CAPTURE, { recursive: true });
+      await page.screenshot({
+        path: join(
+          process.env.LUMEN_ISSUE_REASON_CAPTURE,
+          `issues-reason-${testInfo.project.name}.png`
+        ),
+        fullPage: true,
+        animations: 'disabled',
+      });
+    }
+
+    await page.goto(testAppPath('/issues/29'));
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expect(page.locator('.toolbar').getByText(reason)).toBeVisible();
+  });
+}
+
+test('issue list preserves legacy affected season and episode fields', async ({
+  page,
+}) => {
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const path = testApiPath(route.request().url());
+    if (path === '/auth/me')
+      return route.fulfill({ json: { id: 2, permissions: 2097152 } });
+    if (path === '/issue')
+      return route.fulfill({
+        json: {
+          results: [
+            {
+              id: 8,
+              status: 1,
+              issueType: 1,
+              media: { mediaType: 'tv', tmdbId: 21 },
+              createdBy: { id: 3, displayName: 'Reporter' },
+              createdAt: '2026-11-12T00:00:00Z',
+              problemSeason: 4,
+              problemEpisodes: [2, 3],
+              comments: [],
+            },
+          ],
+          pageInfo: { page: 1, pages: 1 },
+        },
+      });
+    if (path === '/tv/21')
+      return route.fulfill({
+        json: {
+          mediaType: 'tv',
+          title: 'Legacy Series',
+          firstAirDate: '2012-01-01',
+        },
+      });
+    return route.fulfill({ json: {} });
+  });
+  await page.goto(testAppPath('/issues'));
+  const card = page.getByRole('listitem').filter({ hasText: 'Legacy Series' });
+  await expect(card.getByText('Season 4 · Episodes 2, 3')).toBeVisible();
+});
+
+test('issue discussions expand inline and preserve list context', async ({
+  page,
+}) => {
+  const comments = [
+    {
+      id: 1,
+      message: 'Playback freezes after the opening credits.',
+      createdAt: '2026-11-12T00:00:00Z',
+      user: { id: 2, displayName: 'Viewer' },
+    },
+  ];
+  const issue = () => ({
+    id: 12,
+    status: 1,
+    issueType: 1,
+    media: { mediaType: 'movie', tmdbId: 20 },
+    createdBy: { id: 2, displayName: 'Viewer' },
+    createdAt: '2026-11-12T00:00:00Z',
+    comments,
+  });
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', async (route) => {
+    const request = route.request();
+    const path = testApiPath(request.url());
+    if (path === '/auth/me')
+      return route.fulfill({ json: { id: 2, permissions: 4194304 } });
+    if (path === '/issue' && request.method() === 'GET')
+      return route.fulfill({
+        json: { results: [issue()], pageInfo: { page: 1, pages: 1 } },
+      });
+    if (path === '/issue/12' && request.method() === 'GET')
+      return route.fulfill({ json: issue() });
+    if (path === '/issue/12/comment' && request.method() === 'POST') {
+      expect(request.postDataJSON()).toEqual({ message: 'Inline follow-up' });
+      comments.push({
+        id: 2,
+        message: 'Inline follow-up',
+        createdAt: '2026-11-12T00:01:00Z',
+        user: { id: 2, displayName: 'Viewer' },
+      });
+      return route.fulfill({ status: 201, json: issue() });
+    }
+    return route.fulfill({ json: {} });
+  });
+  await page.goto(testAppPath('/issues'));
+
+  const disclosure = page.locator('button[aria-controls="issue-inline-12"]');
+  await disclosure.click();
+  await expect(disclosure).toHaveAttribute('aria-expanded', 'true');
+  await expect(page).toHaveURL(/\/issues(?:\?|$)/);
+  const discussion = page.getByRole('region', { name: 'Issue Details' });
+  await expect(
+    discussion.getByText('Playback freezes after the opening credits.')
+  ).toBeVisible();
+  if (
+    process.env.LUMEN_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(test.info().project.name)
+  )
+    await page.screenshot({
+      path: `${process.env.LUMEN_CAPTURE_DIR}/issues-inline-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
+  await discussion
+    .getByRole('textbox', { name: 'Comment' })
+    .fill('Inline follow-up');
+  const addComment = discussion.getByRole('button', { name: 'Add Comment' });
+  await addComment.scrollIntoViewIfNeeded();
+  if (['iphone', 'android'].includes(test.info().project.name)) {
+    const action = await addComment.boundingBox();
+    const tabs = await page.locator('.tabbar').boundingBox();
+    expect(action).not.toBeNull();
+    expect(tabs).not.toBeNull();
+    expect(action!.y + action!.height).toBeLessThanOrEqual(tabs!.y);
+  }
+  await addComment.click();
+  await expect(discussion.getByText('Inline follow-up')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Hide Details' }).click();
+  await expect(discussion).toBeHidden();
+  await expect(page).toHaveURL(/\/issues(?:\?|$)/);
 });
 
 test('reporting uses the internal media row and opens the confirmed report', async ({
@@ -441,6 +878,21 @@ test('issue filters read from bookmarks and reset pagination when changed', asyn
   await page.goto(
     testAppPath('/issues?mediaType=book&issueType=audio&timeFrame=7d&page=2')
   );
+  await expect(page.getByText('Task Filters', { exact: true })).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
+  if (
+    process.env.LUMEN_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(test.info().project.name)
+  )
+    await page.screenshot({
+      path: `${process.env.LUMEN_CAPTURE_DIR}/issues-filter-groups-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  await page.getByText('Media Filters', { exact: true }).click();
   await expect(page.getByLabel('Media Type')).toHaveValue('book');
   await expect.poll(() => queries.at(-1)?.get('skip')).toBe('10');
   expect(queries.at(-1)?.get('issueType')).toBe('audio');
@@ -451,10 +903,12 @@ test('issue filters read from bookmarks and reset pagination when changed', asyn
   await expect(page).toHaveURL(
     /\/issues\?mediaType=book&issueType=audio&timeFrame=7d&page=2$/
   );
+  await page.getByText('Task Filters', { exact: true }).click();
   await page.getByLabel('Issue Type').selectOption('subtitle');
   await expect.poll(() => queries.at(-1)?.get('issueType')).toBe('subtitle');
   expect(queries.at(-1)?.get('skip')).toBe('0');
   expect(new URL(page.url()).searchParams.has('page')).toBe(false);
+  await page.getByText('Filters', { exact: true }).click();
   await page.getByLabel('Search Issues').fill('missing & audio');
   await page.getByRole('button', { name: 'Search', exact: true }).click();
   await expect
@@ -466,11 +920,85 @@ test('issue filters read from bookmarks and reset pagination when changed', asyn
   await page.getByRole('button', { name: 'Search', exact: true }).click();
   await expect.poll(() => queries.at(-1)?.get('releaseYear')).toBe('2020');
   expect(queries.at(-1)?.get('genre')).toBe('science fiction');
+  await page.getByText('Sort By', { exact: true }).click();
   await page.getByLabel('Sort Issues').selectOption('modified');
   await expect.poll(() => queries.at(-1)?.get('sort')).toBe('modified');
+  await page.getByText('Media Filters', { exact: true }).click();
   await page.getByLabel('Media Type').selectOption('all');
   await expect(page.getByLabel('Release Year')).toHaveCount(0);
   await expect.poll(() => queries.at(-1)?.get('releaseYear')).toBeNull();
+});
+
+test('issue filter disclosures save and restore per-user media-scoped pins', async ({
+  page,
+}) => {
+  let savedPins: Record<string, boolean> = {};
+  let saves = 0;
+  let attempts = 0;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const path = testApiPath(route.request().url());
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 2,
+          permissions: 2097152,
+          settings: { detailDisclosurePins: { tv: savedPins } },
+        },
+      });
+    if (path === '/user/2/settings/detail-disclosures/tv') {
+      attempts++;
+      if (attempts === 1)
+        return route.fulfill({ status: 500, json: { message: 'save failed' } });
+      const change = route.request().postDataJSON() as Record<string, boolean>;
+      savedPins = { ...savedPins, ...change };
+      saves++;
+      return route.fulfill({ json: savedPins });
+    }
+    if (path === '/issue')
+      return route.fulfill({
+        json: { results: [], pageInfo: { page: 1, pages: 1 } },
+      });
+    return route.fulfill({ json: {} });
+  });
+  await page.goto(testAppPath('/issues?mediaType=tv'));
+  const mediaFilters = page
+    .locator('details')
+    .filter({ has: page.getByText('Media Filters', { exact: true }) });
+  await expect(mediaFilters).not.toHaveAttribute('open', '');
+  await page.getByText('Media Filters', { exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Keep Media Filters Open', exact: true })
+    .click();
+  await expect.poll(() => attempts).toBe(1);
+  await expect(
+    page.getByText(
+      'Could not save this filter display preference. Try again.',
+      { exact: true }
+    )
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Keep Media Filters Open', exact: true })
+  ).toHaveAttribute('aria-pressed', 'false');
+  await page
+    .getByRole('button', { name: 'Keep Media Filters Open', exact: true })
+    .click();
+  await expect.poll(() => saves).toBe(1);
+  await expect(mediaFilters).toHaveAttribute('open', '');
+  await expect(
+    page.getByRole('button', { name: 'Keep Media Filters Open', exact: true })
+  ).toHaveAttribute('aria-pressed', 'true');
+  if (
+    process.env.LUMEN_CAPTURE_PINNED &&
+    ['desktop', 'iphone'].includes(test.info().project.name)
+  )
+    await page.screenshot({
+      path: `${process.env.LUMEN_CAPTURE_PINNED}/issues-pinned-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  await page.reload();
+  await expect(mediaFilters).toHaveAttribute('open', '');
+  expect(savedPins).toEqual({ mediaFilters: true });
 });
 
 test('deleting the final issue on a page preserves filters and returns to the last available page', async ({

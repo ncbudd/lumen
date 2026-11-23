@@ -264,21 +264,40 @@ export function SubjectTagsDisclosure({
   );
 }
 
-function VideoDisclosure({
+export function OverviewDisclosure({ overview }: { overview?: string }) {
+  const { t } = useLumenLocale();
+  if (!overview) return null;
+  return (
+    <VideoDisclosure
+      media="tv"
+      panel="overview"
+      label={t('lumen.detail.overview', 'Overview')}
+    >
+      <p className="ov">{overview}</p>
+    </VideoDisclosure>
+  );
+}
+
+export function VideoDisclosure({
   media,
   panel,
   label,
+  testId,
+  deferChildrenUntilOpen = false,
   children,
 }: {
-  media: 'movie' | 'tv';
+  media: 'movie' | 'tv' | 'book' | 'music';
   panel: keyof VideoDetailPins;
   label: string;
+  testId?: string;
+  deferChildrenUntilOpen?: boolean;
   children: ReactNode;
 }) {
   const { t } = useLumenLocale();
   const { user, refresh } = useAuth();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const disclosure = useRef<HTMLDetailsElement>(null);
   const { hash, key } = useLocation();
   const anchor = panel === 'subjectTags' ? undefined : panel;
@@ -292,7 +311,7 @@ function VideoDisclosure({
   }, [anchor, hash, key]);
 
   const pending = useRef(false);
-  const legacy = {
+  const legacy: Partial<VideoDetailPins> = {
     cast: user?.settings?.detailDisclosureCastPinned,
     crew: user?.settings?.detailDisclosureCrewPinned,
     subjectTags: user?.settings?.detailDisclosureSubjectTagsPinned,
@@ -303,7 +322,21 @@ function VideoDisclosure({
   const preference =
     panel === 'subjectTags'
       ? t('lumen.detail.subjectTagPreference', 'subject tag')
-      : t('lumen.detail.creditPreference', 'credit');
+      : panel === 'overview'
+        ? t('lumen.detail.overviewPreference', 'overview')
+        : panel === 'artists'
+          ? t('lumen.detail.artistListPreference', 'artist list')
+          : panel === 'collection'
+            ? t('lumen.detail.collectionPreference', 'collection')
+            : panel === 'details'
+              ? media === 'book'
+                ? t('lumen.detail.bookDetailsPreference', 'book details')
+                : media === 'music'
+                  ? t('lumen.detail.albumDetailsPreference', 'album details')
+                  : media === 'tv'
+                    ? t('lumen.detail.tvDetailsPreference', 'series details')
+                    : t('lumen.detail.movieDetailsPreference', 'movie details')
+              : t('lumen.detail.creditPreference', 'credit');
 
   async function togglePin() {
     if (!user || pending.current) return;
@@ -343,12 +376,23 @@ function VideoDisclosure({
   }
 
   return (
-    <details ref={disclosure} id={anchor} className="adv" open={pinned}>
+    <details
+      ref={disclosure}
+      id={anchor}
+      className="adv"
+      data-testid={testId}
+      open={pinned}
+      onToggle={(event) => setExpanded(event.currentTarget.open)}
+    >
       <summary>
         <Icon name="chev" size="sm" />
         {label}
       </summary>
-      {children}
+      {deferChildrenUntilOpen
+        ? pinned || expanded
+          ? children
+          : null
+        : children}
       {user && (
         <div className="toolbar">
           <button
@@ -575,12 +619,14 @@ interface Server {
 }
 interface ServerDetail {
   profiles: { id: number; name: string }[];
+  metadataProfiles?: { id: number; name: string }[];
   rootFolders: { id: number; path: string }[];
   languageProfiles?: { id: number; name: string }[] | null;
   metadataLanguages?: { id: number; name: string }[];
   tags?: { id: number; label: string }[];
   server: {
     activeProfileId: number;
+    activeMetadataProfileId?: number;
     activeDirectory: string;
     activeLanguageProfileId?: number;
     activeTags?: number[];
@@ -662,13 +708,15 @@ export function AdvancedOptions({
   onReady,
   initial,
   allow4k = false,
+  serverIds,
   series,
 }: {
-  kind: 'movie' | 'tv';
+  kind: 'movie' | 'tv' | 'music';
   series?: { id: number; tvdbId?: number | null };
   is4k: boolean;
   // also list the 4K servers (for people who may request 4K); picking one makes it a 4K request
   allow4k?: boolean;
+  serverIds?: number[];
   onChange: (o: RequestOptions) => void;
   // changing an existing request: start from its server, quality, folder and requester
   initial?: RequestOptions;
@@ -678,7 +726,7 @@ export function AdvancedOptions({
   const { t } = useLumenLocale();
   const { user } = useAuth();
   const allowed = canChooseRequestOptions(user?.permissions);
-  const svc = kind === 'movie' ? 'radarr' : 'sonarr';
+  const svc = kind === 'movie' ? 'radarr' : kind === 'tv' ? 'sonarr' : 'lidarr';
   const [open, setOpen] = useState(inline);
   const [servers, setServers] = useState<Server[] | null>(null);
   const [detail, setDetail] = useState<ServerDetail | null>(null);
@@ -698,9 +746,12 @@ export function AdvancedOptions({
     if (!allowed || !open || servers) return;
     api<Server[]>(`/service/${svc}`)
       .then((s) => {
+        const scoped = serverIds
+          ? s.filter((x) => serverIds.includes(x.id))
+          : s;
         const mine = allow4k
-          ? [...s].sort((a, b) => Number(a.is4k) - Number(b.is4k))
-          : s.filter((x) => x.is4k === is4k);
+          ? [...scoped].sort((a, b) => Number(a.is4k) - Number(b.is4k))
+          : scoped.filter((x) => x.is4k === is4k);
         setServers(mine);
         const d =
           mine.find((x) => x.id === initial?.serverId) ||
@@ -710,7 +761,7 @@ export function AdvancedOptions({
         if (d) setO((x) => ({ ...x, serverId: d.id }));
       })
       .catch((e) => setErr(friendlyError(e)));
-  }, [allowed, open, servers, svc, is4k, allow4k]);
+  }, [allowed, open, servers, svc, is4k, allow4k, serverIds]);
   useEffect(() => {
     if (o.serverId == null) return;
     let live = true;
@@ -732,6 +783,15 @@ export function AdvancedOptions({
                   d.profiles.some((p) => p.id === initial?.profileId)
                     ? initial?.profileId
                     : d.server.activeProfileId),
+                metadataProfileId:
+                  x.metadataProfileId ??
+                  (serverId === initial?.serverId &&
+                  d.metadataProfiles?.some(
+                    (p) => p.id === initial?.metadataProfileId
+                  )
+                    ? initial?.metadataProfileId
+                    : (d.server.activeMetadataProfileId ??
+                      d.metadataProfiles?.[0]?.id)),
                 rootFolder:
                   x.rootFolder ??
                   (serverId === initial?.serverId &&
@@ -771,7 +831,7 @@ export function AdvancedOptions({
         (e) =>
           live &&
           setErr(
-            `${friendlyError(e)} (the ${svc === 'radarr' ? 'Radarr' : 'Sonarr'} server didn't answer)`
+            `${friendlyError(e)} (the ${svc === 'radarr' ? 'Radarr' : svc === 'sonarr' ? 'Sonarr' : 'Lidarr'} server didn't answer)`
           )
       );
     return () => {
@@ -847,7 +907,7 @@ export function AdvancedOptions({
       ? requesterId
       : undefined;
   const { data: quotas } = useApi<
-    Partial<Record<'movie' | 'tv', { limit?: number }>>
+    Partial<Record<'movie' | 'tv' | 'music', { limit?: number }>>
   >(quotaRequesterId ? `/user/${quotaRequesterId}/quota` : null, {
     currentPathOnly: true,
   });
@@ -860,11 +920,14 @@ export function AdvancedOptions({
     const base = picked4k === undefined ? { ...o } : { ...o, is4k: picked4k };
     if (ignoreQuota) base.ignoreQuota = true;
     if (seriesId) base.sonarrSeasonType = seasonOverride;
-    if (!initial && o.tags) {
+    if (!initial && (o.tags !== undefined || kind === 'music')) {
       base.requesterSelectedOptions = {
-        tags: true,
+        tags: kind === 'music' ? o.tags !== undefined : true,
         profile: o.profileId !== undefined,
         rootFolder: !!o.rootFolder,
+        ...(kind === 'music'
+          ? { metadataProfile: o.metadataProfileId !== undefined }
+          : {}),
         ...(kind === 'tv'
           ? { languageProfile: o.languageProfileId !== undefined }
           : {}),
@@ -923,7 +986,12 @@ export function AdvancedOptions({
             'lumen.detail.noServer',
             'No {service} server to choose; SeerrNG uses its defaults.',
             {
-              service: svc === 'radarr' ? 'Radarr' : 'Sonarr',
+              service:
+                svc === 'radarr'
+                  ? 'Radarr'
+                  : svc === 'sonarr'
+                    ? 'Sonarr'
+                    : 'Lidarr',
             }
           )}
         </p>
@@ -995,6 +1063,28 @@ export function AdvancedOptions({
                   ))}
                 </select>
               </label>
+              {kind === 'music' && !!detail.metadataProfiles?.length && (
+                <label className="sel">
+                  <span className="lbl">
+                    {t('lumen.servarr.metadataProfile', 'Metadata Profile')}
+                  </span>
+                  <select
+                    value={o.metadataProfileId ?? ''}
+                    onChange={(e) =>
+                      setO((x) => ({
+                        ...x,
+                        metadataProfileId: Number(e.target.value),
+                      }))
+                    }
+                  >
+                    {detail.metadataProfiles.map((profile) => (
+                      <option key={profile.id} value={profile.id}>
+                        {profile.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
               <label className="sel">
                 <span className="lbl">
                   {t('lumen.detail.folder', 'Folder')}

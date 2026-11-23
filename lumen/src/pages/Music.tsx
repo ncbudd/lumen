@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { MediaStatus } from '../api';
+import { api, MediaStatus, type RequestOptions } from '../api';
 import { isAdministrator, useAuth } from '../auth';
 import BlocklistButton from '../components/BlocklistButton';
 import { MoreOnScroll, Section } from '../components/cards';
+import { ConfirmSheet } from '../components/ConfirmSheet';
 import {
+  AdvancedOptions,
   canChooseRequestOptions,
   canRequestMusic,
   canUseRequestAccess,
   DetailTop,
   Facts,
   Pill,
+  VideoDisclosure,
 } from '../components/detail';
 import {
   ExtraCard,
@@ -24,6 +27,7 @@ import {
 import FollowButton from '../components/FollowButton';
 import { GenrePicker } from '../components/GenrePicker';
 import IndexerSearchLink from '../components/IndexerSearchLink';
+import OpenIssueReports from '../components/OpenIssueReports';
 import ReportIssueButton from '../components/ReportIssueButton';
 import { useToast } from '../components/toast';
 import WatchlistButton from '../components/WatchlistButton';
@@ -35,7 +39,6 @@ import { friendlyError } from '../errors';
 import {
   artistOf,
   fmtTrack,
-  requestExtra,
   type Album,
   type AlbumDetails,
   type ArtistDetails,
@@ -94,6 +97,277 @@ const musicServiceQuality = (
       ? 'mp3'
       : undefined);
 
+function MusicRequestSheet({
+  album,
+  quality,
+  services,
+  serviceIds,
+  initialServerId,
+  onClose,
+  onComplete,
+}: {
+  album: AlbumDetails;
+  quality: 'mp3' | 'flac';
+  services: MusicService[];
+  serviceIds: number[];
+  initialServerId: number;
+  onClose: () => void;
+  onComplete: () => void;
+}) {
+  const { user } = useAuth();
+  const { t } = useLumenLocale();
+  const toast = useToast();
+  const canChoose = canChooseRequestOptions(user?.permissions);
+  const [options, setOptions] = useState<RequestOptions>({
+    serverId: initialServerId,
+  });
+  const [optionsReady, setOptionsReady] = useState(!canChoose);
+  const [busy, setBusy] = useState(false);
+  const quotaUserId = options.userId ?? user?.id;
+  const quota = useApi<{
+    music?: { limit?: number; remaining?: number; restricted?: boolean };
+  }>(quotaUserId ? `/user/${quotaUserId}/quota` : null, {
+    currentPathOnly: true,
+  });
+  const quotaInfo = quota.data?.music;
+  const selectedServerId = options.serverId ?? initialServerId;
+  const blocked = album.mediaInfo?.status === MediaStatus.BLOCKLISTED;
+  const available = album.availableServices?.some(
+    (service) =>
+      service.serverId === selectedServerId &&
+      service.quality.toUpperCase() === quality.toUpperCase()
+  );
+  const pending = album.mediaInfo?.requests?.some((request) => {
+    if (request.status !== 1 && request.status !== 2) return false;
+    const targets = request.serviceTargets ?? [];
+    return (
+      targets.length === 0 ||
+      targets.some(
+        (target) =>
+          target.serviceType === 'lidarr' &&
+          target.serverId === selectedServerId
+      )
+    );
+  });
+  const destinationCovered = blocked || available || pending;
+  const destinationStatus = blocked
+    ? t('components.MusicDetails.blocklisted', 'Blocklisted')
+    : available
+      ? t('components.Common.available', 'Available')
+      : pending
+        ? t('components.RequestModal.Music.requested', 'Requested')
+        : t('components.RequestModal.Music.readyToRequest', 'Ready to Request');
+  const selectedService = services.find(
+    (service) => service.id === selectedServerId
+  );
+  const canSubmit =
+    !busy &&
+    optionsReady &&
+    (!!quota.data || !!quota.error) &&
+    !quota.error &&
+    !quotaInfo?.restricted &&
+    !destinationCovered;
+
+  return (
+    <ConfirmSheet
+      title={t('components.RequestModal.Music.requestmusic', 'Request Music')}
+      body={`${album.artist.name} — ${album.title} · ${quality.toUpperCase()}`}
+      confirm={t('components.Common.ButtonHelp.request', 'Request')}
+      cancel={t('components.Common.ButtonHelp.cancel', 'Cancel')}
+      busy={busy}
+      confirmDisabled={!canSubmit}
+      onClose={onClose}
+      onConfirm={async () => {
+        if (!canSubmit) return;
+        setBusy(true);
+        try {
+          const result = await api<{ status?: number }>('/request', {
+            method: 'POST',
+            body: JSON.stringify({
+              mediaType: 'music',
+              mediaId: album.id,
+              serverId: options.serverId ?? initialServerId,
+              ...(canChoose
+                ? {
+                    ...options,
+                    requesterSelectedOptions: {
+                      tags: options.tags !== undefined,
+                      profile: options.profileId !== undefined,
+                      metadataProfile: options.metadataProfileId !== undefined,
+                      rootFolder: !!options.rootFolder,
+                    },
+                  }
+                : {}),
+            }),
+          });
+          if (result?.status === 4)
+            throw new Error(
+              t(
+                'components.RequestModal.Music.backendRequestFailed',
+                'The request was submitted, but Lidarr rejected it while processing.'
+              )
+            );
+          onComplete();
+          toast(t('lumen.common.requestSubmitted', 'Request submitted.'));
+        } catch (error) {
+          toast(
+            friendlyError(
+              error,
+              t(
+                'components.RequestModal.Music.requesterror',
+                'Something went wrong while submitting the request.'
+              )
+            )
+          );
+          setBusy(false);
+        }
+      }}
+    >
+      <div className="pk-head">
+        <div className="p sq">
+          {album.posterPath && <img src={album.posterPath} alt="" />}
+        </div>
+        <div>
+          <h3>{album.title}</h3>
+          <p className="meta">
+            {album.artist.name} · {quality.toUpperCase()}
+          </p>
+        </div>
+      </div>
+      <dl className="facts">
+        <div>
+          <dt>
+            {t(
+              'components.RequestModal.Music.mediaAndFormat',
+              'Media & Format'
+            )}
+          </dt>
+          <dd>
+            {t('components.Discover.DiscoverMusic.music', 'Music')} ·{' '}
+            {t('components.Discover.DiscoverMusic.album', 'Album')} ·{' '}
+            {quality.toUpperCase()}
+          </dd>
+        </div>
+        <div>
+          <dt>{t('components.RequestModal.Music.artist', 'Artist')}</dt>
+          <dd>{album.artist.name}</dd>
+        </div>
+        <div>
+          <dt>{t('components.RequestModal.Music.albumType', 'Album Type')}</dt>
+          <dd>
+            {album.type ||
+              t('components.RequestModal.Music.notAvailable', 'Not Available')}
+          </dd>
+        </div>
+        <div>
+          <dt>
+            {t('components.RequestModal.Music.trackCount', 'Track Count')}
+          </dt>
+          <dd>{new Intl.NumberFormat().format(album.tracks?.length ?? 0)}</dd>
+        </div>
+        {album.releaseDate && (
+          <div>
+            <dt>
+              {t('components.RequestModal.Music.releaseDate', 'Release Date')}
+            </dt>
+            <dd>{album.releaseDate}</dd>
+          </div>
+        )}
+        <div>
+          <dt>{t('components.RequestModal.Music.status', 'Status')}</dt>
+          <dd>{destinationStatus}</dd>
+        </div>
+        <div>
+          <dt>{t('components.RequestModal.Music.service', 'Service')}</dt>
+          <dd>
+            {selectedService?.name ??
+              t('components.RequestModal.Music.notAvailable', 'Not Available')}
+          </dd>
+        </div>
+      </dl>
+      {!!album.tracks?.length && (
+        <>
+          <p className="note">
+            {t(
+              'components.RequestModal.Music.entireAlbum',
+              'This request includes the entire album.'
+            )}
+          </p>
+          <div>
+            <h4 className="card-title">{t('lumen.music.tracks', 'Tracks')}</h4>
+            <ol className="slist tlist">
+              {album.tracks.map((track) => (
+                <li key={track.position} className="trow">
+                  <span className="tn">{track.position}</span>
+                  <span>
+                    <b>{track.name}</b>
+                  </span>
+                  <span className="tl">{fmtTrack(track.length)}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </>
+      )}
+      {destinationCovered && (
+        <p className="note" role="status">
+          {blocked
+            ? t(
+                'components.MusicDetails.blocklisted',
+                'This title is blocklisted.'
+              )
+            : available
+              ? t(
+                  `components.MusicDetails.${quality}Available`,
+                  `The ${quality.toUpperCase()} version is already available.`
+                )
+              : t(
+                  `components.MusicDetails.${quality}Pending`,
+                  `An open ${quality.toUpperCase()} request already exists.`
+                )}
+        </p>
+      )}
+      {canChoose && (
+        <AdvancedOptions
+          kind="music"
+          is4k={false}
+          inline
+          serverIds={serviceIds}
+          initial={{ serverId: initialServerId }}
+          onChange={setOptions}
+          onReady={setOptionsReady}
+        />
+      )}
+      {!!quotaInfo?.limit && (
+        <p className="note" role={quotaInfo.restricted ? 'status' : undefined}>
+          {quotaInfo.restricted
+            ? t(
+                'lumen.music.requestQuotaReached',
+                'Music request quota reached.'
+              )
+            : t(
+                'lumen.music.requestsRemaining',
+                '{remaining} of {limit} Music requests remaining.',
+                {
+                  remaining: new Intl.NumberFormat().format(
+                    quotaInfo.remaining ?? 0
+                  ),
+                  limit: new Intl.NumberFormat().format(quotaInfo.limit),
+                }
+              )}
+        </p>
+      )}
+      {quota.error && (
+        <ServiceNote
+          error={quota.error}
+          what={t('components.RequestModal.Music.requestmusic', 'Music quota')}
+          retry={quota.reload}
+        />
+      )}
+    </ConfirmSheet>
+  );
+}
+
 function MusicFormatRequestActions({
   album,
   refresh,
@@ -103,10 +377,14 @@ function MusicFormatRequestActions({
 }) {
   const { user } = useAuth();
   const { t } = useLumenLocale();
-  const toast = useToast();
   const serviceState = useApi<MusicService[]>('/service/lidarr');
   const [selected, setSelected] = useState<Record<string, number>>({});
-  const [busy, setBusy] = useState<string>();
+  const [requesting, setRequesting] = useState<{
+    quality: 'mp3' | 'flac';
+    serverId: number;
+    serviceIds: number[];
+    services: MusicService[];
+  }>();
   const canChooseService = canChooseRequestOptions(user?.permissions);
   const services = Array.isArray(serviceState.data) ? serviceState.data : [];
 
@@ -172,7 +450,7 @@ function MusicFormatRequestActions({
                     `An open ${quality.toUpperCase()} request already exists.`
                   )
                 : undefined;
-        const disabled = !!unavailableReason || busy !== undefined;
+        const disabled = !!unavailableReason || requesting !== undefined;
         return (
           <div className="music-format-choice" key={quality}>
             {canChooseService && options.length > 1 && (
@@ -204,28 +482,13 @@ function MusicFormatRequestActions({
                   : `${t('components.Common.FormatRequestControl.request', 'Request')} ${quality.toUpperCase()}`
               }
               onClick={async () => {
-                if (!configured || busy) return;
-                setBusy(quality);
-                try {
-                  await requestExtra('music', album.id, configured.id);
-                  await refresh();
-                  toast(
-                    t('lumen.common.requestSubmitted', 'Request submitted.')
-                  );
-                } catch (error) {
-                  toast(
-                    friendlyError(
-                      error,
-                      t(
-                        'lumen.common.requestFailed',
-                        'The request could not be submitted.'
-                      ),
-                      t
-                    )
-                  );
-                } finally {
-                  setBusy(undefined);
-                }
+                if (!configured || requesting) return;
+                setRequesting({
+                  quality,
+                  serverId: configured.id,
+                  serviceIds: options.map((service) => service.id),
+                  services: options,
+                });
               }}
             >
               {t('components.Common.FormatRequestControl.request', 'Request')}{' '}
@@ -234,6 +497,20 @@ function MusicFormatRequestActions({
           </div>
         );
       })}
+      {requesting && (
+        <MusicRequestSheet
+          album={album}
+          quality={requesting.quality}
+          services={requesting.services}
+          initialServerId={requesting.serverId}
+          serviceIds={requesting.serviceIds}
+          onClose={() => setRequesting(undefined)}
+          onComplete={() => {
+            setRequesting(undefined);
+            void refresh();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -521,101 +798,107 @@ export function Music() {
           onChange={(value) => upd('type', value.join(','))}
         />
       </div>
-      <form
-        className="toolbar"
-        aria-label={t(
-          'lumen.music.discoveryFilters',
-          'Music Discovery Filters'
-        )}
-        key={filters.toString()}
-        onSubmit={(event) => {
-          event.preventDefault();
-          const form = new FormData(event.currentTarget);
-          const next = new URLSearchParams(p);
-          for (const key of [
-            ...MUSIC_FILTERS.map((field) => field.key),
-            'artistId',
-            'availability',
-          ]) {
-            const value = String(form.get(key) ?? '').trim();
-            if (value) next.set(key, value);
-            else next.delete(key);
-          }
-          setP(next, { replace: true });
-        }}
+      <details
+        className="adv more-filters"
+        open={filters.size > 0 || undefined}
       >
-        {MUSIC_FILTERS.map(({ key, label, fallback, type }) =>
-          key === 'artist' ? (
-            <MusicArtistFilter
-              key={key}
-              artist={filters.get(key) ?? ''}
-              artistId={filters.get('artistId') ?? ''}
-            />
-          ) : (
-            <label className="sel" key={key}>
-              <span className="lbl">{t(label, fallback)}</span>
-              <input
-                className="cfg-input"
-                type={type}
-                name={key}
-                defaultValue={filters.get(key) ?? ''}
-                maxLength={type === 'search' ? 256 : undefined}
+        <summary>{t('lumen.browse.moreFilters', 'More Filters')}</summary>
+        <form
+          className="toolbar"
+          aria-label={t(
+            'lumen.music.discoveryFilters',
+            'Music Discovery Filters'
+          )}
+          key={filters.toString()}
+          onSubmit={(event) => {
+            event.preventDefault();
+            const form = new FormData(event.currentTarget);
+            const next = new URLSearchParams(p);
+            for (const key of [
+              ...MUSIC_FILTERS.map((field) => field.key),
+              'artistId',
+              'availability',
+            ]) {
+              const value = String(form.get(key) ?? '').trim();
+              if (value) next.set(key, value);
+              else next.delete(key);
+            }
+            setP(next, { replace: true });
+          }}
+        >
+          {MUSIC_FILTERS.map(({ key, label, fallback, type }) =>
+            key === 'artist' ? (
+              <MusicArtistFilter
+                key={key}
+                artist={filters.get(key) ?? ''}
+                artistId={filters.get('artistId') ?? ''}
               />
-            </label>
-          )
-        )}
-        <label className="sel">
-          <span className="lbl">
-            {t('lumen.music.inLibrary', 'In Library')}
-          </span>
-          <select
-            name="availability"
-            defaultValue={filters.get('availability') ?? ''}
-          >
-            <option value="">
-              {t('lumen.music.anyQuality', 'Any Quality')}
-            </option>
-            <option value="mp3">MP3</option>
-            <option value="flac">FLAC</option>
-          </select>
-        </label>
-        <button className="btn btn-tonal btn-sm" type="submit">
-          {t('lumen.music.applyFilters', 'Apply Music Filters')}
-        </button>
-        {filters.has('genre') && (
-          <button
-            className="chip"
-            type="button"
-            onClick={() => upd('genre', '')}
-          >
-            {t('lumen.music.clearGenre', 'Clear Genre: {genre}', {
-              genre: filters.get('genre') ?? '',
-            })}
+            ) : (
+              <label className="sel" key={key}>
+                <span className="lbl">{t(label, fallback)}</span>
+                <input
+                  className="cfg-input"
+                  type={type}
+                  name={key}
+                  defaultValue={filters.get(key) ?? ''}
+                  maxLength={type === 'search' ? 256 : undefined}
+                />
+              </label>
+            )
+          )}
+          <label className="sel">
+            <span className="lbl">
+              {t('lumen.music.inLibrary', 'In Library')}
+            </span>
+            <select
+              name="availability"
+              defaultValue={filters.get('availability') ?? ''}
+            >
+              <option value="">
+                {t('lumen.music.anyQuality', 'Any Quality')}
+              </option>
+              <option value="mp3">MP3</option>
+              <option value="flac">FLAC</option>
+            </select>
+          </label>
+          <button className="btn btn-tonal btn-sm" type="submit">
+            {t('lumen.music.applyFilters', 'Apply Music Filters')}
           </button>
-        )}
-        {filters.has('artistId') && (
-          <button
-            className="chip"
-            type="button"
-            onClick={() => upd('artistId', '')}
-          >
-            {t('lumen.music.clearExactArtist', 'Clear Exact Artist')}
-          </button>
-        )}
-        {filters.size > 0 && (
-          <button
-            className="chip"
-            type="button"
-            onClick={() => {
-              const next = new URLSearchParams(p);
-              for (const key of filters.keys()) next.delete(key);
-              setP(next, { replace: true });
-            }}
-          >
-            {t('lumen.music.clearFilters', 'Clear Music Filters')}
-          </button>
-        )}
-      </form>
+          {filters.has('genre') && (
+            <button
+              className="chip"
+              type="button"
+              onClick={() => upd('genre', '')}
+            >
+              {t('lumen.music.clearGenre', 'Clear Genre: {genre}', {
+                genre: filters.get('genre') ?? '',
+              })}
+            </button>
+          )}
+          {filters.has('artistId') && (
+            <button
+              className="chip"
+              type="button"
+              onClick={() => upd('artistId', '')}
+            >
+              {t('lumen.music.clearExactArtist', 'Clear Exact Artist')}
+            </button>
+          )}
+          {filters.size > 0 && (
+            <button
+              className="chip"
+              type="button"
+              onClick={() => {
+                const next = new URLSearchParams(p);
+                for (const key of filters.keys()) next.delete(key);
+                setP(next, { replace: true });
+              }}
+            >
+              {t('lumen.music.clearFilters', 'Clear Music Filters')}
+            </button>
+          )}
+        </form>
+      </details>
       <ServiceNote
         error={list.items.length ? null : list.error}
         what="music"
@@ -686,13 +969,54 @@ export function AlbumDetail() {
     );
   if (!a) return <div className="detail-loading" aria-busy="true" />;
   const s = extraStat(progressMedia);
-  const tags = (
-    a.tags?.releaseGroup?.length ? a.tags.releaseGroup : a.tags?.artist || []
-  )
-    .sort((x, y) => y.count - x.count)
-    .slice(0, 4)
-    .map((t) => t.tag);
+  const musicTags = (() => {
+    const unique = new Map<string, { tag: string; count: number }>();
+    for (const item of [
+      ...(a.tags?.releaseGroup ?? []),
+      ...(a.tags?.artist ?? []),
+    ]) {
+      const tag = item.tag.trim();
+      if (!tag) continue;
+      const key = tag.toLocaleLowerCase();
+      const existing = unique.get(key);
+      if (!existing || item.count > existing.count)
+        unique.set(key, { tag, count: item.count });
+    }
+    return [...unique.values()]
+      .sort(
+        (left, right) =>
+          right.count - left.count || left.tag.localeCompare(right.tag)
+      )
+      .slice(0, 50);
+  })();
+  const tags = musicTags.slice(0, 4).map(({ tag }) => tag);
   const total = (a.tracks || []).reduce((n, t) => n + (t.length || 0), 0);
+  const contributors = new Map<
+    string,
+    { id: string; name: string; role: string }
+  >();
+  if (a.artist.id && a.artist.name) {
+    contributors.set(a.artist.id.toLowerCase(), {
+      id: a.artist.id,
+      name: a.artist.name,
+      role: t('lumen.music.albumArtist', 'Album Artist'),
+    });
+  }
+  for (const track of a.tracks ?? []) {
+    for (const artist of track.artists ?? []) {
+      const artistId = artist.mbid?.trim();
+      const name = artist.name?.trim();
+      if (!artistId || !name || contributors.has(artistId.toLowerCase())) {
+        continue;
+      }
+      contributors.set(artistId.toLowerCase(), {
+        id: artistId,
+        name,
+        role: t('lumen.music.trackArtist', 'Track Artist'),
+      });
+    }
+  }
+  const artistContributors = [...contributors.values()];
   const main = canRequestMusic(user?.permissions) ? (
     <MusicFormatRequestActions album={a} refresh={refresh} />
   ) : null;
@@ -769,9 +1093,58 @@ export function AlbumDetail() {
             />
             <WatchlistButton mediaType="music" detail={a} requestedId={id} />
           </div>
+          {artistContributors.length > 0 && (
+            <VideoDisclosure
+              media="music"
+              panel="artists"
+              label={t('lumen.music.viewArtists', 'View Artists')}
+              testId="music-artist-list"
+            >
+              <div className="toolbar">
+                {artistContributors.map((artist) => (
+                  <Link
+                    key={artist.id.toLowerCase()}
+                    className="chip"
+                    to={`/artist/${encodeURIComponent(artist.id)}`}
+                  >
+                    {artist.name} · {artist.role}
+                  </Link>
+                ))}
+              </div>
+            </VideoDisclosure>
+          )}
+          <VideoDisclosure
+            media="music"
+            panel="subjectTags"
+            label={t('lumen.detail.subjectTags', 'Subject Tags')}
+            testId="music-subject-tags"
+          >
+            {musicTags.length > 0 ? (
+              <div className="toolbar">
+                {musicTags.map(({ tag }) => (
+                  <Link
+                    className="chip"
+                    key={tag.toLocaleLowerCase()}
+                    to={`/music?genre=${encodeURIComponent(tag)}`}
+                  >
+                    {tag}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="note">
+                {t('lumen.detail.noSubjectTags', 'No subject tags.')}
+              </p>
+            )}
+          </VideoDisclosure>
           <div className="dacts pc">{main}</div>
           <div className="dcols">
             <div>
+              <OpenIssueReports
+                id="music-open-issues"
+                mediaType="music"
+                issues={a.mediaInfo?.issues}
+              />
               {!!a.tracks?.length && (
                 <>
                   <div className="h2">{t('lumen.music.tracks', 'Tracks')}</div>
@@ -797,20 +1170,26 @@ export function AlbumDetail() {
               )}
             </div>
             <aside>
-              <Facts
-                rows={[
-                  [
-                    t('lumen.music.fact.artist', 'Artist'),
-                    <Link key="a" to={`/artist/${a.artist.id}`}>
-                      {a.artist.name}
-                    </Link>,
-                  ],
-                  [t('lumen.music.fact.released', 'Released'), a.releaseDate],
-                  [t('lumen.music.fact.label', 'Label'), a.recordLabel],
-                  [t('lumen.music.fact.from', 'From'), a.artist.area],
-                  [t('lumen.music.fact.type', 'Type'), a.type],
-                ]}
-              />
+              <VideoDisclosure
+                media="music"
+                panel="details"
+                label={t('lumen.detail.albumDetails', 'Album Details')}
+              >
+                <Facts
+                  rows={[
+                    [
+                      t('lumen.music.fact.artist', 'Artist'),
+                      <Link key="a" to={`/artist/${a.artist.id}`}>
+                        {a.artist.name}
+                      </Link>,
+                    ],
+                    [t('lumen.music.fact.released', 'Released'), a.releaseDate],
+                    [t('lumen.music.fact.label', 'Label'), a.recordLabel],
+                    [t('lumen.music.fact.from', 'From'), a.artist.area],
+                    [t('lumen.music.fact.type', 'Type'), a.type],
+                  ]}
+                />
+              </VideoDisclosure>
             </aside>
           </div>
         </div>
@@ -831,6 +1210,12 @@ export function Artist() {
   const { t } = useLumenLocale();
   const { user } = useAuth();
   const { data: a, error } = useApi<ArtistDetails>(`/artist/${id}`);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, Album[]>>(
+    {}
+  );
+  const [loadingGroups, setLoadingGroups] = useState<Record<string, boolean>>(
+    {}
+  );
   if (error)
     return (
       <ExtraGate k="music">
@@ -843,11 +1228,62 @@ export function Artist() {
       </ExtraGate>
     );
   if (!a) return <div className="detail-loading" aria-busy="true" />;
+  const releaseCount = Object.values(a.typeCounts ?? {}).reduce(
+    (count, total) => count + total,
+    0
+  );
+  const totalReleases = releaseCount || a.releaseGroups.length;
   const groups = [
-    ['Album', t('lumen.music.albums', 'Albums')],
-    ['EP', t('lumen.music.eps', 'EPs')],
-    ['Single', t('lumen.music.singles', 'Singles')],
-  ] as const;
+    'Album',
+    'EP',
+    'Single',
+    'Live',
+    'Compilation',
+    'Remix',
+    'Soundtrack',
+    'Broadcast',
+    'Demo',
+    'Other',
+  ].map((type) => ({
+    type,
+    title:
+      type === 'Album'
+        ? t('lumen.music.albums', 'Albums')
+        : t(`lumen.music.releaseType.${type.toLowerCase()}`, type),
+  }));
+  const toggleGroup = async (
+    type: string,
+    total: number,
+    releases: Album[]
+  ) => {
+    if (expandedGroups[type]) {
+      setExpandedGroups((current) => {
+        const next = { ...current };
+        delete next[type];
+        return next;
+      });
+      return;
+    }
+    if (releases.length >= total) {
+      setExpandedGroups((current) => ({ ...current, [type]: releases }));
+      return;
+    }
+    setLoadingGroups((current) => ({ ...current, [type]: true }));
+    try {
+      const pageSize = Math.min(total, 1000);
+      const result = await api<ArtistDetails>(
+        `/artist/${encodeURIComponent(id)}?albumType=${encodeURIComponent(type)}&pageSize=${pageSize}`
+      );
+      setExpandedGroups((current) => ({
+        ...current,
+        [type]: result.releaseGroups.filter((release) => release?.id),
+      }));
+    } catch {
+      // Keep the initial release list usable and let the viewer retry.
+    } finally {
+      setLoadingGroups((current) => ({ ...current, [type]: false }));
+    }
+  };
   return (
     <ExtraGate k="music">
       <article className="detail">
@@ -864,12 +1300,12 @@ export function Artist() {
                   year: a.artist.beginYear,
                 })
               : '',
-            a.releaseGroups.length === 1
+            totalReleases === 1
               ? t('lumen.music.releaseCountOne', '{count} release', {
-                  count: a.releaseGroups.length,
+                  count: totalReleases,
                 })
               : t('lumen.music.releaseCountMany', '{count} releases', {
-                  count: a.releaseGroups.length,
+                  count: totalReleases,
                 }),
           ]}
         />
@@ -924,15 +1360,39 @@ export function Artist() {
             <AssociationLink mediaType="artist" id={id} />
           </div>
           {a.wikipedia?.extract && <p className="ov">{a.wikipedia.extract}</p>}
-          {groups.map(([k, t]) => {
-            const list = a.releaseGroups.filter(
-              (r) => (r['primary-type'] || 'Album') === k
+          {groups.map(({ type, title }) => {
+            const releases = a.releaseGroups.filter(
+              (release) =>
+                (release.secondary_types?.[0] ??
+                  release['primary-type'] ??
+                  'Other') === type
             );
+            const list = expandedGroups[type] ?? releases;
+            const total = a.typeCounts?.[type] ?? releases.length;
             return list.length ? (
-              <Section key={k} title={t}>
+              <Section
+                key={type}
+                title={`${title} (${total})`}
+                action={
+                  total > 20 ? (
+                    <button
+                      className="btn btn-tonal btn-sm"
+                      type="button"
+                      disabled={loadingGroups[type]}
+                      onClick={() => void toggleGroup(type, total, releases)}
+                    >
+                      {loadingGroups[type]
+                        ? t('lumen.music.loading', 'Loading…')
+                        : expandedGroups[type]
+                          ? t('lumen.music.showLess', 'Show Less')
+                          : t('lumen.music.showAll', 'Show All')}
+                    </button>
+                  ) : null
+                }
+              >
                 <div className="sqg grid">
-                  {list.map((r) => (
-                    <AlbumCard key={r.id} a={r} />
+                  {list.map((release) => (
+                    <AlbumCard key={release.id} a={release} />
                   ))}
                 </div>
               </Section>

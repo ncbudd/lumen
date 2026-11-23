@@ -138,6 +138,15 @@ export interface MediaInfo {
       episodeNumbers?: number[] | null;
     }[];
   }[];
+  issues?: {
+    id: number;
+    status: number;
+    issueType: number;
+    issueSubtype?: string | null;
+    createdAt?: string;
+    createdBy?: { id?: number; displayName?: string };
+    comments?: { message: string }[];
+  }[];
   hasPlexAudiobookFile?: boolean;
   availableEbookServiceIds?: number[] | null;
   availableAudiobookServiceIds?: number[] | null;
@@ -235,9 +244,52 @@ export const defaultCardTitleModes = {
   book: 'always',
 } satisfies Record<CardTitleKind, CardTitleMode>;
 
-export type VideoDetailPins = Partial<
-  Record<'cast' | 'crew' | 'subjectTags', boolean>
+export type DetailDisclosurePins = Partial<
+  Record<
+    | 'cast'
+    | 'crew'
+    | 'subjectTags'
+    | 'collection'
+    | 'overview'
+    | 'details'
+    | 'mediaServer'
+    | 'artists'
+    | 'taskFilters'
+    | 'filters'
+    | 'mediaFilters'
+    | 'sortBy',
+    boolean
+  >
 >;
+export type VideoDetailPins = Pick<
+  DetailDisclosurePins,
+  | 'cast'
+  | 'crew'
+  | 'subjectTags'
+  | 'collection'
+  | 'overview'
+  | 'details'
+  | 'mediaServer'
+  | 'artists'
+>;
+
+export interface UserAvailabilitySubscriptionResponse {
+  subscribed: boolean;
+  canSubscribe: boolean;
+  scope?: { is4k: boolean | null; seasonNumber: number | null };
+}
+
+export interface MediaServerCollectionsStatus {
+  serverType: number;
+  available: boolean;
+  reason?:
+    | 'account-not-linked'
+    | 'not-authorized'
+    | 'series-not-found'
+    | 'unsupported-server'
+    | 'collection-limit';
+  collections: { id: string; name: string; member: boolean }[];
+}
 
 export interface User {
   plexUsername?: string | null;
@@ -255,7 +307,9 @@ export interface User {
     detailDisclosureCastPinned?: boolean;
     detailDisclosureCrewPinned?: boolean;
     detailDisclosureSubjectTagsPinned?: boolean;
-    detailDisclosurePins?: Partial<Record<'movie' | 'tv', VideoDetailPins>>;
+    detailDisclosurePins?: Partial<
+      Record<'movie' | 'tv' | 'music' | 'book', DetailDisclosurePins>
+    >;
     cardTextVisibilityMovie?: CardTitleMode;
     cardTextVisibilityTv?: CardTitleMode;
     cardTextVisibilityAlbum?: CardTitleMode;
@@ -451,6 +505,7 @@ export interface RequestOptions {
   is4k?: boolean;
   serverId?: number;
   profileId?: number;
+  metadataProfileId?: number;
   rootFolder?: string;
   languageProfileId?: number;
   metadataLanguageId?: number | null;
@@ -459,6 +514,7 @@ export interface RequestOptions {
   requesterSelectedOptions?: {
     tags: boolean;
     profile?: boolean;
+    metadataProfile?: boolean;
     rootFolder?: boolean;
     languageProfile?: boolean;
   };

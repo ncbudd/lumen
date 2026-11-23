@@ -14,6 +14,7 @@ import {
   narratorKey,
   requestBook,
   type BookDetails,
+  type BookResult,
   type Edition,
   type EditionList,
 } from '../api';
@@ -28,10 +29,12 @@ import {
   Facts,
   fmtHrs,
   Pill,
+  VideoDisclosure,
 } from '../components/detail';
 import { ServiceNote } from '../components/extra';
 import FollowButton from '../components/FollowButton';
 import IndexerSearchLink from '../components/IndexerSearchLink';
+import OpenIssueReports from '../components/OpenIssueReports';
 import ReaderDeliveryLink from '../components/ReaderDeliveryLink';
 import ReportIssueButton from '../components/ReportIssueButton';
 import { ReaderDownloads } from '../components/RequestFiles';
@@ -161,6 +164,74 @@ function narrations(list: Edition[]): NarrationRow[] {
 
 // Hardcover tags that name a format, not a subject ("Audiobook" on the ebook page)
 const FORMAT_TAG = /^(audio ?books?|e-?books?|kindle|audible)$/i;
+
+interface BookSeriesDetails {
+  id: string;
+  title: string;
+  description?: string;
+  books: BookResult[];
+}
+
+function BookSeriesSummary({ id, title }: { id: string; title: string }) {
+  const { t } = useLumenLocale();
+  const { data, error, reload } = useApi<BookSeriesDetails>(
+    `/series/${encodeURIComponent(id)}`,
+    { currentPathOnly: true }
+  );
+  const subjects = [
+    ...new Set(
+      (data?.books ?? [])
+        .flatMap((book) => book.subjects ?? [])
+        .map((subject) => subject.trim())
+        .filter(Boolean)
+    ),
+  ].slice(0, 3);
+
+  return (
+    <section className="adv" data-testid={`book-series-${id}`}>
+      <h3 className="h2">
+        <Link to={`/book-series/${encodeURIComponent(id)}`}>
+          {data?.title || title}{' '}
+          {t('lumen.bookDetail.collectionTitle', 'Collection')}
+        </Link>
+      </h3>
+      {error ? (
+        <p className="note">
+          {error}{' '}
+          <button className="chip" type="button" onClick={() => void reload()}>
+            {t('lumen.bookSeries.retry', 'Retry')}
+          </button>
+        </p>
+      ) : data ? (
+        <>
+          {data.description && <p className="ov">{data.description}</p>}
+          <p className="note">
+            {t('lumen.bookDetail.collectionSize', 'Collection size: {count}', {
+              count: data.books.length,
+            })}
+          </p>
+          {subjects.length > 0 && (
+            <div className="toolbar">
+              {subjects.map((subject) => (
+                <Link
+                  className="chip"
+                  key={subject}
+                  to={`/books?subject=${encodeURIComponent(subject)}`}
+                >
+                  {subject}
+                </Link>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="note" aria-busy="true">
+          {t('lumen.bookDetail.loadingCollection', 'Loading collection…')}
+        </p>
+      )}
+    </section>
+  );
+}
 
 // bookshelf:N:<base64 of a bare number> -> the same book under bookshelf:N:<base64 of "hc:number">
 function hcFormId(id: string): string | null {
@@ -324,6 +395,15 @@ export default function BookDetail() {
   const chosenRow = requestable.find((r) => r.key === chosen);
   const longest = Math.max(0, ...rows.map((r) => r.durationSeconds || 0));
   const series = b.series?.[0];
+  const bookSeries = (b.series ?? []).filter(
+    (entry): entry is { id: string; title: string; position?: string } =>
+      !!entry.id?.trim() && !!entry.title?.trim()
+  );
+  const bookSubjects = [
+    ...new Set((b.subjects ?? []).map((subject) => subject.trim())),
+  ]
+    .filter(Boolean)
+    .slice(0, 50);
   const audio = f === 'audiobook';
   // nothing to choose between: no narrator details, or no recordings found at all
   const noChoice = !anotherMode && (!work || (!!eds.data && !rows.length));
@@ -646,9 +726,55 @@ export default function BookDetail() {
         </div>
         {/* phones: the action bar holds only the request, so the owned copy's link goes here */}
         {alsoListen && <div className="dacts ph">{alsoListen}</div>}
+        {bookSeries.length > 0 && (
+          <VideoDisclosure
+            media="book"
+            panel="collection"
+            label={t('lumen.movie.fact.collection', 'Collection')}
+            testId="book-series-collections"
+            deferChildrenUntilOpen
+          >
+            {bookSeries.map((entry) => (
+              <BookSeriesSummary
+                key={entry.id}
+                id={entry.id}
+                title={entry.title}
+              />
+            ))}
+          </VideoDisclosure>
+        )}
+        <VideoDisclosure
+          media="book"
+          panel="subjectTags"
+          label={t('lumen.bookDetail.subjects', 'Subjects')}
+          testId="book-subject-tags"
+        >
+          {bookSubjects.length > 0 ? (
+            <div className="toolbar">
+              {bookSubjects.map((subject) => (
+                <Link
+                  className="chip"
+                  key={subject}
+                  to={`/books?subject=${encodeURIComponent(subject)}`}
+                >
+                  {subject}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="note">
+              {t('lumen.detail.noSubjectTags', 'No subject tags.')}
+            </p>
+          )}
+        </VideoDisclosure>
         <div className="dcols">
           <div style={{ display: 'grid', gap: 22 }}>
             {b.description && <p className="ov long">{b.description.trim()}</p>}
+            <OpenIssueReports
+              id="book-open-issues"
+              mediaType="book"
+              issues={b.mediaInfo?.issues}
+            />
             {showNarr ? (
               <div id="narr">
                 <div className="sec-head">
@@ -944,38 +1070,46 @@ export default function BookDetail() {
             </div>
           </div>
           <aside>
-            <Facts
-              rows={[
-                [
-                  t('lumen.bookDetail.series', 'Series'),
-                  series?.id && series.title ? (
-                    <Link to={`/book-series/${encodeURIComponent(series.id)}`}>
-                      {series.title}
-                      {series.position ? ` #${series.position}` : ''}
-                    </Link>
-                  ) : series?.title ? (
-                    `${series.title}${series.position ? ' #' + series.position : ''}`
-                  ) : (
-                    ''
-                  ),
-                ],
-                [
-                  t('lumen.bookDetail.firstPublished', 'First published'),
-                  b.firstPublishYear,
-                ],
-                [
-                  t('lumen.bookDetail.listeningTime', 'Listening time'),
-                  audio && longest ? fmtHrs(longest) : '',
-                ],
-                [
-                  t('lumen.bookDetail.subjects', 'Subjects'),
-                  (b.subjects || [])
-                    .filter((t) => !FORMAT_TAG.test(t))
-                    .slice(0, 4)
-                    .join(', '),
-                ],
-              ]}
-            />
+            <VideoDisclosure
+              media="book"
+              panel="details"
+              label={t('lumen.detail.bookDetails', 'Book Details')}
+            >
+              <Facts
+                rows={[
+                  [
+                    t('lumen.bookDetail.series', 'Series'),
+                    series?.id && series.title ? (
+                      <Link
+                        to={`/book-series/${encodeURIComponent(series.id)}`}
+                      >
+                        {series.title}
+                        {series.position ? ` #${series.position}` : ''}
+                      </Link>
+                    ) : series?.title ? (
+                      `${series.title}${series.position ? ' #' + series.position : ''}`
+                    ) : (
+                      ''
+                    ),
+                  ],
+                  [
+                    t('lumen.bookDetail.firstPublished', 'First published'),
+                    b.firstPublishYear,
+                  ],
+                  [
+                    t('lumen.bookDetail.listeningTime', 'Listening time'),
+                    audio && longest ? fmtHrs(longest) : '',
+                  ],
+                  [
+                    t('lumen.bookDetail.subjects', 'Subjects'),
+                    (b.subjects || [])
+                      .filter((t) => !FORMAT_TAG.test(t))
+                      .slice(0, 4)
+                      .join(', '),
+                  ],
+                ]}
+              />
+            </VideoDisclosure>
           </aside>
         </div>
       </div>

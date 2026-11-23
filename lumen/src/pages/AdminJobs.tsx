@@ -136,6 +136,7 @@ export default function AdminJobs() {
   const [edit, setEdit] = useState<{ job: Job; schedule: string }>();
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState('');
+  const [notice, setNotice] = useState('');
   const working = useRef(false);
 
   useEffect(() => {
@@ -153,11 +154,28 @@ export default function AdminJobs() {
     working.current = true;
     setBusy(true);
     setFailure('');
+    setNotice('');
     try {
       await api(`/settings/jobs/${encodeURIComponent(job.id)}/${action}`, {
         method: 'POST',
         body: body ? JSON.stringify(body) : undefined,
       });
+      if (action === 'schedule') {
+        const updated = await api<Job[]>('/settings/jobs');
+        const persisted = updated.find((item) => item.id === job.id);
+        const expectedSchedule = (body as { schedule?: string } | undefined)
+          ?.schedule;
+        if (!persisted || persisted.cronSchedule !== expectedSchedule) {
+          setFailure(
+            t(
+              'lumen.adminJobs.confirmFailure',
+              'Could not confirm the saved schedule. Try again.'
+            )
+          );
+          return;
+        }
+        setNotice(t('lumen.adminJobs.scheduleSaved', 'Schedule saved.'));
+      }
       setEdit(undefined);
     } catch (error) {
       setFailure(
@@ -179,6 +197,12 @@ export default function AdminJobs() {
       <header className="ph">
         <h1>{t('lumen.adminJobs.title', 'Scheduled Jobs')}</h1>
       </header>
+      <p className="note">
+        {t(
+          'components.Settings.SettingsJobsCache.jobsDescription',
+          'SeerrNG runs maintenance jobs on a schedule. Running a job manually does not change its schedule.'
+        )}
+      </p>
       <div className="toolbar">
         <Link className="btn btn-quiet btn-sm" to="/admin">
           {t('lumen.admin.title', 'Administration')}
@@ -204,6 +228,11 @@ export default function AdminJobs() {
           {failure}
         </p>
       )}
+      {notice && (
+        <p className="note" role="status">
+          {notice}
+        </p>
+      )}
       {!data && !error && (
         <p className="note" role="status">
           {t('lumen.adminJobs.loading', 'Loading scheduled jobs…')}
@@ -219,7 +248,12 @@ export default function AdminJobs() {
           {data.map((job) => (
             <li className="set" key={job.id}>
               <div>
-                <b>{job.name}</b>
+                <b>
+                  {t(
+                    `components.Settings.SettingsJobsCache.${job.id}`,
+                    job.name
+                  )}
+                </b>
                 <small>
                   {t(
                     `components.Settings.SettingsJobsCache.${job.type}`,

@@ -15,6 +15,7 @@ import {
 } from '../api';
 import { isAdministrator, useAuth, useMediaServerName } from '../auth';
 import AnimeContinuation from '../components/AnimeContinuation';
+import AvailabilitySubscriptionButton from '../components/AvailabilitySubscriptionButton';
 import BlocklistButton from '../components/BlocklistButton';
 import {
   Rail,
@@ -35,21 +36,25 @@ import {
   Facts,
   fmtRun,
   originalLanguageLink,
+  OverviewDisclosure,
   Pill,
   productionCountryLinks,
   SubjectTagsDisclosure,
   TrailerButton,
+  VideoDisclosure,
 } from '../components/detail';
 import { EpisodeAvailabilityPanel } from '../components/EpisodeAvailabilityPanel';
 import { ServiceNote } from '../components/extra';
 import IndexerSearchLink from '../components/IndexerSearchLink';
 import LiveTvAirings from '../components/LiveTvAirings';
+import MediaServerCollectionsButton from '../components/MediaServerCollectionsButton';
 import MediaServerSavedItemButton from '../components/MediaServerSavedItemButton';
 import ReportIssueButton from '../components/ReportIssueButton';
 import { useOffers4k, useVideoRequestQuota } from '../components/requestSheet';
 import { useToast } from '../components/toast';
 import TvCollectionLinks from '../components/TvCollectionLinks';
 import TvEpisodeRequestSheet from '../components/TvEpisodeRequestSheet';
+import VideoPlaybackButton from '../components/VideoPlaybackButton';
 import WatchlistButton from '../components/WatchlistButton';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
@@ -85,6 +90,9 @@ export default function TvDetail() {
   const { t: translate } = useLumenLocale();
   const serverName = useMediaServerName();
   const { user } = useAuth();
+  const episodeQueue = useApi<{ defaultEpisodeCount: number }>(
+    user?.id ? `/user/${user.id}/settings/episode-queue` : null
+  ).data;
 
   const { id } = useParams();
   const loc = useLocation();
@@ -591,6 +599,27 @@ export default function TvDetail() {
       <div className="dbody">
         <ServiceNote error={error} what="this series" retry={reload} />
         <div className="dstatus">
+          {episodeQueue && (
+            <Pill
+              k={episodeQueue.defaultEpisodeCount > 0 ? 'ok' : 'neutral'}
+              icon="clock"
+            >
+              {episodeQueue.defaultEpisodeCount > 0
+                ? translate(
+                    episodeQueue.defaultEpisodeCount === 1
+                      ? 'lumen.tv.episodeQueue.one'
+                      : 'lumen.tv.episodeQueue.many',
+                    episodeQueue.defaultEpisodeCount === 1
+                      ? 'Episode Queue · 1 episode set by admin'
+                      : 'Episode Queue · {count} episodes set by admin',
+                    { count: episodeQueue.defaultEpisodeCount }
+                  )
+                : translate(
+                    'lumen.tv.episodeQueue.off',
+                    'Episode Queue · off · managed by admin'
+                  )}
+            </Pill>
+          )}
           {watchable && (
             <Pill k="ok" icon="check">
               {statusLine}
@@ -646,16 +675,48 @@ export default function TvDetail() {
             tvId={t.id}
           />
           <WatchlistButton key={t.id} mediaType="tv" detail={t} />
-          {[1, 2, 3].includes(pub?.mediaServerType ?? 0) && (
-            <MediaServerSavedItemButton
-              key={`media-server-saved:${t.id}:${pub?.mediaServerType}:${is4k}`}
-              tvId={t.id}
-              title={t.name || 'series'}
-              serverType={pub!.mediaServerType!}
-              is4k={!!is4k}
-            />
-          )}
+          <AvailabilitySubscriptionButton
+            key={t.id}
+            mediaType="tv"
+            tmdbId={t.id}
+          />
         </div>
+        {[1, 2, 3].includes(pub?.mediaServerType ?? 0) && (
+          <VideoDisclosure
+            media="tv"
+            panel="mediaServer"
+            label={translate('lumen.tv.mediaServerDetails', 'Media Server')}
+            testId="tv-media-server"
+          >
+            <div className="toolbar">
+              {t.mediaInfo?.id &&
+                user &&
+                canRequestSeries(user.permissions) &&
+                watchable && (
+                  <VideoPlaybackButton
+                    mediaId={t.mediaInfo.id}
+                    is4k={!!is4k}
+                    mediaType="tv"
+                    blockedGroupIndexes={[...sharedSeasons]}
+                    title={t.name || ''}
+                  />
+                )}
+              <MediaServerSavedItemButton
+                key={`media-server-saved:${t.id}:${pub?.mediaServerType}:${is4k}`}
+                tvId={t.id}
+                title={t.name || 'series'}
+                serverType={pub!.mediaServerType!}
+                is4k={!!is4k}
+              />
+              <MediaServerCollectionsButton
+                key={`media-server-collections:${t.id}:${pub?.mediaServerType}:${is4k}`}
+                tvId={t.id}
+                serverType={pub!.mediaServerType!}
+                is4k={!!is4k}
+              />
+            </div>
+          </VideoDisclosure>
+        )}
         <TvCollectionLinks key={t.id} id={t.id} />
         <div className="dacts pc">
           {main}
@@ -750,7 +811,7 @@ export default function TvDetail() {
         )}
         <div className="dcols">
           <div style={{ display: 'grid', gap: 22 }}>
-            <p className="ov">{t.overview}</p>
+            <OverviewDisclosure overview={t.overview} />
             <div id="seasons">
               <div className="sec-head">
                 <h2>{translate('lumen.tv.seasons', 'Seasons')}</h2>
@@ -812,8 +873,8 @@ export default function TvDetail() {
                   >
                     {missing.length === seasons.length
                       ? translate(
-                          'lumen.tv.requestEntireSeries',
-                          'Request entire series'
+                          'lumen.tv.selectEntireSeries',
+                          'Select entire series'
                         )
                       : translate(
                           'lumen.tv.allMissing',
@@ -1014,98 +1075,104 @@ export default function TvDetail() {
             )}
           </div>
           <aside>
-            <Facts
-              rows={[
-                [
-                  translate(
-                    'lumen.tv.fact.streamingProviders',
-                    'Streaming Providers'
-                  ),
-                  streamingProviders,
-                ],
-                [
-                  translate(
-                    'lumen.tv.fact.originalLanguage',
-                    'Original Language'
-                  ),
-                  originalLanguageLink(t.originalLanguage, '/series'),
-                ],
-                [
-                  translate(
-                    'lumen.tv.fact.productionCountries',
-                    'Production Countries'
-                  ),
-                  productionCountryLinks(t.productionCountries, '/series'),
-                ],
-                [
-                  translate('lumen.tv.fact.network', 'Network'),
-                  t.networks?.length
-                    ? t.networks.map(({ id, name }, index) => (
-                        <span key={`${id ?? name}:${index}`}>
-                          {index > 0 && ', '}
-                          {id &&
-                          Number.isSafeInteger(id) &&
-                          id > 0 &&
-                          id <= 1_000_000_000 ? (
-                            <Link to={`/series?network=${id}`}>{name}</Link>
-                          ) : (
-                            name
-                          )}
-                        </span>
-                      ))
-                    : null,
-                ],
-                [
-                  translate('lumen.tv.fact.status', 'Status'),
-                  t.status === 'Returning Series'
-                    ? translate('lumen.tv.fact.stillAiring', 'Still airing')
-                    : ((
-                        {
-                          Planned: translate(
-                            'lumen.browse.seriesStatusOption.1',
-                            'Planned'
-                          ),
-                          'In Production': translate(
-                            'lumen.browse.seriesStatusOption.2',
-                            'In Production'
-                          ),
-                          Ended: translate(
-                            'lumen.browse.seriesStatusOption.3',
-                            'Ended'
-                          ),
-                          Canceled: translate(
-                            'lumen.browse.seriesStatusOption.4',
-                            'Canceled'
-                          ),
-                          Pilot: translate(
-                            'lumen.browse.seriesStatusOption.5',
-                            'Pilot'
-                          ),
-                        } as Record<string, string>
-                      )[t.status ?? ''] ?? t.status),
-                ],
-                [
-                  translate('lumen.tv.fact.episodeLength', 'Episode length'),
-                  fmtRun(t.episodeRunTime?.[0]),
-                ],
-                [
-                  translate('lumen.tv.fact.createdBy', 'Created by'),
-                  t.createdBy?.map((c) => c.name).join(', '),
-                ],
-                [
-                  translate('lumen.tv.fact.lastAired', 'Last aired'),
-                  t.lastEpisodeToAir
-                    ? `S${t.lastEpisodeToAir.seasonNumber} E${t.lastEpisodeToAir.episodeNumber} · ${shortDate(t.lastEpisodeToAir.airDate)}`
-                    : '',
-                ],
-                [
-                  translate('lumen.tv.fact.nextEpisode', 'Next episode'),
-                  t.nextEpisodeToAir
-                    ? `S${t.nextEpisodeToAir.seasonNumber} E${t.nextEpisodeToAir.episodeNumber} · ${shortDate(t.nextEpisodeToAir.airDate)}`
-                    : '',
-                ],
-              ]}
-            />
+            <VideoDisclosure
+              media="tv"
+              panel="details"
+              label={translate('lumen.detail.tvDetails', 'Series Details')}
+            >
+              <Facts
+                rows={[
+                  [
+                    translate(
+                      'lumen.tv.fact.streamingProviders',
+                      'Streaming Providers'
+                    ),
+                    streamingProviders,
+                  ],
+                  [
+                    translate(
+                      'lumen.tv.fact.originalLanguage',
+                      'Original Language'
+                    ),
+                    originalLanguageLink(t.originalLanguage, '/series'),
+                  ],
+                  [
+                    translate(
+                      'lumen.tv.fact.productionCountries',
+                      'Production Countries'
+                    ),
+                    productionCountryLinks(t.productionCountries, '/series'),
+                  ],
+                  [
+                    translate('lumen.tv.fact.network', 'Network'),
+                    t.networks?.length
+                      ? t.networks.map(({ id, name }, index) => (
+                          <span key={`${id ?? name}:${index}`}>
+                            {index > 0 && ', '}
+                            {id &&
+                            Number.isSafeInteger(id) &&
+                            id > 0 &&
+                            id <= 1_000_000_000 ? (
+                              <Link to={`/series?network=${id}`}>{name}</Link>
+                            ) : (
+                              name
+                            )}
+                          </span>
+                        ))
+                      : null,
+                  ],
+                  [
+                    translate('lumen.tv.fact.status', 'Status'),
+                    t.status === 'Returning Series'
+                      ? translate('lumen.tv.fact.stillAiring', 'Still airing')
+                      : ((
+                          {
+                            Planned: translate(
+                              'lumen.browse.seriesStatusOption.1',
+                              'Planned'
+                            ),
+                            'In Production': translate(
+                              'lumen.browse.seriesStatusOption.2',
+                              'In Production'
+                            ),
+                            Ended: translate(
+                              'lumen.browse.seriesStatusOption.3',
+                              'Ended'
+                            ),
+                            Canceled: translate(
+                              'lumen.browse.seriesStatusOption.4',
+                              'Canceled'
+                            ),
+                            Pilot: translate(
+                              'lumen.browse.seriesStatusOption.5',
+                              'Pilot'
+                            ),
+                          } as Record<string, string>
+                        )[t.status ?? ''] ?? t.status),
+                  ],
+                  [
+                    translate('lumen.tv.fact.episodeLength', 'Episode length'),
+                    fmtRun(t.episodeRunTime?.[0]),
+                  ],
+                  [
+                    translate('lumen.tv.fact.createdBy', 'Created by'),
+                    t.createdBy?.map((c) => c.name).join(', '),
+                  ],
+                  [
+                    translate('lumen.tv.fact.lastAired', 'Last aired'),
+                    t.lastEpisodeToAir
+                      ? `S${t.lastEpisodeToAir.seasonNumber} E${t.lastEpisodeToAir.episodeNumber} · ${shortDate(t.lastEpisodeToAir.airDate)}`
+                      : '',
+                  ],
+                  [
+                    translate('lumen.tv.fact.nextEpisode', 'Next episode'),
+                    t.nextEpisodeToAir
+                      ? `S${t.nextEpisodeToAir.seasonNumber} E${t.nextEpisodeToAir.episodeNumber} · ${shortDate(t.nextEpisodeToAir.airDate)}`
+                      : '',
+                  ],
+                ]}
+              />
+            </VideoDisclosure>
           </aside>
         </div>
         {t.originalLanguage === 'ja' &&

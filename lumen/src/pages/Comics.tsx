@@ -37,6 +37,7 @@ import {
 } from '../components/extra';
 import { GenrePicker } from '../components/GenrePicker';
 import IndexerSearchLink from '../components/IndexerSearchLink';
+import OpenIssueReports from '../components/OpenIssueReports';
 import ReaderDeliveryLink from '../components/ReaderDeliveryLink';
 import ReaderShelf from '../components/ReaderShelf';
 import ReportIssueButton from '../components/ReportIssueButton';
@@ -1136,6 +1137,11 @@ export function ComicDetail() {
                 {alsoRead}
               </div>
               {chosen && <ComicIssues id={chosen.id} manga={manga} />}
+              <OpenIssueReports
+                id="comic-open-issues"
+                mediaType="comic"
+                issues={c?.mediaInfo?.issues}
+              />
             </div>
             <aside>
               <Facts
@@ -1788,6 +1794,11 @@ export function MagazineDetail() {
                   </ol>
                 </>
               )}
+              <OpenIssueReports
+                id="magazine-open-issues"
+                mediaType="magazine"
+                issues={m.mediaInfo?.issues}
+              />
             </div>
             <aside>
               <Facts

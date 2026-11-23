@@ -2,6 +2,31 @@ import { expect, test } from '@playwright/test';
 
 const mount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
 const appPath = (path: string) => `${mount}${path}`;
+const introByLocale = {
+  en: 'Search releases in your Prowlarr indexers across every SeerrNG media category.',
+  fr: 'Recherchez des sorties dans vos indexeurs Prowlarr, dans toutes les catégories de médias de SeerrNG.',
+  ar: 'ابحث عن إصدارات في مواقع الفهرسة لديك على Prowlarr ضمن جميع فئات الوسائط في SeerrNG.',
+} as const;
+const categoryEmptyByLocale = {
+  en: 'No enabled media categories are available to this account.',
+  fr: 'Aucune catégorie de média activée n’est disponible pour ce compte.',
+  ar: 'لا تتوفر لهذا الحساب فئات وسائط مفعّلة.',
+} as const;
+const indexerMenuByLocale = {
+  en: 'Indexer Search',
+  fr: 'Recherche d’indexeurs',
+  ar: 'البحث عن المفهرسات',
+} as const;
+const openIndexerByLocale = {
+  en: 'Open Indexer Search',
+  fr: 'Ouvrir Recherche d’indexeurs',
+  ar: 'فتح البحث عن المفهرسات',
+} as const;
+const savedLocale = ['en', 'fr', 'ar'].includes(
+  process.env.LUMEN_INDEXER_LOCALE ?? ''
+)
+  ? (process.env.LUMEN_INDEXER_LOCALE as keyof typeof introByLocale)
+  : 'en';
 
 test('Indexer Search is reachable from the permission-aware mobile You menu', async ({
   page,
@@ -15,11 +40,13 @@ test('Indexer Search is reachable from the permission-aware mobile You menu', as
       json:
         path === '/auth/me'
           ? { id: 1, displayName: 'Operator', permissions: 16 }
-          : path === '/settings/public'
-            ? { mediaServerType: 1 }
-            : path === '/indexer-search/configuration'
-              ? { configured: true, categories: [] }
-              : {},
+          : path === '/user/1/settings/main'
+            ? { locale: savedLocale }
+            : path === '/settings/public'
+              ? { mediaServerType: 1 }
+              : path === '/indexer-search/configuration'
+                ? { configured: true, categories: [] }
+                : {},
     });
   });
 
@@ -32,21 +59,35 @@ test('Indexer Search is reachable from the permission-aware mobile You menu', as
       .click();
   }
   const link = desktop
-    ? page
-        .getByRole('navigation', { name: 'Main', exact: true })
-        .getByRole('link', { name: 'Indexer Search', exact: true })
-    : page.getByRole('link', { name: 'Open Indexer Search', exact: true });
+    ? page.getByRole('link', {
+        name: indexerMenuByLocale[savedLocale],
+        exact: true,
+      })
+    : page.getByRole('link', {
+        name: openIndexerByLocale[savedLocale],
+        exact: true,
+      });
   await expect(link).toBeVisible();
   await link.click();
   await expect(page).toHaveURL(/\/indexer-search$/);
   await expect(
-    page.getByText(
-      'No enabled media categories are available to this account.',
-      {
-        exact: true,
-      }
-    )
+    page.getByText(categoryEmptyByLocale[savedLocale], { exact: true })
   ).toBeVisible();
+  if (process.env.LUMEN_CAPTURE_MODE !== 'baseline')
+    await expect(
+      page.getByText(introByLocale[savedLocale], { exact: true })
+    ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
+  const captureDir = process.env.LUMEN_VISUAL_CAPTURE_DIR;
+  if (captureDir && ['desktop', 'iphone'].includes(test.info().project.name))
+    await page.screenshot({
+      path: `${captureDir}/indexer-no-categories-${process.env.LUMEN_CAPTURE_MODE === 'baseline' ? 'baseline' : 'candidate'}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
 });
 
 test('Indexer Search is absent from the You menu without permission', async ({
@@ -106,6 +147,14 @@ test('unconfigured Prowlarr state exposes settings only to administrators', asyn
   await expect(
     page.getByText(connectionLabels[locale], { exact: true })
   ).toBeVisible();
+  await expect(
+    page.getByText(introByLocale[locale], { exact: true })
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
   const settingsLink = page.getByRole('link', {
     name: configureLabels[locale],
     exact: true,
@@ -178,7 +227,7 @@ test('indexer search honors enabled categories, submitted pagination and one-use
       return route.fulfill({
         json: {
           configured: true,
-          showIndexerDetails: false,
+          showIndexerDetails: true,
           categories: [
             { category: 'ebook', categoryIds: [7020], enabled: true },
             { category: 'adult', categoryIds: [6000], enabled: false },
@@ -195,19 +244,36 @@ test('indexer search honors enabled categories, submitted pagination and one-use
           results: [
             {
               title: body.offset ? 'Second Result' : 'First Result',
-              indexer: 'Hidden Indexer',
+              indexer: 'Example Indexer',
               protocol: 'usenet',
-              size: 1000000,
+              size: 512,
               infoUrl: 'https://example.test/info',
-              grabs: null,
-              seeders: null,
-              leechers: null,
-              publishDate: null,
-              categories: [],
+              grabs: body.offset ? null : 12,
+              seeders: body.offset ? null : 3,
+              leechers: body.offset ? null : 1,
+              publishDate: body.offset ? null : '2026-11-01T00:00:00.000Z',
+              categories: body.offset ? [] : [{ id: 7000, name: 'Books' }],
               grabId: body.offset
                 ? null
                 : 'df924acb-ad33-490f-a44e-150b0e7d6985',
             },
+            ...(!body.offset
+              ? [
+                  {
+                    title: 'Large Result',
+                    indexer: 'Example Indexer',
+                    protocol: 'usenet',
+                    size: 1.5 * 1024 ** 3,
+                    infoUrl: null,
+                    grabs: null,
+                    seeders: null,
+                    leechers: null,
+                    publishDate: null,
+                    categories: [],
+                    grabId: null,
+                  },
+                ]
+              : []),
           ],
         },
       });
@@ -226,10 +292,17 @@ test('indexer search honors enabled categories, submitted pagination and one-use
   await expect(page.getByRole('option', { name: 'Adult' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Search indexers' }).click();
   await expect(page.getByText('First Result')).toBeVisible();
-  await expect(page.getByText('Hidden Indexer')).toHaveCount(0);
+  await expect(page.getByRole('listitem').nth(0)).toContainText('512 B');
+  await expect(page.getByRole('listitem').nth(1)).toContainText('1.5 GB');
+  if (['iphone', 'android'].includes(test.info().project.name))
+    expect(
+      (await page.getByRole('listitem').nth(0).locator('b').boundingBox())
+        ?.width ?? 0
+    ).toBeGreaterThan(70);
+  await expect(page.getByText('Example Indexer').first()).toBeVisible();
   await expect(
     page.getByRole('link', { name: 'Open indexer details' })
-  ).toHaveCount(0);
+  ).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth
@@ -369,6 +442,96 @@ test('changing indexer category clears stale results and is disabled while searc
   expect(searches).toEqual([
     { category: 'movie', query: 'Dune', offset: 0 },
     { category: 'tv', query: 'Dune', offset: 0 },
+  ]);
+});
+
+test('updated search links replace prefill and discard an in-flight search', async ({
+  page,
+}) => {
+  const searches: { category: string; query: string }[] = [];
+  let finishFirstSearch!: () => void;
+  const firstSearchGate = new Promise<void>((resolve) => {
+    finishFirstSearch = resolve;
+  });
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', async (route) => {
+    const path = new URL(route.request().url()).pathname.slice(
+      '/api/v1'.length
+    );
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 1, displayName: 'Operator', permissions: 16 },
+      });
+    if (path === '/indexer-search/configuration')
+      return route.fulfill({
+        json: {
+          configured: true,
+          categories: [
+            { category: 'movie', categoryIds: [2000], enabled: true },
+            { category: 'tv', categoryIds: [5000], enabled: true },
+          ],
+        },
+      });
+    if (path === '/indexer-search/search') {
+      const body = route.request().postDataJSON() as {
+        category: string;
+        query: string;
+      };
+      searches.push(body);
+      if (body.query === 'Dune') await firstSearchGate;
+      return route.fulfill({
+        json: {
+          limit: 50,
+          hasMore: false,
+          results: [
+            {
+              title: `${body.query} result`,
+              protocol: 'usenet',
+              size: null,
+              seeders: null,
+              leechers: null,
+              grabs: null,
+              publishDate: null,
+              infoUrl: null,
+              grabId: null,
+              categories: [],
+            },
+          ],
+        },
+      });
+    }
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/indexer-search?category=movie&query=Dune'));
+  await page.getByRole('button', { name: 'Search indexers' }).click();
+  await expect(
+    page.getByRole('combobox', { name: 'Media category' })
+  ).toBeDisabled();
+  await page.evaluate(
+    (href) => {
+      window.history.pushState({}, '', href);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    },
+    `${appPath('/indexer-search')}?category=tv&query=Foundation`
+  );
+  await expect(
+    page.getByRole('combobox', { name: 'Media category' })
+  ).toHaveValue('tv');
+  await expect(
+    page.getByRole('searchbox', { name: 'Search terms' })
+  ).toHaveValue('Foundation');
+  await expect(
+    page.getByRole('button', { name: 'Search indexers' })
+  ).toBeEnabled();
+
+  finishFirstSearch();
+  await expect(page.getByText('Dune result')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Search indexers' }).click();
+  await expect(page.getByText('Foundation result')).toBeVisible();
+  expect(searches).toEqual([
+    { category: 'movie', query: 'Dune', offset: 0 },
+    { category: 'tv', query: 'Foundation', offset: 0 },
   ]);
 });
 

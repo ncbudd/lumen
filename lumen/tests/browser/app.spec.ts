@@ -1221,11 +1221,13 @@ test('video credits remember scoped pins and leave failed saves retryable', asyn
   const settings = {
     detailDisclosureCastPinned: true,
     detailDisclosurePins: {
-      movie: { cast: false },
-      tv: { cast: false },
+      movie: { cast: false, details: false, collection: false },
+      tv: { cast: false, details: false, mediaServer: false },
+      book: { details: false },
     },
   };
   const writes: unknown[] = [];
+  let collectionReads = 0;
   let reject = true;
   await page.route('**/api/v1/auth/me', (route) =>
     route.fulfill({
@@ -1233,8 +1235,28 @@ test('video credits remember scoped pins and leave failed saves retryable', asyn
     })
   );
   await page.route('**/api/v1/movie/101', (route) =>
-    route.fulfill({ json: { ...movie, credits: { cast, crew } } })
+    route.fulfill({
+      json: {
+        ...movie,
+        collection: { id: 77, name: 'Fixture Collection' },
+        credits: { cast, crew },
+      },
+    })
   );
+  await page.route('**/api/v1/collection/77', (route) => {
+    collectionReads++;
+    return route.fulfill({
+      json: {
+        id: 77,
+        name: 'Fixture Collection',
+        overview: 'A persistent movie collection summary.',
+        parts: [
+          { id: 101, title: 'The Test Film', mediaType: 'movie' },
+          { id: 102, title: 'Another Film', mediaType: 'movie' },
+        ],
+      },
+    });
+  });
   await page.route('**/api/v1/tv/202', (route) =>
     route.fulfill({
       json: {
@@ -1244,7 +1266,19 @@ test('video credits remember scoped pins and leave failed saves retryable', asyn
         name: 'Fixture Series',
         mediaType: 'tv',
         seasons: [],
+        episodeRunTime: [42],
+        overview: 'A persistent series overview.',
         credits: { cast, crew },
+      },
+    })
+  );
+  await page.route('**/api/v1/book/OL123W', (route) =>
+    route.fulfill({
+      json: {
+        id: 'OL123W',
+        title: 'Fixture Book',
+        firstPublishYear: 2001,
+        subjects: ['Science Fiction'],
       },
     })
   );
@@ -1258,6 +1292,24 @@ test('video credits remember scoped pins and leave failed saves retryable', asyn
       return route.fulfill({ json: settings.detailDisclosurePins.movie });
     }
   );
+  await page.route(
+    '**/api/v1/user/1/settings/detail-disclosures/tv',
+    (route) => {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      Object.assign(settings.detailDisclosurePins.tv, body);
+      return route.fulfill({ json: settings.detailDisclosurePins.tv });
+    }
+  );
+  await page.route(
+    '**/api/v1/user/1/settings/detail-disclosures/book',
+    (route) => {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      Object.assign(settings.detailDisclosurePins.book, body);
+      return route.fulfill({ json: settings.detailDisclosurePins.book });
+    }
+  );
 
   await page.route('**/api/v1/person/39', (route) =>
     route.fulfill({ json: { id: 39, name: 'Supporting Actor 10' } })
@@ -1267,6 +1319,16 @@ test('video credits remember scoped pins and leave failed saves retryable', asyn
   );
 
   await page.goto('/movie/101');
+  const movieCapture = process.env.LUMEN_MOVIE_COLLECTION_CAPTURE;
+  await expect(
+    page.getByRole('heading', { name: 'The Test Film' })
+  ).toBeVisible();
+  if (movieCapture) {
+    await page.screenshot({
+      path: `${movieCapture}-closed-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
   const actor = page.locator('.person').filter({ hasText: 'Fixture Actor' });
   await expect(actor).toBeHidden();
   await page.getByText('Starring', { exact: true }).click();
@@ -1283,6 +1345,58 @@ test('video credits remember scoped pins and leave failed saves retryable', asyn
   expect(writes).toEqual([{ cast: true }, { cast: true }]);
   await page.reload();
   await expect(actor).toBeVisible();
+  const movieDetails = page
+    .locator('details.adv')
+    .filter({ hasText: 'Movie Details' });
+  await expect(movieDetails).toBeVisible();
+  await expect(movieDetails).not.toHaveAttribute('open', '');
+  await movieDetails.locator('summary').click();
+  await expect(movieDetails).toContainText('Runtime');
+  const movieDetailsPin = movieDetails.getByRole('button', {
+    name: 'Keep Movie Details Open',
+  });
+  await movieDetailsPin.click();
+  await expect(movieDetailsPin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  const restoredMovieDetails = page
+    .locator('details.adv')
+    .filter({ hasText: 'Movie Details' });
+  await expect(restoredMovieDetails).toHaveAttribute('open', '');
+  await expect(restoredMovieDetails).toContainText('Runtime');
+  const collection = page.getByTestId('movie-collection');
+  await expect(collection).toHaveJSProperty('open', false);
+  expect(collectionReads).toBe(0);
+  await collection.locator('summary').click();
+  const collectionSummary = page.getByTestId('movie-collection-summary');
+  await expect(collectionSummary).toContainText(
+    'A persistent movie collection summary.'
+  );
+  await expect(collectionSummary).toContainText('Collection size: 2 movies');
+  await expect(
+    collectionSummary.getByRole('link', { name: 'Fixture Collection' })
+  ).toHaveAttribute('href', '/collection/77');
+  if (movieCapture) {
+    await page.screenshot({
+      path: `${movieCapture}-open-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  const collectionPin = collection.getByRole('button', {
+    name: 'Keep Collection Open',
+  });
+  await collectionPin.click();
+  await expect(collectionPin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByTestId('movie-collection')).toHaveAttribute(
+    'open',
+    ''
+  );
+  await page.getByRole('button', { name: 'Keep Collection Open' }).click();
+  await page.reload();
+  await expect(page.getByTestId('movie-collection')).not.toHaveAttribute(
+    'open',
+    ''
+  );
   await page.getByText('Crew', { exact: true }).click();
   await expect(
     page.locator('.person').filter({ hasText: 'Fixture Director' })
@@ -1303,9 +1417,156 @@ test('video credits remember scoped pins and leave failed saves retryable', asyn
     page.getByRole('heading', { name: 'Supporting Actor 10' })
   ).toBeVisible();
 
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: {
+        applicationTitle: 'SeerrNG',
+        enabledMediaCategories: {},
+        movie4kEnabled: false,
+        mediaServerType: 2,
+      },
+    })
+  );
+  await page.route(
+    '**/api/v1/tv/202/media-server-saved-item?is4k=false',
+    (route) =>
+      route.fulfill({
+        json: {
+          serverType: 2,
+          kind: 'favorites',
+          available: true,
+          saved: false,
+        },
+      })
+  );
+  await page.route(
+    '**/api/v1/tv/202/media-server-collections?is4k=false',
+    (route) =>
+      route.fulfill({
+        json: {
+          serverType: 2,
+          available: true,
+          collections: [
+            { id: 'fixture', name: 'Fixture Collection', member: false },
+          ],
+        },
+      })
+  );
   await page.goto('/tv/202');
+  const mediaServerCapture = process.env.LUMEN_TV_MEDIA_SERVER_CAPTURE;
+  if (mediaServerCapture) {
+    await page.screenshot({
+      path: `${mediaServerCapture}-closed-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  const seriesCapture = process.env.LUMEN_TV_DETAILS_CAPTURE;
+  await expect(
+    page.getByRole('heading', { name: 'Fixture Series' })
+  ).toBeVisible();
+  if (seriesCapture) {
+    await page.screenshot({
+      path: `${seriesCapture}-closed-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
   await expect(page.getByText('Starring', { exact: true })).toBeVisible();
   await expect(actor).toBeHidden();
+  const overview = page.locator('details.adv').filter({ hasText: 'Overview' });
+  await expect(overview).toBeVisible();
+  await expect(overview).not.toHaveAttribute('open', '');
+  await overview.locator('summary').click();
+  const overviewPin = overview.getByRole('button', {
+    name: 'Keep Overview Open',
+  });
+  await overviewPin.click();
+  await expect(overviewPin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  const restoredOverview = page
+    .locator('details.adv')
+    .filter({ hasText: 'Overview' });
+  await expect(restoredOverview).toHaveAttribute('open', '');
+  await expect(restoredOverview).toContainText('A persistent series overview.');
+  const seriesDetails = page
+    .locator('details.adv')
+    .filter({ hasText: 'Series Details' });
+  await expect(seriesDetails).toBeVisible();
+  await expect(seriesDetails).not.toHaveAttribute('open', '');
+  await seriesDetails.locator('summary').click();
+  await expect(seriesDetails).toContainText('Episode length');
+  if (seriesCapture) {
+    await page.screenshot({
+      path: `${seriesCapture}-open-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  const seriesDetailsPin = seriesDetails.getByRole('button', {
+    name: 'Keep Series Details Open',
+  });
+  await seriesDetailsPin.click();
+  await expect(seriesDetailsPin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  const restoredSeriesDetails = page
+    .locator('details.adv')
+    .filter({ hasText: 'Series Details' });
+  await expect(restoredSeriesDetails).toHaveAttribute('open', '');
+  await expect(restoredSeriesDetails).toContainText('Episode length');
+  const mediaServerPanel = page.getByTestId('tv-media-server');
+  await expect(mediaServerPanel).toHaveJSProperty('open', false);
+  await mediaServerPanel.locator('summary').first().click();
+  await expect(
+    mediaServerPanel.getByRole('button', {
+      name: 'Add Fixture Series to Jellyfin Favorites',
+    })
+  ).toBeVisible();
+  await mediaServerPanel
+    .getByTestId('media-server-collections')
+    .locator('summary')
+    .click();
+  await expect(
+    mediaServerPanel.getByRole('button', {
+      name: 'Add to Fixture Collection',
+    })
+  ).toBeVisible();
+  if (mediaServerCapture) {
+    await page.screenshot({
+      path: `${mediaServerCapture}-open-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  const mediaServerPin = mediaServerPanel.getByRole('button', {
+    name: 'Keep Media Server Open',
+  });
+  await mediaServerPin.click();
+  await expect(mediaServerPin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByTestId('tv-media-server')).toHaveAttribute('open', '');
+  await page.getByRole('button', { name: 'Keep Media Server Open' }).click();
+  await page.reload();
+  await expect(page.getByTestId('tv-media-server')).not.toHaveAttribute(
+    'open',
+    ''
+  );
+
+  await page.goto('/book/OL123W');
+  const bookDetails = page
+    .locator('details.adv')
+    .filter({ hasText: 'Book Details' });
+  await expect(bookDetails).toBeVisible();
+  await expect(bookDetails).not.toHaveAttribute('open', '');
+  await bookDetails.locator('summary').click();
+  await expect(bookDetails).toContainText('Science Fiction');
+  const bookDetailsPin = bookDetails.getByRole('button', {
+    name: 'Keep Book Details Open',
+  });
+  await bookDetailsPin.click();
+  await expect(bookDetailsPin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  const restoredBookDetails = page
+    .locator('details.adv')
+    .filter({ hasText: 'Book Details' });
+  await expect(restoredBookDetails).toHaveAttribute('open', '');
+  await expect(restoredBookDetails).toContainText('Science Fiction');
 
   for (const path of ['/movie/101#crew', '/tv/202#crew', '/tv/202#cast']) {
     await page.goto(path);
@@ -1323,7 +1584,155 @@ test('video credits remember scoped pins and leave failed saves retryable', asyn
     await summary.click();
     await expect(person).toBeHidden();
   }
-  expect(writes).toHaveLength(2);
+  expect(writes).toEqual([
+    { cast: true },
+    { cast: true },
+    { details: true },
+    { collection: true },
+    { collection: false },
+    { overview: true },
+    { details: true },
+    { mediaServer: true },
+    { mediaServer: false },
+    { details: true },
+  ]);
+});
+
+test('book collections and subjects remember scoped pins', async ({ page }) => {
+  await fixtures(page);
+  const settings = {
+    detailDisclosurePins: {
+      book: { collection: false, subjectTags: false, details: false },
+    },
+  };
+  const writes: unknown[] = [];
+  let seriesReads = 0;
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({
+      json: { id: 1, displayName: 'Viewer', permissions: 2, settings },
+    })
+  );
+  await page.route('**/api/v1/book/OL123W', (route) =>
+    route.fulfill({
+      json: {
+        id: 'OL123W',
+        title: 'Fixture Book',
+        subjects: ['Science Fiction', 'Fantasy'],
+        series: [{ id: '550', title: 'Fixture Series', position: '1' }],
+      },
+    })
+  );
+  await page.route('**/api/v1/series/550', (route) => {
+    seriesReads++;
+    return route.fulfill({
+      json: {
+        id: '550',
+        title: 'Fixture Series',
+        description: 'A persistent series summary.',
+        books: [
+          { id: 'OL123W', title: 'Fixture Book', subjects: ['Fantasy'] },
+          { id: 'OL456W', title: 'Another Book', subjects: ['Mythology'] },
+        ],
+      },
+    });
+  });
+  await page.route(
+    '**/api/v1/user/1/settings/detail-disclosures/book',
+    (route) => {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      Object.assign(settings.detailDisclosurePins.book, body);
+      return route.fulfill({ json: settings.detailDisclosurePins.book });
+    }
+  );
+
+  await page.goto('/book/OL123W');
+  await expect(
+    page.getByRole('heading', { name: 'Fixture Book' })
+  ).toBeVisible();
+  const capture = process.env.LUMEN_BOOK_DISCLOSURES_CAPTURE;
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-closed-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  expect(seriesReads).toBe(0);
+  const subjects = page.getByTestId('book-subject-tags');
+  await expect(subjects).toHaveJSProperty('open', false);
+  await subjects.locator('summary').click();
+  await expect(
+    subjects.getByRole('link', { name: 'Science Fiction', exact: true })
+  ).toHaveAttribute('href', '/books?subject=Science%20Fiction');
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-subjects-open-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  const subjectsPin = subjects.getByRole('button', {
+    name: 'Keep Subjects Open',
+  });
+  await subjectsPin.click();
+  await expect(subjectsPin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByTestId('book-subject-tags')).toHaveAttribute(
+    'open',
+    ''
+  );
+  await subjectsPin.click();
+  await page.reload();
+  await expect(page.getByTestId('book-subject-tags')).not.toHaveAttribute(
+    'open',
+    ''
+  );
+
+  const collection = page.getByTestId('book-series-collections');
+  await expect(collection).toHaveJSProperty('open', false);
+  await collection.locator('summary').click();
+  const summary = page.getByTestId('book-series-550');
+  await expect(summary).toContainText('A persistent series summary.');
+  await expect(summary).toContainText('Collection size: 2 books');
+  await expect(
+    summary.getByRole('link', { name: 'Fantasy', exact: true })
+  ).toHaveAttribute('href', '/books?subject=Fantasy');
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-collection-open-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  expect(seriesReads).toBeGreaterThan(0);
+  const collectionPin = collection.getByRole('button', {
+    name: 'Keep Collection Open',
+  });
+  await collectionPin.click();
+  await expect(collectionPin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByTestId('book-series-collections')).toHaveAttribute(
+    'open',
+    ''
+  );
+  await expect(page.getByTestId('book-series-550')).toBeVisible();
+  await collectionPin.click();
+  await page.reload();
+  await expect(page.getByTestId('book-series-collections')).not.toHaveAttribute(
+    'open',
+    ''
+  );
+  expect(writes).toEqual([
+    { subjectTags: true },
+    { subjectTags: false },
+    { collection: true },
+    { collection: false },
+  ]);
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth
+    )
+  ).toBe(true);
 });
 
 test('subject tags share browser visibility and open filtered video discovery', async ({
@@ -1381,6 +1790,180 @@ test('subject tags share browser visibility and open filtered video discovery', 
   const clear = page.getByRole('button', { name: 'Clear Subject Tag' });
   await clear.click();
   await expect(page).toHaveURL(/\/series$/);
+});
+
+test('music album Details and Artists remember scoped pins', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const album = '397b4ce9-89a1-41f8-9599-68983ee4a767';
+  const artist = '934ebb1e-9e64-4a2d-abc2-8aea39d7b50c';
+  const settings = {
+    detailDisclosurePins: {
+      music: { details: false, artists: false, subjectTags: false },
+    },
+  };
+  const writes: unknown[] = [];
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({
+      json: { id: 1, displayName: 'Viewer', permissions: 2, settings },
+    })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: {
+        musicEnabled: true,
+        enabledMediaCategories: { music: true },
+      },
+    })
+  );
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { music: true } } })
+  );
+  await page.route(`**/api/v1/music/${album}`, (route) =>
+    route.fulfill({
+      json: {
+        id: album,
+        title: 'Fixture Album',
+        artist: { id: artist, name: 'Fixture Artist', area: 'Fixture City' },
+        releaseDate: '2024-02-03',
+        recordLabel: 'Fixture Records',
+        type: 'Album',
+        tags: {
+          releaseGroup: [
+            { tag: 'Progressive rock', count: 12 },
+            { tag: 'Duplicate', count: 5 },
+          ],
+          artist: [
+            { tag: 'Ambient', count: 8 },
+            { tag: 'DUPLICATE', count: 7 },
+          ],
+        },
+        'artist-credit': [{ name: 'Fixture Artist', artist: { id: artist } }],
+        tracks: [],
+      },
+    })
+  );
+  await page.route(
+    '**/api/v1/user/1/settings/detail-disclosures/music',
+    (route) => {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      Object.assign(settings.detailDisclosurePins.music, body);
+      return route.fulfill({ json: settings.detailDisclosurePins.music });
+    }
+  );
+
+  await page.goto(`/music/${album}`);
+  const details = page
+    .locator('details.adv')
+    .filter({ hasText: 'Album Details' });
+  await expect(
+    page.getByRole('heading', { name: 'Fixture Album' })
+  ).toBeVisible();
+  await expect(details).toBeVisible();
+  await expect(details).not.toHaveAttribute('open', '');
+  await details.locator('summary').click();
+  await expect(details).toContainText('Fixture Records');
+  const pin = details.getByRole('button', { name: 'Keep Album Details Open' });
+  await pin.click();
+  await expect(pin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  const restored = page
+    .locator('details.adv')
+    .filter({ hasText: 'Album Details' });
+  await expect(restored).toHaveAttribute('open', '');
+  await expect(restored).toContainText('Fixture Records');
+
+  const artists = page.getByTestId('music-artist-list');
+  await expect(artists).toHaveJSProperty('open', false);
+  await artists.locator('summary').click();
+  await expect(
+    artists.getByRole('link', { name: 'Fixture Artist · Album Artist' })
+  ).toHaveAttribute('href', `/artist/${artist}`);
+  const artistsPin = artists.getByRole('button', {
+    name: 'Keep View Artists Open',
+  });
+  await artistsPin.click();
+  await expect(artistsPin).toHaveAttribute('aria-pressed', 'true');
+  await expect(artistsPin).toBeEnabled();
+  await page.reload();
+  await expect(page.getByTestId('music-artist-list')).toHaveAttribute(
+    'open',
+    ''
+  );
+  await expect(artistsPin).toBeEnabled();
+  await artistsPin.click();
+  await expect(page.getByTestId('music-artist-list')).not.toHaveAttribute(
+    'open',
+    ''
+  );
+  await page.getByTestId('music-artist-list').locator('summary').click();
+  await expect(artistsPin).toHaveAttribute('aria-pressed', 'false');
+  await page.reload();
+  await expect(page.getByTestId('music-artist-list')).not.toHaveAttribute(
+    'open',
+    ''
+  );
+  const tags = page.getByTestId('music-subject-tags');
+  await expect(tags).toHaveJSProperty('open', false);
+  const capture = process.env.LUMEN_MUSIC_SUBJECT_TAGS_CAPTURE;
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-closed-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  await tags.locator('summary').click();
+  await expect(
+    tags.getByRole('link', { name: 'Progressive rock', exact: true })
+  ).toHaveAttribute('href', '/music?genre=Progressive%20rock');
+  await expect(
+    tags.getByRole('link', { name: 'DUPLICATE', exact: true })
+  ).toHaveAttribute('href', '/music?genre=DUPLICATE');
+  await expect(
+    tags.getByRole('link', { name: 'Duplicate', exact: true })
+  ).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth
+    )
+  ).toBe(true);
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-open-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  const tagsPin = tags.getByRole('button', {
+    name: 'Keep Subject Tags Open',
+  });
+  await tagsPin.click();
+  await expect(tagsPin).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByTestId('music-subject-tags')).toHaveAttribute(
+    'open',
+    ''
+  );
+  await tagsPin.click();
+  await expect(page.getByTestId('music-subject-tags')).not.toHaveAttribute(
+    'open',
+    ''
+  );
+  await page.reload();
+  await expect(page.getByTestId('music-subject-tags')).not.toHaveAttribute(
+    'open',
+    ''
+  );
+  expect(writes).toEqual([
+    { details: true },
+    { artists: true },
+    { artists: false },
+    { subjectTags: true },
+    { subjectTags: false },
+  ]);
 });
 
 test('person filmography keeps complete cast and crew groups and sorts before filtering', async ({
@@ -1734,6 +2317,115 @@ test('episode availability loads on demand and switches source results with the 
   await expect(page.getByText('Sonarr 4K', { exact: true })).toBeVisible();
   await expect(page.getByText('Plex HD', { exact: true })).toHaveCount(0);
   expect(reads).toEqual([1, 2]);
+});
+
+test('episode availability labels follow the saved locale', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const locales = {
+    en: {
+      title: 'Episode Availability',
+      season: 'Availability Season',
+      loading: 'Loading episodes…',
+      failure: 'Could not load episode availability',
+      retry: 'Retry',
+      empty: 'No file reported',
+      source: 'Plex HD',
+    },
+    fr: {
+      title: 'Disponibilité des épisodes',
+      season: 'Saison pour la disponibilité',
+      loading: 'Chargement des épisodes…',
+      failure: 'Impossible de charger la disponibilité des épisodes',
+      retry: 'Réessayer',
+      empty: 'Aucun fichier signalé',
+      source: 'Plex HD',
+    },
+    ar: {
+      title: 'توفر الحلقات',
+      season: 'الموسم المطلوب لعرض التوفر',
+      loading: 'جارٍ تحميل الحلقات…',
+      failure: 'تعذر تحميل توفر الحلقات',
+      retry: 'إعادة المحاولة',
+      empty: 'لا يوجد ملف مُبلّغ عنه',
+      source: 'Plex HD',
+    },
+  } as const;
+  let locale: keyof typeof locales = 'en';
+  let mediaId = 202;
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale } })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { applicationTitle: 'SeerrNG', trackEpisodeAvailability: true },
+    })
+  );
+  await page.route('**/api/v1/tv/*', (route) =>
+    route.fulfill({
+      json: {
+        ...movie,
+        id: mediaId,
+        mediaType: 'tv',
+        name: 'Fixture Series',
+        seasons: [{ id: 21, seasonNumber: 1, episodeCount: 2 }],
+      },
+    })
+  );
+  let failNextEpisodeRead = true;
+  let releaseEpisodeRead: (() => void) | undefined;
+  await page.route('**/api/v1/tv/*/season/1', (route) => {
+    if (failNextEpisodeRead) {
+      failNextEpisodeRead = false;
+      return new Promise<void>((resolve) => {
+        releaseEpisodeRead = resolve;
+      }).then(() =>
+        route.fulfill({ status: 503, json: { message: 'fixture failure' } })
+      );
+    }
+    return route.fulfill({
+      json: {
+        episodes: [
+          {
+            episodeNumber: 1,
+            name: 'Pilot',
+            availabilitySources: [
+              { sourceType: 'plex', hd: true, fourK: false },
+            ],
+          },
+          { episodeNumber: 2, name: 'Second' },
+        ],
+      },
+    });
+  });
+
+  for (const [index, [entryLocale, copy]] of Object.entries(
+    locales
+  ).entries()) {
+    // Change the fixture's saved locale before loading the detail again.
+    locale = entryLocale as keyof typeof locales;
+    mediaId = 202 + index;
+    failNextEpisodeRead = true;
+    await page.goto(`/tv/${mediaId}`);
+    await page.getByText(copy.title, { exact: true }).click();
+    await expect(page.getByText(copy.loading, { exact: true })).toBeVisible();
+    releaseEpisodeRead?.();
+    await expect(page.getByText(copy.failure, { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: copy.retry, exact: true }).click();
+    await expect(page.getByLabel(copy.season)).toBeVisible();
+    await expect(page.getByText(copy.source, { exact: true })).toBeVisible();
+    await expect(page.getByText(copy.empty, { exact: true })).toBeVisible();
+    const capture = process.env.LUMEN_TV_AVAILABILITY_CAPTURE;
+    if (capture) {
+      await page
+        .getByText(copy.title, { exact: true })
+        .scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: `${capture}-${locale}-${page.context().pages().length}-${page.viewportSize()?.width}.png`,
+      });
+    }
+  }
 });
 
 test('series watch rule keeps the rejected selection and links playback accounts', async ({
@@ -3755,6 +4447,333 @@ test('comic catalogue indexing refreshes into filtered results', async ({
   await expect(page.getByText('Comic catalogue indexing')).toHaveCount(0);
 });
 
+test('comic details show open issues only to issue readers', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let permissions = 2;
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { comic: true } } })
+  );
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { comic: true } } })
+  );
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({ json: { id: 1, displayName: 'Viewer', permissions } })
+  );
+  await page.route('**/api/v1/comic/work/al-42', (route) =>
+    route.fulfill({
+      json: {
+        id: 'al-42',
+        mediaType: 'comic',
+        kind: 'comic',
+        title: 'Night Tales',
+        editions: [{ id: '1234', title: 'Night Tales', issueCount: 10 }],
+        recommendedId: '1234',
+        editionsResolved: true,
+      },
+    })
+  );
+  await page.route('**/api/v1/comic/1234', (route) =>
+    route.fulfill({
+      json: {
+        id: '1234',
+        mediaType: 'comic',
+        title: 'Night Tales',
+        issueCount: 10,
+        mediaInfo: {
+          id: 7,
+          status: 5,
+          issues: [
+            {
+              id: 71,
+              status: 1,
+              issueType: 3,
+              issueSubtype: 'missing_issue',
+              createdAt: '2026-11-20T12:00:00.000Z',
+              createdBy: { id: 17, displayName: 'Issue Reporter' },
+              comments: [{ message: 'Captions are missing.' }],
+            },
+            { id: 72, status: 2, issueType: 4, comments: [] },
+          ],
+        },
+      },
+    })
+  );
+  await page.route('**/api/v1/comic/1234/issues?*', (route) =>
+    route.fulfill({ json: paged([]) })
+  );
+  const discussionComments = [
+    {
+      id: 1,
+      message: 'Captions are missing.',
+      createdAt: '2026-11-20T12:00:00.000Z',
+      user: { id: 17, displayName: 'Issue Reporter' },
+    },
+  ];
+  await page.route('**/api/v1/issue/71', (route) =>
+    route.fulfill({
+      json: {
+        id: 71,
+        status: 1,
+        issueType: 3,
+        issueSubtype: 'missing_issue',
+        createdAt: '2026-11-20T12:00:00.000Z',
+        createdBy: { id: 17, displayName: 'Issue Reporter' },
+        comments: discussionComments,
+      },
+    })
+  );
+  await page.route('**/api/v1/issue/71/comment', async (route) => {
+    const body = route.request().postDataJSON() as { message: string };
+    discussionComments.push({
+      id: discussionComments.length + 1,
+      message: body.message,
+      createdAt: '2026-11-21T12:00:00.000Z',
+      user: { id: 1, displayName: 'Viewer' },
+    });
+    await route.fulfill({ json: {} });
+  });
+  await page.goto('/comic/al-42');
+  await expect(page.getByRole('heading', { name: 'Open Issues' })).toHaveCount(
+    0
+  );
+  permissions = 7340032;
+  await page.reload();
+  const panel = page.getByRole('region', { name: 'Open Issues' });
+  await expect(
+    panel.getByRole('link', { name: 'Subtitles #71' })
+  ).toHaveAttribute('href', '/issues/71');
+  await expect(panel).toContainText('Captions are missing.');
+  await expect(panel).toContainText('Reason: Missing issue');
+  await expect(panel).toContainText('Created Date: Nov 20, 2026');
+  await expect(panel).toContainText('Created By: Issue Reporter');
+  await expect(
+    panel.getByRole('link', { name: 'Issue Reporter' })
+  ).toHaveAttribute('href', '/users/17');
+  await expect(panel.getByRole('link', { name: /#72/ })).toHaveCount(0);
+  await panel.getByRole('button', { name: 'View Discussion' }).click();
+  const embeddedDiscussion = panel.getByRole('region', {
+    name: 'Issue Details',
+  });
+  await expect(embeddedDiscussion).toContainText('Captions are missing.');
+  await expect(
+    panel.getByRole('button', { name: 'Hide Details' })
+  ).toHaveAttribute('aria-expanded', 'true');
+  await expect(
+    embeddedDiscussion.getByRole('button', { name: 'Delete Issue' })
+  ).toHaveCount(0);
+  await embeddedDiscussion.getByLabel('Comment').fill('I will investigate.');
+  await embeddedDiscussion.getByRole('button', { name: 'Add Comment' }).click();
+  await expect(embeddedDiscussion).toContainText('I will investigate.');
+  const capture = process.env.LUMEN_COMIC_OPEN_ISSUES_CAPTURE;
+  if (capture) {
+    await embeddedDiscussion.getByLabel('Comment').scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: `${capture}-expanded-${test.info().project.name}.png`,
+    });
+  }
+  permissions = 4194304;
+  await page.reload();
+  const restrictedReporterPanel = page.getByRole('region', {
+    name: 'Open Issues',
+  });
+  await expect(restrictedReporterPanel).toContainText(
+    'Created By: Not available'
+  );
+  await expect(
+    restrictedReporterPanel.getByRole('link', { name: 'Issue Reporter' })
+  ).toHaveCount(0);
+  permissions = 7340032;
+  await page.reload();
+  const visibleReporterPanel = page.getByRole('region', {
+    name: 'Open Issues',
+  });
+  if (capture) {
+    await visibleReporterPanel.scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: `${capture}-${test.info().project.name}.png`,
+    });
+  }
+});
+
+test('magazine details show open issues only to issue readers', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let permissions = 2;
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({ json: { id: 1, displayName: 'Viewer', permissions } })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { magazine: true } } })
+  );
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { enabledMediaCategories: { magazine: true } } })
+  );
+  await page.route('**/api/v1/magazine/*', (route) =>
+    route.fulfill({
+      json: {
+        id: 'fixture-monthly',
+        title: 'Fixture Monthly',
+        provider: 'lazylibrarian',
+        issueCount: 12,
+        mediaInfo: {
+          id: 8,
+          status: 5,
+          issues: [
+            {
+              id: 81,
+              status: 1,
+              issueType: 4,
+              issueSubtype: 'wrong_issue',
+              comments: [{ message: 'The cover is missing.' }],
+            },
+            { id: 82, status: 2, issueType: 1, comments: [] },
+          ],
+        },
+      },
+    })
+  );
+  await page.goto('/magazine/Fixture%20Monthly');
+  await expect(page.getByRole('heading', { name: 'Open Issues' })).toHaveCount(
+    0
+  );
+  permissions = 7340032;
+  await page.reload();
+  const panel = page.getByRole('region', { name: 'Open Issues' });
+  await expect(panel.getByRole('link', { name: 'Other #81' })).toHaveAttribute(
+    'href',
+    '/issues/81'
+  );
+  await expect(panel).toContainText('The cover is missing.');
+  await expect(panel).toContainText('Reason: Wrong issue or date');
+  await expect(panel.getByRole('link', { name: /#82/ })).toHaveCount(0);
+  const capture = process.env.LUMEN_MAGAZINE_OPEN_ISSUES_CAPTURE;
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+});
+
+test('book and music details show open issues only to issue readers', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let permissions = 2;
+  const album = '397b4ce9-89a1-41f8-9599-68983ee4a767';
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({ json: { id: 1, displayName: 'Viewer', permissions } })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: {
+        musicEnabled: true,
+        enabledMediaCategories: { book: true, music: true },
+      },
+    })
+  );
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({
+      json: { enabledMediaCategories: { book: true, music: true } },
+    })
+  );
+  await page.route('**/api/v1/book/OL123W*', (route) =>
+    route.fulfill({
+      json: {
+        id: 'OL123W',
+        provider: 'openlibrary',
+        title: 'Fixture Book',
+        author: 'Fixture Author',
+        authorId: 'author-1',
+        mediaInfo: {
+          id: 9,
+          status: 5,
+          issues: [
+            {
+              id: 91,
+              status: 1,
+              issueType: 1,
+              issueSubtype: 'wrong_edition',
+              comments: [{ message: 'The audiobook is incomplete.' }],
+            },
+          ],
+        },
+      },
+    })
+  );
+  await page.route('**/api/v1/book/OL123W/ratings*', (route) =>
+    route.fulfill({ json: {} })
+  );
+  await page.route(`**/api/v1/music/${album}`, (route) =>
+    route.fulfill({
+      json: {
+        id: album,
+        title: 'Fixture Album',
+        artist: { id: 'artist-1', name: 'Fixture Artist' },
+        tracks: [],
+        mediaInfo: {
+          id: 10,
+          status: 5,
+          issues: [
+            {
+              id: 92,
+              status: 1,
+              issueType: 2,
+              comments: [{ message: 'The track audio is distorted.' }],
+            },
+          ],
+        },
+      },
+    })
+  );
+
+  await page.goto('/book/OL123W');
+  await expect(page.getByRole('heading', { name: 'Open Issues' })).toHaveCount(
+    0
+  );
+  permissions = 7340032;
+  await page.reload();
+  const bookIssues = page.getByRole('region', { name: 'Open Issues' });
+  await expect(
+    bookIssues.getByRole('link', { name: 'Video #91' })
+  ).toHaveAttribute('href', '/issues/91');
+  await expect(bookIssues).toContainText('The audiobook is incomplete.');
+  await expect(bookIssues).toContainText('Reason: Wrong edition or variant');
+  const capture = process.env.LUMEN_BOOK_MUSIC_OPEN_ISSUES_CAPTURE;
+  if (capture) {
+    await bookIssues.scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: `${capture}-book-${test.info().project.name}.png`,
+    });
+  }
+
+  permissions = 2;
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Open Issues' })).toHaveCount(
+    0
+  );
+  await page.goto(`/music/${album}`);
+  await expect(page.getByRole('heading', { name: 'Open Issues' })).toHaveCount(
+    0
+  );
+  permissions = 7340032;
+  await page.reload();
+  const musicIssues = page.getByRole('region', { name: 'Open Issues' });
+  await expect(
+    musicIssues.getByRole('link', { name: 'Audio #92' })
+  ).toHaveAttribute('href', '/issues/92');
+  await expect(musicIssues).toContainText('The track audio is distorted.');
+  if (capture) {
+    await musicIssues.scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: `${capture}-music-${test.info().project.name}.png`,
+    });
+  }
+});
+
 test('Classic comic discovery bookmarks restore catalogue filters and results', async ({
   page,
 }) => {
@@ -4091,7 +5110,8 @@ test('Music album and artist details localize their controls and metadata', asyn
       type: 'Type',
       albums: 'Albums',
       since: 'Since 1990',
-      releaseCount: '1 release',
+      releaseCount: '21 releases',
+      showAll: 'Show All',
       filter: 'Filter Music by Artist',
       search: 'Search Prowlarr',
       associations: 'Explore Associations',
@@ -4110,7 +5130,8 @@ test('Music album and artist details localize their controls and metadata', asyn
       type: 'Type',
       albums: 'Albums',
       since: 'Depuis 1990',
-      releaseCount: '1 sortie',
+      releaseCount: '21 sorties',
+      showAll: 'Tout afficher',
       filter: 'Filtrer la musique par artiste',
       search: 'Rechercher avec Prowlarr',
       associations: 'Explorer les associations',
@@ -4129,7 +5150,8 @@ test('Music album and artist details localize their controls and metadata', asyn
       type: 'النوع',
       albums: 'الألبومات',
       since: 'منذ 1990',
-      releaseCount: '1 إصدار',
+      releaseCount: '21 إصدارات',
+      showAll: 'عرض الكل',
       filter: 'تصفية الموسيقى حسب الفنان',
       search: 'البحث في Prowlarr',
       associations: 'استكشاف الارتباطات',
@@ -4181,7 +5203,7 @@ test('Music album and artist details localize their controls and metadata', asyn
   await page.route(`**/api/v1/blocklist/${album}?mediaType=music`, (route) =>
     route.fulfill({ status: 404, json: { message: 'Not blocklisted' } })
   );
-  await page.route(`**/api/v1/artist/${artist}`, (route) =>
+  await page.route(`**/api/v1/artist/${artist}*`, (route) =>
     route.fulfill({
       json: {
         artist: {
@@ -4200,6 +5222,7 @@ test('Music album and artist details localize their controls and metadata', asyn
             artist: { id: artist, name: 'Fixture Artist' },
           },
         ],
+        typeCounts: { Album: 21 },
       },
     })
   );
@@ -4254,6 +5277,7 @@ test('Music album and artist details localize their controls and metadata', asyn
   await expect(
     page.getByText(copy.releaseCount, { exact: true })
   ).toBeVisible();
+  await expect(page.getByRole('button', { name: copy.showAll })).toBeVisible();
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth)
   ).toBeLessThanOrEqual(test.info().project.use.viewport?.width ?? 1440);
@@ -4263,6 +5287,114 @@ test('Music album and artist details localize their controls and metadata', asyn
       fullPage: true,
     });
   }
+});
+
+test('artist detail groups secondary release types and loads the rest of a release group', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+    })
+  );
+  const artistId = 'fixture-artist-release-groups';
+  const albumReleases = Array.from({ length: 21 }, (_, index) => ({
+    id: `album-${String(index + 1).padStart(2, '0')}`,
+    title: `Fixture Album ${index + 1}`,
+    'primary-type': 'Album',
+    'first-release-date': `${2025 - index}-01-01`,
+    'artist-credit': [{ name: 'Fixture Artist' }],
+  }));
+  const specialReleases = [
+    {
+      id: 'live-release',
+      title: 'Live Fixture',
+      'primary-type': 'Album',
+      secondary_types: ['Live'],
+      'artist-credit': [{ name: 'Fixture Artist' }],
+    },
+    {
+      id: 'compilation-release',
+      title: 'Compilation Fixture',
+      'primary-type': 'Album',
+      secondary_types: ['Compilation'],
+      'artist-credit': [{ name: 'Fixture Artist' }],
+    },
+  ];
+  const requestedTypes: string[] = [];
+  let expandedRequestAttempts = 0;
+  await page.route(`**/api/v1/artist/${artistId}*`, (route) => {
+    const url = new URL(route.request().url());
+    const type = url.searchParams.get('albumType');
+    if (type) requestedTypes.push(type);
+    const releaseGroups =
+      type === 'Album'
+        ? albumReleases
+        : [...albumReleases.slice(0, 20), ...specialReleases];
+    if (type === 'Album' && expandedRequestAttempts++ === 0) {
+      return route.fulfill({
+        status: 503,
+        json: { message: 'Temporary music metadata failure' },
+      });
+    }
+    return route.fulfill({
+      json: {
+        artist: {
+          id: artistId,
+          name: 'Fixture Artist',
+          type: 'Person',
+          area: 'Fixture City',
+          beginYear: 1990,
+        },
+        releaseGroups,
+        typeCounts: { Album: 21, Live: 1, Compilation: 1 },
+      },
+    });
+  });
+
+  await page.goto(testAppPath(`/artist/${artistId}`));
+  const capture = process.env.LUMEN_MUSIC_ARTIST_GROUP_CAPTURE;
+  await expect(
+    page.getByRole('heading', { name: 'Albums (21)' })
+  ).toBeVisible();
+  await expect(page.getByText('23 releases', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Live (1)' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Compilation (1)' })
+  ).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Live Fixture' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Compilation Fixture' })
+  ).toBeVisible();
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-initial-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  await page.getByRole('button', { name: 'Show All' }).click();
+  await expect(page.getByRole('button', { name: 'Show All' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Show All' }).click();
+  await expect(
+    page.getByRole('link', { name: 'Fixture Album 21' })
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Show Less' })).toBeVisible();
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-expanded-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  await page.getByRole('button', { name: 'Show Less' }).click();
+  await expect(
+    page.getByRole('link', { name: 'Fixture Album 21' })
+  ).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Show All' })).toBeVisible();
+  expect(requestedTypes).toEqual(['Album', 'Album']);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth)
+  ).toBeLessThanOrEqual(test.info().project.use.viewport?.width ?? 1440);
 });
 
 test('configured music shelves preserve genre and yearly chart in Music', async ({
@@ -10595,6 +11727,19 @@ test('Classic Software search bookmarks open the matching Lumen catalog and quer
   page,
 }) => {
   await fixtures(page);
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: {
+        softwareEnabled: true,
+        enabledMediaCategories: { game: true, retro: true },
+      },
+    })
+  );
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({
+      json: { enabledMediaCategories: { game: true, retro: true } },
+    })
+  );
   await page.goto('/search?type=software&query=Fixture+Game&category=retro');
   await expect(page).toHaveURL(/\/games\?c=retro&q=Fixture\+Game$/);
 });

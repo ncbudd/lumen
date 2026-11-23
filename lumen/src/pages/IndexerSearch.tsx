@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../api';
 import { isAdministrator, useAuth } from '../auth';
@@ -66,6 +66,18 @@ function detailsUrl(value: string | null) {
   }
 }
 
+function formatSize(bytes: number | null, locale: string) {
+  if (bytes === null) return '—';
+  if (bytes === 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const exponent = Math.min(
+    Math.floor(Math.log(bytes) / Math.log(1024)),
+    units.length - 1
+  );
+  const value = bytes / 1024 ** exponent;
+  return `${value.toLocaleString(locale, { maximumFractionDigits: 1 })} ${units[exponent]}`;
+}
+
 function ReleaseRow({
   release,
   showDetails,
@@ -90,9 +102,7 @@ function ReleaseRow({
         <small>
           {[
             release.protocol,
-            release.size === null
-              ? null
-              : `${(release.size / 1024 ** 2).toLocaleString(locale, { maximumFractionDigits: 1 })} MB`,
+            release.size === null ? null : formatSize(release.size, locale),
             date && Number.isFinite(date.valueOf())
               ? date.toLocaleDateString(locale)
               : null,
@@ -168,6 +178,9 @@ function SearchForm({
 }) {
   const { locale, t } = useLumenLocale();
   const [params] = useSearchParams();
+  const linkedCategory = params.get('category');
+  const linkedQuery = params.get('query');
+  const linkedSearchKey = JSON.stringify([linkedCategory, linkedQuery]);
   const categories = configuration.categories.filter(
     ({ category, enabled, categoryIds }) =>
       Object.hasOwn(CATEGORIES, category) &&
@@ -186,12 +199,31 @@ function SearchForm({
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState('');
   const searchingRef = useRef(false);
+  const searchGeneration = useRef(0);
+  const linkedSearchKeyRef = useRef(linkedSearchKey);
   const sentHandles = useRef(new Set<string>());
   const [handoffs, setHandoffs] = useState<Record<string, Handoff>>({});
+
+  useEffect(() => {
+    if (linkedSearchKeyRef.current === linkedSearchKey) return;
+    linkedSearchKeyRef.current = linkedSearchKey;
+    searchGeneration.current += 1;
+    searchingRef.current = false;
+    setSearching(false);
+    if (linkedCategory !== null) setCategory(linkedCategory);
+    if (linkedQuery !== null) setQuery(linkedQuery.slice(0, 256));
+    setResults([]);
+    setSubmitted(undefined);
+    setNextOffset(undefined);
+    setError('');
+    sentHandles.current.clear();
+    setHandoffs({});
+  }, [linkedCategory, linkedQuery, linkedSearchKey]);
 
   async function search(input: SearchInput, offset = 0) {
     if (searchingRef.current || !input.category || input.query.length < 2)
       return;
+    const generation = ++searchGeneration.current;
     searchingRef.current = true;
     setSearching(true);
     setError('');
@@ -205,12 +237,14 @@ function SearchForm({
         method: 'POST',
         body: JSON.stringify({ ...input, offset }),
       });
+      if (generation !== searchGeneration.current) return;
       setSubmitted(input);
       setResults((previous) =>
         offset ? [...previous, ...page.results] : page.results
       );
       setNextOffset(page.hasMore ? offset + page.limit : undefined);
     } catch (err) {
+      if (generation !== searchGeneration.current) return;
       setError(
         err instanceof ApiError && err.status === 429
           ? t(
@@ -228,8 +262,10 @@ function SearchForm({
               )
       );
     } finally {
-      searchingRef.current = false;
-      setSearching(false);
+      if (generation === searchGeneration.current) {
+        searchingRef.current = false;
+        setSearching(false);
+      }
     }
   }
 
@@ -250,52 +286,60 @@ function SearchForm({
     setHandoffs((current) => ({ ...current, [grabId]: state }));
   }
 
+  const intro = t(
+    'components.IndexerSearch.intro',
+    'Search releases in your Prowlarr indexers across every SeerrNG media category.'
+  );
+
   if (!configuration.configured)
     return (
-      <div className="note">
-        <p>
-          {t(
-            'components.IndexerSearch.noConnection',
-            'Prowlarr is not connected.'
-          )}
-        </p>
-        <p>
-          {t(
-            'components.IndexerSearch.noConnectionHelp',
-            'Ask an administrator to connect Prowlarr under Settings > Services.'
-          )}
-        </p>
-        {canConfigure && (
+      <>
+        <p className="note">{intro}</p>
+        <div className="note">
           <p>
-            <Link className="btn btn-tonal btn-sm" to="/admin/prowlarr">
-              {t(
-                'components.IndexerSearch.configure',
-                'Open Prowlarr settings'
-              )}
-            </Link>
+            {t(
+              'components.IndexerSearch.noConnection',
+              'Prowlarr is not connected.'
+            )}
           </p>
-        )}
-      </div>
+          <p>
+            {t(
+              'components.IndexerSearch.noConnectionHelp',
+              'Ask an administrator to connect Prowlarr under Settings > Services.'
+            )}
+          </p>
+          {canConfigure && (
+            <p>
+              <Link className="btn btn-tonal btn-sm" to="/admin/prowlarr">
+                {t(
+                  'components.IndexerSearch.configure',
+                  'Open Prowlarr settings'
+                )}
+              </Link>
+            </p>
+          )}
+        </div>
+      </>
     );
   if (!selected)
     return (
-      <div className="note">
-        <p>
-          {t(
-            'lumen.indexerSearch.noCategories',
-            'No enabled media categories are available to this account.'
-          )}
-        </p>
-      </div>
+      <>
+        <p className="note">{intro}</p>
+        <div className="note">
+          <p>
+            {t(
+              'lumen.indexerSearch.noCategories',
+              'No enabled media categories are available to this account.'
+            )}
+          </p>
+        </div>
+      </>
     );
 
   return (
     <>
       <p className="note">
-        {t(
-          'components.IndexerSearch.intro',
-          'Search releases in your Prowlarr indexers across every SeerrNG media category.'
-        )}{' '}
+        {intro}{' '}
         {t(
           'components.IndexerSearch.manualMode',
           'Search results are separate from SeerrNG requests. You can send a result to a download client configured in Prowlarr.'
@@ -388,7 +432,7 @@ function SearchForm({
         </p>
       )}
       {!!results.length && (
-        <ul className="setlist">
+        <ul className="setlist indexer-search-results">
           {results.map((release, index) => (
             <ReleaseRow
               key={index}

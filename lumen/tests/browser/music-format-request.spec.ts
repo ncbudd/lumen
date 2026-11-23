@@ -13,14 +13,32 @@ async function fixture(
     services?: unknown[];
     availableServices?: unknown[];
     followWrites?: unknown[];
+    permissions?: number;
+    quota?: unknown;
+    quotaByUser?: Record<number, unknown>;
+    users?: unknown[];
+    locale?: string;
+    trackArtists?: { name: string; mbid: string }[];
   } = {},
   route = '/music/42'
 ) {
   const writes: unknown[] = [];
   const services = options.services ?? [
-    { id: 1, name: 'Fixture MP3', musicQuality: 'mp3', isDefault: true },
-    { id: 2, name: 'Fixture FLAC', musicQuality: 'flac', isDefault: true },
-    { id: 3, name: 'Alternate FLAC', musicQuality: 'flac' },
+    {
+      id: 1,
+      name: 'Fixture MP3',
+      musicQuality: 'mp3',
+      is4k: false,
+      isDefault: true,
+    },
+    {
+      id: 2,
+      name: 'Fixture FLAC',
+      musicQuality: 'flac',
+      is4k: false,
+      isDefault: true,
+    },
+    { id: 3, name: 'Alternate FLAC', musicQuality: 'flac', is4k: false },
   ];
   let requests: MusicRequest[] = [];
   await page.route('https://**/*', (route) => route.abort());
@@ -34,7 +52,11 @@ async function fixture(
       .slice('/api/v1'.length);
     if (path === '/auth/me')
       return route.fulfill({
-        json: { id: 1, displayName: 'Admin', permissions: 2 },
+        json: {
+          id: 1,
+          displayName: 'Admin',
+          permissions: options.permissions ?? 2,
+        },
       });
     if (path === '/settings/public')
       return route.fulfill({
@@ -45,16 +67,70 @@ async function fixture(
       });
     if (path === '/user/1/settings/main')
       return route.fulfill({
-        json: { locale: 'en', enabledMediaCategories: { music: true } },
+        json: {
+          locale: options.locale ?? 'en',
+          enabledMediaCategories: { music: true },
+        },
       });
+    if (path === '/user/1/quota')
+      return route.fulfill({
+        json: options.quotaByUser?.[1] ??
+          options.quota ?? { music: { limit: 5, remaining: 4 } },
+      });
+    if (path.startsWith('/user/2/quota'))
+      return route.fulfill({
+        json: options.quotaByUser?.[2] ?? { music: { limit: 5, remaining: 4 } },
+      });
+    if (path === '/user')
+      return route.fulfill({ json: { results: options.users ?? [] } });
     if (path === '/service/lidarr') return route.fulfill({ json: services });
+    if (path.startsWith('/service/lidarr/')) {
+      const id = Number(path.split('/').pop());
+      return route.fulfill({
+        json: {
+          profiles: [{ id: 10, name: 'Lossless' }],
+          metadataProfiles: [{ id: 20, name: 'Standard Metadata' }],
+          rootFolders: [{ id: 30, path: `/music/${id}` }],
+          tags: [{ id: 40, label: 'Requested' }],
+          server: {
+            activeProfileId: 10,
+            activeMetadataProfileId: 20,
+            activeDirectory: `/music/${id}`,
+            activeTags: [],
+          },
+        },
+      });
+    }
     if (path === '/music/42')
       return route.fulfill({
         json: {
           id: '42',
           title: 'Fixture Album',
           artist: { id: 'fixture-artist', name: 'Fixture Artist' },
-          tracks: [],
+          tags: {
+            releaseGroup: [
+              { tag: 'Progressive rock', count: 12 },
+              { tag: 'Duplicate', count: 5 },
+            ],
+            artist: [
+              { tag: 'Ambient', count: 8 },
+              { tag: 'DUPLICATE', count: 7 },
+            ],
+          },
+          tracks: [
+            {
+              position: 1,
+              name: 'Opening Track',
+              length: 182000,
+              artists: options.trackArtists ?? [],
+            },
+            {
+              position: 2,
+              name: 'Closing Track',
+              length: 201000,
+              artists: options.trackArtists ?? [],
+            },
+          ],
           availableServices: options.availableServices ?? [
             { serverId: 1, quality: 'MP3' },
           ],
@@ -124,6 +200,104 @@ test('music details link to the request discography workflow with exact identity
   );
 });
 
+test('music album details disclose each unique contributing artist in the saved locale', async ({
+  page,
+}) => {
+  const locale = ['fr', 'ar'].includes(
+    process.env.LUMEN_MUSIC_ARTISTS_LOCALE ?? ''
+  )
+    ? (process.env.LUMEN_MUSIC_ARTISTS_LOCALE as 'fr' | 'ar')
+    : 'en';
+  const copy = {
+    en: {
+      view: 'View Artists',
+      details: 'Album Details',
+      album: 'Album Artist',
+      track: 'Track Artist',
+    },
+    fr: {
+      view: 'Voir les artistes',
+      details: 'Détails de l’album',
+      album: 'Artiste de l’album',
+      track: 'Artiste du morceau',
+    },
+    ar: {
+      view: 'عرض الفنانين',
+      details: 'تفاصيل الألبوم',
+      album: 'فنان الألبوم',
+      track: 'فنان المسار',
+    },
+  }[locale];
+  await fixture(page, {
+    locale,
+    trackArtists: [
+      { mbid: 'fixture-artist', name: 'Fixture Artist' },
+      { mbid: 'fixture-featured-artist', name: 'Featured Artist' },
+      { mbid: 'fixture-featured-artist', name: 'Featured Artist' },
+    ],
+  });
+  const disclosure = page.getByTestId('music-artist-list');
+  await expect(disclosure).toHaveJSProperty('open', false);
+  const capture = process.env.LUMEN_MUSIC_ARTIST_LIST_CAPTURE;
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-closed-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  await disclosure.locator('summary').click();
+  await expect(
+    disclosure.getByRole('link', {
+      name: `Fixture Artist · ${copy.album}`,
+    })
+  ).toHaveAttribute('href', '/artist/fixture-artist');
+  const featuredArtist = disclosure.getByRole('link', {
+    name: `Featured Artist · ${copy.track}`,
+  });
+  await expect(featuredArtist).toHaveAttribute(
+    'href',
+    '/artist/fixture-featured-artist'
+  );
+  await expect(
+    disclosure.locator('a[href="/artist/fixture-featured-artist"]')
+  ).toHaveCount(1);
+  if (capture) {
+    await page.screenshot({
+      path: `${capture}-open-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
+  if ((page.viewportSize()?.width ?? 1040) < 1040) {
+    await page.evaluate(() =>
+      window.scrollTo(0, document.documentElement.scrollHeight)
+    );
+    const actionbar = await page.locator('.actionbar').boundingBox();
+    const albumDetails = await page
+      .getByText(copy.details, { exact: true })
+      .boundingBox();
+    expect(actionbar).not.toBeNull();
+    expect(albumDetails).not.toBeNull();
+    const clearance = await page
+      .locator('#view')
+      .evaluate((view) =>
+        Number.parseFloat(
+          getComputedStyle(view).getPropertyValue(
+            '--mobile-actionbar-clearance'
+          )
+        )
+      );
+    expect(clearance).toBeGreaterThanOrEqual(actionbar!.height);
+    expect(albumDetails!.y + albumDetails!.height).toBeLessThanOrEqual(
+      actionbar!.y + 1
+    );
+    if (capture) {
+      await page.screenshot({
+        path: `${capture}-bottom-${test.info().project.name}.png`,
+      });
+    }
+  }
+});
+
 test('artist details follow new album releases with native rule identity', async ({
   page,
 }) => {
@@ -163,13 +337,66 @@ test('music requests select MP3 or FLAC service and preserve per-quality availab
   await expect(flac).toBeEnabled();
   await actions.getByLabel('FLAC Destination Server').selectOption('3');
   await flac.click();
+  const sheet = page.getByRole('alertdialog', { name: 'Request Music' });
+  await expect(sheet).toBeVisible();
+  await expect(
+    sheet.getByRole('heading', { name: 'Fixture Album' })
+  ).toBeVisible();
+  await expect(sheet.getByText('Opening Track')).toBeVisible();
+  await expect(sheet.getByText('Closing Track')).toBeVisible();
+  await expect(sheet.locator('.facts dd').nth(3)).toHaveText('2');
+  await sheet.evaluate(async (element) => {
+    await Promise.all(
+      element.getAnimations().map((animation) => animation.finished)
+    );
+  });
+  const box = await sheet.boundingBox();
+  const viewport = page.viewportSize();
+  expect(box).not.toBeNull();
+  expect(box!.x).toBeGreaterThanOrEqual(0);
+  expect(box!.y).toBeGreaterThanOrEqual(0);
+  expect(box!.x + box!.width).toBeLessThanOrEqual(viewport!.width);
+  const visibleHeight = await page.evaluate(() => window.innerHeight);
+  expect(box!.y + box!.height).toBeLessThanOrEqual(visibleHeight);
+  expect(
+    await sheet.locator('.facts').evaluate((element) => {
+      return element.scrollWidth - element.clientWidth;
+    })
+  ).toBeLessThanOrEqual(1);
+  await expect(sheet.getByLabel('Server')).toHaveValue('3');
+  await expect(sheet.getByLabel('Quality')).toHaveValue('10');
+  await expect(sheet.getByLabel('Metadata Profile')).toHaveValue('20');
+  await expect(sheet.getByLabel('Folder')).toHaveValue('/music/3');
+  await expect(sheet.locator('.facts')).toContainText('Alternate FLAC');
+  await expect(sheet.locator('.facts')).toContainText('Ready to Request');
+  await expect(
+    sheet.getByText('4 of 5 Music requests remaining.')
+  ).toBeVisible();
+  await sheet.getByLabel('Request Tags').getByText('Requested').click();
+  await sheet.getByRole('button', { name: 'Request', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Request submitted.');
   await expect(flac).toBeDisabled();
   await expect(flac).toHaveAttribute(
     'title',
     'An open FLAC request already exists.'
   );
-  expect(writes).toEqual([{ mediaType: 'music', mediaId: '42', serverId: 3 }]);
+  expect(writes).toEqual([
+    {
+      mediaType: 'music',
+      mediaId: '42',
+      serverId: 3,
+      profileId: 10,
+      metadataProfileId: 20,
+      rootFolder: '/music/3',
+      tags: [40],
+      requesterSelectedOptions: {
+        tags: true,
+        profile: true,
+        metadataProfile: true,
+        rootFolder: true,
+      },
+    },
+  ]);
 });
 
 test('music format actions explain an unconfigured quality and keep the configured one usable', async ({
@@ -177,7 +404,13 @@ test('music format actions explain an unconfigured quality and keep the configur
 }) => {
   await fixture(page, {
     services: [
-      { id: 1, name: 'Fixture MP3', musicQuality: 'mp3', isDefault: true },
+      {
+        id: 1,
+        name: 'Fixture MP3',
+        musicQuality: 'mp3',
+        is4k: false,
+        isDefault: true,
+      },
     ],
     availableServices: [],
   });
@@ -191,3 +424,94 @@ test('music format actions explain an unconfigured quality and keep the configur
     'No FLAC music service is configured.'
   );
 });
+
+test('music quota denial keeps the request sheet open and prevents submission', async ({
+  page,
+}) => {
+  const writes = await fixture(page, {
+    permissions: 32,
+    quota: { music: { limit: 2, remaining: 0, restricted: true } },
+  });
+  const actions = page.locator('.dacts.pc:visible, .actionbar:visible');
+  await actions.getByRole('button', { name: /^Request FLAC/ }).click();
+  const sheet = page.getByRole('alertdialog', { name: 'Request Music' });
+  await expect(sheet.getByText('Music request quota reached.')).toBeVisible();
+  await expect(
+    sheet.getByRole('button', { name: 'Request', exact: true })
+  ).toBeDisabled();
+  await expect(sheet.getByText('Advanced Request Options')).toHaveCount(0);
+  expect(writes).toEqual([]);
+});
+
+test('music request destination changes recheck format availability', async ({
+  page,
+}) => {
+  const writes = await fixture(page, {
+    availableServices: [
+      { serverId: 1, quality: 'MP3' },
+      { serverId: 3, quality: 'FLAC' },
+    ],
+  });
+  const actions = page.locator('.dacts.pc:visible, .actionbar:visible');
+  await actions
+    .locator('.music-format-choice')
+    .nth(1)
+    .locator('button')
+    .click();
+  const sheet = page.getByRole('alertdialog', { name: 'Request Music' });
+  await sheet.getByLabel('Server').selectOption('3');
+  await expect(
+    sheet.getByText('The FLAC version is already available.')
+  ).toBeVisible();
+  await expect(sheet.locator('.pk-foot .btn-primary')).toBeDisabled();
+  expect(writes).toEqual([]);
+});
+
+test('music request quota follows the selected requester', async ({ page }) => {
+  const writes = await fixture(page, {
+    permissions: 2,
+    users: [{ id: 2, displayName: 'Other User', permissions: 32 }],
+    quotaByUser: {
+      1: { music: { limit: 5, remaining: 4 } },
+      2: { music: { limit: 2, remaining: 0, restricted: true } },
+    },
+  });
+  const actions = page.locator('.dacts.pc:visible, .actionbar:visible');
+  await actions
+    .locator('.music-format-choice')
+    .nth(1)
+    .locator('button')
+    .click();
+  const sheet = page.getByRole('alertdialog');
+  await sheet.getByLabel('Request as').selectOption('2');
+  await expect(sheet.getByText('Music request quota reached.')).toBeVisible();
+  await expect(sheet.locator('.pk-foot .btn-primary')).toBeDisabled();
+  expect(writes).toEqual([]);
+});
+
+for (const [locale, quotaText, metadataLabel] of [
+  [
+    'fr',
+    'Le quota de demandes de musique est atteint.',
+    'Profil de métadonnées',
+  ],
+  ['ar', 'تم بلوغ حد طلبات الموسيقى.', 'ملف البيانات الوصفية'],
+] as const) {
+  test(`music request sheet follows ${locale} locale`, async ({ page }) => {
+    await fixture(page, {
+      locale,
+      permissions: 2,
+      quota: { music: { limit: 2, remaining: 0, restricted: true } },
+    });
+    const actions = page.locator('.dacts.pc:visible, .actionbar:visible');
+    await actions
+      .locator('.music-format-choice')
+      .nth(1)
+      .locator('button')
+      .click();
+    const sheet = page.getByRole('alertdialog');
+    await expect(sheet).toContainText(metadataLabel);
+    await expect(sheet).toContainText(quotaText);
+    await expect(sheet.locator('.pk-foot .btn-primary')).toBeDisabled();
+  });
+}

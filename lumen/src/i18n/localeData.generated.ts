@@ -724,6 +724,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'مسلسلات',
       'components.Settings.SettingsCategories.tvDescription':
         'السماح باستكشاف المسلسلات وطلبها.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr مسح المشاهد البالغ',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'دمج توفر المحتويات',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'فحص قصص BackIssue المصورة',
       'components.Settings.SettingsJobsCache.cachehits':
         'إصابات ذاكرة التخزين المؤقت',
       'components.Settings.SettingsJobsCache.cachekeys': 'مفاتيح',
@@ -736,14 +742,67 @@ export const localeData = [
         'ذاكرة تخزين DNS المؤقتة',
       'components.Settings.SettingsJobsCache.dnscachehits': 'إصابات DNS',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'تفويتات DNS',
+      'components.Settings.SettingsJobsCache.download-recovery': 'التعبئة',
+      'components.Settings.SettingsJobsCache.download-sync': 'تحميل الدمج',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'تحميل إعادة تعيين الدمج',
       'components.Settings.SettingsJobsCache.enabled': 'تم التمكين',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'مزامنة قائمة الطلبات الخارجية',
       'components.Settings.SettingsJobsCache.failures': 'الإخفاقات',
       'components.Settings.SettingsJobsCache.flushcache': 'محو الملفات المؤقتة',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'مزامنة الاهتمامات المتتبَّع',
       'components.Settings.SettingsJobsCache.hitRate': 'معدّل الإصابة',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'تنظيف تخزين الصور المؤقت',
       'components.Settings.SettingsJobsCache.imagecachecount': 'صور مخزنة',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'استرجاعات IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'الفحص الكلي لمكتبة Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'فحص المحتوى المضاف مؤخراً في Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'قائمة حلقات الطلبات',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'تقوم Seerr بتنفيذ مهام صيانة معينة كمهام مجدولة بانتظام، ولكن يمكن أيضًا تشغيلها يدويًا أدناه. لن يؤدي تشغيل المهمة يدويًا إلى تغيير جدولها الزمني.',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Kapowarr مسحوق كوميدي',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'مسح Lidarr',
+      'components.Settings.SettingsJobsCache.live-tv-sync':
+        'البث التلفزيوني المباشر',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'مجلة LazyLibrarian',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'قائمة انتظار مجموعات الأفلام',
+      'components.Settings.SettingsJobsCache.mylar-scan': 'Mylar مسحوق كوميدي',
+      'components.Settings.SettingsJobsCache.navidrome-scan': 'مسح Navidrome',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plex مكن المكتبة الكاملة',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'تحليل تشغيل Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex أضيف مؤخرا',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'تحديث رمز Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex مشاهده',
       'components.Settings.SettingsJobsCache.process': 'تنفيذ',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'معالجة الوسوم المحظورة',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'مسح Radarr',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf طلب إعادة النظر',
+      'components.Settings.SettingsJobsCache.readarr-scan': 'مسح رف الكتب',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'مزامنة مجموعة BookOrbit Kobo',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'تاريخ الإصدار',
       'components.Settings.SettingsJobsCache.runnow': 'تنفيذ " الآن "',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'طلب البرمجيات',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'مسح Sonarr',
+      'components.Settings.SettingsJobsCache.soulseek-sync': 'مزامنة Soulseek',
       'components.Settings.SettingsLogs.copiedLogMessage': 'نسخ رسائل السجل.',
       'components.Settings.SettingsLogs.copyToClipboard': 'نسخ',
       'components.Settings.SettingsLogs.filterDebug': 'متابعة عميقة " Debug "',
@@ -1614,6 +1673,23 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'macOS',
       'components.SoftwareCatalog.releaseYearFilter': 'سنة الإصدار',
       'components.SoftwareCatalog.windows': 'النوافذ',
+      'components.RequestModal.Music.requestmusic': 'طلب الموسيقى',
+      'components.RequestModal.Music.backendRequestFailed':
+        'تم إرسال الطلب، لكن Lidarr رفضه أثناء المعالجة.',
+      'components.RequestModal.Music.requesterror':
+        'حدث خطأ ما أثناء إرسال الطلب.',
+      'components.IssueList.IssueItem.issuereason': 'السبب',
+      'components.IssueModal.issueReasonMissingContent': 'محتوى مفقود',
+      'components.IssueModal.issueReasonMissingIssue': 'عدد مفقود',
+      'components.IssueModal.issueReasonWrongEdition':
+        'الطبعة الخاطئة أو البديل',
+      'components.IssueModal.issueReasonWrongIssue':
+        'العدد أو التاريخ غير صحيح',
+      'components.IssueModal.issueReasonDamagedFile':
+        'ملف متضرر أو غير قابل للقراءة',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'العنوان غير الصحيح أو البيانات الوصفية',
+      'components.IssueModal.issueOther': 'أخرى',
       'components.IssueDetails.allepisodes': 'جميع الحلقات',
       'components.Layout.Sidebar.comingSoon': 'قريبًا',
       'components.Layout.Sidebar.watchSessions': 'جلسات المشاهدة',
@@ -1706,6 +1782,7 @@ export const localeData = [
       'lumen.account.loadTimeout':
         'استغرق الخادم وقتاً طويلاً للرد. حاول مجدداً.',
       'lumen.account.loadUnknownFailure': 'تعذّر تحميل هذه المعلومات.',
+      'lumen.account.loading': 'جارٍ التحميل…',
       'lumen.account.loadingPasswordSettings':
         'جارٍ تحميل إعدادات كلمة المرور…',
       'lumen.account.loadingProfileSettings':
@@ -1732,6 +1809,7 @@ export const localeData = [
       'lumen.account.profileSaveMismatch':
         'حفظ SeerrNG قيماً مختلفة. راجع الملف الشخصي المحدّث.',
       'lumen.account.retry': 'إعادة المحاولة',
+      'lumen.account.selectedCount': 'تم تحديد {count}',
       'lumen.account.saveCardTitles': 'حفظ عناوين البطاقات',
       'lumen.account.savePassword': 'حفظ كلمة المرور',
       'lumen.account.saveStreamingSubscriptions': 'حفظ اشتراكات خدمات البث',
@@ -1803,6 +1881,7 @@ export const localeData = [
       'lumen.actions.searchProwlarr': 'البحث في Prowlarr',
       'lumen.admin.administrationCategories': 'فئات الإدارة',
       'lumen.admin.allSettingsTools': 'كل الإعدادات والأدوات',
+      'lumen.admin.back': 'العودة إلى الإدارة',
       'lumen.admin.dest.4k': 'طلبات 4K',
       'lumen.admin.dest.about': 'حول SeerrNG',
       'lumen.admin.dest.apiKey': 'مفتاح واجهة التطبيق',
@@ -1834,6 +1913,9 @@ export const localeData = [
       'lumen.admin.dest.overrideRules': 'قواعد تجاوز الطلبات',
       'lumen.admin.dest.prowlarr': 'إعدادات Prowlarr',
       'lumen.admin.dest.quotas': 'حصص الطلب الافتراضية',
+      'lumen.admin.dest.requestDefaults': 'إعدادات الطلبات الافتراضية',
+      'lumen.admin.dest.defaultPermissions': 'أذونات المستخدمين الافتراضية',
+      'lumen.admin.dest.defaultCategories': 'الفئات الافتراضية للمستخدمين',
       'lumen.admin.dest.radarr': 'خدمات Radarr',
       'lumen.admin.dest.readerDelivery': 'توصيل القارئ',
       'lumen.admin.dest.readmeabook': 'إعدادات ReadMeABook',
@@ -2229,6 +2311,8 @@ export const localeData = [
       'lumen.adminJobs.frequency.seconds.one': 'كل {count} ثانية',
       'lumen.adminJobs.frequency.seconds.other': 'كل {count} ثانية',
       'lumen.adminJobs.frequency.seconds.two': 'كل {count} ثانيتين',
+      'lumen.adminJobs.confirmFailure':
+        'تعذّر تأكيد حفظ الجدول. حاول مرة أخرى.',
       'lumen.adminJobs.goBack': 'رجوع',
       'lumen.adminJobs.idle': 'خاملة',
       'lumen.adminJobs.loading': 'جارٍ تحميل المهام المجدولة…',
@@ -2237,6 +2321,7 @@ export const localeData = [
       'lumen.adminJobs.running': 'قيد التشغيل',
       'lumen.adminJobs.saveSchedule': 'حفظ الجدول',
       'lumen.adminJobs.scheduledJobs': 'المهام المجدولة',
+      'lumen.adminJobs.scheduleSaved': 'تم حفظ الجدول.',
       'lumen.adminJobs.systemCaches': 'ذاكرات النظام المؤقتة',
       'lumen.adminJobs.title': 'المهام المجدولة',
       'lumen.adminJobs.updateFailure': 'تعذّر تحديث المهمة.',
@@ -3379,6 +3464,23 @@ export const localeData = [
       'lumen.detail.folder': 'المجلد',
       'lumen.detail.ignoreQuota': 'تجاهل حد الطلبات',
       'lumen.detail.keepOpen': 'إبقاء «{label}» مفتوحًا',
+      'lumen.detail.movieDetails': 'تفاصيل الفيلم',
+      'lumen.detail.movieDetailsPreference': 'تفاصيل الفيلم',
+      'lumen.movie.collection': 'المجموعة',
+      'lumen.movie.collectionSize': 'عدد الأفلام: {count}',
+      'lumen.movie.collectionLoading': 'جارٍ تحميل تفاصيل المجموعة…',
+      'lumen.movie.collectionLoadFailed': 'تعذر تحميل تفاصيل المجموعة.',
+      'lumen.detail.tvDetails': 'تفاصيل المسلسل',
+      'lumen.detail.tvDetailsPreference': 'تفاصيل المسلسل',
+      'lumen.detail.bookDetails': 'تفاصيل الكتاب',
+      'lumen.detail.bookDetailsPreference': 'تفاصيل الكتاب',
+      'lumen.detail.albumDetails': 'تفاصيل الألبوم',
+      'lumen.detail.albumDetailsPreference': 'تفاصيل الألبوم',
+      'lumen.detail.artistListPreference': 'قائمة الفنانين',
+      'lumen.detail.collectionPreference': 'المجموعة',
+      'lumen.bookDetail.collectionTitle': 'المجموعة',
+      'lumen.bookDetail.collectionSize': 'حجم المجموعة: {count} كتابًا',
+      'lumen.bookDetail.loadingCollection': 'جارٍ تحميل المجموعة…',
       'lumen.detail.languageProfile': 'ملف اللغة',
       'lumen.detail.loadingServers': 'جارٍ تحميل الخوادم…',
       'lumen.detail.me': 'أنا',
@@ -3387,6 +3489,8 @@ export const localeData = [
       'lumen.detail.noServer':
         'لا يوجد خادم {service} للاختيار؛ يستخدم SeerrNG الإعدادات الافتراضية.',
       'lumen.detail.noSubjectTags': 'لا توجد وسوم.',
+      'lumen.detail.overview': 'نظرة عامة',
+      'lumen.detail.overviewPreference': 'نظرة عامة',
       'lumen.detail.openFullCast': 'عرض طاقم التمثيل كاملًا',
       'lumen.detail.openFullCrew': 'عرض طاقم العمل كاملًا',
       'lumen.detail.quality': 'الجودة',
@@ -3729,6 +3833,7 @@ export const localeData = [
       'lumen.gameLibrary.playing': 'قيد اللعب',
       'lumen.gameLibrary.previousPage': 'الصفحة السابقة',
       'lumen.gameLibrary.private': 'خاصة',
+      'lumen.gameLibrary.privateGameLibrary': 'مكتبة الألعاب الخاصة',
       'lumen.gameLibrary.privateGameLibraryDescription':
         'أضفها إلى مكتبتك الخاصة، ثم تابع تقدمك واختر ما إذا كنت تريد مشاركتها مع أفراد أسرتك.',
       'lumen.gameLibrary.privateLibrary': 'المكتبة الخاصة',
@@ -3950,6 +4055,13 @@ export const localeData = [
       'lumen.issues.editIssueDescription': 'تعديل وصف البلاغ',
       'lumen.issues.ep': 'أسطوانة قصيرة',
       'lumen.issues.episode': 'الحلقة {episode}',
+      'lumen.issues.episodesLoadError': 'تعذر تحميل تفاصيل الحلقات.',
+      'lumen.issues.retryEpisodes': 'إعادة المحاولة',
+      'lumen.issues.loadingEpisodes': 'جارٍ تحميل تفاصيل الحلقات…',
+      'lumen.issues.untitledEpisode': 'حلقة بلا عنوان',
+      'lumen.issues.noEpisodeDetails': 'لم يتم العثور على حلقات مطابقة.',
+      'lumen.issues.allSeasons': 'كل المواسم',
+      'lumen.issues.entireSeries': 'المسلسل كاملًا',
       'lumen.issues.episodes': 'الحلقات {episodes}',
       'lumen.issues.filter.filter': 'حالة البلاغ',
       'lumen.issues.filter.issueType': 'نوع المشكلة',
@@ -3957,11 +4069,23 @@ export const localeData = [
       'lumen.issues.filter.sort': 'ترتيب البلاغات',
       'lumen.issues.filter.sortDirection': 'اتجاه الترتيب',
       'lumen.issues.filter.timeFrame': 'تاريخ البلاغ',
+      'lumen.issues.group.filters': 'الفلاتر',
+      'lumen.issues.group.media': 'فلاتر الوسائط',
+      'lumen.issues.group.sort': 'ترتيب حسب',
+      'lumen.issues.pinSaveFailed':
+        'تعذر حفظ تفضيل عرض عوامل التصفية. حاول مرة أخرى.',
+      'lumen.issues.group.task': 'فلاتر البلاغات',
       'lumen.issues.issue': 'بلاغ',
       'lumen.issues.issues': 'البلاغات',
       'lumen.issues.loading': 'جارٍ تحميل البلاغات…',
       'lumen.issues.loadingIssue': 'جارٍ تحميل البلاغ…',
       'lumen.issues.loadingTitle': 'جارٍ تحميل العنوان…',
+      'lumen.issues.runtimeMinutes': '{value} دقيقة',
+      'lumen.issues.pageCount': '{value} صفحة',
+      'lumen.issues.issueCount': '{value} أعداد',
+      'lumen.issues.hideDetails': 'إخفاء التفاصيل',
+      'lumen.issues.viewDetails': 'عرض التفاصيل',
+      'lumen.issues.issueDetails': 'تفاصيل المشكلة',
       'lumen.issues.media.album': 'ألبوم',
       'lumen.issues.media.book': 'كتاب',
       'lumen.issues.media.comic': 'قصة مصورة',
@@ -4061,6 +4185,7 @@ export const localeData = [
         'تعذر بدء تسجيل الدخول عبر OpenID Connect. تحقق من إعداد المزوّد وعنوان SeerrNG.',
       'lumen.login.openFullSeerr': 'فتح SeerrNG الكامل',
       'lumen.login.password': 'كلمة المرور',
+      'lumen.login.plexLoading': 'جارٍ إكمال تسجيل الدخول إلى Plex…',
       'lumen.login.quickGettingCode': 'جارٍ الحصول على رمز…',
       'lumen.login.quickInstructions':
         'في {serverName}، افتح الإعدادات ← Quick Connect وأدخل هذا الرمز.',
@@ -4378,6 +4503,21 @@ export const localeData = [
       'lumen.metadata.test': 'اختبار',
       'lumen.metadata.testFailed': 'تعذر اختبار موفري البيانات الوصفية.',
       'lumen.metadata.title': 'موفرو البيانات الوصفية',
+      'lumen.metadata.help.video':
+        'اختر موفر البيانات الوصفية للتلفاز والأنمي.',
+      'lumen.metadata.help.music':
+        'اضبط حدود طلبات Cover Art Archive واختبر موفري الموسيقى.',
+      'lumen.metadata.help.books':
+        'أدخل حتى 50 رمز لغة مكوّناً من ثلاثة أحرف ومفصولاً بفواصل، مثل eng أو fre أو ger. اتركه فارغاً للسماح بجميع اللغات. تتطلب الطلبات المقيّدة إصداراً تم التحقق منه بلغة مسموح بها.',
+      'lumen.metadata.credential.comicVineApiKey':
+        'مفتاح واجهة برمجة تطبيقات ComicVine',
+      'lumen.metadata.credential.metronToken': 'رمز Metron API',
+      'lumen.metadata.credential.googleBooksApiKey': 'مفتاح Google Books API',
+      'lumen.metadata.credential.youtubeApiKey': 'مفتاح YouTube Data API',
+      'lumen.metadata.loadingSettings': 'جارٍ تحميل الإعدادات…',
+      'lumen.metadata.loadFailedTitle': 'تعذر تحميل إعدادات البيانات الوصفية.',
+      'lumen.metadata.credentialsLoadFailedTitle':
+        'تعذر تحميل بيانات اعتماد البيانات الوصفية.',
       'lumen.migration.addServiceFirst':
         'أضف خدمة BookshelfNG من إعدادات خدمات SeerrNG لترحيل مكتبتها.',
       'lumen.migration.allCurrentFolders': 'كل المجلدات الحالية',
@@ -4501,6 +4641,8 @@ export const localeData = [
       'lumen.music.loadingMore': 'جارٍ تحميل المزيد…',
       'lumen.music.noMatchingArtists': 'لم يتم العثور على فنانين مطابقين.',
       'lumen.music.noReleases': 'لا توجد إصدارات مدرجة',
+      'lumen.music.showAll': 'عرض الكل',
+      'lumen.music.showLess': 'عرض أقل',
       'lumen.music.nothingHere': 'لا توجد نتائج',
       'lumen.music.plays': '{count} استماع',
       'lumen.music.releaseCountMany': '{count} إصدارات',
@@ -4554,6 +4696,9 @@ export const localeData = [
       'lumen.music.tracks': 'المقاطع',
       'lumen.music.useArtistText': 'استخدم نص الفنان',
       'lumen.music.viewDiscography': 'عرض تسجيلات الفنان',
+      'lumen.music.viewArtists': 'عرض الفنانين',
+      'lumen.music.albumArtist': 'فنان الألبوم',
+      'lumen.music.trackArtist': 'فنان المسار',
       'lumen.myMedia.catalogMatches': 'نتائج الكتالوج المطابقة',
       'lumen.myMedia.couldNotLoad': 'تعذر تحميل {what}',
       'lumen.myMedia.enableWrites': 'هل تريد تحديث التتبع من وسائطي؟',
@@ -5565,6 +5710,7 @@ export const localeData = [
       'lumen.tv.requestAnyway': 'طلب على أي حال',
       'lumen.tv.requestApproval': 'طلب الموافقة',
       'lumen.tv.requestEntireSeries': 'طلب المسلسل كاملًا',
+      'lumen.tv.selectEntireSeries': 'اختيار المسلسل كاملًا',
       'lumen.tv.requestMissingSeasons': 'طلب {count} مواسم ناقصة',
       'lumen.tv.requestMoreSeasons': 'طلب {count} مواسم إضافية',
       'lumen.tv.requestSeason': 'طلب موسم {count}',
@@ -5574,6 +5720,7 @@ export const localeData = [
       'lumen.tv.requestedOn': 'في {date}',
       'lumen.tv.seasonCount': '{count} مواسم',
       'lumen.tv.seasons': 'المواسم',
+      'lumen.tv.mediaServerDetails': 'خادم الوسائط',
       'lumen.tv.similar': 'مسلسلات مشابهة',
       'lumen.tv.specials': 'الحلقات الخاصة',
       'lumen.tv.status.everySeasonOn': 'كل المواسم على {server}',
@@ -5599,10 +5746,15 @@ export const localeData = [
       'lumen.tvEpisodeRequest.clearSelection': 'مسح التحديد',
       'lumen.tvEpisodeRequest.close': 'إغلاق',
       'lumen.tvEpisodeRequest.collapseAll': 'طي الكل',
+      'lumen.tvEpisodeRequest.deselectAll':
+        'إلغاء تحديد كل الحلقات القابلة للطلب',
+      'lumen.tvEpisodeRequest.deselectSeason':
+        'إلغاء تحديد كل الحلقات القابلة للطلب في {season}',
       'lumen.tvEpisodeRequest.empty': 'لم يتم العثور على حلقات.',
       'lumen.tvEpisodeRequest.episodeCount': '{count} حلقة',
       'lumen.tvEpisodeRequest.episodes': 'الحلقات',
       'lumen.tvEpisodeRequest.expandAll': 'توسيع الكل',
+      'lumen.tvEpisodeRequest.latestSeason': 'أحدث موسم',
       'lumen.tvEpisodeRequest.loadFailure': 'تعذر تحميل الحلقات',
       'lumen.tvEpisodeRequest.loadFailureBody':
         'تعذر تحميل بعض تفاصيل المواسم.',
@@ -5616,6 +5768,12 @@ export const localeData = [
       'lumen.tvEpisodeRequest.season': 'الموسم',
       'lumen.tvEpisodeRequest.seasonNumber': 'الموسم {number}',
       'lumen.tvEpisodeRequest.seasonSelected': 'تم تحديد {count}',
+      'lumen.tvEpisodeRequest.selectAll': 'تحديد كل الحلقات القابلة للطلب',
+      'lumen.tvEpisodeRequest.selectAllShort': 'تحديد الكل',
+      'lumen.tvEpisodeRequest.selectLatestSeason':
+        'تحديد كل الحلقات القابلة للطلب في أحدث موسم',
+      'lumen.tvEpisodeRequest.selectSeason':
+        'تحديد كل الحلقات القابلة للطلب في {season}',
       'lumen.tvEpisodeRequest.selected': 'المحدد: {count}',
       'lumen.tvEpisodeRequest.specials': 'الحلقات الخاصة',
       'lumen.tvEpisodeRequest.submit': 'طلب الحلقات المحددة',
@@ -6788,6 +6946,112 @@ export const localeData = [
       'lumen.automaticBlocklist.limit': 'حد الصفحات لكل وسم أو نوع محظور',
       'lumen.automaticBlocklist.limitHelp': 'أدخل عددًا صحيحًا من 0 إلى 250.',
       'lumen.automaticBlocklist.genreWhat': 'الأنواع',
+      'lumen.music.requestQuotaReached': 'تم بلوغ حد طلبات الموسيقى.',
+      'lumen.music.requestsRemaining':
+        'متبقي {remaining} من أصل {limit} طلبات موسيقى.',
+      'lumen.issues.field.releaseDate': 'تاريخ الإصدار',
+      'lumen.issues.field.runtime': 'مدة العرض',
+      'lumen.issues.field.createdBy': 'أنشأه',
+      'lumen.issues.field.createdDate': 'تاريخ الإنشاء',
+      'lumen.issues.field.description': 'الوصف',
+      'lumen.issues.field.type': 'النوع',
+      'lumen.issues.field.affectedSeasons': 'المواسم المتأثرة',
+      'lumen.issues.field.status': 'الحالة',
+      'lumen.issues.field.details': 'التفاصيل',
+      'lumen.issues.unavailable': 'غير متاح',
+      'lumen.issues.viewDiscussion': 'عرض المناقشة',
+      'lumen.issues.field.firstPublished': 'تاريخ النشر الأول',
+      'lumen.issues.field.latestIssue': 'أحدث عدد',
+      'lumen.issues.field.pages': 'صفحات',
+      'lumen.issues.field.issues': 'أعداد',
+      'lumen.issues.mediaUnavailable': 'معلومات الوسائط غير متاحة',
+      'lumen.availabilitySubscription.subscribe': 'أعلمني عند التوفر',
+      'lumen.availabilitySubscription.unsubscribe': 'إيقاف إشعارات التوفر',
+      'lumen.availabilitySubscription.subscribed':
+        'سيتم إشعارك عندما يتوفر هذا العنوان.',
+      'lumen.availabilitySubscription.unsubscribed': 'إشعارات التوفر معطلة.',
+      'lumen.availabilitySubscription.requestEnded':
+        'لم يعد لهذا العنوان طلب نشط من مستخدم آخر.',
+      'lumen.availabilitySubscription.updateFailed':
+        'تعذر تحديث إشعارات التوفر. يرجى المحاولة مرة أخرى.',
+      'lumen.mediaServerCollections.title': 'مجموعات {server}',
+      'lumen.mediaServerCollections.add': 'إضافة إلى {name}',
+      'lumen.mediaServerCollections.remove': 'إزالة من {name}',
+      'lumen.mediaServerCollections.added': 'تمت الإضافة إلى {name}',
+      'lumen.mediaServerCollections.removed': 'تمت الإزالة من {name}',
+      'lumen.mediaServerCollections.updateFailed':
+        'تعذر تأكيد تغيير المجموعة. أعد تحميل القائمة ثم حاول مجددًا.',
+      'lumen.mediaServerCollections.link': 'اربط حساب {server} أولًا.',
+      'lumen.mediaServerCollections.permission':
+        'لا يستطيع حساب {server} إدارة المجموعات.',
+      'lumen.mediaServerCollections.missing':
+        'هذا المسلسل غير موجود في مكتبة {server} المتاحة لك.',
+      'lumen.mediaServerCollections.limit':
+        'قائمة مجموعات {server} كبيرة جدًا لعرضها بأمان.',
+      'lumen.mediaServerCollections.unavailable':
+        'المجموعات غير متاحة لهذا الخادم.',
+      'lumen.mediaServerCollections.empty': 'أنشئ مجموعة في {server} أولًا.',
+      'lumen.mediaServerCollections.loading': 'جارٍ تحميل المجموعات…',
+      'lumen.mediaServerCollections.loadFailed':
+        'تعذر تحميل المجموعات أو تأكيد التغيير.',
+      'lumen.mediaServerCollections.retry': 'إعادة تحميل المجموعات',
+      'lumen.tv.episodeQueue.off':
+        'قائمة انتظار الحلقات · متوقفة · يديرها المسؤول',
+      'lumen.tv.episodeQueue.one':
+        'قائمة انتظار الحلقات · حلقة واحدة يحددها المسؤول',
+      'lumen.tv.episodeQueue.many':
+        'قائمة انتظار الحلقات · {count} حلقات يحددها المسؤول',
+      'lumen.videoPlayback.open': 'خيارات التشغيل',
+      'lumen.videoPlayback.title': 'تشغيل الفيلم',
+      'lumen.videoPlayback.quality4k': 'جودة التشغيل: 4K',
+      'lumen.videoPlayback.qualityHd': 'جودة التشغيل: HD',
+      'lumen.videoPlayback.catalog': 'فيلم قابل للتشغيل',
+      'lumen.videoPlayback.catalogFailure': 'تعذر تحميل عنصر التشغيل',
+      'lumen.videoPlayback.devices': 'أجهزة التشغيل',
+      'lumen.videoPlayback.devicesFailure': 'تعذر تحميل أجهزة التشغيل',
+      'lumen.videoPlayback.retry': 'إعادة المحاولة',
+      'lumen.videoPlayback.unavailable':
+        'لا يتوفر فيلم قابل للتشغيل بهذه الجودة.',
+      'lumen.videoPlayback.loadingDevices': 'جارٍ تحميل أجهزة التشغيل…',
+      'lumen.videoPlayback.device': 'الجهاز',
+      'lumen.videoPlayback.chooseDevice': 'اختر…',
+      'lumen.videoPlayback.starting': 'جارٍ البدء…',
+      'lumen.videoPlayback.playOnDevice': 'التشغيل على الجهاز',
+      'lumen.videoPlayback.noDevices': 'لا تتوفر أجهزة تشغيل نشطة ومصرح بها.',
+      'lumen.videoPlayback.deviceFailure':
+        'تعذر بدء التشغيل. تحقق من الجهاز المحدد.',
+      'lumen.videoPlayback.playlistFailure': 'تعذر إنشاء قائمة تشغيل.',
+      'lumen.videoPlayback.started': 'بدأ التشغيل على {device}.',
+      'lumen.videoPlayback.playlistWarning':
+        'إنشاء قائمة تشغيل يستبدل قائمة «التحديد الحالي» على خادم الوسائط.',
+      'lumen.videoPlayback.creating': 'جارٍ الإنشاء…',
+      'lumen.videoPlayback.createPlaylist': 'إنشاء قائمة تشغيل',
+      'lumen.videoPlayback.openPlaylist': 'فتح على خادم الوسائط',
+      'lumen.videoPlayback.close': 'إغلاق',
+      'lumen.videoPlayback.invalidDevices': 'تعذر التحقق من أجهزة التشغيل.',
+      'lumen.videoPlayback.seriesTitle': 'تشغيل المسلسل',
+      'lumen.videoPlayback.catalogSeries': 'حلقات قابلة للتشغيل',
+      'lumen.videoPlayback.invalidCatalog': 'تعذر التحقق من عناصر التشغيل.',
+      'lumen.videoPlayback.episodes': 'الحلقات',
+      'lumen.videoPlayback.episodesUnavailable':
+        'لا تتوفر حلقات قابلة للتشغيل بهذه الجودة.',
+      'lumen.videoPlayback.selectEpisode':
+        'حدد حلقة واحدة قابلة للتشغيل على الأقل.',
+      'lumen.videoPlayback.selectSeason': 'حدد كل الحلقات من {season}',
+      'lumen.issues.openIssues': 'البلاغات المفتوحة',
+      'lumen.tvAvailability.title': 'توفر الحلقات',
+      'lumen.tvAvailability.seasonLabel': 'الموسم المطلوب لعرض التوفر',
+      'lumen.tvAvailability.what': 'توفر الحلقات',
+      'lumen.tvAvailability.loadFailure': 'تعذر تحميل توفر الحلقات',
+      'lumen.tvAvailability.retry': 'إعادة المحاولة',
+      'lumen.tvAvailability.loading': 'جارٍ تحميل الحلقات…',
+      'lumen.tvAvailability.empty': 'لم يتم العثور على حلقات.',
+      'lumen.tvAvailability.noVisibleFile': 'لا يوجد ملف ظاهر مُبلّغ عنه',
+      'lumen.tvAvailability.noFile': 'لا يوجد ملف مُبلّغ عنه',
+      'lumen.tvAvailability.sourceHd': '{source} HD',
+      'lumen.tvAvailability.source4k': '{source} 4K',
+      'lumen.tvAvailability.sharedHd': 'HD مشترك',
+      'lumen.tvAvailability.shared4k': '4K مشترك',
     },
   },
   {
@@ -7137,6 +7401,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Общо заявки',
       'components.Settings.SettingsAbout.uptodate': 'Актуална версия',
       'components.Settings.SettingsAbout.version': 'Версия',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Синхронизиране на наличността на медиите',
       'components.Settings.SettingsJobsCache.cachehits': 'Попадения',
       'components.Settings.SettingsJobsCache.cachekeys': 'Общо ключове',
       'components.Settings.SettingsJobsCache.cachemisses': 'Пропуски',
@@ -7145,15 +7411,41 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS кеш',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Попадения',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Пропуски',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Синхронизиране на изтеглянията',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Нулиране на синхронизирането на изтеглянията',
       'components.Settings.SettingsJobsCache.failures': 'Грешки',
       'components.Settings.SettingsJobsCache.flushcache': 'Изчистване на кеша',
       'components.Settings.SettingsJobsCache.hitRate': 'Процент попадения',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Почистване на кеша с изображения',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Кеширани изображения',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks':
         'Резервни IPv4 адреси',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Пълно сканиране на библиотеката в Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Сканиране на наскоро добавени в Jellyfin',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr изпълнява определени задачи по поддръжката по график, но те могат да бъдат стартирани и ръчно по-долу. Ръчното стартиране на задача няма да промени нейния график.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Пълно сканиране на библиотеката в Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Сканиране на наскоро добавени в Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Обновяване на токена за Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Синхронизиране на списъка за гледане в Plex',
       'components.Settings.SettingsJobsCache.process': 'Процес',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Обработване на блокираните етикети',
+      'components.Settings.SettingsJobsCache.radarr-scan':
+        'Сканиране на Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Изпълни сега',
+      'components.Settings.SettingsJobsCache.sonarr-scan':
+        'Сканиране на Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Съобщението от лог файла е копирано в клипборда.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -7417,6 +7709,7 @@ export const localeData = [
       'i18n.next': 'Напред',
       'i18n.previous': 'Назад',
       'i18n.usersettings': 'Потребителски настройки',
+      'components.IssueModal.issueOther': 'Друго',
     },
   },
   {
@@ -7778,6 +8071,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Sol·licituds totals',
       'components.Settings.SettingsAbout.uptodate': 'Actualitzat',
       'components.Settings.SettingsAbout.version': 'Versió',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Sincronització de disponibilitat de contingut',
       'components.Settings.SettingsJobsCache.cachehits': 'Consultes',
       'components.Settings.SettingsJobsCache.cachekeys': 'Claus totals',
       'components.Settings.SettingsJobsCache.cachemisses': 'Errades',
@@ -7787,16 +8082,40 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Memòria cau DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Consultes',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Fallades',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Sincronitza les baixades',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Restableix la sincronització de descàrregues',
       'components.Settings.SettingsJobsCache.failures': 'Errors',
       'components.Settings.SettingsJobsCache.flushcache':
         'Buida la memòria cau',
       'components.Settings.SettingsJobsCache.hitRate': 'Taxa de consultes',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        "Neteja de la memòria cau d'imatges",
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Imatges a la memòria cau',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks':
         "Alternatives d'IPv4",
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Exploració completa de la biblioteca Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        "Exploració d'elements de Jellyfin afegits recentment",
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr realitza certes tasques de manteniment com a feines programades regularment, però també es poden activar manualment a continuació. L’execució manual d’un tasca no alterarà la seva programació.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Exploració completa de la biblioteca plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        "Exploració d'elements de Plex afegits recentment",
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Actualiza el testimoni de Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Sincronització de la llista de seguiment de Plex',
       'components.Settings.SettingsJobsCache.process': 'Procés',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Processa les etiquetes bloquejades',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Escaneig de Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Executa-ho ara',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Escaneig de Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         "S'ha copiat el missatge de registre al porta-retalls.",
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -7932,6 +8251,7 @@ export const localeData = [
       'i18n.next': 'Endavant',
       'i18n.previous': 'Endarrere',
       'i18n.usersettings': "Configuració de l'usuari",
+      'components.IssueModal.issueOther': 'Altre',
     },
   },
   {
@@ -8275,6 +8595,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Celkem žádostí',
       'components.Settings.SettingsAbout.uptodate': 'Aktuální',
       'components.Settings.SettingsAbout.version': 'Verze',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Synchronizace dostupnosti médií',
       'components.Settings.SettingsJobsCache.cachehits': 'Úspěchy',
       'components.Settings.SettingsJobsCache.cachekeys': 'Celkem klíčů',
       'components.Settings.SettingsJobsCache.cachemisses': 'Neúspěchy',
@@ -8283,15 +8605,39 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Mezipaměť DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Úspěchy',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Neúspěchy',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Synchronizace stahování',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Obnovit synchronizaci stahování',
       'components.Settings.SettingsJobsCache.failures': 'Selhání',
       'components.Settings.SettingsJobsCache.flushcache':
         'Vyprázdnit mezipaměť',
       'components.Settings.SettingsJobsCache.hitRate': 'Míra úspěšnosti',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Vyčištění mezipaměti obrázků',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Obrázky v mezipaměti',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Záložní IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Úplné prohledání knihovny Jellyfinu',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Prohledání nedávno přidaných do Jellyfinu',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr provádí určité úlohy údržby jako pravidelně naplánované úlohy, ale lze je také spustit ručně níže. Ruční spuštění úlohy nezmění její plán.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Úplné prohledání knihovny Plexu',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Prohledání nedávno přidaných do Plexu',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Obnovovací token Plexu',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Synchronizace seznamu ke zhlédnutí Plex',
       'components.Settings.SettingsJobsCache.process': 'Zpracování',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Zpracovat štítky blokování',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Prohledat Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Spustit nyní',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Prohledat Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Zkopírování zprávy protokolu do schránky.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -8559,6 +8905,7 @@ export const localeData = [
       'i18n.next': 'Další',
       'i18n.previous': 'Předchozí',
       'i18n.usersettings': 'Uživatelská nastavení',
+      'components.IssueModal.issueOther': 'Jiný',
     },
   },
   {
@@ -8901,6 +9248,8 @@ export const localeData = [
         'Samlet antal anmodninger',
       'components.Settings.SettingsAbout.uptodate': 'Opdateret',
       'components.Settings.SettingsAbout.version': 'Version',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Synkronisering af medietilgængelighed',
       'components.Settings.SettingsJobsCache.cachehits': 'Træffere',
       'components.Settings.SettingsJobsCache.cachekeys': 'Samlet antal nøgler',
       'components.Settings.SettingsJobsCache.cachemisses': 'Missere',
@@ -8909,14 +9258,38 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS-cache',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Træffere',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Missere',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Downloadsynkronisering',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Nulstil downloadsynkronisering',
       'components.Settings.SettingsJobsCache.failures': 'Fejl',
       'components.Settings.SettingsJobsCache.flushcache': 'Tøm cache',
       'components.Settings.SettingsJobsCache.hitRate': 'Træfferate',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Oprydning af billedcache',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Cachelagrede billeder',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4-reserver',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin - Fuld biblioteksscanning',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin - Senest tilføjet-scanning',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr kører visse vedligeholdelsesopgaver som regelmæssigt planlagte jobs, men de kan også udløses manuelt nedenfor. Manuel kørsel af et job vil ikke ændre dets tidsplan.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plex - Fuld biblioteksscanning',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex - Senest tilføjet-scanning',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex - Opdatér token',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex - Synkronisering af Se senere-liste',
       'components.Settings.SettingsJobsCache.process': 'Proces',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Behandl skjulnings-tags',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr-scanning',
       'components.Settings.SettingsJobsCache.runnow': 'Kør nu',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr-scanning',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Kopierede logmeddelelse til udklipsholder.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -9184,6 +9557,7 @@ export const localeData = [
       'i18n.next': 'Næste',
       'i18n.previous': 'Forrige',
       'i18n.usersettings': 'Brugerindstillinger',
+      'components.IssueModal.issueOther': 'Andet',
     },
   },
   {
@@ -9944,6 +10318,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'Serien',
       'components.Settings.SettingsCategories.tvDescription':
         'Ermöglichen Sie Serienentdeckung und Anfragen.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr-Scan nach Szenen für Erwachsene',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Medienverfügbarkeit Sync',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'BackIssue-Comics-Scan',
       'components.Settings.SettingsJobsCache.cachehits': 'Cache-Treffer',
       'components.Settings.SettingsJobsCache.cachekeys': 'Schlüssel insgesamt',
       'components.Settings.SettingsJobsCache.cachemisses': 'Cache-Fehlzugriff',
@@ -9953,15 +10333,71 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS-Cache',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Zugriffe',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Fehlschläge',
+      'components.Settings.SettingsJobsCache.download-recovery':
+        'Download Wiederherstellung',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Download Synchronisierung',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Download Synchronisierung Zurücksetzen',
       'components.Settings.SettingsJobsCache.enabled': 'Aktiviert',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'Synchronisation der externen Anforderungsliste',
       'components.Settings.SettingsJobsCache.failures': 'Fehlschläge',
       'components.Settings.SettingsJobsCache.flushcache': 'Cache leeren',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'Synchronisation der verfolgten Interessen',
       'components.Settings.SettingsJobsCache.hitRate': 'Trefferquote',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Bild-Cache-Bereinigung',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Bilder im Cache',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4-Fallbacks',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Vollständiger Jellyfin-Bibliotheksscan',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Scan kürzlich hinzugefügter Jellyfin-Medien',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'Warteschlange angeforderter Episoden',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr führt bestimmte Wartungsaufgaben als regulär geplante Aufgaben durch. Diese können allerdings auch manuell ausgeführt werden, ohne dabei den regulären Zeitplan abzuändern.',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Kapowarr-Comics-Scan',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Lidarr-Scan',
+      'components.Settings.SettingsJobsCache.live-tv-sync':
+        'Live-TV-Synchronisierung',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'LazyLibrarian-Zeitschriftenscan',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'Warteschlange für Filmsammlungen',
+      'components.Settings.SettingsJobsCache.mylar-scan': 'Mylar-Comics-Scan',
+      'components.Settings.SettingsJobsCache.navidrome-scan': 'Navidrome-Scan',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Vollständiger Plex-Bibliotheksscan',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Plex-Wiedergabeanalyse',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Scan kürzlich hinzugefügter Plex-Medien',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex-Aktualisierungs-Token',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex-Merklisten-Synchronisierung',
       'components.Settings.SettingsJobsCache.process': 'Prozess',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Verarbeiten von Tags auf der Sperrliste',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr-Scan',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Wiederholungsversuch für Bookshelf-Anfragen',
+      'components.Settings.SettingsJobsCache.readarr-scan': 'Bücherregal-Scan',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'BookOrbit Kobo-Bibliothek-Synchronisation',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'Verlauf des Veröffentlichungskalenders',
       'components.Settings.SettingsJobsCache.runnow': 'Jetzt ausführen',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'Software-Anforderungsabgleich',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr Scannen',
+      'components.Settings.SettingsJobsCache.soulseek-sync':
+        'Soulseek-Synchronisierung',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Protokollnachricht in die Zwischenablage kopiert.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -10879,6 +11315,23 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'macOS',
       'components.SoftwareCatalog.releaseYearFilter': 'Erscheinungsjahr',
       'components.SoftwareCatalog.windows': 'Windows',
+      'components.RequestModal.Music.requestmusic': 'Musik anfordern',
+      'components.RequestModal.Music.backendRequestFailed':
+        'Der Antrag wurde eingereicht, aber Lidarr lehnte ihn während der Bearbeitung ab.',
+      'components.RequestModal.Music.requesterror':
+        'Beim Senden der Anfrage ist etwas schief gelaufen.',
+      'components.IssueList.IssueItem.issuereason': 'Grund',
+      'components.IssueModal.issueReasonMissingContent': 'Fehlender Inhalt',
+      'components.IssueModal.issueReasonMissingIssue': 'Fehlende Ausgabe',
+      'components.IssueModal.issueReasonWrongEdition':
+        'Falsche Edition oder Variante',
+      'components.IssueModal.issueReasonWrongIssue':
+        'Falsche Ausgabe oder Datum',
+      'components.IssueModal.issueReasonDamagedFile':
+        'Beschädigte oder unlesbare Datei',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'Falscher Titel oder falsche Metadaten',
+      'components.IssueModal.issueOther': 'Sonstige',
     },
   },
   {
@@ -11625,6 +12078,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'Series',
       'components.Settings.SettingsCategories.tvDescription':
         'Allow series discovery and requests.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr Adult Scene Scan',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Media Availability Sync',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'BackIssue Comics Scan',
       'components.Settings.SettingsJobsCache.cachehits': 'Hits',
       'components.Settings.SettingsJobsCache.cachekeys': 'Total Keys',
       'components.Settings.SettingsJobsCache.cachemisses': 'Misses',
@@ -11634,14 +12093,67 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS Cache',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Hits',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Misses',
+      'components.Settings.SettingsJobsCache.download-recovery':
+        'Download Recovery',
+      'components.Settings.SettingsJobsCache.download-sync': 'Download Sync',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Download Sync Reset',
       'components.Settings.SettingsJobsCache.enabled': 'Enabled',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'External Request List Sync',
       'components.Settings.SettingsJobsCache.failures': 'Failures',
       'components.Settings.SettingsJobsCache.flushcache': 'Flush Cache',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'Followed Interests Sync',
       'components.Settings.SettingsJobsCache.hitRate': 'Hit Rate',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Image Cache Cleanup',
       'components.Settings.SettingsJobsCache.imagecachecount': 'Images Cached',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 Fallbacks',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin Full Library Scan',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin Recently Added Scan',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'Requested Episode Queue',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr performs certain maintenance tasks as regularly-scheduled jobs, but they can also be manually triggered below. Manually running a job will not alter its schedule.',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Kapowarr Comics Scan',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Lidarr Scan',
+      'components.Settings.SettingsJobsCache.live-tv-sync': 'Live TV Sync',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'LazyLibrarian Magazine Scan',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'Movie Collection Queue',
+      'components.Settings.SettingsJobsCache.mylar-scan': 'Mylar Comics Scan',
+      'components.Settings.SettingsJobsCache.navidrome-scan': 'Navidrome Scan',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plex Full Library Scan',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Plex Playback Analysis',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex Recently Added Scan',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex Refresh Token',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex Watchlist Sync',
       'components.Settings.SettingsJobsCache.process': 'Process',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Process Blocklist Rules',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr Scan',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf Request Retry',
+      'components.Settings.SettingsJobsCache.readarr-scan': 'Bookshelf Scan',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'BookOrbit Kobo Collection Sync',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'Release Calendar History',
       'components.Settings.SettingsJobsCache.runnow': 'Run Now',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'Software Request Reconciliation',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr Scan',
+      'components.Settings.SettingsJobsCache.soulseek-sync': 'Soulseek Sync',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Copied log message to clipboard.',
       'components.Settings.SettingsLogs.copyToClipboard': 'Copy to Clipboard',
@@ -12539,6 +13051,22 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'macOS',
       'components.SoftwareCatalog.releaseYearFilter': 'Release year',
       'components.SoftwareCatalog.windows': 'Windows',
+      'components.RequestModal.Music.requestmusic': 'Request Music',
+      'components.RequestModal.Music.backendRequestFailed':
+        'The request was submitted, but Lidarr rejected it while processing.',
+      'components.RequestModal.Music.requesterror':
+        'Something went wrong while submitting the request.',
+      'components.IssueList.IssueItem.issuereason': 'Reason',
+      'components.IssueModal.issueReasonMissingContent': 'Missing content',
+      'components.IssueModal.issueReasonMissingIssue': 'Missing issue',
+      'components.IssueModal.issueReasonWrongEdition':
+        'Wrong edition or variant',
+      'components.IssueModal.issueReasonWrongIssue': 'Wrong issue or date',
+      'components.IssueModal.issueReasonDamagedFile':
+        'Damaged or unreadable file',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'Incorrect title or metadata',
+      'components.IssueModal.issueOther': 'Other',
       'lumen.account.administratorAccess':
         'This account has administrator access.',
       'lumen.account.backToSettings': 'Back to Account Settings',
@@ -12608,6 +13136,7 @@ export const localeData = [
       'lumen.account.loadTimeout':
         'The server took too long to answer. Try again.',
       'lumen.account.loadUnknownFailure': 'Could not load this information.',
+      'lumen.account.loading': 'Loading…',
       'lumen.account.loadingPasswordSettings': 'Loading password settings…',
       'lumen.account.loadingProfileSettings': 'Loading profile settings…',
       'lumen.account.loadingStreamingProviders': 'Loading streaming providers…',
@@ -12634,6 +13163,7 @@ export const localeData = [
       'lumen.account.profileSaveMismatch':
         'SeerrNG saved different values. Review the updated profile.',
       'lumen.account.retry': 'Retry',
+      'lumen.account.selectedCount': '{count} selected',
       'lumen.account.saveCardTitles': 'Save Card Titles',
       'lumen.account.savePassword': 'Save Password',
       'lumen.account.saveStreamingSubscriptions':
@@ -12708,6 +13238,7 @@ export const localeData = [
       'lumen.actions.searchProwlarr': 'Search Prowlarr',
       'lumen.admin.administrationCategories': 'Administration Categories',
       'lumen.admin.allSettingsTools': 'All Settings and Tools',
+      'lumen.admin.back': 'Administration',
       'lumen.admin.dest.4k': '4K Requests',
       'lumen.admin.dest.about': 'About SeerrNG',
       'lumen.admin.dest.apiKey': 'Application API Key',
@@ -12739,6 +13270,9 @@ export const localeData = [
       'lumen.admin.dest.overrideRules': 'Request Override Rules',
       'lumen.admin.dest.prowlarr': 'Prowlarr Settings',
       'lumen.admin.dest.quotas': 'Default Request Quotas',
+      'lumen.admin.dest.requestDefaults': 'Request Defaults',
+      'lumen.admin.dest.defaultPermissions': 'Default User Permissions',
+      'lumen.admin.dest.defaultCategories': 'Default User Categories',
       'lumen.admin.dest.radarr': 'Radarr Services',
       'lumen.admin.dest.readerDelivery': 'Reader Delivery',
       'lumen.admin.dest.readmeabook': 'ReadMeABook Settings',
@@ -13139,6 +13673,8 @@ export const localeData = [
       'lumen.adminJobs.frequency.seconds.one': 'Every {count} second',
       'lumen.adminJobs.frequency.seconds.other': 'Every {count} seconds',
       'lumen.adminJobs.frequency.seconds.two': 'Every {count} seconds',
+      'lumen.adminJobs.confirmFailure':
+        'Could not confirm the saved schedule. Try again.',
       'lumen.adminJobs.goBack': 'Go Back',
       'lumen.adminJobs.idle': 'Idle',
       'lumen.adminJobs.loading': 'Loading scheduled jobs…',
@@ -13147,6 +13683,7 @@ export const localeData = [
       'lumen.adminJobs.running': 'Running',
       'lumen.adminJobs.saveSchedule': 'Save Schedule',
       'lumen.adminJobs.scheduledJobs': 'scheduled jobs',
+      'lumen.adminJobs.scheduleSaved': 'Schedule saved.',
       'lumen.adminJobs.systemCaches': 'System Caches',
       'lumen.adminJobs.title': 'Scheduled Jobs',
       'lumen.adminJobs.updateFailure': 'The job could not be updated.',
@@ -14320,6 +14857,24 @@ export const localeData = [
       'lumen.detail.folder': 'Folder',
       'lumen.detail.ignoreQuota': 'Ignore Request Quota',
       'lumen.detail.keepOpen': 'Keep {label} Open',
+      'lumen.detail.movieDetails': 'Movie Details',
+      'lumen.detail.movieDetailsPreference': 'movie details',
+      'lumen.movie.collection': 'Collection',
+      'lumen.movie.collectionSize': 'Collection size: {count} movies',
+      'lumen.movie.collectionLoading': 'Loading collection details…',
+      'lumen.movie.collectionLoadFailed':
+        'Collection details could not be loaded.',
+      'lumen.detail.tvDetails': 'Series Details',
+      'lumen.detail.tvDetailsPreference': 'series details',
+      'lumen.detail.bookDetails': 'Book Details',
+      'lumen.detail.bookDetailsPreference': 'book details',
+      'lumen.detail.albumDetails': 'Album Details',
+      'lumen.detail.albumDetailsPreference': 'album details',
+      'lumen.detail.artistListPreference': 'artist list',
+      'lumen.detail.collectionPreference': 'collection',
+      'lumen.bookDetail.collectionTitle': 'Collection',
+      'lumen.bookDetail.collectionSize': 'Collection size: {count} books',
+      'lumen.bookDetail.loadingCollection': 'Loading collection…',
       'lumen.detail.languageProfile': 'Language Profile',
       'lumen.detail.loadingServers': 'Loading servers…',
       'lumen.detail.me': 'Me',
@@ -14328,6 +14883,8 @@ export const localeData = [
       'lumen.detail.noServer':
         'No {service} server to choose; SeerrNG uses its defaults.',
       'lumen.detail.noSubjectTags': 'No subject tags.',
+      'lumen.detail.overview': 'Overview',
+      'lumen.detail.overviewPreference': 'overview',
       'lumen.detail.openFullCast': 'Open Full Cast',
       'lumen.detail.openFullCrew': 'Open Full Crew',
       'lumen.detail.quality': 'Quality',
@@ -14676,6 +15233,7 @@ export const localeData = [
       'lumen.gameLibrary.playing': 'Playing',
       'lumen.gameLibrary.previousPage': 'Previous Page',
       'lumen.gameLibrary.private': 'Private',
+      'lumen.gameLibrary.privateGameLibrary': 'Private Game Library',
       'lumen.gameLibrary.privateGameLibraryDescription':
         'Add it to your private game library, then track progress and choose whether to share it with your household.',
       'lumen.gameLibrary.privateLibrary': 'Private Library',
@@ -14900,6 +15458,13 @@ export const localeData = [
       'lumen.issues.editIssueDescription': 'Edit Issue Description',
       'lumen.issues.ep': 'EP',
       'lumen.issues.episode': 'Episode {episode}',
+      'lumen.issues.episodesLoadError': 'Episode details could not be loaded.',
+      'lumen.issues.retryEpisodes': 'Retry',
+      'lumen.issues.loadingEpisodes': 'Loading episode details…',
+      'lumen.issues.untitledEpisode': 'Untitled episode',
+      'lumen.issues.noEpisodeDetails': 'No matching episodes were found.',
+      'lumen.issues.allSeasons': 'All Seasons',
+      'lumen.issues.entireSeries': 'Entire Series',
       'lumen.issues.episodes': 'Episodes {episodes}',
       'lumen.issues.filter.filter': 'Issue Status',
       'lumen.issues.filter.issueType': 'Issue Type',
@@ -14907,11 +15472,23 @@ export const localeData = [
       'lumen.issues.filter.sort': 'Sort Issues',
       'lumen.issues.filter.sortDirection': 'Sort Direction',
       'lumen.issues.filter.timeFrame': 'Reported Within',
+      'lumen.issues.group.filters': 'Filters',
+      'lumen.issues.group.media': 'Media Filters',
+      'lumen.issues.group.sort': 'Sort By',
+      'lumen.issues.pinSaveFailed':
+        'Could not save this filter display preference. Try again.',
+      'lumen.issues.group.task': 'Task Filters',
       'lumen.issues.issue': 'Issue',
       'lumen.issues.issues': 'Issues',
       'lumen.issues.loading': 'Loading issues…',
       'lumen.issues.loadingIssue': 'Loading issue…',
       'lumen.issues.loadingTitle': 'Loading title…',
+      'lumen.issues.runtimeMinutes': '{value} min',
+      'lumen.issues.pageCount': '{value} pages',
+      'lumen.issues.issueCount': '{value} issues',
+      'lumen.issues.hideDetails': 'Hide Details',
+      'lumen.issues.viewDetails': 'View Details',
+      'lumen.issues.issueDetails': 'Issue Details',
       'lumen.issues.media.album': 'Album',
       'lumen.issues.media.book': 'Book',
       'lumen.issues.media.comic': 'Comic',
@@ -15012,6 +15589,7 @@ export const localeData = [
         'Could not start OpenID Connect sign-in. Check the provider configuration and SeerrNG application URL.',
       'lumen.login.openFullSeerr': 'Open Full SeerrNG',
       'lumen.login.password': 'Password',
+      'lumen.login.plexLoading': 'Completing Plex sign-in…',
       'lumen.login.quickGettingCode': 'Getting a Code…',
       'lumen.login.quickInstructions':
         'On {serverName}, open Settings → Quick Connect and enter this code.',
@@ -15265,6 +15843,20 @@ export const localeData = [
       'lumen.metadata.test': 'Test',
       'lumen.metadata.testFailed': 'Could not test metadata providers.',
       'lumen.metadata.title': 'Metadata Providers',
+      'lumen.metadata.help.video':
+        'Choose the metadata provider for TV and anime.',
+      'lumen.metadata.help.music':
+        'Set Cover Art Archive request limits and test both music providers.',
+      'lumen.metadata.help.books':
+        'Enter up to 50 comma-separated three-letter language codes, such as eng, fre, or ger. Leave blank to allow all languages. Restricted requests require a verified edition in an allowed language.',
+      'lumen.metadata.credential.comicVineApiKey': 'ComicVine API Key',
+      'lumen.metadata.credential.metronToken': 'Metron API Token',
+      'lumen.metadata.credential.googleBooksApiKey': 'Google Books API Key',
+      'lumen.metadata.credential.youtubeApiKey': 'YouTube Data API Key',
+      'lumen.metadata.loadingSettings': 'Loading settings…',
+      'lumen.metadata.loadFailedTitle': 'Could not load metadata settings.',
+      'lumen.metadata.credentialsLoadFailedTitle':
+        'Could not load metadata credentials.',
       'lumen.migration.addServiceFirst':
         'Add a BookshelfNG service in SeerrNG Service Settings to migrate its library.',
       'lumen.migration.allCurrentFolders': 'All Current Folders',
@@ -15390,6 +15982,8 @@ export const localeData = [
       'lumen.music.loadingMore': 'Loading more…',
       'lumen.music.noMatchingArtists': 'No matching artists.',
       'lumen.music.noReleases': 'No releases listed',
+      'lumen.music.showAll': 'Show All',
+      'lumen.music.showLess': 'Show Less',
       'lumen.music.nothingHere': 'Nothing here',
       'lumen.music.plays': '{count} plays',
       'lumen.music.releaseCountMany': '{count} releases',
@@ -15444,6 +16038,9 @@ export const localeData = [
       'lumen.music.tracks': 'Tracks',
       'lumen.music.useArtistText': 'Use Artist Text',
       'lumen.music.viewDiscography': 'View Discography',
+      'lumen.music.viewArtists': 'View Artists',
+      'lumen.music.albumArtist': 'Album Artist',
+      'lumen.music.trackArtist': 'Track Artist',
       'lumen.myMedia.catalogMatches': 'catalogue matches',
       'lumen.myMedia.couldNotLoad': 'Could not load {what}',
       'lumen.myMedia.enableWrites': 'Want to update tracking from My Media?',
@@ -16467,6 +17064,7 @@ export const localeData = [
       'lumen.tv.requestAnyway': 'Request Anyway',
       'lumen.tv.requestApproval': 'Request Approval',
       'lumen.tv.requestEntireSeries': 'Request entire series',
+      'lumen.tv.selectEntireSeries': 'Select entire series',
       'lumen.tv.requestMissingSeasons': 'Request {count} missing seasons',
       'lumen.tv.requestMoreSeasons': 'Request {count} more seasons',
       'lumen.tv.requestSeason': 'Request {count} season',
@@ -16476,6 +17074,7 @@ export const localeData = [
       'lumen.tv.requestedOn': 'on {date}',
       'lumen.tv.seasonCount': '{count} seasons',
       'lumen.tv.seasons': 'Seasons',
+      'lumen.tv.mediaServerDetails': 'Media Server',
       'lumen.tv.similar': 'Similar Series',
       'lumen.tv.specials': 'Specials',
       'lumen.tv.status.everySeasonOn': 'Every season on {server}',
@@ -16502,10 +17101,14 @@ export const localeData = [
       'lumen.tvEpisodeRequest.clearSelection': 'Clear Selection',
       'lumen.tvEpisodeRequest.close': 'Close',
       'lumen.tvEpisodeRequest.collapseAll': 'Collapse All',
+      'lumen.tvEpisodeRequest.deselectAll': 'Deselect all requestable episodes',
+      'lumen.tvEpisodeRequest.deselectSeason':
+        'Deselect all requestable episodes in {season}',
       'lumen.tvEpisodeRequest.empty': 'No episodes found.',
       'lumen.tvEpisodeRequest.episodeCount': '{count} episodes',
       'lumen.tvEpisodeRequest.episodes': 'episodes',
       'lumen.tvEpisodeRequest.expandAll': 'Expand All',
+      'lumen.tvEpisodeRequest.latestSeason': 'Latest Season',
       'lumen.tvEpisodeRequest.loadFailure': 'Could not load episodes',
       'lumen.tvEpisodeRequest.loadFailureBody':
         'Some season details could not be loaded.',
@@ -16519,6 +17122,12 @@ export const localeData = [
       'lumen.tvEpisodeRequest.season': 'Season',
       'lumen.tvEpisodeRequest.seasonNumber': 'Season {number}',
       'lumen.tvEpisodeRequest.seasonSelected': '{count} selected',
+      'lumen.tvEpisodeRequest.selectAll': 'Select all requestable episodes',
+      'lumen.tvEpisodeRequest.selectAllShort': 'Select All',
+      'lumen.tvEpisodeRequest.selectLatestSeason':
+        'Select all requestable episodes in the latest season',
+      'lumen.tvEpisodeRequest.selectSeason':
+        'Select all requestable episodes in {season}',
       'lumen.tvEpisodeRequest.selected': 'Selected: {count}',
       'lumen.tvEpisodeRequest.specials': 'Specials',
       'lumen.tvEpisodeRequest.submit': 'Request Selected Episodes',
@@ -16803,7 +17412,7 @@ export const localeData = [
       'lumen.status.statusUnavailable': 'Status unavailable',
       'lumen.status.differentEdition': 'Different edition in library',
       'lumen.status.on4kServer': '4K on {server}',
-      'lumen.status.overQuota': 'Over quota',
+      'lumen.status.overQuota': 'Over Quota',
       'lumen.requests.row.autoQueued': 'Auto-Queued',
       'lumen.requests.row.differentEditionDetail':
         'This book is in your library in another edition than the one requested.',
@@ -17718,6 +18327,117 @@ export const localeData = [
       'lumen.automaticBlocklist.limitHelp':
         'Enter a whole number from 0 to 250.',
       'lumen.automaticBlocklist.genreWhat': 'genres',
+      'lumen.music.requestQuotaReached': 'Music request quota reached.',
+      'lumen.music.requestsRemaining':
+        '{remaining} of {limit} music requests remaining.',
+      'lumen.issues.field.releaseDate': 'Release Date',
+      'lumen.issues.field.runtime': 'Runtime',
+      'lumen.issues.field.createdBy': 'Created By',
+      'lumen.issues.field.createdDate': 'Created Date',
+      'lumen.issues.field.description': 'Description',
+      'lumen.issues.field.type': 'Type',
+      'lumen.issues.field.affectedSeasons': 'Affected Seasons',
+      'lumen.issues.field.status': 'Status',
+      'lumen.issues.field.details': 'Details',
+      'lumen.issues.unavailable': 'Not available',
+      'lumen.issues.viewDiscussion': 'View Discussion',
+      'lumen.issues.field.firstPublished': 'First Published',
+      'lumen.issues.field.latestIssue': 'Latest Issue',
+      'lumen.issues.field.pages': 'Pages',
+      'lumen.issues.field.issues': 'Issues',
+      'lumen.issues.mediaUnavailable': 'Media information unavailable',
+      'lumen.availabilitySubscription.subscribe': 'Notify Me When Available',
+      'lumen.availabilitySubscription.unsubscribe':
+        'Stop Availability Notifications',
+      'lumen.availabilitySubscription.subscribed':
+        'You will be notified when this title is available.',
+      'lumen.availabilitySubscription.unsubscribed':
+        'Availability notifications are off.',
+      'lumen.availabilitySubscription.requestEnded':
+        'This title no longer has an active request from another user.',
+      'lumen.availabilitySubscription.updateFailed':
+        'Unable to update availability notifications. Please try again.',
+      'lumen.mediaServerCollections.title': '{server} Collections',
+      'lumen.mediaServerCollections.add': 'Add to {name}',
+      'lumen.mediaServerCollections.remove': 'Remove from {name}',
+      'lumen.mediaServerCollections.added': 'Added to {name}',
+      'lumen.mediaServerCollections.removed': 'Removed from {name}',
+      'lumen.mediaServerCollections.updateFailed':
+        'Could not confirm the collection change. Reload and retry.',
+      'lumen.mediaServerCollections.link': 'Link your {server} account first.',
+      'lumen.mediaServerCollections.permission':
+        'Your {server} account cannot manage collections.',
+      'lumen.mediaServerCollections.missing':
+        'This series is not in your accessible {server} library.',
+      'lumen.mediaServerCollections.limit':
+        'The {server} collection list is too large to show safely.',
+      'lumen.mediaServerCollections.unavailable':
+        'Collections are unavailable for this server.',
+      'lumen.mediaServerCollections.empty':
+        'Create a collection in {server} first.',
+      'lumen.mediaServerCollections.loading': 'Loading collections…',
+      'lumen.mediaServerCollections.loadFailed':
+        'Collections could not be loaded or confirmed.',
+      'lumen.mediaServerCollections.retry': 'Reload collections',
+      'lumen.tv.episodeQueue.off': 'Episode Queue · off · managed by admin',
+      'lumen.tv.episodeQueue.one': 'Episode Queue · 1 episode set by admin',
+      'lumen.tv.episodeQueue.many':
+        'Episode Queue · {count} episodes set by admin',
+      'lumen.videoPlayback.open': 'Playback Options',
+      'lumen.videoPlayback.title': 'Play Movie',
+      'lumen.videoPlayback.quality4k': 'Playback quality: 4K',
+      'lumen.videoPlayback.qualityHd': 'Playback quality: HD',
+      'lumen.videoPlayback.catalog': 'Playable Movie',
+      'lumen.videoPlayback.catalogFailure': 'Couldn’t Load Playback Item',
+      'lumen.videoPlayback.devices': 'Playback Devices',
+      'lumen.videoPlayback.devicesFailure': 'Couldn’t Load Playback Devices',
+      'lumen.videoPlayback.retry': 'Retry',
+      'lumen.videoPlayback.unavailable':
+        'No playable movie is available at this quality.',
+      'lumen.videoPlayback.loadingDevices': 'Loading playback devices…',
+      'lumen.videoPlayback.device': 'Device',
+      'lumen.videoPlayback.chooseDevice': 'Choose…',
+      'lumen.videoPlayback.starting': 'Starting…',
+      'lumen.videoPlayback.playOnDevice': 'Play on Device',
+      'lumen.videoPlayback.noDevices':
+        'No active, authorized playback devices are available.',
+      'lumen.videoPlayback.deviceFailure':
+        'Playback could not be started. Check the selected device.',
+      'lumen.videoPlayback.playlistFailure':
+        'Could not create a playback playlist.',
+      'lumen.videoPlayback.started': 'Playback started on {device}.',
+      'lumen.videoPlayback.playlistWarning':
+        'Creating a playlist replaces the media server’s Current Selection playlist.',
+      'lumen.videoPlayback.creating': 'Creating…',
+      'lumen.videoPlayback.createPlaylist': 'Create Playback Playlist',
+      'lumen.videoPlayback.openPlaylist': 'Open on Media Server',
+      'lumen.videoPlayback.close': 'Close',
+      'lumen.videoPlayback.invalidDevices':
+        'Playback devices could not be verified.',
+      'lumen.videoPlayback.seriesTitle': 'Play Series',
+      'lumen.videoPlayback.catalogSeries': 'Playable Episodes',
+      'lumen.videoPlayback.invalidCatalog':
+        'Playback items could not be verified.',
+      'lumen.videoPlayback.episodes': 'Episodes',
+      'lumen.videoPlayback.episodesUnavailable':
+        'No playable episodes are available at this quality.',
+      'lumen.videoPlayback.selectEpisode':
+        'Select at least one playable episode.',
+      'lumen.videoPlayback.selectSeason': 'Select all episodes from {season}',
+      'lumen.issues.openIssues': 'Open Issues',
+      'lumen.tvAvailability.title': 'Episode Availability',
+      'lumen.tvAvailability.seasonLabel': 'Availability Season',
+      'lumen.tvAvailability.what': 'episode availability',
+      'lumen.tvAvailability.loadFailure': 'Could not load episode availability',
+      'lumen.tvAvailability.retry': 'Retry',
+      'lumen.tvAvailability.loading': 'Loading episodes…',
+      'lumen.tvAvailability.empty': 'No episodes found.',
+      'lumen.tvAvailability.noVisibleFile': 'No visible file reported',
+      'lumen.tvAvailability.noFile': 'No file reported',
+      'lumen.tvAvailability.sourceHd': '{source} HD',
+      'lumen.tvAvailability.source4k': '{source} 4K',
+      'lumen.tvAvailability.sharedHd': 'Shared HD',
+      'lumen.tvAvailability.shared4k': 'Shared 4K',
     },
   },
   {
@@ -17998,17 +18718,39 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Σύνολο αιτημάτων',
       'components.Settings.SettingsAbout.uptodate': 'Ενημερωμένο',
       'components.Settings.SettingsAbout.version': 'Έκδοση',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Συγχρονισμός διαθεσιμότητας περιεχομένου',
       'components.Settings.SettingsJobsCache.cachehits': 'Κλήσεις',
       'components.Settings.SettingsJobsCache.cachekeys': 'Σύνολο κλειδιών',
       'components.Settings.SettingsJobsCache.cachemisses': 'Χαμένες',
       'components.Settings.SettingsJobsCache.canceljob': 'Ακύρωση Εργασίας',
       'components.Settings.SettingsJobsCache.command': 'Εντολή',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Λήψη συγχρονισμού',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Επαναρύθμιση Λήψης Συγχρονισμού',
       'components.Settings.SettingsJobsCache.flushcache':
         'Εκκαθάριση κρυφής μνήμης',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Καθαρισμός cached εικόνων',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Οι εικόνες έγιναν cache',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Σάρωση πλήρους βιβλιοθήκης Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Σάρωση Jellyfin για μέσα που προστέθηκαν πρόσφατα',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Το Seerr εκτελεί ορισμένες εργασίες συντήρησης ως τακτικά προγραμματισμένες εργασίες, αλλά μπορούν επίσης να ενεργοποιηθούν χειροκίνητα παρακάτω. Η χειροκίνητη εκτέλεση μιας εργασίας δεν θα αλλάξει το χρονοδιάγραμμα του.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Σάρωση πλήρους βιβλιοθήκης Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Σάρωση Plex για μέσα που προστέθηκαν πρόσφατα',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Συγχρονισμός λίστας παρακολούθησης Plex',
       'components.Settings.SettingsJobsCache.process': 'Διεργασία',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Σάρωση Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Τρέξε τώρα',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Σάρωση Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Αντιγράφηκε το μήνυμα καταγραφής στο πρόχειρο.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -18144,6 +18886,7 @@ export const localeData = [
       'i18n.next': 'Επόμενο',
       'i18n.previous': 'Προηγούμενο',
       'i18n.usersettings': 'Ρυθμίσεις χρήστη',
+      'components.IssueModal.issueOther': 'Άλλο',
     },
   },
   {
@@ -18912,6 +19655,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'Serie',
       'components.Settings.SettingsCategories.tvDescription':
         'Permitir el descubrimiento de series y solicitudes.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr Escaneo de Escenas para Adultos',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Sincronización de la disponibilidad de medios',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'Escaneo de cómics BackIssue',
       'components.Settings.SettingsJobsCache.cachehits': 'Consultas',
       'components.Settings.SettingsJobsCache.cachekeys': 'Claves Totales',
       'components.Settings.SettingsJobsCache.cachemisses': 'Fallos',
@@ -18922,15 +19671,74 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Caché DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Aciertos',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Fallos',
+      'components.Settings.SettingsJobsCache.download-recovery':
+        'Descargar Recuperación',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Descarga Sincronizada',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Reiniciar Descarga Sincronizada',
       'components.Settings.SettingsJobsCache.enabled': 'Activado',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'Sincronización de lista de solicitudes externas',
       'components.Settings.SettingsJobsCache.failures': 'Fallos',
       'components.Settings.SettingsJobsCache.flushcache': 'Vaciar Caché',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'Sincronización de intereses seguidos',
       'components.Settings.SettingsJobsCache.hitRate': 'Tasa de aciertos',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Limpieza de la caché de imágenes',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Imágenes en caché',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Fallbacks IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Escaneo Completo de la libreria de Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Escanear Añadidos Recientemente de Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'Cola de episodios solicitados',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr realiza ciertas tareas de mantenimiento como empleos programados regularmente, pero también se pueden activar manualmente a continuación. Manejo manual de un trabajo no alterará su horario.',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Escaneo de cómics de Kapowarr',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Escaneo Lidarr',
+      'components.Settings.SettingsJobsCache.live-tv-sync':
+        'Sincronización de TV en directo',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'Escaneo de revistas LazyLibrarian',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'Cola de películas de una colección',
+      'components.Settings.SettingsJobsCache.mylar-scan':
+        'Escaneo de cómics de Mylar',
+      'components.Settings.SettingsJobsCache.navidrome-scan':
+        'Escaneo de Navidrome',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Escaneo Completo de la Biblioteca de Plex',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Análisis de reproducción de Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Escaneo de Recien Añadidos de Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Token de actualización Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Sincronización de la lista de seguimiento de Plex',
       'components.Settings.SettingsJobsCache.process': 'Procesamiento',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Procesar etiquetas bloqueadas',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Escaneo de Radarr',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf Solicitud Retry',
+      'components.Settings.SettingsJobsCache.readarr-scan':
+        'Escaneo de estanterías',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'Sincronización de colección Kobo de BookOrbit',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'Historia del calendario de lanzamiento',
       'components.Settings.SettingsJobsCache.runnow': 'Ejecutar Ahora',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'Solicitud de software',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Escaneo de Sonarr',
+      'components.Settings.SettingsJobsCache.soulseek-sync':
+        'Sincronización de Soulseek',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Copiar log al portapapeles.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -19848,6 +20656,23 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'macOS',
       'components.SoftwareCatalog.releaseYearFilter': 'Año de lanzamiento',
       'components.SoftwareCatalog.windows': 'Windows',
+      'components.RequestModal.Music.requestmusic': 'Solicitar música',
+      'components.RequestModal.Music.backendRequestFailed':
+        'La solicitud se envió, pero Lidarr la rechazó durante el procesamiento.',
+      'components.RequestModal.Music.requesterror':
+        'Algo fue mal al realizar la solicitud.',
+      'components.IssueList.IssueItem.issuereason': 'Razón',
+      'components.IssueModal.issueReasonMissingContent': 'Falta de contenido',
+      'components.IssueModal.issueReasonMissingIssue': 'Número faltante',
+      'components.IssueModal.issueReasonWrongEdition':
+        'Edición o variante incorrecta',
+      'components.IssueModal.issueReasonWrongIssue':
+        'Número equivocado o fecha',
+      'components.IssueModal.issueReasonDamagedFile':
+        'Archivo dañado o no legible',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'Título incorrecto o metadatos',
+      'components.IssueModal.issueOther': 'Otro',
     },
   },
   {
@@ -20602,6 +21427,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'Serie',
       'components.Settings.SettingsCategories.tvDescription':
         'Permitir el descubrimiento de series y solicitudes.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr Escaneo de Escenas para Adultos',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Sincronización de la disponibilidad de medios',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'Escaneo de cómics de números atrasados',
       'components.Settings.SettingsJobsCache.cachehits': 'Consultas',
       'components.Settings.SettingsJobsCache.cachekeys': 'Claves Totales',
       'components.Settings.SettingsJobsCache.cachemisses': 'Fallos',
@@ -20612,15 +21443,74 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Caché DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Golpes',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'falla',
+      'components.Settings.SettingsJobsCache.download-recovery':
+        'Descargar Recuperación',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Descarga Sincronizada',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Reiniciar Descarga Sincronizada',
       'components.Settings.SettingsJobsCache.enabled': 'Activado',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'Sincronización de lista de solicitudes externas',
       'components.Settings.SettingsJobsCache.failures': 'Fallos',
       'components.Settings.SettingsJobsCache.flushcache': 'Vaciar Caché',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'Sincronización de intereses seguidos',
       'components.Settings.SettingsJobsCache.hitRate': 'Tasa de crecimiento',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Limpieza de la caché de imágenes',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Imágenes en caché',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Reservas de IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin Escaneo completo de la biblioteca',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin recientemente Añadido escán',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'Cola de episodios solicitados',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr realiza ciertas tareas de mantenimiento como empleos programados regularmente, pero también se pueden activar manualmente a continuación. Manejo manual de un trabajo no alterará su horario.',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Escaneo de cómics de Kapowarr',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Escaneo Lidarr',
+      'components.Settings.SettingsJobsCache.live-tv-sync':
+        'Sincronización de TV en vivo',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'Escaneo de la revista LazyLibrarian',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'Cola de películas de una colección',
+      'components.Settings.SettingsJobsCache.mylar-scan':
+        'Escaneo de cómics de Mylar',
+      'components.Settings.SettingsJobsCache.navidrome-scan':
+        'Escaneo de Navidrome',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Escaneo Completo de la Biblioteca de Plex',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Análisis de reproducción de Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Escaneo de Recien Añadidos de Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Token de actualización Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Sincronización de la lista de seguimiento de Plex',
       'components.Settings.SettingsJobsCache.process': 'Procesamiento',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Procesar etiquetas bloqueadas',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Escaneo de Radarr',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf Solicitud Retry',
+      'components.Settings.SettingsJobsCache.readarr-scan':
+        'Escaneo de estantería',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'Sincronización de colección Kobo de BookOrbit',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'Historia del calendario de lanzamiento',
       'components.Settings.SettingsJobsCache.runnow': 'Ejecutar Ahora',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'Solicitud de software',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Escaneo de Sonarr',
+      'components.Settings.SettingsJobsCache.soulseek-sync':
+        'Sincronización de búsqueda de almas',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Copiar log al portapapeles.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -21537,6 +22427,23 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'macOS',
       'components.SoftwareCatalog.releaseYearFilter': 'Año de lanzamiento',
       'components.SoftwareCatalog.windows': 'Windows',
+      'components.RequestModal.Music.requestmusic': 'Solicitud de música',
+      'components.RequestModal.Music.backendRequestFailed':
+        'La solicitud fue presentada, pero Lidarr lo rechazó durante el procesamiento.',
+      'components.RequestModal.Music.requesterror':
+        'Algo fue mal al realizar la solicitud.',
+      'components.IssueList.IssueItem.issuereason': 'Razón',
+      'components.IssueModal.issueReasonMissingContent': 'Falta de contenido',
+      'components.IssueModal.issueReasonMissingIssue': 'Falta de problemas',
+      'components.IssueModal.issueReasonWrongEdition':
+        'Edición o variante incorrecta',
+      'components.IssueModal.issueReasonWrongIssue':
+        'Número equivocado o fecha',
+      'components.IssueModal.issueReasonDamagedFile':
+        'Archivo dañado o no legible',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'Título incorrecto o metadatos',
+      'components.IssueModal.issueOther': 'Otro',
     },
   },
   {
@@ -21885,6 +22792,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Taotlusi kokku',
       'components.Settings.SettingsAbout.uptodate': 'Ajakohane',
       'components.Settings.SettingsAbout.version': 'Versioon',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Meedia saadavuse sünkroonimine',
       'components.Settings.SettingsJobsCache.cachehits': 'Tabamused',
       'components.Settings.SettingsJobsCache.cachekeys': 'Võtmeid kokku',
       'components.Settings.SettingsJobsCache.cachemisses': 'Möödalasud',
@@ -21893,15 +22802,39 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS-puhver',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Tabamused',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Möödalasud',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Allalaadimiste sünkroonimine',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Allalaadimiste sünkroonimise lähtestamine',
       'components.Settings.SettingsJobsCache.failures': 'Ebaõnnestumised',
       'components.Settings.SettingsJobsCache.flushcache': 'Tühjenda puhver',
       'components.Settings.SettingsJobsCache.hitRate': 'Tabamuste määr',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Pildipuhvri puhastus',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Puhverdatud pilte',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks':
         'IPv4-varulahendused',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfini täielik meediakogu skannimine',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfini viimati lisatud sisu skannimine',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr viib regulaarselt läbi hooldustöid, kuid neid saab ka allpool käsitsi käivitada. Töö käsitsi käivitamine ei muuda selle ajakava.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plexi täielik meediakogu skannimine',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plexi viimati lisatud sisu skannimine',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plexi värskendustõend (token)',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plexi sooviloendi sünkroonimine',
       'components.Settings.SettingsJobsCache.process': 'Protsess',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Töötle mustas nimekirjas olevaid silte',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarri skannimine',
       'components.Settings.SettingsJobsCache.runnow': 'Käivita kohe',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarri skannimine',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Logiteade on kopeeritud lõikelauale.',
       'components.Settings.SettingsLogs.copyToClipboard': 'Kopeeri lõikelauale',
@@ -22159,6 +23092,7 @@ export const localeData = [
       'i18n.next': 'Järgmine',
       'i18n.previous': 'Eelmine',
       'i18n.usersettings': 'Kasutaja seaded',
+      'components.IssueModal.issueOther': 'Muu',
     },
   },
   {
@@ -22294,6 +23228,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Pyyntöjä yhteensä',
       'components.Settings.SettingsAbout.uptodate': 'Ajan tasalla',
       'components.Settings.SettingsAbout.version': 'Versio',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Median saatavuuden synkronointi',
       'components.Settings.SettingsJobsCache.cachehits': 'Osumia',
       'components.Settings.SettingsJobsCache.cachemisses': 'Huteja',
       'components.Settings.SettingsJobsCache.canceljob': 'Peruuta tehtävä',
@@ -22301,11 +23237,23 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS välimuisti',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Osumia',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Huteja',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Latauksien synkronointi',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Latauksien synkronoin',
       'components.Settings.SettingsJobsCache.failures': 'Virheitä',
       'components.Settings.SettingsJobsCache.flushcache': 'Tyhjennä välimuisti',
       'components.Settings.SettingsJobsCache.hitRate': 'Osumisprosentti',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Kuvavälimuistin tyhjennys',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Kuvia välimuistissa',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin kirjaston täydellinen skannaus',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin viimeksi lisättyjen skannaus',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Käsittele estolistatut tägit',
       'components.Settings.SettingsJobsCache.runnow': 'Käynnistä',
       'components.Settings.SettingsLogs.filterDebug': 'Vianhaku',
       'components.Settings.SettingsLogs.filterError': 'Virhe',
@@ -22374,6 +23322,7 @@ export const localeData = [
       'i18n.next': 'Seuraava',
       'i18n.previous': 'Edellinen',
       'i18n.usersettings': 'Käyttäjäasetukset',
+      'components.IssueModal.issueOther': 'Muu',
     },
   },
   {
@@ -23151,6 +24100,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'Séries',
       'components.Settings.SettingsCategories.tvDescription':
         'Permettre la découverte et les demandes de séries.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr Scan de scènes pour adultes',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Synchronisation de la disponibilité des médias',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'Scannage BD de BackIssue',
       'components.Settings.SettingsJobsCache.cachehits': 'Succès',
       'components.Settings.SettingsJobsCache.cachekeys': 'Clés',
       'components.Settings.SettingsJobsCache.cachemisses': 'Manquées',
@@ -23160,14 +24115,72 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Succès',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Manquées',
+      'components.Settings.SettingsJobsCache.download-recovery':
+        'Télécharger la récupération',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Synchronisation des téléchargements',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Reset de la synchronisation des téléchargements',
       'components.Settings.SettingsJobsCache.enabled': 'Activé',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'Synchronisation de la liste de demandes externe',
       'components.Settings.SettingsJobsCache.failures': 'Échecs',
       'components.Settings.SettingsJobsCache.flushcache': 'Vider le cache',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'Synchronisation des intérêts suivis',
       'components.Settings.SettingsJobsCache.hitRate': 'Taux de succès',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        "Nettoyage du cache d'images",
       'components.Settings.SettingsJobsCache.imagecachecount': 'images',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Recours à IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Analyse complète des bibliothèques Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Analyse des ajouts récents aux bibliothèques Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        "File d'attente des épisodes demandés",
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        "Seerr effectue régulièrement certaines des tâches de maintenance de manière planifiée, mais elles peuvent également être déclenchées manuellement ci-dessous. L'exécution manuelle d'une tâche ne modifiera pas sa planification.",
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Scannage des comics Kapowarr',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Scan Lidarr',
+      'components.Settings.SettingsJobsCache.live-tv-sync':
+        'Synchronisation TV en direct',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'Scannage du magazine LazyLibrarian',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'File d’attente des collections de films',
+      'components.Settings.SettingsJobsCache.mylar-scan':
+        'Scannage des comiques Mylar',
+      'components.Settings.SettingsJobsCache.navidrome-scan': 'Scan Navidrome',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Analyse complète des bibliothèques Plex',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Analyse de lecture Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Analyse des ajouts récents Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Actualiser le token Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Synchronisation de la liste de suivi Plex',
       'components.Settings.SettingsJobsCache.process': 'Processus',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Traiter les tags bloqués',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Analyse de Radarr',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        "Nouvelle tentative de demande d'étagère",
+      'components.Settings.SettingsJobsCache.readarr-scan':
+        "Numérisation d'étagère",
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'Synchronisation de la collection Kobo BookOrbit',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'Historique du calendrier de publication',
       'components.Settings.SettingsJobsCache.runnow': 'Exécuter',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'Rapprochement des demandes de logiciels',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Analyse de Sonarr',
+      'components.Settings.SettingsJobsCache.soulseek-sync':
+        "Synchronisation de recherche d'âme",
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Message journal copié dans le presse-papiers.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -24083,6 +25096,22 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'MACOS',
       'components.SoftwareCatalog.releaseYearFilter': 'Année de sortie',
       'components.SoftwareCatalog.windows': 'Fenêtres',
+      'components.RequestModal.Music.requestmusic': 'Demander de la musique',
+      'components.RequestModal.Music.backendRequestFailed':
+        "La demande a été présentée, mais Lidarr l'a rejetée pendant le traitement.",
+      'components.RequestModal.Music.requesterror':
+        "Une erreur s'est produite lors de la demande.",
+      'components.IssueList.IssueItem.issuereason': 'Motif',
+      'components.IssueModal.issueReasonMissingContent': 'Contenu manquant',
+      'components.IssueModal.issueReasonMissingIssue': 'Numéro manquant',
+      'components.IssueModal.issueReasonWrongEdition':
+        'Mauvaise édition ou variante',
+      'components.IssueModal.issueReasonWrongIssue': 'Mauvais numéro ou date',
+      'components.IssueModal.issueReasonDamagedFile':
+        'Fichier endommagé ou illisible',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'Titre ou métadonnées incorrects',
+      'components.IssueModal.issueOther': 'Autre',
       'components.IssueDetails.allepisodes': 'Tous les épisodes',
       'components.Layout.Sidebar.comingSoon': 'À venir',
       'components.Layout.Sidebar.watchSessions': 'Séances de visionnage',
@@ -24188,6 +25217,7 @@ export const localeData = [
         'Le serveur a mis trop de temps à répondre. Réessayez.',
       'lumen.account.loadUnknownFailure':
         'Impossible de charger ces informations.',
+      'lumen.account.loading': 'Chargement…',
       'lumen.account.loadingPasswordSettings':
         'Chargement des paramètres du mot de passe…',
       'lumen.account.loadingProfileSettings':
@@ -24218,6 +25248,7 @@ export const localeData = [
       'lumen.account.profileSaveMismatch':
         'SeerrNG a enregistré des valeurs différentes. Vérifiez le profil mis à jour.',
       'lumen.account.retry': 'Réessayer',
+      'lumen.account.selectedCount': '{count} sélectionnés',
       'lumen.account.saveCardTitles': 'Enregistrer les titres des affiches',
       'lumen.account.savePassword': 'Enregistrer le mot de passe',
       'lumen.account.saveStreamingSubscriptions':
@@ -24297,6 +25328,7 @@ export const localeData = [
       'lumen.actions.searchProwlarr': 'Rechercher avec Prowlarr',
       'lumen.admin.administrationCategories': 'Catégories d’administration',
       'lumen.admin.allSettingsTools': 'Tous les paramètres et outils',
+      'lumen.admin.back': 'Retour à l’administration',
       'lumen.admin.dest.4k': 'Demandes 4K',
       'lumen.admin.dest.about': 'À propos de SeerrNG',
       'lumen.admin.dest.apiKey': 'Clé API de l’application',
@@ -24330,6 +25362,10 @@ export const localeData = [
       'lumen.admin.dest.overrideRules': 'Règles de remplacement des demandes',
       'lumen.admin.dest.prowlarr': 'Paramètres Prowlarr',
       'lumen.admin.dest.quotas': 'Quotas de demande par défaut',
+      'lumen.admin.dest.requestDefaults': 'Paramètres par défaut des demandes',
+      'lumen.admin.dest.defaultPermissions':
+        'Autorisations par défaut des utilisateurs',
+      'lumen.admin.dest.defaultCategories': 'Catégories utilisateur par défaut',
       'lumen.admin.dest.radarr': 'Services Radarr',
       'lumen.admin.dest.readerDelivery': 'Distribution aux lecteurs',
       'lumen.admin.dest.readmeabook': 'Paramètres ReadMeABook',
@@ -24774,6 +25810,8 @@ export const localeData = [
       'lumen.adminJobs.frequency.seconds.one': 'Toutes les {count} seconde',
       'lumen.adminJobs.frequency.seconds.other': 'Toutes les {count} secondes',
       'lumen.adminJobs.frequency.seconds.two': 'Toutes les {count} secondes',
+      'lumen.adminJobs.confirmFailure':
+        'Impossible de confirmer l’enregistrement du planning. Réessayez.',
       'lumen.adminJobs.goBack': 'Retour',
       'lumen.adminJobs.idle': 'Inactive',
       'lumen.adminJobs.loading': 'Chargement des tâches planifiées…',
@@ -24782,6 +25820,7 @@ export const localeData = [
       'lumen.adminJobs.running': 'En cours',
       'lumen.adminJobs.saveSchedule': 'Enregistrer le planning',
       'lumen.adminJobs.scheduledJobs': 'tâches planifiées',
+      'lumen.adminJobs.scheduleSaved': 'Planning enregistré.',
       'lumen.adminJobs.systemCaches': 'Caches système',
       'lumen.adminJobs.title': 'Tâches planifiées',
       'lumen.adminJobs.updateFailure':
@@ -26048,6 +27087,26 @@ export const localeData = [
       'lumen.detail.folder': 'Dossier',
       'lumen.detail.ignoreQuota': 'Ignorer le quota de demandes',
       'lumen.detail.keepOpen': 'Garder « {label} » ouvert',
+      'lumen.detail.movieDetails': 'Détails du film',
+      'lumen.detail.movieDetailsPreference': 'détails du film',
+      'lumen.movie.collection': 'Collection',
+      'lumen.movie.collectionSize': 'Nombre de films : {count}',
+      'lumen.movie.collectionLoading':
+        'Chargement des détails de la collection…',
+      'lumen.movie.collectionLoadFailed':
+        'Impossible de charger les détails de la collection.',
+      'lumen.detail.tvDetails': 'Détails de la série',
+      'lumen.detail.tvDetailsPreference': 'détails de la série',
+      'lumen.detail.bookDetails': 'Détails du livre',
+      'lumen.detail.bookDetailsPreference': 'détails du livre',
+      'lumen.detail.albumDetails': 'Détails de l’album',
+      'lumen.detail.albumDetailsPreference': 'détails de l’album',
+      'lumen.detail.artistListPreference': 'liste d’artistes',
+      'lumen.detail.collectionPreference': 'collection',
+      'lumen.bookDetail.collectionTitle': 'Collection',
+      'lumen.bookDetail.collectionSize':
+        'Taille de la collection : {count} livres',
+      'lumen.bookDetail.loadingCollection': 'Chargement de la collection…',
       'lumen.detail.languageProfile': 'Profil linguistique',
       'lumen.detail.loadingServers': 'Chargement des serveurs…',
       'lumen.detail.me': 'Moi',
@@ -26056,6 +27115,8 @@ export const localeData = [
       'lumen.detail.noServer':
         'Aucun serveur {service} à choisir ; SeerrNG utilise ses paramètres par défaut.',
       'lumen.detail.noSubjectTags': 'Aucun mot-clé.',
+      'lumen.detail.overview': 'Synopsis',
+      'lumen.detail.overviewPreference': 'synopsis',
       'lumen.detail.openFullCast': 'Voir toute la distribution',
       'lumen.detail.openFullCrew': 'Voir toute l’équipe',
       'lumen.detail.quality': 'Qualité',
@@ -26428,6 +27489,7 @@ export const localeData = [
       'lumen.gameLibrary.playing': 'En cours',
       'lumen.gameLibrary.previousPage': 'Page précédente',
       'lumen.gameLibrary.private': 'Privé',
+      'lumen.gameLibrary.privateGameLibrary': 'Bibliothèque de jeux privée',
       'lumen.gameLibrary.privateGameLibraryDescription':
         'Ajoutez-le à votre bibliothèque de jeux privée, puis suivez votre progression et choisissez de le partager ou non avec votre foyer.',
       'lumen.gameLibrary.privateLibrary': 'Bibliothèque privée',
@@ -26673,6 +27735,15 @@ export const localeData = [
         'Modifier la description du signalement',
       'lumen.issues.ep': 'EP',
       'lumen.issues.episode': 'Épisode {episode}',
+      'lumen.issues.episodesLoadError':
+        'Les détails des épisodes n’ont pas pu être chargés.',
+      'lumen.issues.retryEpisodes': 'Réessayer',
+      'lumen.issues.loadingEpisodes': 'Chargement des détails des épisodes…',
+      'lumen.issues.untitledEpisode': 'Épisode sans titre',
+      'lumen.issues.noEpisodeDetails':
+        'Aucun épisode correspondant n’a été trouvé.',
+      'lumen.issues.allSeasons': 'Toutes les saisons',
+      'lumen.issues.entireSeries': 'Série entière',
       'lumen.issues.episodes': 'Épisodes {episodes}',
       'lumen.issues.filter.filter': 'État du signalement',
       'lumen.issues.filter.issueType': 'Type de problème',
@@ -26680,11 +27751,23 @@ export const localeData = [
       'lumen.issues.filter.sort': 'Trier les signalements',
       'lumen.issues.filter.sortDirection': 'Sens du tri',
       'lumen.issues.filter.timeFrame': 'Signalé depuis',
+      'lumen.issues.group.filters': 'Filtres',
+      'lumen.issues.group.media': 'Filtres des médias',
+      'lumen.issues.group.sort': 'Trier par',
+      'lumen.issues.pinSaveFailed':
+        'Impossible d’enregistrer cette préférence d’affichage des filtres. Réessayez.',
+      'lumen.issues.group.task': 'Filtres des signalements',
       'lumen.issues.issue': 'Signalement',
       'lumen.issues.issues': 'Signalements',
       'lumen.issues.loading': 'Chargement des signalements…',
       'lumen.issues.loadingIssue': 'Chargement du signalement…',
       'lumen.issues.loadingTitle': 'Chargement du titre…',
+      'lumen.issues.runtimeMinutes': '{value} min',
+      'lumen.issues.pageCount': '{value} pages',
+      'lumen.issues.issueCount': '{value} numéros',
+      'lumen.issues.hideDetails': 'Masquer les détails',
+      'lumen.issues.viewDetails': 'Afficher les détails',
+      'lumen.issues.issueDetails': 'Détails du problème',
       'lumen.issues.media.album': 'Album',
       'lumen.issues.media.book': 'Livre',
       'lumen.issues.media.comic': 'Bande dessinée',
@@ -26788,6 +27871,7 @@ export const localeData = [
         'Impossible de démarrer la connexion OpenID Connect. Vérifiez la configuration du fournisseur et l’URL de SeerrNG.',
       'lumen.login.openFullSeerr': 'Ouvrir SeerrNG complet',
       'lumen.login.password': 'Mot de passe',
+      'lumen.login.plexLoading': 'Connexion à Plex en cours…',
       'lumen.login.quickGettingCode': 'Obtention d’un code…',
       'lumen.login.quickInstructions':
         'Dans {serverName}, ouvrez Paramètres → Quick Connect et saisissez ce code.',
@@ -27140,6 +28224,21 @@ export const localeData = [
       'lumen.metadata.testFailed':
         'Impossible de tester les fournisseurs de métadonnées.',
       'lumen.metadata.title': 'Fournisseurs de métadonnées',
+      'lumen.metadata.help.video':
+        'Choisissez le fournisseur de métadonnées pour la télévision et l’anime.',
+      'lumen.metadata.help.music':
+        'Définissez les limites de requêtes de Cover Art Archive et testez les deux fournisseurs de musique.',
+      'lumen.metadata.help.books':
+        'Saisissez jusqu’à 50 codes de langue de trois lettres, séparés par des virgules (par exemple eng, fre ou ger). Laissez vide pour autoriser toutes les langues. Les demandes restreintes exigent une édition vérifiée dans une langue autorisée.',
+      'lumen.metadata.credential.comicVineApiKey': 'Clé de l’API ComicVine',
+      'lumen.metadata.credential.metronToken': 'Jeton API Metron',
+      'lumen.metadata.credential.googleBooksApiKey': 'Clé API Google Books',
+      'lumen.metadata.credential.youtubeApiKey': 'Clé de l’API YouTube Data',
+      'lumen.metadata.loadingSettings': 'Chargement des paramètres…',
+      'lumen.metadata.loadFailedTitle':
+        'Impossible de charger les paramètres de métadonnées.',
+      'lumen.metadata.credentialsLoadFailedTitle':
+        'Impossible de charger les identifiants de métadonnées.',
       'lumen.migration.addServiceFirst':
         'Ajoutez un service BookshelfNG dans les paramètres des services SeerrNG pour migrer sa bibliothèque.',
       'lumen.migration.allCurrentFolders': 'Tous les dossiers actuels',
@@ -27273,6 +28372,8 @@ export const localeData = [
       'lumen.music.loadingMore': 'Chargement de la suite…',
       'lumen.music.noMatchingArtists': 'Aucun artiste correspondant.',
       'lumen.music.noReleases': 'Aucune sortie répertoriée',
+      'lumen.music.showAll': 'Tout afficher',
+      'lumen.music.showLess': 'Afficher moins',
       'lumen.music.nothingHere': 'Aucun résultat',
       'lumen.music.plays': '{count} écoutes',
       'lumen.music.releaseCountMany': '{count} sorties',
@@ -27328,6 +28429,9 @@ export const localeData = [
       'lumen.music.tracks': 'Pistes',
       'lumen.music.useArtistText': 'Utiliser le texte saisi',
       'lumen.music.viewDiscography': 'Voir la discographie',
+      'lumen.music.viewArtists': 'Voir les artistes',
+      'lumen.music.albumArtist': 'Artiste de l’album',
+      'lumen.music.trackArtist': 'Artiste du morceau',
       'lumen.myMedia.catalogMatches': 'résultats correspondants du catalogue',
       'lumen.myMedia.couldNotLoad': 'Impossible de charger {what}',
       'lumen.myMedia.enableWrites':
@@ -28432,6 +29536,7 @@ export const localeData = [
       'lumen.tv.requestAnyway': 'Demander quand même',
       'lumen.tv.requestApproval': 'Demander une approbation',
       'lumen.tv.requestEntireSeries': 'Demander toute la série',
+      'lumen.tv.selectEntireSeries': 'Sélectionner toute la série',
       'lumen.tv.requestMissingSeasons': 'Demander {count} saisons manquantes',
       'lumen.tv.requestMoreSeasons': 'Demander {count} saisons supplémentaires',
       'lumen.tv.requestSeason': 'Demander {count} saison',
@@ -28441,6 +29546,7 @@ export const localeData = [
       'lumen.tv.requestedOn': 'le {date}',
       'lumen.tv.seasonCount': '{count} saisons',
       'lumen.tv.seasons': 'Saisons',
+      'lumen.tv.mediaServerDetails': 'Serveur multimédia',
       'lumen.tv.similar': 'Séries similaires',
       'lumen.tv.specials': 'Épisodes spéciaux',
       'lumen.tv.status.everySeasonOn': 'Toutes les saisons sur {server}',
@@ -28467,10 +29573,15 @@ export const localeData = [
       'lumen.tvEpisodeRequest.clearSelection': 'Effacer la sélection',
       'lumen.tvEpisodeRequest.close': 'Fermer',
       'lumen.tvEpisodeRequest.collapseAll': 'Tout réduire',
+      'lumen.tvEpisodeRequest.deselectAll':
+        'Désélectionner tous les épisodes pouvant être demandés',
+      'lumen.tvEpisodeRequest.deselectSeason':
+        'Désélectionner tous les épisodes pouvant être demandés de {season}',
       'lumen.tvEpisodeRequest.empty': 'Aucun épisode trouvé.',
       'lumen.tvEpisodeRequest.episodeCount': '{count} épisodes',
       'lumen.tvEpisodeRequest.episodes': 'épisodes',
       'lumen.tvEpisodeRequest.expandAll': 'Tout développer',
+      'lumen.tvEpisodeRequest.latestSeason': 'Dernière saison',
       'lumen.tvEpisodeRequest.loadFailure':
         'Impossible de charger les épisodes',
       'lumen.tvEpisodeRequest.loadFailureBody':
@@ -28485,6 +29596,13 @@ export const localeData = [
       'lumen.tvEpisodeRequest.season': 'Saison',
       'lumen.tvEpisodeRequest.seasonNumber': 'Saison {number}',
       'lumen.tvEpisodeRequest.seasonSelected': '{count} sélectionnés',
+      'lumen.tvEpisodeRequest.selectAll':
+        'Sélectionner tous les épisodes pouvant être demandés',
+      'lumen.tvEpisodeRequest.selectAllShort': 'Tout sélectionner',
+      'lumen.tvEpisodeRequest.selectLatestSeason':
+        'Sélectionner tous les épisodes pouvant être demandés de la dernière saison',
+      'lumen.tvEpisodeRequest.selectSeason':
+        'Sélectionner tous les épisodes pouvant être demandés de {season}',
       'lumen.tvEpisodeRequest.selected': 'Sélection : {count}',
       'lumen.tvEpisodeRequest.specials': 'Épisodes spéciaux',
       'lumen.tvEpisodeRequest.submit': 'Demander les épisodes sélectionnés',
@@ -29769,6 +30887,126 @@ export const localeData = [
       'lumen.automaticBlocklist.limitHelp':
         'Saisissez un nombre entier de 0 à 250.',
       'lumen.automaticBlocklist.genreWhat': 'genres',
+      'lumen.music.requestQuotaReached':
+        'Le quota de demandes de musique est atteint.',
+      'lumen.music.requestsRemaining':
+        '{remaining} sur {limit} demandes de musique restantes.',
+      'lumen.issues.field.releaseDate': 'Date de sortie',
+      'lumen.issues.field.runtime': 'Durée',
+      'lumen.issues.field.createdBy': 'Créé par',
+      'lumen.issues.field.createdDate': 'Date de création',
+      'lumen.issues.field.description': 'Description',
+      'lumen.issues.field.type': 'Type',
+      'lumen.issues.field.affectedSeasons': 'Saisons concernées',
+      'lumen.issues.field.status': 'État',
+      'lumen.issues.field.details': 'Détails',
+      'lumen.issues.unavailable': 'Indisponible',
+      'lumen.issues.viewDiscussion': 'Voir la discussion',
+      'lumen.issues.field.firstPublished': 'Première publication',
+      'lumen.issues.field.latestIssue': 'Dernier numéro',
+      'lumen.issues.field.pages': 'Pages',
+      'lumen.issues.field.issues': 'Numéros',
+      'lumen.issues.mediaUnavailable':
+        'Informations sur le média indisponibles',
+      'lumen.availabilitySubscription.subscribe': "M'alerter quand disponible",
+      'lumen.availabilitySubscription.unsubscribe':
+        'Arrêter les notifications de disponibilité',
+      'lumen.availabilitySubscription.subscribed':
+        'Vous serez notifié(e) quand ce titre sera disponible.',
+      'lumen.availabilitySubscription.unsubscribed':
+        'Les notifications de disponibilité sont désactivées.',
+      'lumen.availabilitySubscription.requestEnded':
+        "Ce titre n'a plus de demande active d'un autre utilisateur.",
+      'lumen.availabilitySubscription.updateFailed':
+        'Impossible de mettre à jour les notifications de disponibilité. Veuillez réessayer.',
+      'lumen.mediaServerCollections.title': 'Collections {server}',
+      'lumen.mediaServerCollections.add': 'Ajouter à {name}',
+      'lumen.mediaServerCollections.remove': 'Retirer de {name}',
+      'lumen.mediaServerCollections.added': 'Ajouté à {name}',
+      'lumen.mediaServerCollections.removed': 'Retiré de {name}',
+      'lumen.mediaServerCollections.updateFailed':
+        'Impossible de confirmer le changement. Rechargez la liste et réessayez.',
+      'lumen.mediaServerCollections.link':
+        "Liez d'abord votre compte {server}.",
+      'lumen.mediaServerCollections.permission':
+        'Votre compte {server} ne peut pas gérer les collections.',
+      'lumen.mediaServerCollections.missing':
+        'Cette série est absente de votre bibliothèque {server} accessible.',
+      'lumen.mediaServerCollections.limit':
+        'La liste des collections {server} est trop volumineuse pour être affichée sans risque.',
+      'lumen.mediaServerCollections.unavailable':
+        'Les collections ne sont pas disponibles sur ce serveur.',
+      'lumen.mediaServerCollections.empty':
+        "Créez d'abord une collection sur {server}.",
+      'lumen.mediaServerCollections.loading': 'Chargement des collections…',
+      'lumen.mediaServerCollections.loadFailed':
+        'Impossible de charger ou de confirmer les collections.',
+      'lumen.mediaServerCollections.retry': 'Recharger les collections',
+      'lumen.tv.episodeQueue.off':
+        'File d’attente des épisodes · désactivée · gérée par l’administrateur',
+      'lumen.tv.episodeQueue.one':
+        'File d’attente des épisodes · 1 épisode défini par l’administrateur',
+      'lumen.tv.episodeQueue.many':
+        'File d’attente des épisodes · {count} épisodes définis par l’administrateur',
+      'lumen.videoPlayback.open': 'Options de lecture',
+      'lumen.videoPlayback.title': 'Lire le film',
+      'lumen.videoPlayback.quality4k': 'Qualité de lecture : 4K',
+      'lumen.videoPlayback.qualityHd': 'Qualité de lecture : HD',
+      'lumen.videoPlayback.catalog': 'Film lisible',
+      'lumen.videoPlayback.catalogFailure': 'Impossible de charger le média',
+      'lumen.videoPlayback.devices': 'Appareils de lecture',
+      'lumen.videoPlayback.devicesFailure':
+        'Impossible de charger les appareils de lecture',
+      'lumen.videoPlayback.retry': 'Réessayer',
+      'lumen.videoPlayback.unavailable':
+        'Aucun film lisible n’est disponible dans cette qualité.',
+      'lumen.videoPlayback.loadingDevices':
+        'Chargement des appareils de lecture…',
+      'lumen.videoPlayback.device': 'Appareil',
+      'lumen.videoPlayback.chooseDevice': 'Choisir…',
+      'lumen.videoPlayback.starting': 'Démarrage…',
+      'lumen.videoPlayback.playOnDevice': 'Lire sur l’appareil',
+      'lumen.videoPlayback.noDevices':
+        'Aucun appareil de lecture actif et autorisé n’est disponible.',
+      'lumen.videoPlayback.deviceFailure':
+        'Impossible de démarrer la lecture. Vérifiez l’appareil sélectionné.',
+      'lumen.videoPlayback.playlistFailure':
+        'Impossible de créer une liste de lecture.',
+      'lumen.videoPlayback.started': 'Lecture démarrée sur {device}.',
+      'lumen.videoPlayback.playlistWarning':
+        'La création d’une liste remplace la liste « Sélection actuelle » du serveur multimédia.',
+      'lumen.videoPlayback.creating': 'Création…',
+      'lumen.videoPlayback.createPlaylist': 'Créer une liste de lecture',
+      'lumen.videoPlayback.openPlaylist': 'Ouvrir sur le serveur multimédia',
+      'lumen.videoPlayback.close': 'Fermer',
+      'lumen.videoPlayback.invalidDevices':
+        'Impossible de vérifier les appareils de lecture.',
+      'lumen.videoPlayback.seriesTitle': 'Lire la série',
+      'lumen.videoPlayback.catalogSeries': 'Épisodes lisibles',
+      'lumen.videoPlayback.invalidCatalog':
+        'Impossible de vérifier les médias à lire.',
+      'lumen.videoPlayback.episodes': 'Épisodes',
+      'lumen.videoPlayback.episodesUnavailable':
+        'Aucun épisode lisible n’est disponible dans cette qualité.',
+      'lumen.videoPlayback.selectEpisode':
+        'Sélectionnez au moins un épisode lisible.',
+      'lumen.videoPlayback.selectSeason':
+        'Sélectionner tous les épisodes de {season}',
+      'lumen.issues.openIssues': 'Problèmes ouverts',
+      'lumen.tvAvailability.title': 'Disponibilité des épisodes',
+      'lumen.tvAvailability.seasonLabel': 'Saison pour la disponibilité',
+      'lumen.tvAvailability.what': 'disponibilité des épisodes',
+      'lumen.tvAvailability.loadFailure':
+        'Impossible de charger la disponibilité des épisodes',
+      'lumen.tvAvailability.retry': 'Réessayer',
+      'lumen.tvAvailability.loading': 'Chargement des épisodes…',
+      'lumen.tvAvailability.empty': 'Aucun épisode trouvé.',
+      'lumen.tvAvailability.noVisibleFile': 'Aucun fichier visible signalé',
+      'lumen.tvAvailability.noFile': 'Aucun fichier signalé',
+      'lumen.tvAvailability.sourceHd': '{source} HD',
+      'lumen.tvAvailability.source4k': '{source} 4K',
+      'lumen.tvAvailability.sharedHd': 'HD partagé',
+      'lumen.tvAvailability.shared4k': '4K partagé',
     },
   },
   {
@@ -30046,17 +31284,37 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Ukupno zahtjeva',
       'components.Settings.SettingsAbout.uptodate': 'Aktualno',
       'components.Settings.SettingsAbout.version': 'Verzija',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Sinkronizacija dostupnosti medija',
       'components.Settings.SettingsJobsCache.cachehits': 'Pogodci',
       'components.Settings.SettingsJobsCache.cachekeys': 'Ukupno ključeva',
       'components.Settings.SettingsJobsCache.cachemisses': 'Promašaji',
       'components.Settings.SettingsJobsCache.canceljob': 'Prekini zadatak',
       'components.Settings.SettingsJobsCache.command': 'Naredba',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Sinkronizacija preuzimanja',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Resetiraj sinkronizaciju preuzimanja',
       'components.Settings.SettingsJobsCache.flushcache':
         'Isprazni predmemoriju',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Brisanje predmemorije slika',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Slike spremljene u predmemoriju',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr obavlja određene zadatke održavanja kao redovito planirane zadatke, ali oni se također mogu dolje ručno pokrenuti. Ručno pokretanje zadatka neće promijeniti njegov plan.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Pretraživanje cijele Plex biblioteke',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Pretraživanje nedavno dodanih u Plex biblioteku',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Sinkronizacija Plex popisa gledanja',
       'components.Settings.SettingsJobsCache.process': 'Obrada',
+      'components.Settings.SettingsJobsCache.radarr-scan':
+        'Radarr pretraživanje',
       'components.Settings.SettingsJobsCache.runnow': 'Pokreni sada',
+      'components.Settings.SettingsJobsCache.sonarr-scan':
+        'Sonarr pretraživanje',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Poruka zapisnika je kopirana u međuspremnik.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -30192,6 +31450,7 @@ export const localeData = [
       'i18n.next': 'Dalje',
       'i18n.previous': 'Prethodno',
       'i18n.usersettings': 'Korisničke postavke',
+      'components.IssueModal.issueOther': 'Ostalo',
     },
   },
   {
@@ -30437,6 +31696,7 @@ export const localeData = [
       'components.Settings.SettingsNetwork.proxyHostname': 'שם מארח Proxy',
       'i18n.previous': 'קודם',
       'i18n.usersettings': 'הגדרות משתמש',
+      'components.IssueModal.issueOther': 'אחר',
     },
   },
   {
@@ -31172,6 +32432,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'श्रृंखला',
       'components.Settings.SettingsCategories.tvDescription':
         'श्रृंखला खोज और अनुरोध की अनुमति दें।',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr वयस्क सीन स्कैन',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'मीडिया उपलब्धता सिंक',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'BackIssue कॉमिक्स स्कैन',
       'components.Settings.SettingsJobsCache.cachehits': 'हिट',
       'components.Settings.SettingsJobsCache.cachekeys': 'कुल कुंजी',
       'components.Settings.SettingsJobsCache.cachemisses': 'मिस',
@@ -31181,14 +32447,66 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS कैश',
       'components.Settings.SettingsJobsCache.dnscachehits': 'हिट',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'मिस',
+      'components.Settings.SettingsJobsCache.download-recovery': 'रिकवरी',
+      'components.Settings.SettingsJobsCache.download-sync': 'Sync डाउनलोड',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Sync रीसेट डाउनलोड करें',
       'components.Settings.SettingsJobsCache.enabled': 'सक्षम',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'बाहरी अनुरोध सूची सिंक',
       'components.Settings.SettingsJobsCache.failures': 'विफलता',
       'components.Settings.SettingsJobsCache.flushcache': 'फ्लश कैश',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'फॉलो किए गए रुचि सिंक',
       'components.Settings.SettingsJobsCache.hitRate': 'हिट दर',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'छवि कैश क्लीनअप',
       'components.Settings.SettingsJobsCache.imagecachecount': 'तस्वीरें',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 फ़ॉलबैक',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin पूर्ण पुस्तकालय स्कैन',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin हाल ही में जोड़ा स्कैन',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'अनुरोधित एपिसोड कतार',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr नियमित रूप से अनुसूचित नौकरियों के रूप में कुछ रखरखाव कार्य करता है, लेकिन उन्हें मैन्युअल रूप से नीचे ट्रिगर किया जा सकता है। मैन्युअल रूप से एक नौकरी चलाने के अपने शेड्यूल में बदलाव नहीं होगा।',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Kapowarr कॉमिक्स स्कैन',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Lidarr स्कैन',
+      'components.Settings.SettingsJobsCache.live-tv-sync': 'लाइव टीवी सिंक',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'LazyLibrarian पत्रिका स्कैन',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'फ़िल्म संग्रह कतार',
+      'components.Settings.SettingsJobsCache.mylar-scan': 'Mylar कॉमिक्स स्कैन',
+      'components.Settings.SettingsJobsCache.navidrome-scan': 'Navidrome स्कैन',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plex पूर्ण पुस्तकालय स्कैन',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Plex प्लेबैक विश्लेषण',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'हाल ही में Plex जोड़ा गया स्कैन',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex ताज़ा टोकन',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex वॉचलिस्ट सिंक',
       'components.Settings.SettingsJobsCache.process': 'प्रक्रिया',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'ब्लॉकलिस्ट टैग संसाधित करें',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr स्कैन',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'बुकशेल्फ़ अनुरोध पुनः प्रयास करें',
+      'components.Settings.SettingsJobsCache.readarr-scan': 'बुकशेल्फ़ स्कैन',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'BookOrbit Kobo संग्रह सिंक',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'रिलीज कैलेंडर इतिहास',
       'components.Settings.SettingsJobsCache.runnow': 'अब चलायें',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'सॉफ्टवेयर अनुरोध पारस्परिकता',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr स्कैन',
+      'components.Settings.SettingsJobsCache.soulseek-sync': 'सोलसीक सिंक',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Copied लॉग संदेश क्लिपबोर्ड करने के लिए।',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -32080,6 +33398,21 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'MacOS',
       'components.SoftwareCatalog.releaseYearFilter': 'रिलीज वर्ष',
       'components.SoftwareCatalog.windows': 'विंडोज',
+      'components.RequestModal.Music.requestmusic': 'संगीत अनुरोध',
+      'components.RequestModal.Music.backendRequestFailed':
+        'अनुरोध प्रस्तुत किया गया था, लेकिन Lidarr प्रसंस्करण के दौरान इसे खारिज कर दिया गया।',
+      'components.RequestModal.Music.requesterror':
+        'अनुरोध प्रस्तुत करते समय कुछ गलत हो गया।',
+      'components.IssueList.IssueItem.issuereason': 'कारण',
+      'components.IssueModal.issueReasonMissingContent': 'लापता सामग्री',
+      'components.IssueModal.issueReasonMissingIssue': 'अंक गायब',
+      'components.IssueModal.issueReasonWrongEdition': 'गलत संस्करण या वैरिएंट',
+      'components.IssueModal.issueReasonWrongIssue': 'गलत अंक या तारीख',
+      'components.IssueModal.issueReasonDamagedFile':
+        'क्षतिग्रस्त या अपठनीय फ़ाइल',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'गलत शीर्षक या मेटाडाटा',
+      'components.IssueModal.issueOther': 'अन्य',
     },
   },
   {
@@ -32429,6 +33762,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Összes kérés',
       'components.Settings.SettingsAbout.uptodate': 'Naprakész',
       'components.Settings.SettingsAbout.version': 'Verzió',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Média elérhetőség szinkronizálása',
       'components.Settings.SettingsJobsCache.cachehits': 'Találatok',
       'components.Settings.SettingsJobsCache.cachekeys': 'Összes "API lékérés"',
       'components.Settings.SettingsJobsCache.cachemisses': 'Hiányzók',
@@ -32437,14 +33772,38 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS-gyorsítótár',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Találatok',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Hiányzók',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Letöltési szinkron',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Letöltési szinkron visszaállítása',
       'components.Settings.SettingsJobsCache.failures': 'Hibák',
       'components.Settings.SettingsJobsCache.flushcache': 'Gyorsítótár ürítése',
       'components.Settings.SettingsJobsCache.hitRate': 'Találati arány',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Képgyorsítótár tisztítása',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Képek gyorsítótárban',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 tartalék',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin összes könyvtárának beolvasása',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin "nemrégiben hozzáadott" beolvasása',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'A Seerr bizonyos karbantartási feladatokat rendszeresen ütemezett feladatként végez, de ezeket az alábbiakban kézzel is elindíthatja. Egy feladat kézi futtatása nem változtatja meg annak ütemezését.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plex összes könyvtárának beolvasása',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex "nemrégiben hozzáadott" beolvasása',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex Token frissítése',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex figyelőlista szinkronizálása',
       'components.Settings.SettingsJobsCache.process': 'Folyamat',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Tiltólistázott címkék feldolgozása',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr szkennelés',
       'components.Settings.SettingsJobsCache.runnow': 'Futtatás most',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr szkennelés',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Naplóüzenet másolása a vágólapra.',
       'components.Settings.SettingsLogs.copyToClipboard': 'Másolás a vágólapra',
@@ -32713,6 +34072,7 @@ export const localeData = [
       'i18n.next': 'Következő',
       'i18n.previous': 'Előző',
       'i18n.usersettings': 'Felhasználói beállítások',
+      'components.IssueModal.issueOther': 'Egyéb',
     },
   },
   {
@@ -33455,6 +34815,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'Serial',
       'components.Settings.SettingsCategories.tvDescription':
         'Ijinkan serangkaian penemuan dan permintaan.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr Pindai Scene Dewasa',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Sinkronisasi Ketersediaan Media',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'Pindai ReckIssue Comics',
       'components.Settings.SettingsJobsCache.cachehits': 'Pukulan',
       'components.Settings.SettingsJobsCache.cachekeys': 'Total Kunci',
       'components.Settings.SettingsJobsCache.cachemisses': 'Hilang',
@@ -33464,14 +34830,70 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Pukulan',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Hilang',
+      'components.Settings.SettingsJobsCache.download-recovery':
+        'Unduh Pemulihan',
+      'components.Settings.SettingsJobsCache.download-sync': 'Unduh Selaraskan',
+      'components.Settings.SettingsJobsCache.download-sync-reset': 'undo-type',
       'components.Settings.SettingsJobsCache.enabled': 'Diaktifkan',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'Sinkronisasi Daftar Permintaan Eksternal',
       'components.Settings.SettingsJobsCache.failures': 'Gagal',
       'components.Settings.SettingsJobsCache.flushcache': 'Quush Cache',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'Sinkronisasi Minat yang Diikuti',
       'components.Settings.SettingsJobsCache.hitRate': 'Laju Tekan',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Pembersih Cache Gambar',
       'components.Settings.SettingsJobsCache.imagecachecount': 'Cache Gambar',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Fallbacks IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Pindai Pustaka Penuh Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin Yang Terkini Ditambahkan Pindai',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'Antrean Episode yang Diminta',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr melakukan tugas pemeliharaan tertentu sebagai pekerjaan yang dijadwalkan secara teratur, tetapi mereka juga dapat dipicu secara manual di bawah ini. Secara manual menjalankan pekerjaan tidak akan mengubah jadwalnya.',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Pemindaian Komik Kapowarr',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Pindai Lidarr',
+      'components.Settings.SettingsJobsCache.live-tv-sync':
+        'Siaran TV Langsung',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'LazyLibrarian Revista Scan',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'Antrean Koleksi Film',
+      'components.Settings.SettingsJobsCache.mylar-scan': 'Pindai Komik Mylar',
+      'components.Settings.SettingsJobsCache.navidrome-scan':
+        'Pindai Navidrome',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Pindai Pustaka Penuh Plex',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Analisis pemutaran Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex Yang Baru-baru Ini Ditambahkan',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Token Plex Refresh',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex Watchlist Selaraskan',
       'components.Settings.SettingsJobsCache.process': 'Proses',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Proses Tag Terblok',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Pemindaian Radarr',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf Minta Coba Lagi',
+      'components.Settings.SettingsJobsCache.readarr-scan':
+        'Pemindaian Bookshelf',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'Sinkronisasi Koleksi BookOrbit Kobo',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'Rilis Riwayat Kalender',
       'components.Settings.SettingsJobsCache.runnow': 'Jalankan Sekarang',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'Permintaan Software Rekonsiliasi',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Pindai Sonarr',
+      'components.Settings.SettingsJobsCache.soulseek-sync':
+        'Soulseek Selaraskan',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Salin pesan log ke papan klip.',
       'components.Settings.SettingsLogs.copyToClipboard': 'Salin ke Papan Klip',
@@ -34373,6 +35795,22 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'MaOS',
       'components.SoftwareCatalog.releaseYearFilter': 'Rilis tahun',
       'components.SoftwareCatalog.windows': 'Jendela',
+      'components.RequestModal.Music.requestmusic': 'Permintaan Musik',
+      'components.RequestModal.Music.backendRequestFailed':
+        'Permintaan itu diajukan, tapi Lidarr menolaknya saat memproses.',
+      'components.RequestModal.Music.requesterror':
+        'Sesuatu yang salah saat mengirimkan permintaan.',
+      'components.IssueList.IssueItem.issuereason': 'Alasan',
+      'components.IssueModal.issueReasonMissingContent': 'Isi hilang',
+      'components.IssueModal.issueReasonMissingIssue': 'Edisi yang hilang',
+      'components.IssueModal.issueReasonWrongEdition':
+        'Edisi salah atau varian',
+      'components.IssueModal.issueReasonWrongIssue': 'Nomor atau tanggal salah',
+      'components.IssueModal.issueReasonDamagedFile':
+        'Berkas rusak atau tidak dapat dibaca',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'Judul atau metadata salah',
+      'components.IssueModal.issueOther': 'Lainnya',
     },
   },
   {
@@ -34717,6 +36155,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Totale richieste',
       'components.Settings.SettingsAbout.uptodate': 'Aggiornato',
       'components.Settings.SettingsAbout.version': 'Versione',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Sincronizzazione della disponibilità dei media',
       'components.Settings.SettingsJobsCache.cachehits': 'Chiamate',
       'components.Settings.SettingsJobsCache.cachekeys': 'Chiavi totali',
       'components.Settings.SettingsJobsCache.cachemisses': 'Mancanti',
@@ -34727,14 +36167,38 @@ export const localeData = [
         'Richieste dalla memoria',
       'components.Settings.SettingsJobsCache.dnscachemisses':
         'Richieste non in memoria',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Scarica sincronizzazione',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Reimposta sincronizzazione di scaricamento',
       'components.Settings.SettingsJobsCache.failures': 'Fallimenti',
       'components.Settings.SettingsJobsCache.flushcache': 'Svuota cache',
       'components.Settings.SettingsJobsCache.hitRate': 'Tasso di successo',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Pulizia della cache delle immagini',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Immagini memorizzate nella cache',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Ripiega su IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Scansione completa della libreria Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Scansione degli elementi aggiunti di recente di Jellyfin',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr esegue alcune attività di manutenzione come lavori programmati regolarmente, ma possono anche essere attivati manualmente qui sotto. Eseguire manualmente un lavoro non altererà la sua programmazione.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Scansione completa della libreria di Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Scansione aggiunti di recente su Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Token di aggiornamento Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Sincronizza Plex Watchlist',
       'components.Settings.SettingsJobsCache.process': 'Processo',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Processa i Tag bloccati',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Scansione Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Esegui ora',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Scansione Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Messaggio di registro copiato negli appunti.',
       'components.Settings.SettingsLogs.copyToClipboard': 'Copia negli appunti',
@@ -34995,6 +36459,7 @@ export const localeData = [
       'i18n.next': 'Avanti',
       'i18n.previous': 'Precedente',
       'i18n.usersettings': 'Impostazioni utente',
+      'components.IssueModal.issueOther': 'Altro',
     },
   },
   {
@@ -35740,6 +37205,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'シリーズ',
       'components.Settings.SettingsCategories.tvDescription':
         'シリーズの発見と要求を許可します。',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr 成人向けシーンスキャン',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'メディア可用性の同期',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'BackIsssueコミックスキャン',
       'components.Settings.SettingsJobsCache.cachehits': 'ヒット数',
       'components.Settings.SettingsJobsCache.cachekeys': 'キーの総数',
       'components.Settings.SettingsJobsCache.cachemisses': 'ミス',
@@ -35749,16 +37220,71 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNSキャッシュ',
       'components.Settings.SettingsJobsCache.dnscachehits': 'ヒット数',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'ミス',
+      'components.Settings.SettingsJobsCache.download-recovery':
+        '回復をダウンロード',
+      'components.Settings.SettingsJobsCache.download-sync': 'ダウンロード同期',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'ダウンロード同期のリセット',
       'components.Settings.SettingsJobsCache.enabled': '有効化',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        '外部リクエストリスト同期',
       'components.Settings.SettingsJobsCache.failures': '失敗',
       'components.Settings.SettingsJobsCache.flushcache': 'キャッシュクリア',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'フォロー中アイテムの同期',
       'components.Settings.SettingsJobsCache.hitRate': 'ヒット率',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        '画像キャッシュのクリーンアップ',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'キャッシュされた画像',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks':
         'IPv4フォールバック',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin フルライブラリスキャン',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfinの最近の追加をスキャン',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'リクエスト済みエピソードキュー',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerrは定期的にスケジュールされたジョブとして特定のメンテナンスタスクを実行しますが、以下で手動でトリガーすることもできます。ジョブを手動で実行してもスケジュールは変更されません。',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Kapowarrコミックスキャン',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Lidarr 扫描',
+      'components.Settings.SettingsJobsCache.live-tv-sync': 'ライブTVシンク',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'LazyLibrarianマガジンスキャン',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        '映画コレクションキュー',
+      'components.Settings.SettingsJobsCache.mylar-scan':
+        'Mylar コミックスキャン',
+      'components.Settings.SettingsJobsCache.navidrome-scan':
+        'Navidromeスキャン',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plex フルライブラリスキャン',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Plex再生解析',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plexの最近の追加をスキャン',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex リフレッシュトークン',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex ウォッチリストの同期',
       'components.Settings.SettingsJobsCache.process': 'プロセス',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'ブロックリストに登録されたタグを処理する',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarrをスキャン',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf のリクエストを再試行',
+      'components.Settings.SettingsJobsCache.readarr-scan': 'Bookshelf 扫描',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'BookOrbit Koboコレクション同期',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'リリースカレンダー履歴',
       'components.Settings.SettingsJobsCache.runnow': '今すぐ実行',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'ソフトウェア要求の承諾',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarrをスキャン',
+      'components.Settings.SettingsJobsCache.soulseek-sync': 'Soulseek 同期',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'ログメッセージをクリップボードにコピーしました。',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -36656,6 +38182,22 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'マックオース',
       'components.SoftwareCatalog.releaseYearFilter': 'リリース年',
       'components.SoftwareCatalog.windows': 'ウィンドウズ',
+      'components.RequestModal.Music.requestmusic': '音楽のリクエスト',
+      'components.RequestModal.Music.backendRequestFailed':
+        'リクエストは送信されましたが、Lidarr が処理中に拒否しました。',
+      'components.RequestModal.Music.requesterror':
+        'リクエストの送信中に問題が発生しました。',
+      'components.IssueList.IssueItem.issuereason': '理由',
+      'components.IssueModal.issueReasonMissingContent': 'コンテンツの欠如',
+      'components.IssueModal.issueReasonMissingIssue': '欠号',
+      'components.IssueModal.issueReasonWrongEdition':
+        '誤った版またはバリアント',
+      'components.IssueModal.issueReasonWrongIssue': '号数または日付が違う',
+      'components.IssueModal.issueReasonDamagedFile':
+        '破損または読み取れないファイル',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'タイトルやメタデータの誤り',
+      'components.IssueModal.issueOther': 'その他',
     },
   },
   {
@@ -37371,6 +38913,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': '시리즈',
       'components.Settings.SettingsCategories.tvDescription':
         '시리즈 발견 및 요청을 허용하십시오.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr 성인 씬 스캔',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        '사용가능한 미디어 동기화',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'BackIssue 만화 검사',
       'components.Settings.SettingsJobsCache.cachehits': '조회 수',
       'components.Settings.SettingsJobsCache.cachekeys': '전체 키',
       'components.Settings.SettingsJobsCache.cachemisses': '누락',
@@ -37380,14 +38928,67 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS 캐시',
       'components.Settings.SettingsJobsCache.dnscachehits': '적중 수',
       'components.Settings.SettingsJobsCache.dnscachemisses': '실패',
+      'components.Settings.SettingsJobsCache.download-recovery':
+        '다운로드 Recovery',
+      'components.Settings.SettingsJobsCache.download-sync': '다운로드 동기화',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        '다운로드 동기화 재설정',
       'components.Settings.SettingsJobsCache.enabled': '활성화됨',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        '외부 요청 목록 동기화',
       'components.Settings.SettingsJobsCache.failures': '실패',
       'components.Settings.SettingsJobsCache.flushcache': '캐시 플러시',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        '팔로우 중인 관심사 동기화',
       'components.Settings.SettingsJobsCache.hitRate': '적중률',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        '이미지 캐시 비우기',
       'components.Settings.SettingsJobsCache.imagecachecount': '저장된 이미지',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 가을',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin 전체 도서관 검사',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin 최근 추가된 스캔',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        '요청된 에피소드 대기열',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr는 특정 유지 관리 작업을 정기적으로 예약된 작업으로 수행하지만 아래에서 수동으로 트리거할 수도 있습니다. 작업을 수동으로 실행해도 일정이 변경되지는 않습니다.',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Kapowarr 만화 검사',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Lidarr 검사',
+      'components.Settings.SettingsJobsCache.live-tv-sync': '라이브 TV 동기화',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'LazyLibrarian 매거진 스캔',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        '영화 컬렉션 대기열',
+      'components.Settings.SettingsJobsCache.mylar-scan': 'Mylar 만화 검사',
+      'components.Settings.SettingsJobsCache.navidrome-scan': 'Navidrome 스캔',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plex 전체 라이브러리 스캔',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Plex 재생 분석',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex 최근 추가 스캔',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex는 토큰을 새로 고침',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex 시청 목록 동기화',
       'components.Settings.SettingsJobsCache.process': '프로세스',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        '차단 목록 태그 처리',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr 스캔',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf 요청 시',
+      'components.Settings.SettingsJobsCache.readarr-scan': 'Bookshelf 검사',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'BookOrbit Kobo 컬렉션 동기화',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        '릴리스 일정 기록',
       'components.Settings.SettingsJobsCache.runnow': '지금 실행',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        '소프트웨어 요청 재구성',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr 스캔',
+      'components.Settings.SettingsJobsCache.soulseek-sync': 'Soulseek 동기화',
       'components.Settings.SettingsLogs.copiedLogMessage':
         '로그 메시지를 클립보드에 복사했습니다.',
       'components.Settings.SettingsLogs.copyToClipboard': '클립보드에 복사',
@@ -38264,6 +39865,21 @@ export const localeData = [
       'components.SoftwareCatalog.macos': '맥 OS',
       'components.SoftwareCatalog.releaseYearFilter': '출시 년',
       'components.SoftwareCatalog.windows': '윈도우',
+      'components.RequestModal.Music.requestmusic': '음악 요청',
+      'components.RequestModal.Music.backendRequestFailed':
+        '요청이 제출되었지만 Lidarr은 처리 중에 거부했습니다.',
+      'components.RequestModal.Music.requesterror':
+        '요청을 제출하는 동안 문제가 발생했습니다.',
+      'components.IssueList.IssueItem.issuereason': '사유',
+      'components.IssueModal.issueReasonMissingContent': '누락된 콘텐츠',
+      'components.IssueModal.issueReasonMissingIssue': '누락된 호',
+      'components.IssueModal.issueReasonWrongEdition': '잘못된 판 또는 변형판',
+      'components.IssueModal.issueReasonWrongIssue': '호수 또는 날짜가 잘못됨',
+      'components.IssueModal.issueReasonDamagedFile':
+        '손상되었거나 읽을 수 없는 파일',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        '잘못된 제목 또는 메타데이터',
+      'components.IssueModal.issueOther': '기타',
     },
   },
   {
@@ -38395,6 +40011,10 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.cachekeys': 'Viso raktų',
       'components.Settings.SettingsJobsCache.cachemisses': 'Praleisti',
       'components.Settings.SettingsJobsCache.command': 'Komanda',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Parsisiuntimų sinchronizavimas',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Parsiuntimų sinchronizacijos atstatymas',
       'components.Settings.SettingsJobsCache.process': 'Procesas',
       'components.Settings.SettingsJobsCache.runnow': 'Paleisti dabar',
       'components.Settings.SettingsLogs.filterError': 'Klaida',
@@ -38417,6 +40037,7 @@ export const localeData = [
       'i18n.next': 'Kitas',
       'i18n.previous': 'Ankstesnis',
       'i18n.usersettings': 'Vartotojo nustatymai',
+      'components.IssueModal.issueOther': 'Kita',
     },
   },
   {
@@ -38696,9 +40317,23 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.cachemisses': 'Bom',
       'components.Settings.SettingsJobsCache.canceljob': 'Avbryt',
       'components.Settings.SettingsJobsCache.command': 'Kommando',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Nedlastningssynkronisering',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Nullstill nedlastningssynkronisering',
       'components.Settings.SettingsJobsCache.flushcache': 'Tøm mellomlager',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr kjører enkelte vedlikeholdsoppgaver med fast tidsintervall, men de kan også velges å kjøres manuelt under. En oppgave som blir trigget manuelt forstyrrer ikke det faste tidsintervalet.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Full Skanning av Plex-biblioteket',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Sjekk for nye titler i Plex-biblioteket',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Synkronisering av Plex Visningsliste',
       'components.Settings.SettingsJobsCache.process': 'Prosess',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr-skann',
       'components.Settings.SettingsJobsCache.runnow': 'Kjør nå',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr-skann',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Kopierte loggmelding til utklippstavlen.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -38826,6 +40461,7 @@ export const localeData = [
       'i18n.next': 'Neste',
       'i18n.previous': 'Forrige',
       'i18n.usersettings': 'Bruker-instillinger',
+      'components.IssueModal.issueOther': 'Annet',
     },
   },
   {
@@ -39175,6 +40811,8 @@ export const localeData = [
         'Totaal aantal aanvragen',
       'components.Settings.SettingsAbout.uptodate': 'Bijgewerkt',
       'components.Settings.SettingsAbout.version': 'Versie',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Synchronisatie van mediabeschikbaarheid',
       'components.Settings.SettingsJobsCache.cachehits': 'Treffers',
       'components.Settings.SettingsJobsCache.cachekeys':
         'Totaal aantal sleutels',
@@ -39184,14 +40822,38 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS-cache',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Treffers',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Missers',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Synchronisatie downloads',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Reset download sync',
       'components.Settings.SettingsJobsCache.failures': 'Fouten',
       'components.Settings.SettingsJobsCache.flushcache': 'Cache wissen',
       'components.Settings.SettingsJobsCache.hitRate': 'Trefferpercentage',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Afbeeldingcache legen',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Afbeeldingen in cache',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4-fallbacks',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Volledige bibliotheekscan Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        "Scan van 'onlangs toegevoegd' in Jellyfin",
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr voert bepaalde onderhoudstaken uit als regelmatig ingeplande taken, maar ze kunnen hieronder ook handmatig worden gestart. Het handmatig uitvoeren van een taak verandert de planning niet.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plex volledige bibliotheekscan',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex recent toegevoegde scan',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex-verversingstoken',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex-kijklijst synchroniseren',
       'components.Settings.SettingsJobsCache.process': 'Proces',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Geblokkeerde labels verwerken',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr-scan',
       'components.Settings.SettingsJobsCache.runnow': 'Nu uitvoeren',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr-scan',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Logbericht naar klembord gekopieerd.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -39462,6 +41124,7 @@ export const localeData = [
       'i18n.next': 'Volgende',
       'i18n.previous': 'Vorige',
       'i18n.usersettings': 'Gebruikersinstellingen',
+      'components.IssueModal.issueOther': 'Anders',
     },
   },
   {
@@ -39812,6 +41475,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Łączna liczba próśb',
       'components.Settings.SettingsAbout.uptodate': 'Aktualne',
       'components.Settings.SettingsAbout.version': 'Wersja',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Synchronizacja dostępności mediów',
       'components.Settings.SettingsJobsCache.cachehits': 'Trafienia',
       'components.Settings.SettingsJobsCache.cachekeys': 'Klucze ogółem',
       'components.Settings.SettingsJobsCache.cachemisses': 'Chybienia',
@@ -39820,16 +41485,40 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Pamięć podręczna DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Trafienia',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Chybienia',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Synchronizuj pobierania',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Zresetuj synchronizację pobierania',
       'components.Settings.SettingsJobsCache.failures': 'Błędy',
       'components.Settings.SettingsJobsCache.flushcache':
         'Opróżnij pamięć podręczną',
       'components.Settings.SettingsJobsCache.hitRate': 'Współczynnik trafień',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Czyszczenie pamięci podręcznej obrazów',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Zbuforowane obrazy',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks':
         'Przełączenia awaryjne na IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Pełne skanowanie bibliotek Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Ostatnio dodane skanowanie Jellyfin',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr wykonuje pewne zadania konserwacyjne jako cyklicznie zaplanowane zadania, ale mogą być one również ręcznie uruchamiane poniżej. Ręczne uruchomienie zadania nie spowoduje zmiany jego harmonogramu.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Pełne skanowanie biblioteki Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Skanowanie ostatnio dodanych na Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Token odświeżania Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Synchronizacja listy Do obejrzenia Plex',
       'components.Settings.SettingsJobsCache.process': 'Proces',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Przetwarzaj tagi czarnej listy',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Skan Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Uruchom teraz',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Skanowanie Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Skopiowano komunikat dziennika do schowka.',
       'components.Settings.SettingsLogs.copyToClipboard': 'Skopiuj do schowka',
@@ -40097,6 +41786,7 @@ export const localeData = [
       'i18n.next': 'Następny',
       'i18n.previous': 'Poprzedni',
       'i18n.usersettings': 'Ustawienia użytkownika',
+      'components.IssueModal.issueOther': 'Inny',
     },
   },
   {
@@ -40859,6 +42549,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'Séries',
       'components.Settings.SettingsCategories.tvDescription':
         'Permita uma série de descobertas e pedidos.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Verificação de cenas adultas do Whisparr',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Sincronização de Disponibilidade de Mídia',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'Digitalização de quadrinhos da BackIssue',
       'components.Settings.SettingsJobsCache.cachehits': 'Encontrado',
       'components.Settings.SettingsJobsCache.cachekeys': 'Total de Chaves',
       'components.Settings.SettingsJobsCache.cachemisses': 'Não Encontrado',
@@ -40868,16 +42564,77 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Acertos',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Falhas',
+      'components.Settings.SettingsJobsCache.download-recovery':
+        'Baixar Recuperação',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Sincronizar Downloads',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Limpar Sincronização de Download',
       'components.Settings.SettingsJobsCache.enabled': 'Activado',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'Sincronização de Lista de Solicitações Externa',
       'components.Settings.SettingsJobsCache.failures': 'Falhas',
       'components.Settings.SettingsJobsCache.flushcache': 'Limpar Cache',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'Sincronização de Interesses Seguidos',
       'components.Settings.SettingsJobsCache.hitRate': 'Taxa de acertos',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Limpeza de Cache de Imagens',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Imagens Armazenadas em Cache',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks':
         'Alternativos IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Escaneamento completa da biblioteca Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Escanear adicionados recentemente ao Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'Fila de Episódios Solicitados',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr executa tarefas regularares de manutenção de forma automática, mas elas podem também serem iniciadas manualmente abaixo. Tarefas executadas manualmente não irão afetar o agendamento da próxima execução.',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Kapowarr Scan de quadrinhos',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Varredura Lidarr',
+      'components.Settings.SettingsJobsCache.live-tv-sync':
+        'Sincronia ao vivo da TV',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'LazyLibrarian Revista Scan',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'Fila de coleções de filmes',
+      'components.Settings.SettingsJobsCache.mylar-scan':
+        'Mylar Scan de quadrinhos',
+      'components.Settings.SettingsJobsCache.navidrome-scan':
+        'Varredura Navidrome',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Escaneamento de Todas Bibliotecas do Plex',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Análise de reprodução do Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Recentemente Adicionado ao Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Token de atualização do Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Sincronizar Lista Para Assistir do Plex',
       'components.Settings.SettingsJobsCache.process': 'Processo',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Processar tags bloqueadas',
+      'components.Settings.SettingsJobsCache.radarr-scan':
+        'Escanemento do Radarr',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf Requisito Repetição',
+      'components.Settings.SettingsJobsCache.readarr-scan':
+        'Digitalização de estante',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'Sincronização de Coleção Kobo BookOrbit',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'Histórico do calendário de lançamento',
       'components.Settings.SettingsJobsCache.runnow': 'Executar Agora',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'Solicitação de Software Reconciliação',
+      'components.Settings.SettingsJobsCache.sonarr-scan':
+        'Escaneamento do Sonarr',
+      'components.Settings.SettingsJobsCache.soulseek-sync':
+        'Sincronização Soulseek',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Mensagem copiada para área de transferência.',
       'components.Settings.SettingsLogs.copyToClipboard': 'Copiar',
@@ -41784,6 +43541,23 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'MacOS',
       'components.SoftwareCatalog.releaseYearFilter': 'Ano de lançamento',
       'components.SoftwareCatalog.windows': 'Janelas',
+      'components.RequestModal.Music.requestmusic': 'Pedir Música',
+      'components.RequestModal.Music.backendRequestFailed':
+        'O pedido foi apresentado, mas Lidarr rejeitou enquanto processava.',
+      'components.RequestModal.Music.requesterror':
+        'Algo deu errado ao enviar a solicitação.',
+      'components.IssueList.IssueItem.issuereason': 'Razão',
+      'components.IssueModal.issueReasonMissingContent': 'Falta o conteúdo.',
+      'components.IssueModal.issueReasonMissingIssue': 'Edição ausente',
+      'components.IssueModal.issueReasonWrongEdition':
+        'Edição errada ou variante.',
+      'components.IssueModal.issueReasonWrongIssue':
+        'Número ou data incorretos',
+      'components.IssueModal.issueReasonDamagedFile':
+        'Arquivo danificado ou ilegível',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'Título ou metadados incorretos',
+      'components.IssueModal.issueOther': 'Outro',
     },
   },
   {
@@ -42112,6 +43886,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Todos os Pedidos',
       'components.Settings.SettingsAbout.uptodate': 'Atualizado',
       'components.Settings.SettingsAbout.version': 'Versão',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Sincronização de disponibilidade de média',
       'components.Settings.SettingsJobsCache.cachehits': 'Acertos',
       'components.Settings.SettingsJobsCache.cachekeys': 'Chaves Totais',
       'components.Settings.SettingsJobsCache.cachemisses': 'Falhas',
@@ -42120,14 +43896,38 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Acertos',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Falhas',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Sincronizar Transferências',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Reiniciar Sincronização de Transferências',
       'components.Settings.SettingsJobsCache.failures': 'Falhas',
       'components.Settings.SettingsJobsCache.flushcache': 'Limpar Cache',
       'components.Settings.SettingsJobsCache.hitRate': 'Taxa de acertos',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Limpeza de Cache de Imagens',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Imagens Armazenadas em Cache',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Recursos a IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Sincronização Completa da Biblioteca Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Sincronizar Adicionado Recentemente do Jellyfin',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'O Seerr executa certas tarefas de manutenção como tarefas agendadas regularmente, mas também podem ser acionadas manualmente abaixo. Executar uma tarefa manualmente não irá alterar o seu agendamento.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Sincronização Completa da Biblioteca Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Sincronizar Adicionado Recentemente do Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Token de atualização do Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Sincronização da lista para ver do Plex',
       'components.Settings.SettingsJobsCache.process': 'Processo',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Processar tags bloqueadas',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Sincronizar Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Executar Agora',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sincronizar Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Mensagem do registo copiada para o área de transferência.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -42393,6 +44193,7 @@ export const localeData = [
       'i18n.next': 'Próxima',
       'i18n.previous': 'Anterior',
       'i18n.usersettings': 'Utilizadores',
+      'components.IssueModal.issueOther': 'Outros',
     },
   },
   {
@@ -42690,6 +44491,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Total cereri',
       'components.Settings.SettingsAbout.uptodate': 'La zi',
       'components.Settings.SettingsAbout.version': 'Versiune',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Sincronizare disponibilitate materiale',
       'components.Settings.SettingsJobsCache.cachehits': 'Accesări',
       'components.Settings.SettingsJobsCache.cachekeys': 'Total chei',
       'components.Settings.SettingsJobsCache.cachemisses': 'Ratări',
@@ -42698,13 +44501,21 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Accesări',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Ratări',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Sincronizare descărcări',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Resetare sincronizare download-uri',
       'components.Settings.SettingsJobsCache.failures': 'Eșecuri',
       'components.Settings.SettingsJobsCache.flushcache': 'Golește cache',
       'components.Settings.SettingsJobsCache.hitRate': 'Rate de succes',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Curățare cache imagini',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Imagini stocate în cache',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks':
         'Fallback-uri IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Scanare completă librărie Jellyfin',
       'components.UserProfile.UserSettings.UserGeneralSettings.originallanguage':
         'Limbă Descoperire',
       'components.UserProfile.UserSettings.UserPasswordChange.confirmpassword':
@@ -42724,6 +44535,7 @@ export const localeData = [
       'components.UserProfile.UserSettings.menuPermissions': 'Permisiuni',
       'i18n.previous': 'Precedent',
       'i18n.usersettings': 'Setări utilizator',
+      'components.IssueModal.issueOther': 'Altele',
     },
   },
   {
@@ -43074,6 +44886,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Всего запросов',
       'components.Settings.SettingsAbout.uptodate': 'Актуальная',
       'components.Settings.SettingsAbout.version': 'Версия',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Синхронизировать доступность медиа',
       'components.Settings.SettingsJobsCache.cachehits': 'Удачных обращений',
       'components.Settings.SettingsJobsCache.cachekeys': 'Всего ключей',
       'components.Settings.SettingsJobsCache.cachemisses':
@@ -43083,15 +44897,41 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Кеш DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Попаданий',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Промахов',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Синхронизировать загрузки',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Сбросить синхронизацию загрузок',
       'components.Settings.SettingsJobsCache.failures': 'Ошибки',
       'components.Settings.SettingsJobsCache.flushcache': 'Очистить кэш',
       'components.Settings.SettingsJobsCache.hitRate': 'Процент попаданий',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Очистка кэша изображения',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Изображений кэшированно',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks':
         'Переходов на IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Сканировать всю библиотеку Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Сканировать недавно добавленное в Jellyfin',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr выполняет определенные задачи по обслуживанию в виде регулярно запланированных заданий, но они также могут быть запущены вручную ниже. Выполнение задания вручную не изменит его расписание.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Полное сканирование библиотек Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Сканирование недавно добавленных медиафайлов в Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Токен обновления Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Синхронизация списка просмотра Plex',
       'components.Settings.SettingsJobsCache.process': 'Процесс',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Обработать заблокированные теги',
+      'components.Settings.SettingsJobsCache.radarr-scan':
+        'Сканирование Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Выполнить сейчас',
+      'components.Settings.SettingsJobsCache.sonarr-scan':
+        'Сканирование Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Сообщение лога скопировано в буфер обмена.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -43365,6 +45205,7 @@ export const localeData = [
       'i18n.next': 'Следующая',
       'i18n.previous': 'Предыдущая',
       'i18n.usersettings': 'Настройки пользователя',
+      'components.IssueModal.issueOther': 'Другое',
     },
   },
   {
@@ -43642,9 +45483,21 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.cachemisses': 'Mungesa',
       'components.Settings.SettingsJobsCache.canceljob': 'Anuloni punën',
       'components.Settings.SettingsJobsCache.command': 'Komandë',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Sinkonizim Shkarkimi',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Rivendos Sinkronizimin e Shkarkimit',
       'components.Settings.SettingsJobsCache.flushcache': 'Pastro Cache',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Mbikëqyrësi kryen disa detyra mirëmbajtjeje si punë të programuara rregullisht, por ato mund të aktivizohen edhe manualisht më poshtë. Bërja manuale e një pune nuk do të ndryshojë programin e saj.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Skanimi i plotë i Librarisë Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Skanimi i të shtuarave kohët e fundit nga Plex',
       'components.Settings.SettingsJobsCache.process': 'Procesi',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Skanimi i Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Nise Tani',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Skanimi i Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Mesazhi i regjistrit u kopjua.',
       'components.Settings.SettingsLogs.copyToClipboard': 'Kopjo',
@@ -43769,6 +45622,7 @@ export const localeData = [
       'i18n.next': 'Tjetra',
       'i18n.previous': 'Para',
       'i18n.usersettings': 'Cilësimet e përdoruesit',
+      'components.IssueModal.issueOther': 'Të tjera',
     },
   },
   {
@@ -43863,9 +45717,13 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.cachemisses': 'Gospođica',
       'components.Settings.SettingsJobsCache.canceljob': 'Otkaži posao',
       'components.Settings.SettingsJobsCache.command': 'Komanda',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Download sinhronizacija',
       'components.Settings.SettingsJobsCache.flushcache': 'Obriši keš',
       'components.Settings.SettingsJobsCache.process': 'Proces',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr skeniranje',
       'components.Settings.SettingsJobsCache.runnow': 'Pokreni sada',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr skeniranje',
       'components.Settings.SettingsLogs.filterDebug': 'Otklanjanje grešaka',
       'components.Settings.SettingsLogs.filterError': 'Greška',
       'components.Settings.SettingsLogs.filterInfo': 'Info',
@@ -43931,6 +45789,7 @@ export const localeData = [
       'i18n.next': 'Sledeći',
       'i18n.previous': 'Prethodni',
       'i18n.usersettings': 'Korisnička podešavanja',
+      'components.IssueModal.issueOther': 'Ostalo',
     },
   },
   {
@@ -44282,6 +46141,8 @@ export const localeData = [
         'Totalt antal förfrågningar',
       'components.Settings.SettingsAbout.uptodate': 'Uppdaterad',
       'components.Settings.SettingsAbout.version': 'Version',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Synkronisering av mediatillgänglighet',
       'components.Settings.SettingsJobsCache.cachehits': 'Träffar',
       'components.Settings.SettingsJobsCache.cachekeys': 'Totalt antal nycklar',
       'components.Settings.SettingsJobsCache.cachemisses': 'Missar',
@@ -44290,13 +46151,37 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS-cache',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Träffar',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Missar',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Nedladdningssynkronisering',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Nollställ nedladdningssynkronisering',
       'components.Settings.SettingsJobsCache.failures': 'Misslyckanden',
       'components.Settings.SettingsJobsCache.flushcache': 'Rensa cache',
       'components.Settings.SettingsJobsCache.hitRate': 'Träffratio',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Rensning av bildcache',
       'components.Settings.SettingsJobsCache.imagecachecount': 'Bilder cachade',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4-reserv',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Full Jellyfin-biblioteksskanning',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Skanning av nyligen tillagda objekt i Jellyfin',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr utför vissa underhållsuppgifter som schemalagda jobb automatiskt, men de kan också köras manuellt nedan. Att köra ett jobb manuellt ändrar inte schemat.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Full biblioteksskanning för Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Skanning av senast tillagda i Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex uppdateringstoken',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Synkronisering av bevakningslista från Plex',
       'components.Settings.SettingsJobsCache.process': 'Process',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Bearbeta blockerade taggar',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr-skanning',
       'components.Settings.SettingsJobsCache.runnow': 'Kör nu',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr-skanning',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Kopierat loggmeddelande till urklipp.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -44563,6 +46448,7 @@ export const localeData = [
       'i18n.next': 'Nästa',
       'i18n.previous': 'Föregående',
       'i18n.usersettings': 'Användarinställningar',
+      'components.IssueModal.issueOther': 'Övrigt',
     },
   },
   {
@@ -44903,6 +46789,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Toplam Talepler',
       'components.Settings.SettingsAbout.uptodate': 'Güncel',
       'components.Settings.SettingsAbout.version': 'Sürüm',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Medya Kullanılabilirlik Senkronizasyonu',
       'components.Settings.SettingsJobsCache.cachehits': 'İsabet',
       'components.Settings.SettingsJobsCache.cachekeys': 'Toplam Anahtar',
       'components.Settings.SettingsJobsCache.cachemisses': 'Kaçırma',
@@ -44911,14 +46799,38 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS Önbelleği',
       'components.Settings.SettingsJobsCache.dnscachehits': 'İsabet',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Kaçırma',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'İndirme Senkronizasyonu',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'İndirme Senkronizasyonu Sıfırlama',
       'components.Settings.SettingsJobsCache.failures': 'Başarısızlıklar',
       'components.Settings.SettingsJobsCache.flushcache': 'Önbelleği Temizle',
       'components.Settings.SettingsJobsCache.hitRate': 'İsabet Oranı',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Resim Önbelleği Temizleme',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Önbelleğe Alınan Resimler',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 Yedekleri',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin Tam Kütüphane Taraması',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin Son Eklenenler Taraması',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr belirli bakım görevlerini düzenli aralıklarla gerçekleştirir, ancak bunlar aşağıdan manuel olarak da tetiklenebilir. Bir görevi manuel olarak çalıştırmak zamanlamasını değiştirmez.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Plex Tam Kütüphane Taraması',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex Son Eklenenler Taraması',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex Token Yenileme',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex İzleme Listesi Senkronizasyonu',
       'components.Settings.SettingsJobsCache.process': 'İşle',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Engellenen Etiketleri İşle',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr Taraması',
       'components.Settings.SettingsJobsCache.runnow': 'Şimdi Çalıştır',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr Taraması',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Günlük mesajı panoya kopyalandı.',
       'components.Settings.SettingsLogs.copyToClipboard': 'Panoya Kopyala',
@@ -45184,6 +47096,7 @@ export const localeData = [
       'i18n.next': 'Sonraki',
       'i18n.previous': 'Önceki',
       'i18n.usersettings': 'Kullanıcı Ayarları',
+      'components.IssueModal.issueOther': 'Diğer',
     },
   },
   {
@@ -45507,6 +47420,8 @@ export const localeData = [
       'components.Settings.SettingsAbout.totalrequests': 'Усього запитів',
       'components.Settings.SettingsAbout.uptodate': 'Актуальна',
       'components.Settings.SettingsAbout.version': 'Версія',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Синхронізація доступності медіа',
       'components.Settings.SettingsJobsCache.cachehits': 'Вдалих звернень',
       'components.Settings.SettingsJobsCache.cachekeys': 'Усього ключів',
       'components.Settings.SettingsJobsCache.cachemisses': 'Невдалих звернень',
@@ -45516,14 +47431,36 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnscachehits': 'Вдалих звернень',
       'components.Settings.SettingsJobsCache.dnscachemisses':
         'Невдалих звернень',
+      'components.Settings.SettingsJobsCache.download-sync':
+        'Синхронізувати завантаження',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        'Скинути синхронізацію завантажень',
       'components.Settings.SettingsJobsCache.failures': 'Помилки',
       'components.Settings.SettingsJobsCache.flushcache': 'Очистити кеш',
       'components.Settings.SettingsJobsCache.hitRate': 'Частка вдалих',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Очищення кешу зображень',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Зображення кешовані',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Запасні IPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Сканування повної бібліотеки Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Нещодавно додане сканування Jellyfin',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr виконує певні завдання обслуговування як регулярно запланованих завдань, але вони також можуть бути запущені вручну нижче. Виконання завдання вручну не змінить його розклад.',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Повне сканування бібліотек Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Сканування нещодавно доданих медіафайлів у Plex',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Оновлення токена Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Синхронізація списку перегляду Plex',
       'components.Settings.SettingsJobsCache.process': 'Процес',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Сканування Radarr',
       'components.Settings.SettingsJobsCache.runnow': 'Виконати зараз',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Сканування Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Повідомлення лога скопійовано в буфер обміну.',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -45775,6 +47712,7 @@ export const localeData = [
       'i18n.next': 'Наступна',
       'i18n.previous': 'Попередня',
       'i18n.usersettings': 'Налаштування користувача',
+      'components.IssueModal.issueOther': 'Інше',
     },
   },
   {
@@ -46461,6 +48399,11 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': '剧集',
       'components.Settings.SettingsCategories.tvDescription':
         '允许系列发现和请求.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr 成人场景扫描',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        '同步媒体可用性',
+      'components.Settings.SettingsJobsCache.backissue-scan': '后期漫画扫描',
       'components.Settings.SettingsJobsCache.cachehits': '击中数',
       'components.Settings.SettingsJobsCache.cachekeys': '键数',
       'components.Settings.SettingsJobsCache.cachemisses': '失误数',
@@ -46470,14 +48413,64 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS 缓存',
       'components.Settings.SettingsJobsCache.dnscachehits': '点击数',
       'components.Settings.SettingsJobsCache.dnscachemisses': '错过',
+      'components.Settings.SettingsJobsCache.download-recovery': '下载回收',
+      'components.Settings.SettingsJobsCache.download-sync': '下载状态同步',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        '下载状态同步复位',
       'components.Settings.SettingsJobsCache.enabled': '已启用',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        '外部请求列表同步',
       'components.Settings.SettingsJobsCache.failures': '失败',
       'components.Settings.SettingsJobsCache.flushcache': '清除缓存',
+      'components.Settings.SettingsJobsCache.follow-sync': '关注兴趣同步',
       'components.Settings.SettingsJobsCache.hitRate': '点击率',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        '清理图片缓存',
       'components.Settings.SettingsJobsCache.imagecachecount': '已缓存图片',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 退缩',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin全库扫描',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin最近新增扫描',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        '请求剧集队列',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr将某些维护任务作为定期计划的任务执行，但它们也可以在下面手动触发。手动运行任务不会改变它的时间表。',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Kapowarr 漫画扫描',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Lidarr 扫描',
+      'components.Settings.SettingsJobsCache.live-tv-sync': '现场电视同步',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'LazyLibrarian杂志扫描',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        '电影合集队列',
+      'components.Settings.SettingsJobsCache.mylar-scan': 'Mylar 漫画扫描',
+      'components.Settings.SettingsJobsCache.navidrome-scan': 'Navidrome 扫描',
+      'components.Settings.SettingsJobsCache.plex-full-scan': 'Plex 媒体库扫描',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Plex 播放分析',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex 最新添加扫描',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Plex 刷新令牌',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        '同步 Plex 关注列表',
       'components.Settings.SettingsJobsCache.process': '程序',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        '处理屏蔽标签',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr 扫描',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf 请求重试',
+      'components.Settings.SettingsJobsCache.readarr-scan': 'Bookshelf 扫描',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'BookOrbit Kobo 合集同步',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        '发布日历历史',
       'components.Settings.SettingsJobsCache.runnow': '执行',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        '软件请求调节',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr 扫描',
+      'components.Settings.SettingsJobsCache.soulseek-sync': '灵魂同步',
       'components.Settings.SettingsLogs.copiedLogMessage':
         '日志消息已复制到剪贴板。',
       'components.Settings.SettingsLogs.copyToClipboard': '复制到剪贴板',
@@ -47320,6 +49313,19 @@ export const localeData = [
       'components.SoftwareCatalog.macos': '马科斯',
       'components.SoftwareCatalog.releaseYearFilter': '发布年份',
       'components.SoftwareCatalog.windows': '窗口',
+      'components.RequestModal.Music.requestmusic': '请求音乐',
+      'components.RequestModal.Music.backendRequestFailed':
+        '请求已提交，但 Lidarr 在处理过程中拒绝了该请求。',
+      'components.RequestModal.Music.requesterror': '提交请求中出了点问题。',
+      'components.IssueList.IssueItem.issuereason': '原因',
+      'components.IssueModal.issueReasonMissingContent': '缺少内容',
+      'components.IssueModal.issueReasonMissingIssue': '缺期',
+      'components.IssueModal.issueReasonWrongEdition': '错误的版本或变体',
+      'components.IssueModal.issueReasonWrongIssue': '期号或日期错误',
+      'components.IssueModal.issueReasonDamagedFile': '损坏或无法读取的文件',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        '标题或元数据不正确',
+      'components.IssueModal.issueOther': '其他',
     },
   },
   {
@@ -48007,6 +50013,11 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': '影集',
       'components.Settings.SettingsCategories.tvDescription':
         '允許系列發現與要求 。',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr 成人場景掃描',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        '同步媒體可用性',
+      'components.Settings.SettingsJobsCache.backissue-scan': '后期漫畫掃描',
       'components.Settings.SettingsJobsCache.cachehits': '擊中數',
       'components.Settings.SettingsJobsCache.cachekeys': '鍵數',
       'components.Settings.SettingsJobsCache.cachemisses': '失誤數',
@@ -48016,14 +50027,63 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS 快取',
       'components.Settings.SettingsJobsCache.dnscachehits': '命中',
       'components.Settings.SettingsJobsCache.dnscachemisses': '失誤',
+      'components.Settings.SettingsJobsCache.download-recovery': '下載回收',
+      'components.Settings.SettingsJobsCache.download-sync': '下載狀態同步',
+      'components.Settings.SettingsJobsCache.download-sync-reset':
+        '下載狀態同步復位',
       'components.Settings.SettingsJobsCache.enabled': '已開啟',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        '外部請求清單同步',
       'components.Settings.SettingsJobsCache.failures': '失敗',
       'components.Settings.SettingsJobsCache.flushcache': '清除快取',
+      'components.Settings.SettingsJobsCache.follow-sync': '關注興趣同步',
       'components.Settings.SettingsJobsCache.hitRate': '命中率',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        '清理影像快取',
       'components.Settings.SettingsJobsCache.imagecachecount': '快取的影像',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'IPv4 後退',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Jellyfin 完整文庫掃瞄',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        '最近添加的 Jellyfin 掃描',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        '已請求集數佇列',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr 會將部分維護工作設定為定期排程工作，也可在下方手動執行。手動執行工作不會變更排程。',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Kapowarr 漫畫掃描',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Lidarr 扫描',
+      'components.Settings.SettingsJobsCache.live-tv-sync': '直播電視同步',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'LazyLibrarian雜志掃描',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        '電影合集佇列',
+      'components.Settings.SettingsJobsCache.mylar-scan': 'Mylar 漫畫掃描',
+      'components.Settings.SettingsJobsCache.navidrome-scan': 'Navidrome 掃描',
+      'components.Settings.SettingsJobsCache.plex-full-scan': 'Plex 媒體庫掃描',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Plex 播放分析',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Plex 最近新增掃描',
+      'components.Settings.SettingsJobsCache.plex-refresh-token': 'Plex 刷新',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Plex 關注列表同步',
       'components.Settings.SettingsJobsCache.process': '程序',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        '處理封鎖清單標籤',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr 掃描',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Bookshelf 请求重试',
+      'components.Settings.SettingsJobsCache.readarr-scan': 'Bookshelf 扫描',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'BookOrbit Kobo 收藏同步',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        '釋放行事曆歷史',
       'components.Settings.SettingsJobsCache.runnow': '執行',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        '軟體要求對應',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr 掃描',
+      'components.Settings.SettingsJobsCache.soulseek-sync': 'Soulseek 同步',
       'components.Settings.SettingsLogs.copiedLogMessage':
         '日誌訊息已複製到剪貼板。',
       'components.Settings.SettingsLogs.copyToClipboard': '複製到剪貼板',
@@ -48862,6 +50922,19 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'macOS',
       'components.SoftwareCatalog.releaseYearFilter': '发布年份',
       'components.SoftwareCatalog.windows': '視窗',
+      'components.RequestModal.Music.requestmusic': '要求音樂',
+      'components.RequestModal.Music.backendRequestFailed':
+        '請求已送出，但 Lidarr 在處理時拒絕了該請求。',
+      'components.RequestModal.Music.requesterror': '提出請求時出了點問題。',
+      'components.IssueList.IssueItem.issuereason': '理由',
+      'components.IssueModal.issueReasonMissingContent': '缺少內容',
+      'components.IssueModal.issueReasonMissingIssue': '缺期',
+      'components.IssueModal.issueReasonWrongEdition': '版本或變體錯誤',
+      'components.IssueModal.issueReasonWrongIssue': '錯誤的一期或日期',
+      'components.IssueModal.issueReasonDamagedFile': '損毀或無法讀取的檔案',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        '標題或中繼資料不正確',
+      'components.IssueModal.issueOther': '其他',
     },
   },
   {
@@ -49607,6 +51680,12 @@ export const localeData = [
       'components.Settings.SettingsCategories.tv': 'Loạt phim',
       'components.Settings.SettingsCategories.tvDescription':
         'Cho phép phát hiện và yêu cầu loạt.',
+      'components.Settings.SettingsJobsCache.adult-scan':
+        'Whisparr Quét Cảnh Người Lớn',
+      'components.Settings.SettingsJobsCache.availability-sync':
+        'Đồng bộ thiết bị lưu trữName',
+      'components.Settings.SettingsJobsCache.backissue-scan':
+        'Quét truyện tranh ngược',
       'components.Settings.SettingsJobsCache.cachehits': 'Trúng',
       'components.Settings.SettingsJobsCache.cachekeys': 'Tổng phím',
       'components.Settings.SettingsJobsCache.cachemisses': 'Bỏ lỡ',
@@ -49616,15 +51695,69 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.dnsCache': 'Bộ nhớ tạm DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Trúng',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Bỏ lỡ',
+      'components.Settings.SettingsJobsCache.download-recovery': 'Tải về',
+      'components.Settings.SettingsJobsCache.download-sync': 'Đồng bộ tải về',
+      'components.Settings.SettingsJobsCache.download-sync-reset': 'Tải về',
       'components.Settings.SettingsJobsCache.enabled': 'Bật',
+      'components.Settings.SettingsJobsCache.external-request-list-sync':
+        'Đồng bộ danh sách yêu cầu bên ngoài',
       'components.Settings.SettingsJobsCache.failures': 'Lỗi',
       'components.Settings.SettingsJobsCache.flushcache': 'Bộ nhớ tạm Flush',
+      'components.Settings.SettingsJobsCache.follow-sync':
+        'Đồng bộ quan tâm đã theo dõi',
       'components.Settings.SettingsJobsCache.hitRate': 'Trúng',
+      'components.Settings.SettingsJobsCache.image-cache-cleanup':
+        'Bộ nhớ tạm ảnh',
       'components.Settings.SettingsJobsCache.imagecachecount':
         'Hình ảnh được lưu vào bộ nhớ đệm',
       'components.Settings.SettingsJobsCache.ipv4Fallbacks': 'Gặp lỗi lPv4',
+      'components.Settings.SettingsJobsCache.jellyfin-full-scan':
+        'Quét toàn bộ thư viện Jellyfin',
+      'components.Settings.SettingsJobsCache.jellyfin-recently-added-scan':
+        'Jellyfin Quét bổ sung gần đây',
+      'components.Settings.SettingsJobsCache.jellyfin-watch-ahead':
+        'Hàng đợi tập đã yêu cầu',
+      'components.Settings.SettingsJobsCache.jobsDescription':
+        'Seerr thực hiện một số nhiệm vụ bảo trì như công việc thường lệ, nhưng chúng cũng có thể được kích hoạt bằng tay bên dưới. Chạy bằng tay sẽ không thay đổi thời gian biểu.',
+      'components.Settings.SettingsJobsCache.kapowarr-scan':
+        'Quét truyện tranh Kapowarr',
+      'components.Settings.SettingsJobsCache.lidarr-scan': 'Quét Lidarr',
+      'components.Settings.SettingsJobsCache.live-tv-sync':
+        'Đồng bộ hoá chương trình truyền hình trực tiếp',
+      'components.Settings.SettingsJobsCache.magazine-scan':
+        'Quét tạp chí LazyLibrarian',
+      'components.Settings.SettingsJobsCache.movie-collection-queue':
+        'Hàng đợi bộ sưu tập phim',
+      'components.Settings.SettingsJobsCache.mylar-scan':
+        'Quét truyện tranh Mylar',
+      'components.Settings.SettingsJobsCache.navidrome-scan': 'Quét Navidrome',
+      'components.Settings.SettingsJobsCache.plex-full-scan':
+        'Quét thư viện Plex đầy đủ',
+      'components.Settings.SettingsJobsCache.plex-playback-analysis':
+        'Phân tích phát lại Plex',
+      'components.Settings.SettingsJobsCache.plex-recently-added-scan':
+        'Quét thêm Plex gần đây',
+      'components.Settings.SettingsJobsCache.plex-refresh-token':
+        'Mã thông báo làm mới Plex',
+      'components.Settings.SettingsJobsCache.plex-watchlist-sync':
+        'Đồng bộ hoá danh sách Plex',
       'components.Settings.SettingsJobsCache.process': 'Tiến trình',
+      'components.Settings.SettingsJobsCache.process-blocklisted-tags':
+        'Xử lý thẻ thuộc danh sách chặn',
+      'components.Settings.SettingsJobsCache.radarr-scan': 'Quét Radarr',
+      'components.Settings.SettingsJobsCache.readarr-request-retry':
+        'Yêu cầu giá sách Thử lại',
+      'components.Settings.SettingsJobsCache.readarr-scan': 'Quét giá sách',
+      'components.Settings.SettingsJobsCache.reader-delivery-kobo-sync':
+        'Đồng bộ bộ sưu tập Kobo của BookOrbit',
+      'components.Settings.SettingsJobsCache.release-calendar-history':
+        'Lịch sử ra đời',
       'components.Settings.SettingsJobsCache.runnow': 'Chạy ngay',
+      'components.Settings.SettingsJobsCache.software-request-reconciliation':
+        'Yêu cầu hòa giải phần mềm',
+      'components.Settings.SettingsJobsCache.sonarr-scan': 'Quét Sonarr',
+      'components.Settings.SettingsJobsCache.soulseek-sync':
+        'Đồng bộ tìm kiếm linh hồn',
       'components.Settings.SettingsLogs.copiedLogMessage':
         'Sao chép tin nhắn vào bảng nháp',
       'components.Settings.SettingsLogs.copyToClipboard':
@@ -50519,6 +52652,22 @@ export const localeData = [
       'components.SoftwareCatalog.macos': 'MacOS',
       'components.SoftwareCatalog.releaseYearFilter': 'Phát hành năm',
       'components.SoftwareCatalog.windows': 'Cửa sổ',
+      'components.RequestModal.Music.requestmusic': 'Yêu cầu âm nhạc',
+      'components.RequestModal.Music.backendRequestFailed':
+        'Yêu cầu đã được đệ trình, nhưng Lidarr đã từ chối khi xử lý.',
+      'components.RequestModal.Music.requesterror':
+        'Có gì đó không ổn trong khi gửi yêu cầu.',
+      'components.IssueList.IssueItem.issuereason': 'Lý do',
+      'components.IssueModal.issueReasonMissingContent': 'Thiếu nội dung',
+      'components.IssueModal.issueReasonMissingIssue': 'Thiếu số phát hành',
+      'components.IssueModal.issueReasonWrongEdition':
+        'Phiên bản hoặc biến thể sai',
+      'components.IssueModal.issueReasonWrongIssue': 'Sai số, ngày tháng',
+      'components.IssueModal.issueReasonDamagedFile':
+        'Tập tin bị hỏng hay không đọc được',
+      'components.IssueModal.issueReasonIncorrectMetadata':
+        'Không đúng tiêu đề hay siêu dữ liệu',
+      'components.IssueModal.issueOther': 'Khác',
     },
   },
 ] as const;

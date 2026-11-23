@@ -13,6 +13,7 @@ import {
   type TitleResult,
 } from '../api';
 import { isAdministrator, useAuth, useMediaServerName } from '../auth';
+import AvailabilitySubscriptionButton from '../components/AvailabilitySubscriptionButton';
 import BlocklistButton from '../components/BlocklistButton';
 import {
   Rail,
@@ -23,11 +24,13 @@ import {
   TitleCard,
   withoutPending4k,
 } from '../components/cards';
+import type { MovieCollection } from '../components/CollectionRequestSheet';
 import { ConfirmSheet } from '../components/ConfirmSheet';
 import {
   ActionBar,
   AdvancedOptions,
   canRequest4k,
+  canRequestMovies,
   CreditsDisclosure,
   DetailTop,
   DiscoverDetailNavigation,
@@ -38,6 +41,7 @@ import {
   productionCountryLinks,
   SubjectTagsDisclosure,
   TrailerButton,
+  VideoDisclosure,
 } from '../components/detail';
 import { ServiceNote } from '../components/extra';
 import IndexerSearchLink from '../components/IndexerSearchLink';
@@ -45,6 +49,7 @@ import LiveTvAirings from '../components/LiveTvAirings';
 import ReportIssueButton from '../components/ReportIssueButton';
 import { useVideoRequestQuota } from '../components/requestSheet';
 import { useToast } from '../components/toast';
+import VideoPlaybackButton from '../components/VideoPlaybackButton';
 import WatchlistButton from '../components/WatchlistButton';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
@@ -72,6 +77,44 @@ function movieCurrency(value?: number) {
   return typeof value === 'number' && Number.isFinite(value) && value > 0
     ? usd.format(value)
     : '';
+}
+
+function MovieCollectionSummary({ id, name }: { id: number; name: string }) {
+  const { t } = useLumenLocale();
+  const { data, error, reload } = useApi<MovieCollection>(`/collection/${id}`);
+  const collection = data?.id === id ? data : undefined;
+
+  return (
+    <section className="card" data-testid="movie-collection-summary">
+      <h2>
+        <Link to={`/collection/${id}`}>{collection?.name || name}</Link>
+      </h2>
+      {collection?.overview ? <p>{collection.overview}</p> : null}
+      {collection ? (
+        <p>
+          {t('lumen.movie.collectionSize', 'Collection size: {count} movies', {
+            count: collection.parts.length,
+          })}
+        </p>
+      ) : error ? (
+        <div role="status">
+          <span>
+            {t(
+              'lumen.movie.collectionLoadFailed',
+              'Collection details could not be loaded.'
+            )}
+          </span>{' '}
+          <button className="chip" type="button" onClick={() => void reload()}>
+            {t('lumen.common.retry', 'Retry')}
+          </button>
+        </div>
+      ) : (
+        <p role="status">
+          {t('lumen.movie.collectionLoading', 'Loading collection details…')}
+        </p>
+      )}
+    </section>
+  );
 }
 
 export default function MovieDetail() {
@@ -166,6 +209,9 @@ export default function MovieDetail() {
   const available4k =
     s4k === MediaStatus.AVAILABLE || s4k === MediaStatus.PARTIAL;
   const visible4k = available4k && !(shared4k && mode === 'hide');
+  const canPlaySelectedQuality = selected4k
+    ? visible4k
+    : playableStatus?.k === 'ok';
   const fourKLabel = shared4k
     ? t('lumen.status.shared', 'Available to Other Users')
     : s4k === MediaStatus.PARTIAL
@@ -388,12 +434,42 @@ export default function MovieDetail() {
             allow4k={!!pub?.movie4kEnabled && can4k}
           />
           <WatchlistButton key={m.id} mediaType="movie" detail={m} />
+          <AvailabilitySubscriptionButton
+            key={m.id}
+            mediaType="movie"
+            tmdbId={m.id}
+          />
+          {m.mediaInfo?.id &&
+            user &&
+            canRequestMovies(user.permissions) &&
+            canPlaySelectedQuality &&
+            (!selected4k || (visible4k && !!pub?.movie4kEnabled && can4k)) && (
+              <VideoPlaybackButton
+                mediaId={m.mediaInfo.id}
+                is4k={selected4k}
+                title={m.title || ''}
+              />
+            )}
         </div>
         <div className="dacts pc">
           {main}
           {fourK}
           {trailerBtn}
         </div>
+        {m.collection && (
+          <VideoDisclosure
+            media="movie"
+            panel="collection"
+            label={t('lumen.movie.collection', 'Collection')}
+            testId="movie-collection"
+            deferChildrenUntilOpen
+          >
+            <MovieCollectionSummary
+              id={m.collection.id}
+              name={m.collection.name}
+            />
+          </VideoDisclosure>
+        )}
         {!s && (
           <AdvancedOptions
             key={pub?.movie4kEnabled && can4k && !has4k ? 'with-4k' : 'hd'}
@@ -432,95 +508,104 @@ export default function MovieDetail() {
             )}
           </div>
           <aside>
-            <Facts
-              rows={[
-                [
-                  t(
-                    'lumen.movie.fact.streamingProviders',
-                    'Streaming Providers'
-                  ),
-                  streamingProviders,
-                ],
-                [
-                  t('lumen.movie.fact.originalLanguage', 'Original Language'),
-                  originalLanguageLink(m.originalLanguage, '/movies'),
-                ],
-                [
-                  t(
-                    'lumen.movie.fact.productionCountries',
-                    'Production Countries'
-                  ),
-                  productionCountryLinks(m.productionCountries, '/movies'),
-                ],
-                [
-                  t('lumen.movie.fact.productionStudios', 'Production Studios'),
-                  m.productionCompanies?.length
-                    ? m.productionCompanies.map(({ id, name }, index) => (
-                        <span key={`${id}:${index}`}>
-                          {index > 0 && ', '}
-                          {Number.isSafeInteger(id) &&
-                          id > 0 &&
-                          id <= 1_000_000_000 ? (
-                            <Link to={`/movies?studio=${id}`}>{name}</Link>
-                          ) : (
-                            name
-                          )}
-                        </span>
-                      ))
-                    : null,
-                ],
-                [t('lumen.movie.fact.status', 'Status'), m.status],
-                [t('lumen.movie.fact.runtime', 'Runtime'), fmtRun(m.runtime)],
-                [
-                  t('lumen.movie.fact.budget', 'Budget'),
-                  movieCurrency(m.budget),
-                ],
-                [
-                  t('lumen.movie.fact.revenue', 'Revenue'),
-                  movieCurrency(m.revenue),
-                ],
-                [
-                  releaseDates.size > 1
-                    ? t('lumen.movie.fact.releaseDates', 'Release Dates')
-                    : t('lumen.movie.fact.released', 'Released'),
-                  releaseDates.size
-                    ? [...releaseDates.values()].map(
-                        ({ label, date }, index) => (
-                          <span key={label}>
-                            {index > 0 && <br />}
-                            {label} · {shortDate(date, false)},{' '}
-                            {date.slice(0, 4)}
+            <VideoDisclosure
+              media="movie"
+              panel="details"
+              label={t('lumen.detail.movieDetails', 'Movie Details')}
+            >
+              <Facts
+                rows={[
+                  [
+                    t(
+                      'lumen.movie.fact.streamingProviders',
+                      'Streaming Providers'
+                    ),
+                    streamingProviders,
+                  ],
+                  [
+                    t('lumen.movie.fact.originalLanguage', 'Original Language'),
+                    originalLanguageLink(m.originalLanguage, '/movies'),
+                  ],
+                  [
+                    t(
+                      'lumen.movie.fact.productionCountries',
+                      'Production Countries'
+                    ),
+                    productionCountryLinks(m.productionCountries, '/movies'),
+                  ],
+                  [
+                    t(
+                      'lumen.movie.fact.productionStudios',
+                      'Production Studios'
+                    ),
+                    m.productionCompanies?.length
+                      ? m.productionCompanies.map(({ id, name }, index) => (
+                          <span key={`${id}:${index}`}>
+                            {index > 0 && ', '}
+                            {Number.isSafeInteger(id) &&
+                            id > 0 &&
+                            id <= 1_000_000_000 ? (
+                              <Link to={`/movies?studio=${id}`}>{name}</Link>
+                            ) : (
+                              name
+                            )}
                           </span>
+                        ))
+                      : null,
+                  ],
+                  [t('lumen.movie.fact.status', 'Status'), m.status],
+                  [t('lumen.movie.fact.runtime', 'Runtime'), fmtRun(m.runtime)],
+                  [
+                    t('lumen.movie.fact.budget', 'Budget'),
+                    movieCurrency(m.budget),
+                  ],
+                  [
+                    t('lumen.movie.fact.revenue', 'Revenue'),
+                    movieCurrency(m.revenue),
+                  ],
+                  [
+                    releaseDates.size > 1
+                      ? t('lumen.movie.fact.releaseDates', 'Release Dates')
+                      : t('lumen.movie.fact.released', 'Released'),
+                    releaseDates.size
+                      ? [...releaseDates.values()].map(
+                          ({ label, date }, index) => (
+                            <span key={label}>
+                              {index > 0 && <br />}
+                              {label} · {shortDate(date, false)},{' '}
+                              {date.slice(0, 4)}
+                            </span>
+                          )
                         )
-                      )
-                    : date
-                      ? `${shortDate(date, false)}, ${date.slice(0, 4)}`
+                      : date
+                        ? `${shortDate(date, false)}, ${date.slice(0, 4)}`
+                        : '',
+                  ],
+                  [t('lumen.movie.fact.director', 'Director'), director],
+                  [t('lumen.movie.fact.rated', 'Rated'), certification],
+                  [
+                    t('lumen.movie.fact.collection', 'Collection'),
+                    m.collection && (
+                      <Link to={`/collection/${m.collection.id}`}>
+                        {m.collection.name}
+                      </Link>
+                    ),
+                  ],
+                  [
+                    '4K',
+                    pub?.movie4kEnabled
+                      ? available4k
+                        ? visible4k
+                          ? fourKLabel
+                          : ''
+                        : has4k
+                          ? t('lumen.movie.fact.requested', 'Requested')
+                          : t('lumen.movie.fact.notYet', 'Not yet')
                       : '',
-                ],
-                [t('lumen.movie.fact.director', 'Director'), director],
-                [t('lumen.movie.fact.rated', 'Rated'), certification],
-                [
-                  t('lumen.movie.fact.collection', 'Collection'),
-                  m.collection && (
-                    <Link to={`/collection/${m.collection.id}`}>
-                      {m.collection.name}
-                    </Link>
-                  ),
-                ],
-                [
-                  '4K',
-                  pub?.movie4kEnabled
-                    ? available4k
-                      ? visible4k
-                        ? fourKLabel
-                        : ''
-                      : has4k
-                        ? t('lumen.movie.fact.requested', 'Requested')
-                        : t('lumen.movie.fact.notYet', 'Not yet')
-                    : '',
-                ],
-              ]}
-            />
+                  ],
+                ]}
+              />
+            </VideoDisclosure>
           </aside>
         </div>
         <Section
