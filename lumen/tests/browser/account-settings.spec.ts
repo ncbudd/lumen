@@ -48,8 +48,370 @@ test('password and Episode Queue bookmarks scroll to the selected section after 
   await page.goto(appPath('./me/account'));
   await expect(page.getByText('Jellyfin User', { exact: true })).toBeVisible();
   await expect(
+    page.getByRole('heading', { name: 'Default Request Folders' })
+  ).toHaveCount(0);
+  await expect(
     page.locator('dd').getByText('User', { exact: true })
   ).toBeVisible();
+});
+
+test('request folders preserve service choices and confirm persisted values', async ({
+  page,
+}) => {
+  const locale = ['en', 'fr', 'ar'].includes(
+    process.env.LUMEN_ROOT_FOLDER_LOCALE ?? ''
+  )
+    ? (process.env.LUMEN_ROOT_FOLDER_LOCALE as 'en' | 'fr' | 'ar')
+    : 'en';
+  const labels = {
+    en: {
+      title: 'Default Request Folders',
+      movie: 'Movies · radarr one',
+      unavailable: 'Saved folder (not currently offered)',
+      save: 'Save Request Folders',
+    },
+    fr: {
+      title: 'Dossiers de destination par défaut',
+      movie: 'Films · radarr one',
+      unavailable: 'Dossier enregistré (actuellement indisponible)',
+      save: 'Enregistrer les dossiers de demande',
+    },
+    ar: {
+      title: 'مجلدات الطلب الافتراضية',
+      movie: 'الأفلام · radarr one',
+      unavailable: 'المجلد المحفوظ (غير متاح حاليًا)',
+      save: 'حفظ مجلدات الطلب',
+    },
+  } as const;
+  const profile = { username: 'Viewer', locale };
+  let folders: Record<string, string> = { 'radarr:1': '/legacy' };
+  const writes: unknown[] = [];
+  let rejectNextSave = true;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', async (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname
+      .replace(/^\/lumen(?=\/)/, '')
+      .replace(/^\/api\/v1/, '');
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 2,
+          displayName: 'Viewer',
+          permissions: 8192,
+          userType: 2,
+        },
+      });
+    if (path === '/user/2/settings/main') {
+      if (request.method() === 'POST') {
+        const body = request.postDataJSON();
+        writes.push(body);
+        if (rejectNextSave) {
+          rejectNextSave = false;
+          return route.fulfill({ status: 503, json: {} });
+        }
+        Object.assign(profile, body);
+        folders = body.requestRootFolders;
+      }
+      return route.fulfill({ json: profile });
+    }
+    if (path === '/user/2/settings/request-root-folders')
+      return route.fulfill({ json: folders });
+    if (/^\/service\/(radarr|sonarr|lidarr|readarr)$/.test(path)) {
+      const type = path.split('/')[2];
+      return route.fulfill({
+        json: [{ id: 1, name: `${type} one`, serviceType: 'ebook' }],
+      });
+    }
+    if (/^\/service\/(radarr|sonarr|lidarr|readarr)\/1$/.test(path))
+      return route.fulfill({
+        json: {
+          rootFolders: [{ path: '/media/primary' }, { path: '/media/alt' }],
+        },
+      });
+    if (path === '/service/comic')
+      return route.fulfill({
+        json: [{ id: 3, name: 'Kapowarr', backendType: 'kapowarr' }],
+      });
+    if (path === '/service/comic/3/rootfolders')
+      return route.fulfill({ json: { rootFolders: [{ path: '/comics' }] } });
+    if (path === '/user/2/settings/password')
+      return route.fulfill({ json: { hasPassword: true } });
+    if (path === '/user/2/settings/discover-book-sections')
+      return route.fulfill({
+        json: {
+          sections: [
+            { key: 'popular:ebook', enabled: true },
+            { key: 'popular:audiobook', enabled: true },
+          ],
+        },
+      });
+    if (path === '/languages') return route.fulfill({ json: [] });
+    if (path === '/request/lists') return route.fulfill({ json: [] });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/me/account'));
+  const title = page.getByRole('heading', { name: labels[locale].title });
+  await expect(title).toBeVisible();
+  const radarr = page.getByLabel(labels[locale].movie);
+  await expect(radarr).toHaveValue('/legacy');
+  await expect(radarr.locator('option[value="/legacy"]')).toHaveText(
+    labels[locale].unavailable
+  );
+  if (process.env.LUMEN_ROOT_FOLDER_CAPTURE_DIR) {
+    const project = await page.evaluate(() =>
+      innerWidth < 600 ? 'iphone' : 'desktop'
+    );
+    await page.screenshot({
+      path: `${process.env.LUMEN_ROOT_FOLDER_CAPTURE_DIR}/account-${project}.png`,
+      fullPage: true,
+      scale: 'css',
+      animations: 'disabled',
+    });
+  }
+  await radarr.selectOption('/media/alt');
+  await page.getByRole('button', { name: labels[locale].save }).click();
+  await expect(page.getByRole('alert')).toBeVisible();
+  await expect(radarr).toHaveValue('/media/alt');
+  await expect(
+    page.getByRole('button', { name: labels[locale].save })
+  ).toBeEnabled();
+  await page.getByRole('button', { name: labels[locale].save }).click();
+  await expect(radarr).toHaveValue('/media/alt');
+  expect(writes).toEqual([
+    { requestRootFolders: { 'radarr:1': '/media/alt' } },
+    { requestRootFolders: { 'radarr:1': '/media/alt' } },
+  ]);
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
+    )
+    .toBe(true);
+});
+
+test('external request lists connect, sync, import CSV and remove through account settings', async ({
+  page,
+}, testInfo) => {
+  const calls: { method: string; path: string; body?: unknown }[] = [];
+  let lists = [
+    {
+      id: 7,
+      provider: 'imdb',
+      sourceUrl: 'https://www.imdb.com/user/ur12345678/watchlist/',
+      lastSyncedAt: null,
+      lastSyncError: null,
+    },
+  ];
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', async (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname
+      .replace(/^\/lumen(?=\/)/, '')
+      .replace(/^\/api\/v1/, '');
+    if (['POST', 'DELETE'].includes(request.method())) {
+      const body = request.postData();
+      calls.push({
+        method: request.method(),
+        path,
+        ...(body ? { body: JSON.parse(body) } : {}),
+      });
+    }
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 2, displayName: 'Viewer', permissions: 32, userType: 2 },
+      });
+    if (path === '/user/2/settings/main')
+      return route.fulfill({ json: { username: 'Viewer' } });
+    if (path === '/user/2/settings/password')
+      return route.fulfill({ json: { hasPassword: true } });
+    if (path === '/user/2/settings/card-text')
+      return route.fulfill({ json: {} });
+    if (path === '/user/2/settings/discover-book-sections')
+      return route.fulfill({
+        json: {
+          sections: [
+            { key: 'popular:ebook', enabled: true },
+            { key: 'popular:audiobook', enabled: true },
+          ],
+        },
+      });
+    if (path === '/languages') return route.fulfill({ json: [] });
+    if (path === '/request/lists' && request.method() === 'GET')
+      return route.fulfill({ json: lists });
+    if (path === '/request/lists' && request.method() === 'POST') {
+      lists = [
+        ...lists,
+        {
+          id: 8,
+          provider: 'goodreads',
+          sourceUrl: String(request.postDataJSON().url),
+          lastSyncedAt: null,
+          lastSyncError: null,
+        },
+      ];
+      return route.fulfill({ status: 201, json: lists[1] });
+    }
+    if (path === '/request/lists/hardcover')
+      return route.fulfill({ status: 201, json: { validatedBooks: 3 } });
+    if (path === '/request/lists/7/sync')
+      return route.fulfill({
+        json: { requested: 2, alreadyRequested: 1, unmatched: 3, failed: 0 },
+      });
+    if (path === '/request/lists/7/import')
+      return route.fulfill({
+        json: { requested: 1, alreadyRequested: 0, unmatched: 0, failed: 0 },
+      });
+    if (path === '/request/lists/7' && request.method() === 'DELETE') {
+      lists = lists.filter((list) => list.id !== 7);
+      return route.fulfill({ status: 204 });
+    }
+    return route.fulfill({ json: {} });
+  });
+  await page.goto(appPath('/me/account'));
+  await expect(
+    page.getByRole('heading', { name: 'External Request Lists' })
+  ).toBeVisible();
+  if (process.env.LUMEN_EXTERNAL_LIST_CAPTURE_DIR) {
+    const { mkdir } = await import('node:fs/promises');
+    await mkdir(process.env.LUMEN_EXTERNAL_LIST_CAPTURE_DIR, {
+      recursive: true,
+    });
+    await page.screenshot({
+      path: `${process.env.LUMEN_EXTERNAL_LIST_CAPTURE_DIR}/account-${testInfo.project.name}.png`,
+      fullPage: true,
+      scale: 'css',
+      animations: 'disabled',
+    });
+  }
+  await page
+    .getByLabel('Public List URL')
+    .fill('https://www.goodreads.com/review/list/123');
+  await page.getByRole('button', { name: 'Add List' }).click();
+  await expect(
+    page.getByRole('link', {
+      name: 'https://www.goodreads.com/review/list/123',
+    })
+  ).toBeVisible();
+  await page.getByLabel('Hardcover API Token').fill('x'.repeat(20));
+  await page.getByRole('button', { name: 'Connect Hardcover' }).click();
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Books found on your shelf: 3' })
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Sync Now' }).first().click();
+  await expect(
+    page
+      .getByRole('status')
+      .filter({ hasText: '2 requested, 1 already requested' })
+  ).toBeVisible();
+  await page.getByLabel('Import IMDb CSV').setInputFiles({
+    name: 'watchlist.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from('Const,Title\ntt1234567,Test Title\n'),
+  });
+  await expect(
+    page
+      .getByRole('status')
+      .filter({ hasText: '1 requested, 0 already requested' })
+  ).toBeVisible();
+  expect(calls).toContainEqual({
+    method: 'POST',
+    path: '/request/lists/7/import',
+    body: { itemIds: ['tt1234567'] },
+  });
+  await page.getByRole('button', { name: 'Remove' }).first().click();
+  await expect(
+    page.getByRole('link', {
+      name: 'https://www.imdb.com/user/ur12345678/watchlist/',
+    })
+  ).toHaveCount(0);
+  expect(calls).toContainEqual({
+    method: 'POST',
+    path: '/request/lists',
+    body: { url: 'https://www.goodreads.com/review/list/123' },
+  });
+  expect(calls).toContainEqual({
+    method: 'POST',
+    path: '/request/lists/hardcover',
+    body: { apiToken: 'x'.repeat(20) },
+  });
+  expect(calls).toContainEqual({
+    method: 'DELETE',
+    path: '/request/lists/7',
+    body: undefined,
+  });
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
+    )
+    .toBe(true);
+});
+
+test('book home sections preserve order and enabled state through settings readback', async ({
+  page,
+}) => {
+  const defaults = [
+    { key: 'popular:ebook', enabled: true },
+    { key: 'popular:audiobook', enabled: true },
+  ];
+  let sections = defaults;
+  const writes: unknown[] = [];
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', async (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname
+      .replace(/^\/lumen(?=\/)/, '')
+      .replace(/^\/api\/v1/, '');
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 2, displayName: 'Viewer', permissions: 32, userType: 2 },
+      });
+    if (path === '/user/2/settings/main')
+      return route.fulfill({ json: { username: 'Viewer' } });
+    if (path === '/user/2/settings/password')
+      return route.fulfill({ json: { hasPassword: true } });
+    if (path === '/user/2/settings/discover-book-sections') {
+      if (request.method() === 'POST') {
+        sections = request.postDataJSON().sections;
+        writes.push(request.postDataJSON());
+      }
+      return route.fulfill({ json: { sections } });
+    }
+    if (path === '/request/lists') return route.fulfill({ json: [] });
+    if (path === '/languages') return route.fulfill({ json: [] });
+    return route.fulfill({ json: {} });
+  });
+  await page.goto(appPath('/me/account'));
+  await expect(
+    page.getByRole('heading', { name: 'Book and Audiobook Home Sections' })
+  ).toBeVisible();
+  const picker = page.locator('#book-home-section-add');
+  await picker.selectOption('new:ebook');
+  await page.getByRole('button', { name: 'Add Section' }).click();
+  const newRow = page.locator('.set').filter({ hasText: 'New Books' });
+  await newRow.getByRole('button', { name: 'Move Up' }).click();
+  await newRow.getByRole('button', { name: 'Move Up' }).click();
+  const enabled = newRow.getByRole('checkbox');
+  await enabled.uncheck();
+  await page.getByRole('button', { name: 'Save Sections' }).click();
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Book home sections saved.' })
+  ).toBeVisible();
+  expect(writes).toEqual([
+    {
+      sections: [
+        { key: 'new:ebook', enabled: false },
+        { key: 'popular:ebook', enabled: true },
+        { key: 'popular:audiobook', enabled: true },
+      ],
+    },
+  ]);
+  await expect(picker.locator('option[value="new:ebook"]')).toHaveCount(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
+    )
+    .toBe(true);
 });
 
 test('account settings preserve failed profile edits and save only changes and password fields', async ({
@@ -625,6 +987,115 @@ for (const scenario of [
   });
 }
 
+test('account applies the shared built-in theme preset and preserves overrides', async ({
+  page,
+}) => {
+  const overrides: Record<string, string | number> = {
+    '--theme-page-spotlight-strength': 0.5,
+    '--theme-page-bg': '#112233',
+  };
+  let submitted: Record<string, string | number | null> | undefined;
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname.slice(7);
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 2,
+          permissions: 32,
+          settings: { advancedThemeOverrides: overrides },
+        },
+      });
+    if (path === '/user/2/settings/advanced-theme') {
+      submitted = request.postDataJSON().changes;
+      for (const [key, value] of Object.entries(submitted ?? {})) {
+        if (typeof value === 'string' || typeof value === 'number')
+          overrides[key] = value;
+        else delete overrides[key];
+      }
+      return route.fulfill({ json: { advancedThemeOverrides: overrides } });
+    }
+    return route.fulfill({ json: {} });
+  });
+  await page.goto(appPath('./me/account#advanced-theme'));
+  await page.locator('#advanced-theme').scrollIntoViewIfNeeded();
+  if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/candidate-${page.viewportSize()?.width}.png`,
+    });
+  await page.getByLabel('Page Background').fill('#445566');
+  await page.getByLabel('Built-in Theme Preset').selectOption('john-redesign');
+  await page.getByRole('button', { name: 'Apply Theme Preset' }).click();
+  await expect(page.getByText('Theme colors saved.')).toBeVisible();
+  expect(submitted?.preset).toBe('john-redesign');
+  expect(submitted?.['--palette-blue']).toBe('#0051d4');
+  expect(submitted?.['--theme-page-bg']).toBe('#445566');
+  expect(overrides['--theme-page-bg']).toBe('#445566');
+  expect(overrides['--theme-page-spotlight-strength']).toBe(0.5);
+  await expect(page.getByLabel('Page Background')).toHaveValue('#445566');
+  await page.getByRole('button', { name: 'Edit All Overrides' }).click();
+  const editor = page.getByLabel('Theme Override JSON');
+  await editor.fill('{"--theme-control-border":"#abcdef"}');
+  await page.getByLabel('Built-in Theme Preset').selectOption('john-redesign');
+  await page.getByRole('button', { name: 'Apply Theme Preset' }).click();
+  await expect.poll(() => overrides['--theme-control-border']).toBe('#abcdef');
+  expect(overrides['--theme-page-bg']).toBe('#445566');
+  expect(overrides['--theme-page-spotlight-strength']).toBe(0.5);
+  await page.getByRole('button', { name: 'Edit Theme Colors' }).click();
+  await expect(page.getByLabel('Page Background')).toHaveValue('#445566');
+  await page.getByLabel('Built-in Theme Preset').scrollIntoViewIfNeeded();
+  await expect(page.getByText(/Applying a preset saves it/)).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
+});
+
+test('account resets all saved theme overrides together', async ({ page }) => {
+  const overrides: Record<string, string | number> = {
+    preset: 'john-redesign',
+    '--theme-page-bg': '#112233',
+    '--theme-page-spotlight-strength': 0.5,
+  };
+  let submitted: Record<string, string | number | null> | undefined;
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname.slice(7);
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 2,
+          permissions: 32,
+          settings: { advancedThemeOverrides: overrides },
+        },
+      });
+    if (path === '/user/2/settings/advanced-theme') {
+      submitted = request.postDataJSON().changes;
+      for (const [key, value] of Object.entries(submitted ?? {})) {
+        if (typeof value === 'string' || typeof value === 'number')
+          overrides[key] = value;
+        else delete overrides[key];
+      }
+      return route.fulfill({ json: { advancedThemeOverrides: overrides } });
+    }
+    return route.fulfill({ json: {} });
+  });
+  await page.goto(appPath('./me/account#advanced-theme'));
+  await page.getByRole('button', { name: 'Reset Theme Overrides' }).click();
+  await expect(page.getByText('Theme overrides cleared.')).toBeVisible();
+  expect(submitted).toEqual({
+    preset: null,
+    '--theme-page-bg': null,
+    '--theme-page-spotlight-strength': null,
+  });
+  expect(overrides).toEqual({});
+  await expect(page.getByLabel('Page Background')).toHaveValue('');
+  await expect(
+    page.getByRole('button', { name: 'Reset Theme Overrides' })
+  ).toBeDisabled();
+});
+
 test('account theme colors preserve stored overrides for other controls', async ({
   page,
 }) => {
@@ -746,7 +1217,7 @@ test('account theme colors preserve stored overrides for other controls', async 
     await expect(sidebar).toHaveCSS('border-right-color', 'rgb(42, 48, 59)');
     await expect(sidebar).toHaveCSS('background-image', 'none');
   } else {
-    const tabs = page.getByRole('navigation', { name: 'Tabs' });
+    const tabs = page.locator('nav.tabbar[aria-label="Tabs"]');
     await expect(tabs).toHaveCSS('background-image', 'none');
     const width = (await tabs.boundingBox())?.width;
     const color = page.getByLabel('Sidebar Background Start');

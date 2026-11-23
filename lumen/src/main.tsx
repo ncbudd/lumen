@@ -23,6 +23,7 @@ import { LumenLocaleProvider, useLumenLocale } from './i18n';
 import { canSearchIndexers } from './indexerPermissions';
 import { clearLoginLinkFromAddress } from './loginLink';
 import { MediaServerProvider } from './mediaServer';
+import { nativeDiscoverDestination } from './nativeDiscoverRoutes';
 import AdminHome from './pages/AdminHome';
 import Associations from './pages/Associations';
 import BookDetail from './pages/BookDetail';
@@ -226,6 +227,23 @@ function ProfileBookmark() {
   return <Navigate to={`/me${search}`} replace />;
 }
 
+function NativeDiscoverBookmark() {
+  const { pathname, search, hash } = useLocation();
+  return (
+    <Navigate to={nativeDiscoverDestination(pathname, search, hash)} replace />
+  );
+}
+
+function NativeComingSoonBookmark() {
+  const { search, hash } = useLocation();
+  return <Navigate to={`/soon${search}${hash}`} replace />;
+}
+
+function NativeUsersBookmark() {
+  const { search, hash } = useLocation();
+  return <Navigate to={`/admin/users${search}${hash}`} replace />;
+}
+
 function ProfileSettingsBookmark() {
   const { pathname, search } = useLocation();
   const suffix = pathname.split('/profile/settings')[1] ?? '';
@@ -361,6 +379,12 @@ function App() {
       <Shell>
       <PageBoundary key={location.pathname}>
         <Routes>
+          <Route path="/discover/*" element={<NativeDiscoverBookmark />} />
+          <Route
+            path="/coming-soon"
+            element={<NativeComingSoonBookmark />}
+          />
+          <Route path="/users" element={<NativeUsersBookmark />} />
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/" element={<Discover />} />
           <Route path="/providers" element={<ProviderDiscovery />} />
@@ -813,7 +837,7 @@ function App() {
               </Suspense>
             }
           />
-          <Route path="/soon" element={<MediaCategoryRoute categories={['movie']}><Soon /></MediaCategoryRoute>} />
+          <Route path="/soon" element={<MediaCategoryRoute categories={['movie', 'tv']}><Soon /></MediaCategoryRoute>} />
           <Route path="/me" element={<Me />} />
           <Route
             path="/me/account"

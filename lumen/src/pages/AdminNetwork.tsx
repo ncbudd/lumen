@@ -430,6 +430,7 @@ function NetworkForm({
   async function save() {
     if (pending.current || !dirty) return;
     const patch: Settings = {};
+    const changedIds: string[] = [];
     for (const { group, fields } of sections) {
       const changes: Settings = {};
       for (const field of fields) {
@@ -437,6 +438,7 @@ function NetworkForm({
         const value = draft[id];
         if (id === 'proxy.password' && draft['proxy.clearPassword']) {
           changes.password = '';
+          changedIds.push(id);
         } else if (value !== saved[id]) {
           if (field.kind === 'number' && value === '') {
             setFailure(
@@ -477,6 +479,7 @@ function NetworkForm({
               : field.key === 'apiRequestTimeout'
                 ? Math.round(Number(value) * 1000)
                 : Number(value);
+          changedIds.push(id);
         }
       }
 
@@ -520,7 +523,23 @@ function NetworkForm({
         body: JSON.stringify(patch),
       });
       if (generation !== sessionGeneration()) return;
-      const values = readSettings(result);
+      const readback = await api<Settings>(path);
+      if (generation !== sessionGeneration()) return;
+      const responseValues = readSettings(result);
+      const values = readSettings(readback);
+      if (
+        changedIds.some(
+          (id) => responseValues[id] !== draft[id] || values[id] !== draft[id]
+        )
+      ) {
+        setFailure(
+          t(
+            'lumen.adminNetwork.confirmFailure',
+            'Could not confirm the saved network settings.'
+          )
+        );
+        return;
+      }
       setSaved(values);
       setDraft(values);
       setNotice(
@@ -568,6 +587,11 @@ function NetworkForm({
                       'components.Settings.SettingsNetwork.transportSecurityDescription',
                       'Choose how SeerrNG protects browser login sessions. Listener changes require a server restart.'
                     )}
+            </p>
+          )}
+          {group === 'tls' && draft['tls.mode'] === 'provided' && (
+            <p className="note">
+              {t('components.Settings.SettingsNetwork.providedFileTip')}
             </p>
           )}
           <div className="setlist">

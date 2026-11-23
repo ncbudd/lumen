@@ -3,9 +3,12 @@ import { Link, useLocation } from 'react-router-dom';
 import { api, ApiError } from '../api';
 import { isAdministrator, useAuth } from '../auth';
 import AccountThemeOverrides from '../components/AccountThemeOverrides';
+import { BookHomeSections } from '../components/BookHomeSections';
 import { Section } from '../components/cards';
 import { CardTitlePreferences } from '../components/CardTitlePreferences';
+import { ExternalRequestLists } from '../components/ExternalRequestLists';
 import { ServiceNote } from '../components/extra';
+import { RequestRootFolders } from '../components/RequestRootFolders';
 import { StreamingSubscriptions } from '../components/StreamingSubscriptions';
 import { useApi, usePublicSettings } from '../hooks';
 import { lumenLocales, useLumenLocale } from '../i18n';
@@ -878,6 +881,11 @@ function Settings({ id, plex }: { id: number; plex: boolean }) {
           initialIds={profile.data.streamingSubscriptionProviderIds ?? []}
         />
       )}
+      {user && (
+        <RequestRootFolders userId={id} permissions={user.permissions ?? 0} />
+      )}
+      <ExternalRequestLists />
+      <BookHomeSections userId={id} />
       <CardTitlePreferences path={base + '/card-text'} />
       <Section
         title={t(

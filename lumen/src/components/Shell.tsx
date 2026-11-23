@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   Link,
   NavLink,
@@ -77,7 +77,6 @@ const SIDE: [string, IconName, string, string][] = [
 const TABS: [string, IconName, string, string][] = [
   ['/', 'home', 'components.Layout.Sidebar.discover', 'Discover'],
   ['/search', 'search', 'i18n.searchLabel', 'Search'],
-  ['/books', 'book', 'components.Layout.Sidebar.browsebooks', 'Books'],
   ['/requests', 'inbox', 'components.Layout.Sidebar.requests', 'Requests'],
   ['/me', 'user', 'components.Layout.UserDropdown.myprofile', 'You'],
 ];
@@ -139,6 +138,27 @@ export default function Shell({ children }: { children: ReactNode }) {
     );
   };
   const loc = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
+  useEffect(() => setMoreOpen(false), [loc.pathname]);
+  useEffect(() => {
+    if (!moreOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMoreOpen(false);
+    };
+    const closeOnNavigation = (event: MouseEvent) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest('#mobile-primary-navigation a')
+      )
+        setMoreOpen(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    window.addEventListener('click', closeOnNavigation, true);
+    return () => {
+      window.removeEventListener('keydown', closeOnEscape);
+      window.removeEventListener('click', closeOnNavigation, true);
+    };
+  }, [moreOpen]);
   const showBlocklist = useBlocklistNavigation();
   const managesRequests = canManageRequests(user?.permissions);
   const [pendingRequests, setPendingRequests] = useState(0);
@@ -414,7 +434,12 @@ export default function Shell({ children }: { children: ReactNode }) {
   return (
     <>
       <div className="app">
-        <nav className="side" aria-label="Main">
+        <nav
+          id="mobile-primary-navigation"
+          className="side"
+          aria-label={t('i18n.primaryNavigation', 'Main navigation')}
+          data-mobile-open={moreOpen || undefined}
+        >
           <Link
             className="brand"
             to="/"
@@ -439,15 +464,28 @@ export default function Shell({ children }: { children: ReactNode }) {
           ))}
           {/* music, comics, games and the rest: only the ones this server has turned on */}
           {extras.list.map((e) => (
-            <NavLink
-              key={e.path}
-              to={e.path}
-              onClick={toTop(e.path)}
-              className={({ isActive }) => (isActive ? 'active' : '')}
-            >
-              <Icon name={e.icon} />
-              {t(e.message, e.label)}
-            </NavLink>
+            <Fragment key={e.path}>
+              <NavLink
+                to={e.path}
+                onClick={toTop(e.path)}
+                className={({ isActive }) => (isActive ? 'active' : '')}
+              >
+                <Icon name={e.icon} />
+                {t(e.message, e.label)}
+              </NavLink>
+              {e.key === 'game' &&
+                extras.games.includes('game') &&
+                canUseRequestAccess(user?.permissions) && (
+                  <NavLink
+                    to="/games/discovery"
+                    onClick={toTop('/games/discovery')}
+                    className={({ isActive }) => (isActive ? 'active' : '')}
+                  >
+                    <Icon name="game" />
+                    {t('lumen.gameFinder.title', 'Game Finder')}
+                  </NavLink>
+                )}
+            </Fragment>
           ))}
           {shareAvailable && (
             <NavLink
@@ -480,7 +518,11 @@ export default function Shell({ children }: { children: ReactNode }) {
             {pendingRequests > 0 && (
               <span
                 className="n"
-                aria-label={`${pendingRequests} pending requests`}
+                aria-label={t(
+                  'lumen.nav.pendingRequests',
+                  'Pending requests: {count}',
+                  { count: pendingRequests }
+                )}
               >
                 {pendingRequests}
               </span>
@@ -546,10 +588,13 @@ export default function Shell({ children }: { children: ReactNode }) {
             <Icon name="cal" />
             {t('components.Layout.Sidebar.calendar', 'Release Calendar')}
           </NavLink>
-          <NavLink to="/soon">
-            <Icon name="cal" />
-            {t('components.Layout.Sidebar.comingSoon', 'Coming soon')}
-          </NavLink>
+          {(extras.categoryEnabled('movie') ||
+            extras.categoryEnabled('tv')) && (
+            <NavLink to="/soon">
+              <Icon name="cal" />
+              {t('components.Layout.Sidebar.comingSoon', 'Coming soon')}
+            </NavLink>
+          )}
           <Link className="me" to="/me">
             <span className="avatar">
               <AvatarContent
@@ -564,6 +609,13 @@ export default function Shell({ children }: { children: ReactNode }) {
             </span>
           </Link>
         </nav>
+        {moreOpen && (
+          <button
+            className="mobile-nav-scrim"
+            aria-label={t('i18n.closeMenu', 'Close menu')}
+            onClick={() => setMoreOpen(false)}
+          />
+        )}
         <div className="main">
           <div className="topbar" ref={topbar}>
             <button
@@ -632,7 +684,7 @@ export default function Shell({ children }: { children: ReactNode }) {
       )}
       <nav
         className="tabbar"
-        aria-label="Tabs"
+        aria-label={t('i18n.tabs', 'Tabs')}
         aria-hidden={tabsHidden || undefined}
         data-hidden={tabsHidden || undefined}
         inert={tabsHidden}
@@ -652,13 +704,31 @@ export default function Shell({ children }: { children: ReactNode }) {
             {h === '/requests' && pendingRequests > 0 && (
               <span
                 className="badge"
-                aria-label={`${pendingRequests} pending requests`}
+                aria-label={t(
+                  'lumen.nav.pendingRequests',
+                  'Pending requests: {count}',
+                  { count: pendingRequests }
+                )}
               >
                 {pendingRequests}
               </span>
             )}
           </NavLink>
         ))}
+        <button
+          type="button"
+          className="tab"
+          aria-label={t(
+            moreOpen ? 'i18n.closeMenu' : 'i18n.moreNavigation',
+            moreOpen ? 'Close menu' : 'More navigation'
+          )}
+          aria-expanded={moreOpen}
+          aria-controls="mobile-primary-navigation"
+          onClick={() => setMoreOpen((open) => !open)}
+        >
+          <Icon name={moreOpen ? 'x' : 'more'} />
+          {t('lumen.nav.more', 'More')}
+        </button>
       </nav>
     </>
   );

@@ -72,6 +72,21 @@ for (const permissions of [32, 8796093022208]) {
     await expect(
       page.getByText('Current Download', { exact: true })
     ).toBeVisible();
+    const partialWarning = page.getByText(
+      'Some acquisition services could not be checked. Their warnings may be missing or out of date.',
+      { exact: true }
+    );
+    await expect(partialWarning).toBeVisible();
+    const warningColors = await page.evaluate(() => {
+      const warning = document.querySelector('.note.wait');
+      const probe = document.createElement('span');
+      probe.style.color = 'var(--wait)';
+      document.body.append(probe);
+      const expected = getComputedStyle(probe).color;
+      probe.remove();
+      return { actual: warning && getComputedStyle(warning).color, expected };
+    });
+    expect(warningColors.actual).toBe(warningColors.expected);
     await page.getByRole('button', { name: 'Next page' }).click();
     await expect.poll(() => queries.at(-1)?.get('page')).toBe('2');
     await page.getByRole('button', { name: 'History', exact: true }).click();
@@ -391,6 +406,38 @@ test('Download Inbox follows the saved locale at desktop and phone sizes', async
       name: expected('import', 'Import Selected Files'),
     })
   ).toBeDisabled();
+  const searchControlBounds = await dialog.evaluate((element) => {
+    const form = element.querySelector('form.toolbar');
+    const field = form?.querySelector('label.search');
+    const button = form?.querySelector('button');
+    const bounds = (item: Element | null | undefined) => {
+      if (!item) return null;
+      const { left, right } = item.getBoundingClientRect();
+      return { left, right };
+    };
+    return {
+      sheet: bounds(element),
+      field: bounds(field),
+      button: bounds(button),
+    };
+  });
+  expect(searchControlBounds.sheet).not.toBeNull();
+  expect(searchControlBounds.field).not.toBeNull();
+  expect(searchControlBounds.button).not.toBeNull();
+  expect(searchControlBounds.field!.left).toBeGreaterThanOrEqual(
+    searchControlBounds.sheet!.left
+  );
+  expect(searchControlBounds.button!.right).toBeLessThanOrEqual(
+    searchControlBounds.sheet!.right
+  );
+  const modeBounds = await dialog
+    .locator('label.sel[data-layout="stacked"] select')
+    .boundingBox();
+  expect(modeBounds).not.toBeNull();
+  expect(modeBounds!.width).toBeGreaterThan(200);
+  expect(modeBounds!.x + modeBounds!.width).toBeLessThanOrEqual(
+    searchControlBounds.sheet!.right
+  );
   await page.waitForTimeout(350);
   expect(
     await page.evaluate(

@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { advancedThemePresets } from '@app/utils/advancedThemePresets';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import { friendlyError } from '../errors';
@@ -19,6 +20,9 @@ export default function AccountThemeOverrides() {
   const [editingJson, setEditingJson] = useState(false);
   const [json, setJson] = useState('{}');
   const [jsonBase, setJsonBase] = useState<Record<string, string | number>>({});
+  const [selectedPreset, setSelectedPreset] = useState(
+    typeof saved?.preset === 'string' ? saved.preset : ''
+  );
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
@@ -29,7 +33,59 @@ export default function AccountThemeOverrides() {
     (value) => value.trim() !== '' && !isThemeColor(value.trim())
   );
 
-  async function save(changes: Record<string, string | number | null>) {
+  useEffect(() => {
+    setSelectedPreset(typeof saved?.preset === 'string' ? saved.preset : '');
+  }, [saved?.preset]);
+
+  function applyPreset() {
+    const preset = advancedThemePresets.find(
+      (item) => item.id === selectedPreset
+    );
+    if (!preset || !user) return;
+    let current: Record<string, string | number> = { ...(saved ?? {}) };
+    for (const [key, value] of Object.entries(draft)) {
+      if (value.trim()) current[key] = value.trim();
+      else delete current[key];
+    }
+    if (editingJson) {
+      try {
+        const parsed: unknown = JSON.parse(json);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
+          throw new Error();
+        const entries = Object.entries(parsed);
+        if (
+          entries.some(
+            ([, value]) =>
+              typeof value !== 'string' && typeof value !== 'number'
+          )
+        )
+          throw new Error();
+        current = { ...current, ...Object.fromEntries(entries) };
+      } catch {
+        setNotice('');
+        setError(
+          t(
+            'lumen.account.themeOverrideInvalidJson',
+            'Enter a JSON object with string or numeric override values.'
+          )
+        );
+        return;
+      }
+    }
+    const target = { ...preset.overrides, ...current, preset: preset.id };
+    const changes: Record<string, string | number | null> = Object.fromEntries(
+      Object.entries(target).filter(([key, value]) => saved?.[key] !== value)
+    );
+    for (const key of Object.keys(saved ?? {}))
+      if (!Object.hasOwn(target, key)) changes[key] = null;
+    if (Object.keys(changes).length === 0) return;
+    void save(changes);
+  }
+
+  async function save(
+    changes: Record<string, string | number | null>,
+    reset = false
+  ) {
     if (!user || pending.current || Object.keys(changes).length === 0) return;
     const generation = sessionGeneration();
     pending.current = true;
@@ -67,15 +123,20 @@ export default function AccountThemeOverrides() {
         return;
       }
       setDraft({});
+      if (reset) setSelectedPreset('');
       if (editingJson) openJson(readback ?? {});
       setNotice(
         t(
-          editingJson
-            ? 'pages.profile.advancedTheme.saved'
-            : 'lumen.account.themeColorsSaved',
-          editingJson
-            ? 'Your theme overrides were saved.'
-            : 'Theme colors saved.'
+          reset
+            ? 'lumen.account.themeOverridesReset'
+            : editingJson
+              ? 'pages.profile.advancedTheme.saved'
+              : 'lumen.account.themeColorsSaved',
+          reset
+            ? 'Theme overrides cleared.'
+            : editingJson
+              ? 'Your theme overrides were saved.'
+              : 'Theme colors saved.'
         )
       );
     } catch (cause) {
@@ -164,6 +225,57 @@ export default function AccountThemeOverrides() {
           )}
         </p>
       )}
+      <div className="setlist">
+        <label className="set cfg-row">
+          <b>{t('lumen.account.themePreset', 'Built-in Theme Preset')}</b>
+          <select
+            className="cfg-input"
+            value={selectedPreset}
+            disabled={busy}
+            onChange={(event) => setSelectedPreset(event.target.value)}
+          >
+            <option value="">
+              {t('lumen.account.themePresetPlaceholder', 'Choose a preset')}
+            </option>
+            {advancedThemePresets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="note">
+          {t(
+            'lumen.account.themePresetHelp',
+            'Applying a preset saves it to your account and keeps existing override values, which continue to take precedence.'
+          )}
+        </p>
+        <div className="toolbar">
+          <button
+            className="btn btn-quiet btn-sm"
+            type="button"
+            disabled={busy || !selectedPreset || invalid}
+            onClick={applyPreset}
+          >
+            {t('lumen.account.applyThemePreset', 'Apply Theme Preset')}
+          </button>
+          <button
+            className="btn btn-quiet btn-sm"
+            type="button"
+            disabled={busy || Object.keys(saved ?? {}).length === 0}
+            onClick={() =>
+              void save(
+                Object.fromEntries(
+                  Object.keys(saved ?? {}).map((key) => [key, null])
+                ),
+                true
+              )
+            }
+          >
+            {t('lumen.account.resetThemeOverrides', 'Reset Theme Overrides')}
+          </button>
+        </div>
+      </div>
       <form
         onSubmit={(event) => {
           event.preventDefault();

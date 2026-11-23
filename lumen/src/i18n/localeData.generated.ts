@@ -6,6 +6,23 @@ export const localeData = [
     direction: 'rtl',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'مسلسلات',
+      'components.Common.FormatRequestControl.request': 'طلب',
+      'components.ArtistDetails.requestdiscography':
+        'طلب قائمة الأعمال الموسيقية',
+      'components.ArtistDetails.followreleases': 'متابعة الألبومات الجديدة',
+      'components.MusicDetails.requestdiscography': 'اطلب قائمة إصدارات الفنان',
+      'components.Settings.lidarrsettings': 'Lidarr التركيبات',
+      'components.MusicDetails.blocklisted': 'هذا العنوان مدرج في قائمة الحظر.',
+      'components.MusicDetails.flacAvailable': 'ونسخة FLAC متاحة بالفعل.',
+      'components.MusicDetails.flacPending': 'يوجد بالفعل طلب FLAC مفتوح.',
+      'components.MusicDetails.flacServiceUnavailable':
+        'لم يتم إعداد أي خدمة موسيقى FLAC.',
+      'components.MusicDetails.mp3Available': 'إصدار MP3 متاح بالفعل.',
+      'components.MusicDetails.mp3Pending': 'يوجد بالفعل طلب MP3 مفتوح',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'لم يتم إعداد أي خدمة موسيقى MP3.',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'الخادم المستهدف',
       'components.IdentityMappingControls.change': 'تغيير مطابقة العنوان',
       'components.IdentityMappingControls.match': 'طابق العنوان مع الكتالوج',
       'components.IdentityMappingControls.mediaTypeLabel': 'نوع وسائط الإعلام',
@@ -1410,7 +1427,11 @@ export const localeData = [
       'i18n.next': 'التالي',
       'i18n.previous': 'السابق',
       'i18n.providerDiscovery': 'الكشف عن المورد',
+      'i18n.primaryNavigation': 'التنقل الرئيسي',
       'i18n.searchLabel': 'بحث',
+      'i18n.tabs': 'علامات التبويب',
+      'i18n.closeMenu': 'أغلق القائمة',
+      'i18n.moreNavigation': 'المزيد من عناصر التنقل',
       'i18n.unknown': 'غير معروف',
       'i18n.usersettings': 'إعدادات المستخدم',
       'library.accounts': 'الحسابات المرتبطة بالمشروع',
@@ -1583,6 +1604,17 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'للبالغين',
       'components.Discover.DiscoverAdult.unavailable':
         'البحث في مشاهد البالغين غير متاح حاليًا.',
+      'components.Discover.FilterPanel.filters': 'عوامل التصفية',
+      'components.SoftwareCatalog.allPcPlatforms': 'جميع منابر PC',
+      'components.SoftwareCatalog.allSystems': 'جميع النظم',
+      'components.SoftwareCatalog.genreFilter': 'النوع',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        'أدخل سنة الإفراج من 1950 إلى 2200',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'macOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'سنة الإصدار',
+      'components.SoftwareCatalog.windows': 'النوافذ',
+      'components.IssueDetails.allepisodes': 'جميع الحلقات',
       'components.Layout.Sidebar.comingSoon': 'قريبًا',
       'components.Layout.Sidebar.watchSessions': 'جلسات المشاهدة',
       'components.Layout.Sidebar.you': 'أنت',
@@ -1595,6 +1627,7 @@ export const localeData = [
       'components.Persius.empty': 'لا توجد عناوين لعرضها.',
       'components.Persius.failed': 'تعذر تحميل هذا القسم.',
       'components.Persius.genres': 'الأنواع',
+      'components.Persius.loading': 'جارٍ التحميل…',
       'components.Persius.movies': 'أفلام',
       'components.Persius.popularAudio': 'كتب صوتية رائجة',
       'components.Persius.popularMovies': 'أفلام رائجة',
@@ -1604,6 +1637,9 @@ export const localeData = [
       'components.Persius.searchAll': 'أفلام ومسلسلات وكتب ورواة…',
       'components.Persius.seeAll': 'عرض الكل',
       'components.Persius.series': 'مسلسلات',
+      'components.UserProfile.UserSettings.UserLinkedAccountsSettings.linkIdentityProvider':
+        'ربط موفّر الهوية',
+      'components.UserProfile.UserSettings.menuClientTokens': 'رموز العملاء',
       'lumen.account.administratorAccess': 'يملك هذا الحساب صلاحيات المسؤول.',
       'lumen.account.backToSettings': 'العودة إلى إعدادات الحساب',
       'lumen.account.backToYou': 'العودة إلى صفحتك',
@@ -1701,6 +1737,27 @@ export const localeData = [
       'lumen.account.saveStreamingSubscriptions': 'حفظ اشتراكات خدمات البث',
       'lumen.account.saveThemeColors': 'حفظ ألوان المظهر',
       'lumen.account.saving': 'جارٍ الحفظ…',
+      'lumen.account.rootFoldersTitle': 'مجلدات الطلب الافتراضية',
+      'lumen.account.rootFoldersDescription':
+        'اختر مجلد الوجهة الافتراضي للطلبات في كل خدمة. تستخدم المجلدات غير المحددة مجلد الخدمة الافتراضي.',
+      'lumen.account.rootFoldersLoadFailure':
+        'تعذر تحميل إعدادات مجلدات الطلب.',
+      'lumen.account.rootFoldersOptionsFailure':
+        'تعذر تحميل خيارات مجلدات الخدمات.',
+      'lumen.account.rootFoldersMismatch':
+        'القيم المحفوظة غير مطابقة. راجع القيم الحالية.',
+      'lumen.account.rootFoldersSaveFailure': 'تعذر حفظ إعدادات مجلدات الطلب.',
+      'lumen.account.rootFolder.movie': 'الأفلام',
+      'lumen.account.rootFolder.series': 'المسلسلات',
+      'lumen.account.rootFolder.music': 'الموسيقى',
+      'lumen.account.rootFolder.books': 'الكتب',
+      'lumen.account.rootFolder.audiobooks': 'الكتب الصوتية',
+      'lumen.account.rootFolder.comics': 'القصص المصورة',
+      'lumen.account.rootFolderDefault': 'استخدام مجلد الخدمة الافتراضي',
+      'lumen.account.rootFolderUnavailable': 'المجلد المحفوظ (غير متاح حاليًا)',
+      'lumen.account.rootFolderServiceFailure': 'تعذر تحميل مجلدات هذه الخدمة.',
+      'lumen.account.rootFolderNoServices': 'لم يتم إعداد خدمات للطلبات.',
+      'lumen.account.saveRootFolders': 'حفظ مجلدات الطلب',
       'lumen.account.selectShown': 'تحديد الخدمات المعروضة',
       'lumen.account.streamingSubscriptions': 'اشتراكات خدمات البث',
       'lumen.account.streamingSubscriptionsConfirmFailure':
@@ -1897,6 +1954,8 @@ export const localeData = [
       'lumen.adminConnectionHosts.retry': 'إعادة المحاولة',
       'lumen.adminConnectionHosts.save': 'حفظ',
       'lumen.adminConnectionHosts.saveFailure': 'تعذّر حفظ مضيفات الاتصال.',
+      'lumen.adminConnectionHosts.confirmFailure':
+        'تعذّر تأكيد حفظ مضيفات الاتصال.',
       'lumen.adminConnectionHosts.saved': 'تم حفظ مضيفات الاتصال.',
       'lumen.adminConnectionHosts.sectionTitle': 'المضيفون المحفوظون',
       'lumen.adminConnectionHosts.title': 'مضيفو الاتصال',
@@ -2246,6 +2305,7 @@ export const localeData = [
       'lumen.adminNetwork.ackRequired':
         'أقرّ بأن جلسات تسجيل الدخول عبر HTTP قد تُعترض قبل تفعيل تسجيل الدخول عبر HTTP.',
       'lumen.adminNetwork.clearProxyPassword': 'مسح كلمة مرور الوكيل المحفوظة',
+      'lumen.adminNetwork.confirmFailure': 'تعذّر تأكيد حفظ إعدادات الشبكة.',
       'lumen.adminNetwork.currentIpRequired':
         'أضف عنوان IP الحالي إلى الشبكات المسموح بها قبل تفعيل هذا التقييد أو تغييره.',
       'lumen.adminNetwork.differentHttpsPort':
@@ -2349,6 +2409,7 @@ export const localeData = [
       'lumen.adminReaderDelivery.removeShelfTitle': 'إزالة {name}؟',
       'lumen.adminReaderDelivery.removeShelfWithKobo':
         'سيؤدي هذا إلى إزالة رف القارئ ومجموعة Kobo. ستبقى ملفات المكتبة كما هي.',
+      'lumen.adminReaderDelivery.saveFailure': 'تعذر حفظ إعدادات القارئ.',
       'lumen.adminReaderDelivery.saveSettings': 'حفظ إعدادات القارئ',
       'lumen.adminReaderDelivery.savedCredential': 'بيانات اعتماد محفوظة',
       'lumen.adminReaderDelivery.settingsSaved': 'تم حفظ إعدادات القارئ.',
@@ -2692,8 +2753,8 @@ export const localeData = [
       'lumen.associations.view': 'طريقة عرض الارتباطات',
       'lumen.associations.what': 'الارتباطات',
       'lumen.automaticBlocklist.confirmFailure':
-        'تعذر تأكيد حفظ إعدادات الحظر التلقائي.',
-      'lumen.automaticBlocklist.findKeywords': 'البحث عن كلمات',
+        'تعذر تأكيد إعدادات الحظر المحفوظة.',
+      'lumen.automaticBlocklist.findKeywords': 'البحث عن كلمات الحظر',
       'lumen.automaticBlocklist.genreId': 'النوع رقم {id}',
       'lumen.automaticBlocklist.genres': 'الأنواع',
       'lumen.automaticBlocklist.keywordHelp':
@@ -3058,6 +3119,8 @@ export const localeData = [
       'lumen.browse.hd': 'HD',
       'lumen.browse.libraryOrder': 'ترتيب المكتبة',
       'lumen.browse.loadFailed': 'تعذّر تحميل {what}',
+      'lumen.browse.loadMoreFailure': 'تعذّر تحميل المزيد.',
+      'lumen.browse.loadingMore': 'جارٍ تحميل المزيد…',
       'lumen.browse.loadingStreamingRegion': 'جارٍ تحميل منطقة البث…',
       'lumen.browse.lookFurther': 'البحث بشكل أوسع',
       'lumen.browse.moreFilters': 'عوامل تصفية إضافية',
@@ -4305,6 +4368,8 @@ export const localeData = [
       'lumen.metadata.save': 'حفظ',
       'lumen.metadata.saveCredentials': 'حفظ بيانات اعتماد البيانات الوصفية',
       'lumen.metadata.saveFailed': 'تعذر حفظ إعدادات البيانات الوصفية.',
+      'lumen.metadata.confirmFailed':
+        'تعذّر تأكيد حفظ إعدادات البيانات الوصفية.',
       'lumen.metadata.saved': 'تم حفظ الإعدادات.',
       'lumen.metadata.savedCredential': 'بيانات اعتماد محفوظة',
       'lumen.metadata.section.books': 'قيود لغة الكتب',
@@ -4554,6 +4619,8 @@ export const localeData = [
       'lumen.nav.comicsManga': 'قصص مصورة/مانغا',
       'lumen.nav.games': 'ألعاب',
       'lumen.nav.lumenSettings': 'إعدادات Lumen',
+      'lumen.nav.more': 'المزيد',
+      'lumen.nav.pendingRequests': 'الطلبات المعلّقة: {count}',
       'lumen.nav.seerrAdministration': 'إدارة SeerrNG',
       'lumen.nav.signedIn': 'تم تسجيل الدخول',
       'lumen.notifications.accountSettings': 'إعدادات الحساب',
@@ -4781,6 +4848,9 @@ export const localeData = [
       'lumen.recordings.followUpdateFailed': 'تعذّر تحديث متابعة الفريق.',
       'lumen.recordings.keep': 'الاحتفاظ بالتسجيل',
       'lumen.recordings.liveTvStatus': 'حالة البث التلفزيوني المباشر',
+      'lumen.recordings.loading': 'جارٍ تحميل التسجيلات…',
+      'lumen.recordings.statusLoadError':
+        'تعذّر تحميل حالة البث التلفزيوني المباشر.',
       'lumen.recordings.loadingSchedules': 'جارٍ تحميل جداول الفرق…',
       'lumen.recordings.loadingTeams': 'جارٍ تحميل الفرق التي تتابعها…',
       'lumen.recordings.maxFollowedTeams': 'يمكنك متابعة 20 فريقًا كحد أقصى.',
@@ -5270,6 +5340,7 @@ export const localeData = [
       'lumen.streamingFilter.match': 'مطابقة الخدمة',
       'lumen.streamingFilter.region': 'منطقة البث',
       'lumen.streamingFilter.services': 'خدمات البث',
+      'lumen.streamingFilter.selectedCount': 'المحدد: {count}',
       'lumen.streamingFilter.servicesLower': 'خدمات البث',
       'lumen.streamingPolicy.action': 'إجراء الطلب',
       'lumen.streamingPolicy.allowOverride': 'السماح بالاستثناءات لكل مستخدم',
@@ -5832,6 +5903,8 @@ export const localeData = [
       'lumen.status.on4kServer': 'بدقة 4K على {server}',
       'lumen.status.overQuota': 'تجاوز الحصة',
       'lumen.requests.row.autoQueued': 'مضاف تلقائيًا',
+      'lumen.requests.row.differentEditionDetail':
+        'هذا الكتاب موجود في مكتبتك بإصدار مختلف عن الإصدار المطلوب.',
       'lumen.requests.row.episodeQueueAhead':
         'قائمة انتظار الحلقات · {count} قادمة',
       'lumen.requests.row.etaAlmostDone': 'اكتمل تقريبًا',
@@ -6626,6 +6699,95 @@ export const localeData = [
       'lumen.setup.useHttps': 'استخدام HTTPS',
       'lumen.setup.username': 'اسم المستخدم',
       'lumen.setup.videoGroup': 'الأفلام والمسلسلات',
+      'lumen.account.themePreset': 'إعداد مسبق مضمّن للمظهر',
+      'lumen.account.themePresetPlaceholder': 'اختر إعدادًا مسبقًا',
+      'lumen.account.themePresetHelp':
+        'يؤدي تطبيق الإعداد المسبق إلى حفظه في حسابك مع الاحتفاظ بقيم التجاوز الحالية التي تظل لها الأولوية.',
+      'lumen.account.applyThemePreset': 'تطبيق الإعداد المسبق',
+      'lumen.account.resetThemeOverrides': 'إعادة تعيين تجاوزات المظهر',
+      'lumen.account.themeOverridesReset': 'تم مسح تجاوزات المظهر.',
+      'lumen.account.external.title': 'قوائم الطلب الخارجية',
+      'lumen.account.external.description':
+        'اربط قائمة IMDb عامة أو رف Goodreads للقراءة أو رف Hardcover Want to Read. تُفحص العناصر الجديدة يوميًا وتُطلب وفق أذوناتك وإعدادات الموافقة. يمكنك استيراد ملف IMDb بصيغة CSV عند تعذر المزامنة من الخادم.',
+      'lumen.account.external.url': 'رابط القائمة العامة',
+      'lumen.account.external.add': 'إضافة قائمة',
+      'lumen.account.external.token': 'رمز API لـ Hardcover',
+      'lumen.account.external.connect': 'ربط Hardcover',
+      'lumen.account.external.empty': 'لا توجد قوائم خارجية مرتبطة.',
+      'lumen.account.external.error':
+        'تعذر تحديث القائمة الخارجية. حاول مرة أخرى.',
+      'lumen.account.external.added': 'تمت إضافة القائمة الخارجية.',
+      'lumen.account.external.connected':
+        'تم ربط Hardcover. الكتب الموجودة على رفك: {count}.',
+      'lumen.account.external.removed': 'تمت إزالة القائمة الخارجية.',
+      'lumen.account.external.summary':
+        'اكتملت المزامنة: طُلب {requested}، مطلوب مسبقًا {already}، غير موجود {unmatched}، فشل {failed}.',
+      'lumen.account.external.tooLarge':
+        'يجب ألا يتجاوز ملف IMDb حجم 5 ميغابايت.',
+      'lumen.account.external.import': 'استيراد IMDb CSV',
+      'lumen.account.external.sync': 'مزامنة الآن',
+      'lumen.account.external.remove': 'إزالة',
+      'lumen.account.external.never': 'لم تتم المزامنة بعد',
+      'lumen.account.external.imdb': 'قائمة IMDb',
+      'lumen.account.external.csv': 'قائمة IMDb (استيراد CSV)',
+      'lumen.account.external.goodreads': 'رف Goodreads للقراءة',
+      'lumen.account.external.hardcover': 'Hardcover Want to Read',
+      'lumen.account.bookSections.title':
+        'أقسام الكتب والكتب الصوتية في الصفحة الرئيسية',
+      'lumen.account.bookSections.description':
+        'اختر صفوف الكتب والكتب الصوتية في الاستكشاف، وأخفِ الصفوف ورتّبها.',
+      'lumen.account.bookSections.add': 'إضافة قسم',
+      'lumen.account.bookSections.choose': 'اختر قسمًا',
+      'lumen.account.bookSections.enabled': 'إظهار في الصفحة الرئيسية',
+      'lumen.account.bookSections.up': 'نقل لأعلى',
+      'lumen.account.bookSections.down': 'نقل لأسفل',
+      'lumen.account.bookSections.empty':
+        'لا توجد أقسام محددة. أضف قسمًا لإظهار الكتب في الاستكشاف.',
+      'lumen.account.bookSections.save': 'حفظ الأقسام',
+      'lumen.account.bookSections.saved': 'تم حفظ أقسام الكتب.',
+      'lumen.account.bookSections.loadFailure': 'تعذر تحميل أقسام الكتب.',
+      'lumen.account.bookSections.saveFailure': 'تعذر حفظ أقسام الكتب.',
+      'lumen.account.bookSections.mismatch':
+        'الأقسام المحفوظة غير مطابقة. راجع القيم الحالية.',
+      'lumen.account.bookSections.option.popular:ebook': 'كتب شائعة',
+      'lumen.account.bookSections.option.new:ebook': 'كتب جديدة',
+      'lumen.account.bookSections.option.popular:audiobook': 'كتب صوتية شائعة',
+      'lumen.account.bookSections.option.new:audiobook': 'كتب صوتية جديدة',
+      'lumen.account.bookSections.option.subject:fantasy:ebook': 'كتب فانتازيا',
+      'lumen.account.bookSections.option.subject:mystery:ebook': 'كتب غموض',
+      'lumen.account.bookSections.option.subject:romance:ebook': 'كتب رومانسية',
+      'lumen.account.bookSections.option.subject:science_fiction:ebook':
+        'كتب خيال علمي',
+      'lumen.account.bookSections.option.subject:history:ebook': 'كتب تاريخ',
+      'lumen.account.bookSections.option.subject:biography:ebook':
+        'كتب سير ذاتية',
+      'lumen.account.bookSections.option.subject:fantasy:audiobook':
+        'كتب صوتية فانتازيا',
+      'lumen.account.bookSections.option.subject:mystery:audiobook':
+        'كتب صوتية غموض',
+      'lumen.account.bookSections.option.subject:romance:audiobook':
+        'كتب صوتية رومانسية',
+      'lumen.account.bookSections.option.subject:science_fiction:audiobook':
+        'كتب صوتية خيال علمي',
+      'lumen.account.bookSections.option.subject:history:audiobook':
+        'كتب صوتية تاريخ',
+      'lumen.account.bookSections.option.subject:biography:audiobook':
+        'كتب صوتية سير ذاتية',
+      'lumen.discover.audiobookRequested': 'تم طلب {title}.',
+      'lumen.discover.audiobookRequestFailed': 'تعذر إكمال طلب الكتاب الصوتي.',
+      'lumen.discover.audiobookLoadFailed': 'تعذر تحميل قسم الكتب الصوتية هذا.',
+      'lumen.discover.requesting': 'جارٍ الطلب…',
+      'lumen.discover.requested': 'تم الطلب',
+      'lumen.discover.request': 'طلب',
+      'lumen.discover.bookSectionsFailed': 'تعذر تحميل أرفف الكتب الشخصية.',
+      'lumen.tunerr.saveFailed': 'تعذر حفظ إعدادات Tunerr.',
+      'lumen.software.saveFailed': 'تعذر حفظ إعدادات اقتناء البرامج.',
+      'lumen.automaticBlocklist.what': 'إعدادات الحظر التلقائي',
+      'lumen.automaticBlocklist.keywordIds': 'معرّفات كلمات TMDB المحظورة',
+      'lumen.automaticBlocklist.find': 'البحث عن كلمات',
+      'lumen.automaticBlocklist.limit': 'حد الصفحات لكل وسم أو نوع محظور',
+      'lumen.automaticBlocklist.limitHelp': 'أدخل عددًا صحيحًا من 0 إلى 250.',
+      'lumen.automaticBlocklist.genreWhat': 'الأنواع',
     },
   },
   {
@@ -6633,6 +6795,8 @@ export const localeData = [
     nativeName: 'Български',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Целеви сървър',
       'components.IssueDetails.allepisodes': 'Всички епизоди',
       'components.Layout.Sidebar.blocklist': 'Списък с блокирани',
       'components.Layout.Sidebar.browsemovies': 'Филми',
@@ -7260,6 +7424,8 @@ export const localeData = [
     nativeName: 'Català',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Servidor de destí',
       'components.IssueDetails.allepisodes': 'Tots els episodis',
       'components.Layout.Sidebar.blocklist': 'Llista de bloqueig',
       'components.Layout.Sidebar.browsemovies': 'Pel·lícules',
@@ -7773,6 +7939,8 @@ export const localeData = [
     nativeName: 'Čeština',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Cílový server',
       'components.IssueDetails.allepisodes': 'Všechny epizody',
       'components.Layout.Sidebar.blocklist': 'Zablokované',
       'components.Layout.Sidebar.browsemovies': 'Filmy',
@@ -8398,6 +8566,8 @@ export const localeData = [
     nativeName: 'Dansk',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Destinationsserver',
       'components.IssueDetails.allepisodes': 'Alle episoder',
       'components.Layout.Sidebar.blocklist': 'Skjulning',
       'components.Layout.Sidebar.browsemovies': 'Film',
@@ -9022,6 +9192,27 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'Serien',
+      'components.Common.FormatRequestControl.request': 'Anfordern',
+      'components.ArtistDetails.requestdiscography': 'Discographie anfordern',
+      'components.ArtistDetails.followreleases': 'Neue Alben verfolgen',
+      'components.MusicDetails.requestdiscography': 'Discographie anfordern',
+      'components.Settings.lidarrsettings': 'Lidarr Einstellungen',
+      'components.MusicDetails.blocklisted':
+        'Dieser Titel steht auf der Sperrliste.',
+      'components.MusicDetails.flacAvailable':
+        'Die FLAC-Version ist bereits verfügbar.',
+      'components.MusicDetails.flacPending':
+        'Eine offene FLAC-Anfrage existiert bereits.',
+      'components.MusicDetails.flacServiceUnavailable':
+        'Kein FLAC-Musikdienst ist konfiguriert.',
+      'components.MusicDetails.mp3Available':
+        'Die MP3-Version ist bereits verfügbar.',
+      'components.MusicDetails.mp3Pending':
+        'Eine offene MP3-Anfrage existiert bereits.',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'Kein MP3-Musikdienst ist konfiguriert.',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Zielserver',
       'components.IdentityMappingControls.change':
         'Titelübereinstimmung ändern',
       'components.IdentityMappingControls.match': 'Katalogtitel zuordnen',
@@ -10493,7 +10684,11 @@ export const localeData = [
       'i18n.next': 'Weiter',
       'i18n.previous': 'Zurück',
       'i18n.providerDiscovery': 'Anbieter Discovery',
+      'i18n.primaryNavigation': 'Hauptnavigation',
       'i18n.searchLabel': 'Suche',
+      'i18n.tabs': 'Registerkarten',
+      'i18n.closeMenu': 'Menü schließen',
+      'i18n.moreNavigation': 'Weitere Navigation',
       'i18n.unknown': 'Unbekannt',
       'i18n.usersettings': 'Benutzereinstellungen',
       'library.accounts': 'Verwalten von verbundenen Konten',
@@ -10674,6 +10869,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'Erwachsene Inhalte',
       'components.Discover.DiscoverAdult.unavailable':
         'Die Suche nach erwachsenen Szenen ist derzeit nicht verfügbar.',
+      'components.Discover.FilterPanel.filters': 'Filter',
+      'components.SoftwareCatalog.allPcPlatforms': 'Alle PC Plattformen',
+      'components.SoftwareCatalog.allSystems': 'Alle Systeme',
+      'components.SoftwareCatalog.genreFilter': 'Genre',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        'Geben Sie ein Release-Jahr von 1950 bis 2200 ein.',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'macOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'Erscheinungsjahr',
+      'components.SoftwareCatalog.windows': 'Windows',
     },
   },
   {
@@ -10682,6 +10887,26 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'Series',
+      'components.Common.FormatRequestControl.request': 'Request',
+      'components.ArtistDetails.requestdiscography': 'Request Discography',
+      'components.ArtistDetails.followreleases': 'Follow New Albums',
+      'components.MusicDetails.requestdiscography': 'Request Discography',
+      'components.Settings.lidarrsettings': 'Lidarr Settings',
+      'components.MusicDetails.blocklisted': 'This title is blocklisted.',
+      'components.MusicDetails.flacAvailable':
+        'The FLAC version is already available.',
+      'components.MusicDetails.flacPending':
+        'An open FLAC request already exists.',
+      'components.MusicDetails.flacServiceUnavailable':
+        'No FLAC music service is configured.',
+      'components.MusicDetails.mp3Available':
+        'The MP3 version is already available.',
+      'components.MusicDetails.mp3Pending':
+        'An open MP3 request already exists.',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'No MP3 music service is configured.',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Destination Server',
       'components.IdentityMappingControls.change': 'Change title match',
       'components.IdentityMappingControls.match': 'Match catalog title',
       'components.IdentityMappingControls.mediaTypeLabel': 'Catalog media type',
@@ -12127,7 +12352,11 @@ export const localeData = [
       'i18n.next': 'Next',
       'i18n.previous': 'Previous',
       'i18n.providerDiscovery': 'Provider Discovery',
+      'i18n.primaryNavigation': 'Main navigation',
       'i18n.searchLabel': 'Search',
+      'i18n.tabs': 'Tabs',
+      'i18n.closeMenu': 'Close menu',
+      'i18n.moreNavigation': 'More navigation',
       'i18n.unknown': 'Unknown',
       'i18n.usersettings': 'User Settings',
       'library.accounts': 'Manage connected accounts',
@@ -12300,6 +12529,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'Adult',
       'components.Discover.DiscoverAdult.unavailable':
         'Adult scene search is unavailable right now.',
+      'components.Discover.FilterPanel.filters': 'Filters',
+      'components.SoftwareCatalog.allPcPlatforms': 'All PC platforms',
+      'components.SoftwareCatalog.allSystems': 'All systems',
+      'components.SoftwareCatalog.genreFilter': 'Genre',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        'Enter a release year from 1950 to 2200.',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'macOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'Release year',
+      'components.SoftwareCatalog.windows': 'Windows',
       'lumen.account.administratorAccess':
         'This account has administrator access.',
       'lumen.account.backToSettings': 'Back to Account Settings',
@@ -12401,6 +12640,31 @@ export const localeData = [
         'Save Streaming Subscriptions',
       'lumen.account.saveThemeColors': 'Save Theme Colors',
       'lumen.account.saving': 'Saving…',
+      'lumen.account.rootFoldersTitle': 'Default Request Folders',
+      'lumen.account.rootFoldersDescription':
+        'Choose a default destination folder for requests on each service. Unset folders use the service default.',
+      'lumen.account.rootFoldersLoadFailure':
+        'Could not load request folder settings.',
+      'lumen.account.rootFoldersOptionsFailure':
+        'Could not load service folder options.',
+      'lumen.account.rootFoldersMismatch':
+        'Saved folders did not match. Review the current values.',
+      'lumen.account.rootFoldersSaveFailure':
+        'Could not save request folder settings.',
+      'lumen.account.rootFolder.movie': 'Movies',
+      'lumen.account.rootFolder.series': 'Series',
+      'lumen.account.rootFolder.music': 'Music',
+      'lumen.account.rootFolder.books': 'Books',
+      'lumen.account.rootFolder.audiobooks': 'Audiobooks',
+      'lumen.account.rootFolder.comics': 'Comics',
+      'lumen.account.rootFolderDefault': 'Use service default',
+      'lumen.account.rootFolderUnavailable':
+        'Saved folder (not currently offered)',
+      'lumen.account.rootFolderServiceFailure':
+        'Could not load folders for this service.',
+      'lumen.account.rootFolderNoServices':
+        'No request services are configured.',
+      'lumen.account.saveRootFolders': 'Save Request Folders',
       'lumen.account.selectShown': 'Select Shown',
       'lumen.account.streamingSubscriptions': 'Streaming Subscriptions',
       'lumen.account.streamingSubscriptionsConfirmFailure':
@@ -12597,6 +12861,8 @@ export const localeData = [
       'lumen.adminConnectionHosts.save': 'Save Changes',
       'lumen.adminConnectionHosts.saveFailure':
         'Could not save connection hosts.',
+      'lumen.adminConnectionHosts.confirmFailure':
+        'Could not confirm the saved connection hosts.',
       'lumen.adminConnectionHosts.saved': 'Connection hosts saved.',
       'lumen.adminConnectionHosts.sectionTitle': 'Saved Hosts',
       'lumen.adminConnectionHosts.title': 'Connection Hosts',
@@ -12951,6 +13217,8 @@ export const localeData = [
       'lumen.adminNetwork.ackRequired':
         'Confirm that HTTP login sessions can be intercepted before enabling sign-in over HTTP.',
       'lumen.adminNetwork.clearProxyPassword': 'Clear Saved Proxy Password',
+      'lumen.adminNetwork.confirmFailure':
+        'Could not confirm the saved network settings.',
       'lumen.adminNetwork.currentIpRequired':
         'Include your current client IP in the allowed networks before enabling or changing this restriction.',
       'lumen.adminNetwork.differentHttpsPort':
@@ -13057,6 +13325,8 @@ export const localeData = [
       'lumen.adminReaderDelivery.removeShelfTitle': 'Remove {name}?',
       'lumen.adminReaderDelivery.removeShelfWithKobo':
         'This removes the reader shelf and its Kobo Collection. Library files are kept.',
+      'lumen.adminReaderDelivery.saveFailure':
+        'Reader settings could not be saved.',
       'lumen.adminReaderDelivery.saveSettings': 'Save Reader Settings',
       'lumen.adminReaderDelivery.savedCredential': 'Saved Credential',
       'lumen.adminReaderDelivery.settingsSaved': 'Reader settings saved.',
@@ -13410,7 +13680,7 @@ export const localeData = [
       'lumen.associations.what': 'associations',
       'lumen.automaticBlocklist.confirmFailure':
         'Could not confirm the saved blocklist settings.',
-      'lumen.automaticBlocklist.findKeywords': 'Find Keywords',
+      'lumen.automaticBlocklist.findKeywords': 'Find Blocklist Keywords',
       'lumen.automaticBlocklist.genreId': 'Genre #{id}',
       'lumen.automaticBlocklist.genres': 'genres',
       'lumen.automaticBlocklist.keywordHelp':
@@ -13789,6 +14059,8 @@ export const localeData = [
       'lumen.browse.hd': 'HD',
       'lumen.browse.libraryOrder': 'Library Order',
       'lumen.browse.loadFailed': 'Couldn’t load {what}',
+      'lumen.browse.loadMoreFailure': 'Couldn’t load more.',
+      'lumen.browse.loadingMore': 'Loading more…',
       'lumen.browse.loadingStreamingRegion': 'Loading streaming region…',
       'lumen.browse.lookFurther': 'Look further',
       'lumen.browse.moreFilters': 'More Filters',
@@ -14983,6 +15255,8 @@ export const localeData = [
       'lumen.metadata.save': 'Save',
       'lumen.metadata.saveCredentials': 'Save Metadata Credentials',
       'lumen.metadata.saveFailed': 'Could not save metadata settings.',
+      'lumen.metadata.confirmFailed':
+        'Could not confirm the saved metadata settings.',
       'lumen.metadata.saved': 'Settings saved.',
       'lumen.metadata.savedCredential': 'Saved credential',
       'lumen.metadata.section.books': 'Book Language Restrictions',
@@ -15234,6 +15508,8 @@ export const localeData = [
       'lumen.nav.comicsManga': 'Comics/Manga',
       'lumen.nav.games': 'Games',
       'lumen.nav.lumenSettings': 'Lumen Settings',
+      'lumen.nav.more': 'More',
+      'lumen.nav.pendingRequests': 'Pending requests: {count}',
       'lumen.nav.seerrAdministration': 'SeerrNG Administration',
       'lumen.nav.signedIn': 'Signed in',
       'lumen.notifications.accountSettings': 'Account Settings',
@@ -15462,6 +15738,8 @@ export const localeData = [
         'Could not update the team follow.',
       'lumen.recordings.keep': 'Keep Recording',
       'lumen.recordings.liveTvStatus': 'Live TV status',
+      'lumen.recordings.loading': 'Loading recordings…',
+      'lumen.recordings.statusLoadError': 'Live TV status could not be loaded.',
       'lumen.recordings.loadingSchedules': 'Loading team schedules…',
       'lumen.recordings.loadingTeams': 'Loading followed teams…',
       'lumen.recordings.maxFollowedTeams': 'You can follow up to 20 teams.',
@@ -15961,6 +16239,7 @@ export const localeData = [
       'lumen.streamingFilter.match': 'Provider Match',
       'lumen.streamingFilter.region': 'Streaming Region',
       'lumen.streamingFilter.services': 'Streaming Services',
+      'lumen.streamingFilter.selectedCount': 'Selected: {count}',
       'lumen.streamingFilter.servicesLower': 'streaming services',
       'lumen.streamingPolicy.action': 'Request action',
       'lumen.streamingPolicy.allowOverride': 'Allow per-user overrides',
@@ -16526,6 +16805,8 @@ export const localeData = [
       'lumen.status.on4kServer': '4K on {server}',
       'lumen.status.overQuota': 'Over quota',
       'lumen.requests.row.autoQueued': 'Auto-Queued',
+      'lumen.requests.row.differentEditionDetail':
+        'This book is in your library in another edition than the one requested.',
       'lumen.requests.row.episodeQueueAhead': 'Episode Queue · {count} ahead',
       'lumen.requests.row.etaAlmostDone': 'Almost done',
       'lumen.requests.row.etaHours': 'About {count} hr left',
@@ -17336,6 +17617,107 @@ export const localeData = [
       'lumen.setup.useHttps': 'Use HTTPS',
       'lumen.setup.username': 'Username',
       'lumen.setup.videoGroup': 'Movies and Series',
+      'lumen.account.themePreset': 'Built-in Theme Preset',
+      'lumen.account.themePresetPlaceholder': 'Choose a preset',
+      'lumen.account.themePresetHelp':
+        'Applying a preset saves it to your account and keeps existing override values, which continue to take precedence.',
+      'lumen.account.applyThemePreset': 'Apply Theme Preset',
+      'lumen.account.resetThemeOverrides': 'Reset Theme Overrides',
+      'lumen.account.themeOverridesReset': 'Theme overrides cleared.',
+      'lumen.account.external.title': 'External Request Lists',
+      'lumen.account.external.description':
+        'Connect a public IMDb watchlist, Goodreads to-read shelf, or Hardcover Want to Read shelf. New items are checked daily and requested through your normal permissions and approval settings. IMDb CSV exports can be imported when server-side sync is unavailable.',
+      'lumen.account.external.url': 'Public List URL',
+      'lumen.account.external.add': 'Add List',
+      'lumen.account.external.token': 'Hardcover API Token',
+      'lumen.account.external.connect': 'Connect Hardcover',
+      'lumen.account.external.empty': 'No external lists are connected.',
+      'lumen.account.external.error':
+        'Could not update the external list. Try again.',
+      'lumen.account.external.added': 'External list added.',
+      'lumen.account.external.connected':
+        'Hardcover connected. Books found on your shelf: {count}.',
+      'lumen.account.external.removed': 'External list removed.',
+      'lumen.account.external.summary':
+        'Sync complete: {requested} requested, {already} already requested, {unmatched} not found, {failed} failed.',
+      'lumen.account.external.tooLarge':
+        'The IMDb export file must be 5 MB or smaller.',
+      'lumen.account.external.import': 'Import IMDb CSV',
+      'lumen.account.external.sync': 'Sync Now',
+      'lumen.account.external.remove': 'Remove',
+      'lumen.account.external.never': 'Not Synced Yet',
+      'lumen.account.external.imdb': 'IMDb Watchlist',
+      'lumen.account.external.csv': 'IMDb Watchlist (CSV Import)',
+      'lumen.account.external.goodreads': 'Goodreads To-Read Shelf',
+      'lumen.account.external.hardcover': 'Hardcover Want to Read',
+      'lumen.account.bookSections.title': 'Book and Audiobook Home Sections',
+      'lumen.account.bookSections.description':
+        'Choose the book and audiobook rows on Discover, hide rows, and arrange their order.',
+      'lumen.account.bookSections.add': 'Add Section',
+      'lumen.account.bookSections.choose': 'Choose a section',
+      'lumen.account.bookSections.enabled': 'Show on Home',
+      'lumen.account.bookSections.up': 'Move Up',
+      'lumen.account.bookSections.down': 'Move Down',
+      'lumen.account.bookSections.empty':
+        'No sections are selected. Add one to show books on Discover.',
+      'lumen.account.bookSections.save': 'Save Sections',
+      'lumen.account.bookSections.saved': 'Book home sections saved.',
+      'lumen.account.bookSections.loadFailure':
+        'Could not load book home sections.',
+      'lumen.account.bookSections.saveFailure':
+        'Could not save book home sections.',
+      'lumen.account.bookSections.mismatch':
+        'Saved sections did not match. Review the current values.',
+      'lumen.account.bookSections.option.popular:ebook': 'Popular Books',
+      'lumen.account.bookSections.option.new:ebook': 'New Books',
+      'lumen.account.bookSections.option.popular:audiobook':
+        'Popular Audiobooks',
+      'lumen.account.bookSections.option.new:audiobook': 'New Audiobooks',
+      'lumen.account.bookSections.option.subject:fantasy:ebook':
+        'Fantasy Books',
+      'lumen.account.bookSections.option.subject:mystery:ebook':
+        'Mystery Books',
+      'lumen.account.bookSections.option.subject:romance:ebook':
+        'Romance Books',
+      'lumen.account.bookSections.option.subject:science_fiction:ebook':
+        'Science Fiction Books',
+      'lumen.account.bookSections.option.subject:history:ebook':
+        'History Books',
+      'lumen.account.bookSections.option.subject:biography:ebook':
+        'Biography Books',
+      'lumen.account.bookSections.option.subject:fantasy:audiobook':
+        'Fantasy Audiobooks',
+      'lumen.account.bookSections.option.subject:mystery:audiobook':
+        'Mystery Audiobooks',
+      'lumen.account.bookSections.option.subject:romance:audiobook':
+        'Romance Audiobooks',
+      'lumen.account.bookSections.option.subject:science_fiction:audiobook':
+        'Science Fiction Audiobooks',
+      'lumen.account.bookSections.option.subject:history:audiobook':
+        'History Audiobooks',
+      'lumen.account.bookSections.option.subject:biography:audiobook':
+        'Biography Audiobooks',
+      'lumen.discover.audiobookRequested': '{title} requested.',
+      'lumen.discover.audiobookRequestFailed':
+        'The audiobook request could not be completed.',
+      'lumen.discover.audiobookLoadFailed':
+        'This audiobook section could not be loaded.',
+      'lumen.discover.requesting': 'Requesting…',
+      'lumen.discover.requested': 'Requested',
+      'lumen.discover.request': 'Request',
+      'lumen.discover.bookSectionsFailed':
+        'Personal book shelves could not be loaded.',
+      'lumen.tunerr.saveFailed': 'Could not save Tunerr settings.',
+      'lumen.software.saveFailed':
+        'Could not save software acquisition settings.',
+      'lumen.automaticBlocklist.what': 'automatic blocklist settings',
+      'lumen.automaticBlocklist.keywordIds': 'Blocklisted TMDB Keyword IDs',
+      'lumen.automaticBlocklist.find': 'Find Keywords',
+      'lumen.automaticBlocklist.limit':
+        'Limit Pages per Blocklist Tag or Genre',
+      'lumen.automaticBlocklist.limitHelp':
+        'Enter a whole number from 0 to 250.',
+      'lumen.automaticBlocklist.genreWhat': 'genres',
     },
   },
   {
@@ -17343,6 +17725,8 @@ export const localeData = [
     nativeName: 'Ελληνικά',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Προορισμός Διακομιστή',
       'components.IssueDetails.allepisodes': 'Όλα τα επεισόδια',
       'components.Layout.Sidebar.browsemovies': 'Ταινίες',
       'components.Layout.Sidebar.browsetv': 'Σειρές',
@@ -17768,6 +18152,26 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'Series',
+      'components.Common.FormatRequestControl.request': 'Solicitar',
+      'components.ArtistDetails.requestdiscography': 'Solicitud de discografía',
+      'components.ArtistDetails.followreleases': 'Seguir nuevos álbumes',
+      'components.MusicDetails.requestdiscography': 'Solicitar discografía',
+      'components.Settings.lidarrsettings': 'Ajustes de Lidarr',
+      'components.MusicDetails.blocklisted': 'Este título está bloqueado.',
+      'components.MusicDetails.flacAvailable':
+        'La versión FLAC ya está disponible.',
+      'components.MusicDetails.flacPending':
+        'Ya existe una solicitud abierta de FLAC.',
+      'components.MusicDetails.flacServiceUnavailable':
+        'No se configura ningún servicio de música FLAC.',
+      'components.MusicDetails.mp3Available':
+        'La versión MP3 ya está disponible.',
+      'components.MusicDetails.mp3Pending':
+        'Ya existe una solicitud de MP3 abierta.',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'No se configura ningún servicio de música MP3.',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Servidor de destino',
       'components.IdentityMappingControls.change':
         'Cambiar coincidencia de título',
       'components.IdentityMappingControls.match':
@@ -19250,7 +19654,11 @@ export const localeData = [
       'i18n.next': 'Adelante',
       'i18n.previous': 'Anterior',
       'i18n.providerDiscovery': 'Proveedor Discovery',
+      'i18n.primaryNavigation': 'Navegación principal',
       'i18n.searchLabel': 'Buscar',
+      'i18n.tabs': 'Pestañas',
+      'i18n.closeMenu': 'Cerrar el menú',
+      'i18n.moreNavigation': 'Más navegación',
       'i18n.unknown': 'Desconocido',
       'i18n.usersettings': 'Ajustes de Usuario',
       'library.accounts': 'Gestionar cuentas conectadas',
@@ -19430,6 +19838,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'Para adultos',
       'components.Discover.DiscoverAdult.unavailable':
         'La búsqueda de escenas para adultos no está disponible ahora mismo.',
+      'components.Discover.FilterPanel.filters': 'Filtros',
+      'components.SoftwareCatalog.allPcPlatforms': 'Todas las plataformas PC',
+      'components.SoftwareCatalog.allSystems': 'Todos los sistemas',
+      'components.SoftwareCatalog.genreFilter': 'Género',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        'Introduzca un año de liberación de 1950 a 2200.',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'macOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'Año de lanzamiento',
+      'components.SoftwareCatalog.windows': 'Windows',
     },
   },
   {
@@ -19438,6 +19856,26 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'Serie',
+      'components.Common.FormatRequestControl.request': 'Solicitar',
+      'components.ArtistDetails.requestdiscography': 'Solicitud de discografía',
+      'components.ArtistDetails.followreleases': 'Seguir nuevos álbumes',
+      'components.MusicDetails.requestdiscography': 'Solicitud de discografía',
+      'components.Settings.lidarrsettings': 'Ajustes de Lidarr',
+      'components.MusicDetails.blocklisted': 'Este título está bloqueado.',
+      'components.MusicDetails.flacAvailable':
+        'La versión FLAC ya está disponible.',
+      'components.MusicDetails.flacPending':
+        'Ya existe una solicitud abierta de FLAC.',
+      'components.MusicDetails.flacServiceUnavailable':
+        'No se configura ningún servicio de música FLAC.',
+      'components.MusicDetails.mp3Available':
+        'La versión MP3 ya está disponible.',
+      'components.MusicDetails.mp3Pending':
+        'Ya existe una solicitud de MP3 abierta.',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'No se configura ningún servicio de música MP3.',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Servidor de destino',
       'components.IdentityMappingControls.change': 'Cambiar el título',
       'components.IdentityMappingControls.match':
         'Título del catálogo de partido',
@@ -20904,7 +21342,11 @@ export const localeData = [
       'i18n.next': 'Adelante',
       'i18n.previous': 'Anterior',
       'i18n.providerDiscovery': 'Proveedor Discovery',
+      'i18n.primaryNavigation': 'Navegación principal',
       'i18n.searchLabel': 'Buscar',
+      'i18n.tabs': 'Pestañas',
+      'i18n.closeMenu': 'Cerrar el menú',
+      'i18n.moreNavigation': 'Más navegación',
       'i18n.unknown': 'Desconocido',
       'i18n.usersettings': 'Ajustes de Usuario',
       'library.accounts': 'Gestionar cuentas conectadas',
@@ -21085,6 +21527,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'Para adultos',
       'components.Discover.DiscoverAdult.unavailable':
         'La búsqueda de escenas para adultos no está disponible ahora mismo.',
+      'components.Discover.FilterPanel.filters': 'Filtros',
+      'components.SoftwareCatalog.allPcPlatforms': 'Todas las plataformas PC',
+      'components.SoftwareCatalog.allSystems': 'Todos los sistemas',
+      'components.SoftwareCatalog.genreFilter': 'Género',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        'Introduzca un año de liberación de 1950 a 2200.',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'macOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'Año de lanzamiento',
+      'components.SoftwareCatalog.windows': 'Windows',
     },
   },
   {
@@ -21092,6 +21544,8 @@ export const localeData = [
     nativeName: 'Eesti',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Sihtserver',
       'components.IssueDetails.allepisodes': 'Kõik osad',
       'components.Layout.Sidebar.blocklist': 'Blokeerimisloend',
       'components.Layout.Sidebar.browsemovies': 'Filmid',
@@ -21712,6 +22166,8 @@ export const localeData = [
     nativeName: 'Suomi',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Kohdepalvelin',
       'components.IssueDetails.allepisodes': 'Kaikki jaksot',
       'components.Layout.Sidebar.blocklist': 'Estolista',
       'components.Layout.Sidebar.browsemovies': 'Elokuvat',
@@ -21926,6 +22382,27 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'Séries',
+      'components.Common.FormatRequestControl.request': 'Demander',
+      'components.ArtistDetails.requestdiscography':
+        'Demander une discographie',
+      'components.ArtistDetails.followreleases': 'Suivre les nouveaux albums',
+      'components.MusicDetails.requestdiscography': 'Demander une discographie',
+      'components.Settings.lidarrsettings': 'Paramètres Lidarr',
+      'components.MusicDetails.blocklisted': 'Ce titre est bloqué.',
+      'components.MusicDetails.flacAvailable':
+        'La version FLAC est déjà disponible.',
+      'components.MusicDetails.flacPending':
+        'Une demande de FLAC ouverte existe déjà.',
+      'components.MusicDetails.flacServiceUnavailable':
+        "Aucun service de musique FLAC n'est configuré.",
+      'components.MusicDetails.mp3Available':
+        'La version MP3 est déjà disponible.',
+      'components.MusicDetails.mp3Pending':
+        'Une requête MP3 ouverte existe déjà.',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        "Aucun service musical MP3 n'est configuré.",
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Serveur de destination',
       'components.IdentityMappingControls.change':
         'Modifier la correspondance de titre',
       'components.IdentityMappingControls.match':
@@ -23410,7 +23887,11 @@ export const localeData = [
       'i18n.next': 'Suivant',
       'i18n.previous': 'Précédent',
       'i18n.providerDiscovery': 'Découverte du fournisseur',
+      'i18n.primaryNavigation': 'Navigation principale',
       'i18n.searchLabel': 'Rechercher',
+      'i18n.tabs': 'Onglets',
+      'i18n.closeMenu': 'Fermer le menu',
+      'i18n.moreNavigation': 'Plus de navigation',
       'i18n.unknown': 'Inconnu',
       'i18n.usersettings': 'Paramètres utilisateur',
       'library.accounts': 'Gérer les comptes connectés',
@@ -23592,6 +24073,17 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'Adulte',
       'components.Discover.DiscoverAdult.unavailable':
         "La recherche de scènes pour adultes n'est pas disponible pour le moment.",
+      'components.Discover.FilterPanel.filters': 'Filtres',
+      'components.SoftwareCatalog.allPcPlatforms': 'Toutes les plateformes PC',
+      'components.SoftwareCatalog.allSystems': 'Tous les systèmes',
+      'components.SoftwareCatalog.genreFilter': 'Genre',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        'Entrez une année de sortie de 1950 à 2200.',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'MACOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'Année de sortie',
+      'components.SoftwareCatalog.windows': 'Fenêtres',
+      'components.IssueDetails.allepisodes': 'Tous les épisodes',
       'components.Layout.Sidebar.comingSoon': 'À venir',
       'components.Layout.Sidebar.watchSessions': 'Séances de visionnage',
       'components.Layout.Sidebar.you': 'Vous',
@@ -23604,6 +24096,7 @@ export const localeData = [
       'components.Persius.empty': 'Aucun titre à afficher.',
       'components.Persius.failed': 'Impossible de charger cette section.',
       'components.Persius.genres': 'Genres',
+      'components.Persius.loading': 'Chargement…',
       'components.Persius.movies': 'Films',
       'components.Persius.popularAudio': 'Livres audio populaires',
       'components.Persius.popularMovies': 'Films populaires',
@@ -23615,6 +24108,9 @@ export const localeData = [
       'components.Persius.series': 'Séries',
       'components.UserProfile.UserSettings.UserGeneralSettings.streamingSubscriptions':
         'Abonnements aux services de streaming',
+      'components.UserProfile.UserSettings.UserLinkedAccountsSettings.linkIdentityProvider':
+        'Lier un fournisseur d’identité',
+      'components.UserProfile.UserSettings.menuClientTokens': 'Jetons client',
       'lumen.account.administratorAccess':
         'Ce compte dispose des droits d’administration.',
       'lumen.account.backToSettings': 'Retour aux paramètres du compte',
@@ -23728,6 +24224,32 @@ export const localeData = [
         'Enregistrer les abonnements de streaming',
       'lumen.account.saveThemeColors': 'Enregistrer les couleurs du thème',
       'lumen.account.saving': 'Enregistrement…',
+      'lumen.account.rootFoldersTitle': 'Dossiers de destination par défaut',
+      'lumen.account.rootFoldersDescription':
+        'Choisissez un dossier de destination par défaut pour les demandes sur chaque service. Les dossiers non définis utilisent le dossier par défaut du service.',
+      'lumen.account.rootFoldersLoadFailure':
+        'Impossible de charger les paramètres des dossiers de demande.',
+      'lumen.account.rootFoldersOptionsFailure':
+        'Impossible de charger les dossiers proposés par les services.',
+      'lumen.account.rootFoldersMismatch':
+        'Les dossiers enregistrés ne correspondent pas. Vérifiez les valeurs actuelles.',
+      'lumen.account.rootFoldersSaveFailure':
+        'Impossible d’enregistrer les paramètres des dossiers de demande.',
+      'lumen.account.rootFolder.movie': 'Films',
+      'lumen.account.rootFolder.series': 'Séries',
+      'lumen.account.rootFolder.music': 'Musique',
+      'lumen.account.rootFolder.books': 'Livres',
+      'lumen.account.rootFolder.audiobooks': 'Livres audio',
+      'lumen.account.rootFolder.comics': 'Bandes dessinées',
+      'lumen.account.rootFolderDefault':
+        'Utiliser le dossier par défaut du service',
+      'lumen.account.rootFolderUnavailable':
+        'Dossier enregistré (actuellement indisponible)',
+      'lumen.account.rootFolderServiceFailure':
+        'Impossible de charger les dossiers de ce service.',
+      'lumen.account.rootFolderNoServices':
+        'Aucun service de demande n’est configuré.',
+      'lumen.account.saveRootFolders': 'Enregistrer les dossiers de demande',
       'lumen.account.selectShown': 'Sélectionner les services affichés',
       'lumen.account.streamingSubscriptions':
         'Abonnements aux services de streaming',
@@ -23939,6 +24461,8 @@ export const localeData = [
       'lumen.adminConnectionHosts.save': 'Enregistrer',
       'lumen.adminConnectionHosts.saveFailure':
         'Impossible d’enregistrer les hôtes de connexion.',
+      'lumen.adminConnectionHosts.confirmFailure':
+        'Impossible de confirmer l’enregistrement des hôtes de connexion.',
       'lumen.adminConnectionHosts.saved': 'Hôtes de connexion enregistrés.',
       'lumen.adminConnectionHosts.sectionTitle': 'Hôtes enregistrés',
       'lumen.adminConnectionHosts.title': 'Hôtes de connexion',
@@ -24342,6 +24866,8 @@ export const localeData = [
         'Confirmez que les sessions de connexion HTTP peuvent être interceptées avant d’activer la connexion en HTTP.',
       'lumen.adminNetwork.clearProxyPassword':
         'Effacer le mot de passe du proxy enregistré',
+      'lumen.adminNetwork.confirmFailure':
+        'Impossible de confirmer l’enregistrement des paramètres réseau.',
       'lumen.adminNetwork.currentIpRequired':
         'Ajoutez l’adresse IP actuelle aux réseaux autorisés avant d’activer ou de modifier cette restriction.',
       'lumen.adminNetwork.differentHttpsPort':
@@ -24456,6 +24982,8 @@ export const localeData = [
       'lumen.adminReaderDelivery.removeShelfTitle': 'Supprimer {name} ?',
       'lumen.adminReaderDelivery.removeShelfWithKobo':
         'Cette action supprime le rayon et sa collection Kobo. Les fichiers de la bibliothèque sont conservés.',
+      'lumen.adminReaderDelivery.saveFailure':
+        'Impossible d’enregistrer les paramètres du lecteur.',
       'lumen.adminReaderDelivery.saveSettings':
         'Enregistrer les paramètres du lecteur',
       'lumen.adminReaderDelivery.savedCredential': 'Identifiant enregistré',
@@ -24836,8 +25364,9 @@ export const localeData = [
       'lumen.associations.view': 'Affichage des associations',
       'lumen.associations.what': 'les associations',
       'lumen.automaticBlocklist.confirmFailure':
-        'Impossible de confirmer l’enregistrement des paramètres de blocage automatique.',
-      'lumen.automaticBlocklist.findKeywords': 'Rechercher des mots-clés',
+        'Impossible de confirmer les paramètres de blocage enregistrés.',
+      'lumen.automaticBlocklist.findKeywords':
+        'Rechercher des mots-clés de blocage',
       'lumen.automaticBlocklist.genreId': 'Genre nº {id}',
       'lumen.automaticBlocklist.genres': 'genres',
       'lumen.automaticBlocklist.keywordHelp':
@@ -25239,6 +25768,8 @@ export const localeData = [
       'lumen.browse.hd': 'HD',
       'lumen.browse.libraryOrder': 'Ordre de la médiathèque',
       'lumen.browse.loadFailed': 'Impossible de charger {what}',
+      'lumen.browse.loadMoreFailure': 'Impossible de charger la suite.',
+      'lumen.browse.loadingMore': 'Chargement de la suite…',
       'lumen.browse.loadingStreamingRegion':
         'Chargement de la région de streaming…',
       'lumen.browse.lookFurther': 'Chercher plus loin',
@@ -25639,8 +26170,7 @@ export const localeData = [
       'lumen.discoveryRegions.loading':
         'Chargement des paramètres de région de découverte…',
       'lumen.discoveryRegions.regions': 'régions',
-      'lumen.discoveryRegions.save':
-        'Enregistrer les paramètres de région de découverte',
+      'lumen.discoveryRegions.save': 'Enregistrer les réglages',
       'lumen.discoveryRegions.saveFailure':
         'Impossible d’enregistrer les paramètres de région de découverte.',
       'lumen.discoveryRegions.saved':
@@ -26599,6 +27129,8 @@ export const localeData = [
         'Enregistrer les identifiants de métadonnées',
       'lumen.metadata.saveFailed':
         'Impossible d’enregistrer les paramètres de métadonnées.',
+      'lumen.metadata.confirmFailed':
+        'Impossible de confirmer l’enregistrement des paramètres de métadonnées.',
       'lumen.metadata.saved': 'Paramètres enregistrés.',
       'lumen.metadata.savedCredential': 'Identifiant enregistré',
       'lumen.metadata.section.books': 'Restrictions de langue des livres',
@@ -26870,6 +27402,8 @@ export const localeData = [
       'lumen.nav.comicsManga': 'BD/Manga',
       'lumen.nav.games': 'Jeux',
       'lumen.nav.lumenSettings': 'Paramètres de Lumen',
+      'lumen.nav.more': 'Plus',
+      'lumen.nav.pendingRequests': 'Demandes en attente : {count}',
       'lumen.nav.seerrAdministration': 'Administration de SeerrNG',
       'lumen.nav.signedIn': 'Connecté',
       'lumen.notifications.accountSettings': 'Paramètres du compte',
@@ -27121,6 +27655,9 @@ export const localeData = [
         'Impossible de modifier le suivi de l’équipe.',
       'lumen.recordings.keep': 'Conserver l’enregistrement',
       'lumen.recordings.liveTvStatus': 'État de la télévision en direct',
+      'lumen.recordings.loading': 'Chargement des enregistrements…',
+      'lumen.recordings.statusLoadError':
+        'Impossible de charger l’état de la télévision en direct.',
       'lumen.recordings.loadingSchedules':
         'Chargement des calendriers des équipes…',
       'lumen.recordings.loadingTeams': 'Chargement des équipes suivies…',
@@ -27656,6 +28193,7 @@ export const localeData = [
       'lumen.streamingFilter.match': 'Correspondance des services',
       'lumen.streamingFilter.region': 'Région de streaming',
       'lumen.streamingFilter.services': 'Services de streaming',
+      'lumen.streamingFilter.selectedCount': 'Sélection : {count}',
       'lumen.streamingFilter.servicesLower': 'services de streaming',
       'lumen.streamingPolicy.action': 'Action de demande',
       'lumen.streamingPolicy.allowOverride':
@@ -28261,6 +28799,8 @@ export const localeData = [
       'lumen.status.on4kServer': '4K sur {server}',
       'lumen.status.overQuota': 'Quota dépassé',
       'lumen.requests.row.autoQueued': 'Ajout automatique',
+      'lumen.requests.row.differentEditionDetail':
+        'Ce livre est dans votre bibliothèque dans une autre édition que celle demandée.',
       'lumen.requests.row.episodeQueueAhead':
         'File d’attente des épisodes · {count} à venir',
       'lumen.requests.row.etaAlmostDone': 'Presque terminé',
@@ -29124,6 +29664,111 @@ export const localeData = [
       'lumen.setup.useHttps': 'Utiliser HTTPS',
       'lumen.setup.username': 'Nom d’utilisateur',
       'lumen.setup.videoGroup': 'Films et séries',
+      'lumen.account.themePreset': 'Préréglage de thème intégré',
+      'lumen.account.themePresetPlaceholder': 'Choisir un préréglage',
+      'lumen.account.themePresetHelp':
+        'L’application d’un préréglage l’enregistre dans votre compte et conserve les valeurs de remplacement existantes, qui restent prioritaires.',
+      'lumen.account.applyThemePreset': 'Appliquer le préréglage',
+      'lumen.account.resetThemeOverrides':
+        'Réinitialiser les remplacements du thème',
+      'lumen.account.themeOverridesReset':
+        'Les remplacements du thème ont été effacés.',
+      'lumen.account.external.title': 'Listes de demandes externes',
+      'lumen.account.external.description':
+        'Connectez une liste publique IMDb, une étagère Goodreads À lire ou l’étagère Hardcover Want to Read. Les nouveaux éléments sont vérifiés chaque jour et demandés selon vos autorisations et règles d’approbation. Importez un export CSV IMDb si la synchronisation serveur est indisponible.',
+      'lumen.account.external.url': 'URL de la liste publique',
+      'lumen.account.external.add': 'Ajouter la liste',
+      'lumen.account.external.token': 'Jeton API Hardcover',
+      'lumen.account.external.connect': 'Connecter Hardcover',
+      'lumen.account.external.empty': 'Aucune liste externe connectée.',
+      'lumen.account.external.error':
+        'Impossible de mettre à jour la liste externe. Réessayez.',
+      'lumen.account.external.added': 'Liste externe ajoutée.',
+      'lumen.account.external.connected':
+        'Hardcover connecté. Livres trouvés sur votre étagère : {count}.',
+      'lumen.account.external.removed': 'Liste externe supprimée.',
+      'lumen.account.external.summary':
+        'Synchronisation terminée : {requested} demandés, {already} déjà demandés, {unmatched} introuvables, {failed} échecs.',
+      'lumen.account.external.tooLarge':
+        'Le fichier export IMDb doit faire 5 Mo ou moins.',
+      'lumen.account.external.import': 'Importer un CSV IMDb',
+      'lumen.account.external.sync': 'Synchroniser',
+      'lumen.account.external.remove': 'Supprimer',
+      'lumen.account.external.never': 'Jamais synchronisée',
+      'lumen.account.external.imdb': 'Liste IMDb',
+      'lumen.account.external.csv': 'Liste IMDb (import CSV)',
+      'lumen.account.external.goodreads': 'Étagère Goodreads À lire',
+      'lumen.account.external.hardcover': 'Hardcover Want to Read',
+      'lumen.account.bookSections.title': 'Sections de livres et livres audio',
+      'lumen.account.bookSections.description':
+        'Choisissez les rangées de livres et de livres audio dans Découvrir, masquez-les et définissez leur ordre.',
+      'lumen.account.bookSections.add': 'Ajouter une section',
+      'lumen.account.bookSections.choose': 'Choisir une section',
+      'lumen.account.bookSections.enabled': 'Afficher sur l’accueil',
+      'lumen.account.bookSections.up': 'Monter',
+      'lumen.account.bookSections.down': 'Descendre',
+      'lumen.account.bookSections.empty':
+        'Aucune section sélectionnée. Ajoutez-en une pour afficher les livres dans Découvrir.',
+      'lumen.account.bookSections.save': 'Enregistrer les sections',
+      'lumen.account.bookSections.saved': 'Sections de livres enregistrées.',
+      'lumen.account.bookSections.loadFailure':
+        'Impossible de charger les sections de livres.',
+      'lumen.account.bookSections.saveFailure':
+        'Impossible d’enregistrer les sections de livres.',
+      'lumen.account.bookSections.mismatch':
+        'Les sections enregistrées ne correspondent pas. Vérifiez les valeurs actuelles.',
+      'lumen.account.bookSections.option.popular:ebook': 'Livres populaires',
+      'lumen.account.bookSections.option.new:ebook': 'Nouveaux livres',
+      'lumen.account.bookSections.option.popular:audiobook':
+        'Livres audio populaires',
+      'lumen.account.bookSections.option.new:audiobook':
+        'Nouveaux livres audio',
+      'lumen.account.bookSections.option.subject:fantasy:ebook':
+        'Livres fantastiques',
+      'lumen.account.bookSections.option.subject:mystery:ebook':
+        'Livres policiers',
+      'lumen.account.bookSections.option.subject:romance:ebook':
+        'Livres sentimentaux',
+      'lumen.account.bookSections.option.subject:science_fiction:ebook':
+        'Livres de science-fiction',
+      'lumen.account.bookSections.option.subject:history:ebook':
+        'Livres d’histoire',
+      'lumen.account.bookSections.option.subject:biography:ebook':
+        'Biographies',
+      'lumen.account.bookSections.option.subject:fantasy:audiobook':
+        'Livres audio fantastiques',
+      'lumen.account.bookSections.option.subject:mystery:audiobook':
+        'Livres audio policiers',
+      'lumen.account.bookSections.option.subject:romance:audiobook':
+        'Livres audio sentimentaux',
+      'lumen.account.bookSections.option.subject:science_fiction:audiobook':
+        'Livres audio de science-fiction',
+      'lumen.account.bookSections.option.subject:history:audiobook':
+        'Livres audio d’histoire',
+      'lumen.account.bookSections.option.subject:biography:audiobook':
+        'Livres audio biographiques',
+      'lumen.discover.audiobookRequested': '{title} demandé.',
+      'lumen.discover.audiobookRequestFailed':
+        'La demande de livre audio a échoué.',
+      'lumen.discover.audiobookLoadFailed':
+        'Cette section de livres audio n’a pas pu être chargée.',
+      'lumen.discover.requesting': 'Demande en cours…',
+      'lumen.discover.requested': 'Demandé',
+      'lumen.discover.request': 'Demander',
+      'lumen.discover.bookSectionsFailed':
+        'Impossible de charger les étagères personnelles de livres.',
+      'lumen.tunerr.saveFailed':
+        'Impossible d’enregistrer les paramètres de Tunerr.',
+      'lumen.software.saveFailed':
+        'Impossible d’enregistrer les paramètres d’acquisition de logiciels.',
+      'lumen.automaticBlocklist.what': 'paramètres de blocage automatique',
+      'lumen.automaticBlocklist.keywordIds': 'ID de mots-clés TMDB bloqués',
+      'lumen.automaticBlocklist.find': 'Rechercher des mots-clés',
+      'lumen.automaticBlocklist.limit':
+        'Limiter les pages par balise ou genre bloqué',
+      'lumen.automaticBlocklist.limitHelp':
+        'Saisissez un nombre entier de 0 à 250.',
+      'lumen.automaticBlocklist.genreWhat': 'genres',
     },
   },
   {
@@ -29131,6 +29776,8 @@ export const localeData = [
     nativeName: 'Hrvatski',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Odredišni poslužitelj',
       'components.IssueDetails.allepisodes': 'Sve Epizode',
       'components.Layout.Sidebar.browsemovies': 'Filmovi',
       'components.Layout.Sidebar.browsetv': 'Serije',
@@ -29552,6 +30199,7 @@ export const localeData = [
     nativeName: 'עברית',
     direction: 'rtl',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver': 'שרת יעד',
       'components.IssueDetails.allepisodes': 'כל הפרקים',
       'components.Layout.Sidebar.browsemovies': 'סרטים',
       'components.Layout.Sidebar.browsetv': 'סדרות',
@@ -29797,6 +30445,27 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'श्रृंखला',
+      'components.Common.FormatRequestControl.request': 'अनुरोध करें',
+      'components.ArtistDetails.requestdiscography': 'अनुरोध डिस्कोग्राफी',
+      'components.ArtistDetails.followreleases': 'नए एल्बम फॉलो करें',
+      'components.MusicDetails.requestdiscography':
+        'डिस्कोग्राफी का अनुरोध करें',
+      'components.Settings.lidarrsettings': 'Lidarr सेटिंग्स',
+      'components.MusicDetails.blocklisted': 'यह शीर्षक ब्लॉकलिस्ट में है।',
+      'components.MusicDetails.flacAvailable':
+        'FLAC संस्करण पहले से ही उपलब्ध है।',
+      'components.MusicDetails.flacPending':
+        'एक खुला FLAC अनुरोध पहले से ही मौजूद है।',
+      'components.MusicDetails.flacServiceUnavailable':
+        'कोई FLAC संगीत सेवा कॉन्फ़िगर नहीं की गई है।',
+      'components.MusicDetails.mp3Available':
+        'MP3 संस्करण पहले से ही उपलब्ध है।',
+      'components.MusicDetails.mp3Pending':
+        'एक खुला MP3 अनुरोध पहले से ही मौजूद है।',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'कोई MP3 संगीत सेवा कॉन्फ़िगर नहीं की गई है।',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'गंतव्य सर्वर',
       'components.IdentityMappingControls.change': 'शीर्षक मिलान बदलें',
       'components.IdentityMappingControls.match':
         'कैटलॉग के शीर्षक से मिलान करें',
@@ -31222,7 +31891,11 @@ export const localeData = [
       'i18n.next': 'अगला',
       'i18n.previous': 'पिछला',
       'i18n.providerDiscovery': 'प्रदाता डिस्कवरी',
+      'i18n.primaryNavigation': 'मुख्य नेविगेशन',
       'i18n.searchLabel': 'खोजें',
+      'i18n.tabs': 'टैब',
+      'i18n.closeMenu': 'मेनू बंद करें',
+      'i18n.moreNavigation': 'अन्य नेविगेशन',
       'i18n.unknown': 'अज्ञात',
       'i18n.usersettings': 'उपयोगकर्ता सेटिंग्स',
       'library.accounts': 'संबद्ध खातों का प्रबंधन',
@@ -31397,6 +32070,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'अडल्ट',
       'components.Discover.DiscoverAdult.unavailable':
         'अडल्ट सीन खोज अभी उपलब्ध नहीं है।',
+      'components.Discover.FilterPanel.filters': 'फ़िल्टर',
+      'components.SoftwareCatalog.allPcPlatforms': 'सभी पीसी प्लेटफॉर्म',
+      'components.SoftwareCatalog.allSystems': 'सभी प्रणालियों',
+      'components.SoftwareCatalog.genreFilter': 'शैली',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        '1950 से 2200 तक एक रिलीज वर्ष दर्ज करें।',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'MacOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'रिलीज वर्ष',
+      'components.SoftwareCatalog.windows': 'विंडोज',
     },
   },
   {
@@ -31404,6 +32087,8 @@ export const localeData = [
     nativeName: 'Magyar',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Cél szerver',
       'components.IssueDetails.allepisodes': 'Minden epizód',
       'components.Layout.Sidebar.blocklist': 'Tiltólista',
       'components.Layout.Sidebar.browsemovies': 'Filmek',
@@ -32036,6 +32721,25 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'Serial',
+      'components.Common.FormatRequestControl.request': 'Minta',
+      'components.ArtistDetails.requestdiscography': 'Permintaan Diskografi',
+      'components.ArtistDetails.followreleases': 'Ikuti Album Baru',
+      'components.MusicDetails.requestdiscography':
+        'Ajukan permintaan diskografi',
+      'components.Settings.lidarrsettings': 'Pengaturan Lidarr',
+      'components.MusicDetails.blocklisted': 'Judul ini diblokir.',
+      'components.MusicDetails.flacAvailable': 'Versi FLAC sudah tersedia.',
+      'components.MusicDetails.flacPending':
+        'Sudah ada permintaan FLAC yang terbuka.',
+      'components.MusicDetails.flacServiceUnavailable':
+        'Tak ada layanan musik FLAC yang dikonfigurasi.',
+      'components.MusicDetails.mp3Available': 'Versi MP3 sudah tersedia.',
+      'components.MusicDetails.mp3Pending':
+        'Sudah ada permintaan MP3 yang terbuka.',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'Tak ada layanan musik MP3 yang dikonfigurasi.',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Server Tujuan',
       'components.IdentityMappingControls.change': 'Ubah kecocokan judul',
       'components.IdentityMappingControls.match':
         'Cocokkan dengan judul di katalog',
@@ -33481,7 +34185,11 @@ export const localeData = [
       'i18n.next': 'Berikutnya',
       'i18n.previous': 'Sebelumnya',
       'i18n.providerDiscovery': 'Discovery Penyedia',
+      'i18n.primaryNavigation': 'Navigasi utama',
       'i18n.searchLabel': 'Cari',
+      'i18n.tabs': 'Tab',
+      'i18n.closeMenu': 'Tutup menu',
+      'i18n.moreNavigation': 'Navigasi lainnya',
       'i18n.unknown': 'yang tidak diketahui',
       'i18n.usersettings': 'Pengaturan pengguna',
       'library.accounts': 'Kelola akun yang tersambung',
@@ -33655,6 +34363,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'Dewasa',
       'components.Discover.DiscoverAdult.unavailable':
         'Pencarian scene dewasa saat ini tidak tersedia.',
+      'components.Discover.FilterPanel.filters': 'Filter',
+      'components.SoftwareCatalog.allPcPlatforms': 'Semua platform PC',
+      'components.SoftwareCatalog.allSystems': 'Semua sistem',
+      'components.SoftwareCatalog.genreFilter': 'Genre',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        'Masukkan tahun lepas dari 1950-2200.',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'MaOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'Rilis tahun',
+      'components.SoftwareCatalog.windows': 'Jendela',
     },
   },
   {
@@ -33662,6 +34380,8 @@ export const localeData = [
     nativeName: 'Italiano',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Server di destinazione',
       'components.IssueDetails.allepisodes': 'Tutti gli episodi',
       'components.Layout.Sidebar.blocklist': 'Lista blocchi',
       'components.Layout.Sidebar.browsemovies': 'Film',
@@ -34283,6 +35003,29 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'シリーズ',
+      'components.Common.FormatRequestControl.request': 'リクエスト',
+      'components.ArtistDetails.requestdiscography':
+        'リクエスト・ディスコグラフィー',
+      'components.ArtistDetails.followreleases': '新譜を追跡',
+      'components.MusicDetails.requestdiscography':
+        'ディスコグラフィーをリクエスト',
+      'components.Settings.lidarrsettings': 'Lidarr 设置',
+      'components.MusicDetails.blocklisted':
+        'このタイトルはブロックリストに登録されています。',
+      'components.MusicDetails.flacAvailable':
+        'FLACバージョンは既に利用可能です。',
+      'components.MusicDetails.flacPending':
+        'FLACリクエストは既に存在しています。',
+      'components.MusicDetails.flacServiceUnavailable':
+        'FLACの音楽サービスは設定されていません。',
+      'components.MusicDetails.mp3Available':
+        'MP3バージョンは既に利用可能です。',
+      'components.MusicDetails.mp3Pending':
+        'オープンMP3リクエストは既に存在しています。',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'MP3の音楽サービスは構成されていません。',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        '送信先サーバー',
       'components.IdentityMappingControls.change': 'タイトルの対応付けを変更',
       'components.IdentityMappingControls.match': 'カタログのタイトルと照合',
       'components.IdentityMappingControls.mediaTypeLabel':
@@ -35721,7 +36464,11 @@ export const localeData = [
       'i18n.next': '次',
       'i18n.previous': '前',
       'i18n.providerDiscovery': 'プロバイダー検索',
+      'i18n.primaryNavigation': 'メインナビゲーション',
       'i18n.searchLabel': '検索',
+      'i18n.tabs': 'タブ',
+      'i18n.closeMenu': 'メニューを閉じる',
+      'i18n.moreNavigation': 'その他のナビゲーション',
       'i18n.unknown': '不明',
       'i18n.usersettings': 'ユーザー設定',
       'library.accounts': '接続されたアカウントを管理する',
@@ -35899,6 +36646,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'アダルト',
       'components.Discover.DiscoverAdult.unavailable':
         'アダルトシーン検索は現在利用できません。',
+      'components.Discover.FilterPanel.filters': 'フィルター',
+      'components.SoftwareCatalog.allPcPlatforms': 'すべてのPCプラットフォーム',
+      'components.SoftwareCatalog.allSystems': 'すべてのシステム',
+      'components.SoftwareCatalog.genreFilter': 'ジャンル',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        '1950年から2200年にかけてリリース年を入力してください。',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'マックオース',
+      'components.SoftwareCatalog.releaseYearFilter': 'リリース年',
+      'components.SoftwareCatalog.windows': 'ウィンドウズ',
     },
   },
   {
@@ -35907,6 +36664,27 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': '시리즈',
+      'components.Common.FormatRequestControl.request': '요청',
+      'components.ArtistDetails.requestdiscography': '음반 요청',
+      'components.ArtistDetails.followreleases': '새 앨범 팔로우',
+      'components.MusicDetails.requestdiscography': '음반 요청',
+      'components.Settings.lidarrsettings': 'Lidarr 설정',
+      'components.MusicDetails.blocklisted':
+        '이 제목은 차단 목록에 등록되어 있습니다.',
+      'components.MusicDetails.flacAvailable':
+        'FLAC 버전은 이미 사용할 수 있습니다.',
+      'components.MusicDetails.flacPending':
+        '열린 FLAC 요청은 이미 존재합니다.',
+      'components.MusicDetails.flacServiceUnavailable':
+        'FLAC 음악 서비스가 구성되지 않습니다.',
+      'components.MusicDetails.mp3Available':
+        'MP3 버전은 이미 사용할 수 있습니다.',
+      'components.MusicDetails.mp3Pending':
+        '열려 있는 MP3 요청이 이미 있습니다.',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'MP3 음악 서비스가 구성되지 않습니다.',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        '대상 서버',
       'components.IdentityMappingControls.change': '제목 일치 항목 변경',
       'components.IdentityMappingControls.match': '카탈로그 제목과 일치시키기',
       'components.IdentityMappingControls.mediaTypeLabel':
@@ -37297,7 +38075,11 @@ export const localeData = [
       'i18n.next': '다음',
       'i18n.previous': '이전',
       'i18n.providerDiscovery': '제공자 검색',
+      'i18n.primaryNavigation': '주요 탐색',
       'i18n.searchLabel': '검색',
+      'i18n.tabs': '탭',
+      'i18n.closeMenu': '메뉴 닫기',
+      'i18n.moreNavigation': '추가 탐색 메뉴',
       'i18n.unknown': '알려지지 않은',
       'i18n.usersettings': '사용자 설정',
       'library.accounts': '연결된 계정 관리',
@@ -37472,6 +38254,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': '성인',
       'components.Discover.DiscoverAdult.unavailable':
         '현재 성인 장면 검색을 사용할 수 없습니다.',
+      'components.Discover.FilterPanel.filters': '필터',
+      'components.SoftwareCatalog.allPcPlatforms': '모든 PC 플랫폼',
+      'components.SoftwareCatalog.allSystems': '모든 시스템',
+      'components.SoftwareCatalog.genreFilter': '장르',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        '1950년부터 2200년까지 릴리스 해를 입력하십시오.',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': '맥 OS',
+      'components.SoftwareCatalog.releaseYearFilter': '출시 년',
+      'components.SoftwareCatalog.windows': '윈도우',
     },
   },
   {
@@ -37485,6 +38277,7 @@ export const localeData = [
     nativeName: 'Lietuvių',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver': 'Serveris',
       'components.IssueDetails.allepisodes': 'Visi epizodai',
       'components.Layout.Sidebar.browsemovies': 'Filmai',
       'components.Layout.Sidebar.browsetv': 'Serialai',
@@ -37631,6 +38424,8 @@ export const localeData = [
     nativeName: 'Norsk Bokmål',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Måltjener',
       'components.IssueDetails.allepisodes': 'Alle Episoder',
       'components.Layout.Sidebar.browsemovies': 'Filmer',
       'components.Layout.Sidebar.browsetv': 'Serier',
@@ -38038,6 +38833,8 @@ export const localeData = [
     nativeName: 'Nederlands',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Doelserver',
       'components.IssueDetails.allepisodes': 'Alle afleveringen',
       'components.Layout.Sidebar.blocklist': 'Blokkeerlijst',
       'components.Layout.Sidebar.browsemovies': 'Films',
@@ -38672,6 +39469,8 @@ export const localeData = [
     nativeName: 'Polski',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Serwer docelowy',
       'components.IssueDetails.allepisodes': 'Wszystkie odcinki',
       'components.Layout.Sidebar.blocklist': 'Czarna lista',
       'components.Layout.Sidebar.browsemovies': 'Filmy',
@@ -39306,6 +40105,26 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'Séries',
+      'components.Common.FormatRequestControl.request': 'Solicitar',
+      'components.ArtistDetails.requestdiscography': 'Pedir discografia.',
+      'components.ArtistDetails.followreleases': 'Acompanhar Novos Álbuns',
+      'components.MusicDetails.requestdiscography': 'Pedir discografia',
+      'components.Settings.lidarrsettings': 'Configurações do Lidarr',
+      'components.MusicDetails.blocklisted':
+        'Este título está na lista de bloqueio.',
+      'components.MusicDetails.flacAvailable':
+        'A versão FLAC já está disponível.',
+      'components.MusicDetails.flacPending': 'Um pedido da FLAC já existe.',
+      'components.MusicDetails.flacServiceUnavailable':
+        'Nenhum serviço de música FLAC está configurado.',
+      'components.MusicDetails.mp3Available':
+        'A versão MP3 já está disponível.',
+      'components.MusicDetails.mp3Pending':
+        'Um pedido de MP3 aberto já existe.',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'Nenhum serviço de música MP3 está configurado.',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Servidor de Destino',
       'components.IdentityMappingControls.change':
         'Alterar correspondência de título',
       'components.IdentityMappingControls.match':
@@ -40773,7 +41592,11 @@ export const localeData = [
       'i18n.next': 'Próxima',
       'i18n.previous': 'Anterior',
       'i18n.providerDiscovery': 'Descoberta de provedores',
+      'i18n.primaryNavigation': 'Navegação principal',
       'i18n.searchLabel': 'Pesquisar',
+      'i18n.tabs': 'Abas',
+      'i18n.closeMenu': 'Fechar menu',
+      'i18n.moreNavigation': 'Mais opções de navegação',
       'i18n.unknown': 'Desconhecido',
       'i18n.usersettings': 'Configurações de Usuário',
       'library.accounts': 'Gerencie contas conectadas',
@@ -40951,6 +41774,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'Adulto',
       'components.Discover.DiscoverAdult.unavailable':
         'A pesquisa de cenas adultas não está disponível no momento.',
+      'components.Discover.FilterPanel.filters': 'Filtros',
+      'components.SoftwareCatalog.allPcPlatforms': 'Todas as plataformas PC',
+      'components.SoftwareCatalog.allSystems': 'Todos os sistemas.',
+      'components.SoftwareCatalog.genreFilter': 'Gênero',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        'Entre em um ano de lançamento de 1950 a 2200.',
+      'components.SoftwareCatalog.linux': 'Linux.',
+      'components.SoftwareCatalog.macos': 'MacOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'Ano de lançamento',
+      'components.SoftwareCatalog.windows': 'Janelas',
     },
   },
   {
@@ -40958,6 +41791,8 @@ export const localeData = [
     nativeName: 'Português (Portugal)',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Servidor de Destino',
       'components.IssueDetails.allepisodes': 'Todos Episódios',
       'components.Layout.Sidebar.blocklist': 'Lista de bloqueio',
       'components.Layout.Sidebar.browsemovies': 'Filmes',
@@ -41565,6 +42400,8 @@ export const localeData = [
     nativeName: 'Română',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Server de destinație',
       'components.IssueDetails.allepisodes': 'Toate episoadele',
       'components.Layout.Sidebar.blocklist': 'Blocate',
       'components.Layout.Sidebar.browsemovies': 'Filme',
@@ -41894,6 +42731,8 @@ export const localeData = [
     nativeName: 'Русский',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Сервер-получатель',
       'components.IssueDetails.allepisodes': 'Все эпизоды',
       'components.Layout.Sidebar.blocklist': 'Список блокировки',
       'components.Layout.Sidebar.browsemovies': 'Фильмы',
@@ -42533,6 +43372,8 @@ export const localeData = [
     nativeName: 'Shqip',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Serveri i destinacionit',
       'components.IssueDetails.allepisodes': 'Të gjithë Episodet',
       'components.Layout.Sidebar.issues': 'Problemet',
       'components.Layout.Sidebar.requests': 'Kërkesat',
@@ -42935,6 +43776,8 @@ export const localeData = [
     nativeName: 'Српски',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Odredišni server',
       'components.IssueDetails.allepisodes': 'Sve epizode',
       'components.Layout.Sidebar.issues': 'Problemi',
       'components.Layout.Sidebar.requests': 'Zahtevi',
@@ -43095,6 +43938,8 @@ export const localeData = [
     nativeName: 'Svenska',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Destinationsserver',
       'components.IssueDetails.allepisodes': 'Alla avsnitt',
       'components.Layout.Sidebar.blocklist': 'Blocklista',
       'components.Layout.Sidebar.browsemovies': 'Filmer',
@@ -43725,6 +44570,8 @@ export const localeData = [
     nativeName: 'Türkçe',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Hedef Sunucu',
       'components.IssueDetails.allepisodes': 'Tüm Bölümler',
       'components.Layout.Sidebar.blocklist': 'Engelleme Listesi',
       'components.Layout.Sidebar.browsemovies': 'Filmler',
@@ -44344,6 +45191,8 @@ export const localeData = [
     nativeName: 'Українська',
     direction: 'ltr',
     messages: {
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Сервер-одержувач',
       'components.IssueDetails.allepisodes': 'Всі епізоди',
       'components.Layout.Sidebar.browsemovies': 'Фільми',
       'components.Layout.Sidebar.browsetv': 'Серіали',
@@ -44934,6 +45783,22 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': '剧集',
+      'components.Common.FormatRequestControl.request': '提交请求',
+      'components.ArtistDetails.requestdiscography': '请求完整唱片目录',
+      'components.ArtistDetails.followreleases': '关注新专辑',
+      'components.MusicDetails.requestdiscography': '请求完整唱片目录',
+      'components.Settings.lidarrsettings': 'Lidarr 设置',
+      'components.MusicDetails.blocklisted': '此标题已加入屏蔽列表。',
+      'components.MusicDetails.flacAvailable': 'FLAC 版本已经提供.',
+      'components.MusicDetails.flacPending': '已存在开放式 FLAC 请求 。',
+      'components.MusicDetails.flacServiceUnavailable':
+        '没有配置 FLAC 音乐服务 。',
+      'components.MusicDetails.mp3Available': 'MP3版本已经可用.',
+      'components.MusicDetails.mp3Pending': '一个开放的 MP3 请求已经存在 。',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        '没有配置 MP3 音乐服务 。',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        '目標服务器',
       'components.IdentityMappingControls.change': '更改匹配的标题',
       'components.IdentityMappingControls.match': '匹配目录中的标题',
       'components.IdentityMappingControls.mediaTypeLabel': '目录内容类型',
@@ -46283,7 +47148,11 @@ export const localeData = [
       'i18n.next': '下一页',
       'i18n.previous': '上一页',
       'i18n.providerDiscovery': '服务提供方探索',
+      'i18n.primaryNavigation': '主导航',
       'i18n.searchLabel': '搜索',
+      'i18n.tabs': '标签页',
+      'i18n.closeMenu': '关闭菜单',
+      'i18n.moreNavigation': '更多导航',
       'i18n.unknown': '未知',
       'i18n.usersettings': '用户设定',
       'library.accounts': '管理连接的账户',
@@ -46441,6 +47310,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': '成人',
       'components.Discover.DiscoverAdult.unavailable':
         '成人场景搜索当前不可用。',
+      'components.Discover.FilterPanel.filters': '筛选条件',
+      'components.SoftwareCatalog.allPcPlatforms': '所有个人电脑平台',
+      'components.SoftwareCatalog.allSystems': '所有系统',
+      'components.SoftwareCatalog.genreFilter': '类型',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        '从1950年到2200年进入发行年.',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': '马科斯',
+      'components.SoftwareCatalog.releaseYearFilter': '发布年份',
+      'components.SoftwareCatalog.windows': '窗口',
     },
   },
   {
@@ -46449,6 +47328,22 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': '影集',
+      'components.Common.FormatRequestControl.request': '提出請求',
+      'components.ArtistDetails.requestdiscography': '請求完整唱片目錄',
+      'components.ArtistDetails.followreleases': '追蹤新專輯',
+      'components.MusicDetails.requestdiscography': '要求完整唱片目錄',
+      'components.Settings.lidarrsettings': 'Lidarr 设置',
+      'components.MusicDetails.blocklisted': '此標題已列入封鎖清單。',
+      'components.MusicDetails.flacAvailable': '已提供 FLAC 版本 。',
+      'components.MusicDetails.flacPending': '已存在開啟的 FLAC 要求 。',
+      'components.MusicDetails.flacServiceUnavailable':
+        '沒有配置 FLAC 音樂服務 。',
+      'components.MusicDetails.mp3Available': 'MP3 版本已可用 。',
+      'components.MusicDetails.mp3Pending': '已存在開啟的 MP3 要求 。',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        '沒有配置 MP3 音樂服務 。',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        '目標伺服器',
       'components.IdentityMappingControls.change': '變更配對的標題',
       'components.IdentityMappingControls.match': '比對目錄中的標題',
       'components.IdentityMappingControls.mediaTypeLabel': '目錄內容類型',
@@ -47799,7 +48694,11 @@ export const localeData = [
       'i18n.next': '下一頁',
       'i18n.previous': '上一頁',
       'i18n.providerDiscovery': '服務供應商探索',
+      'i18n.primaryNavigation': '主要導覽',
       'i18n.searchLabel': '搜尋',
+      'i18n.tabs': '索引標籤',
+      'i18n.closeMenu': '關閉選單',
+      'i18n.moreNavigation': '更多導覽',
       'i18n.unknown': '未知',
       'i18n.usersettings': '使用者設定',
       'library.accounts': '管理連接帳號',
@@ -47954,6 +48853,15 @@ export const localeData = [
       'components.Discover.DiscoverAdult.serverFilter': '瀏覽伺服器',
       'components.Discover.DiscoverAdult.title': '成人',
       'components.Discover.DiscoverAdult.unavailable': '目前無法搜尋成人場景。',
+      'components.Discover.FilterPanel.filters': '篩選條件',
+      'components.SoftwareCatalog.allPcPlatforms': '所有PC平台',
+      'components.SoftwareCatalog.allSystems': '所有系統',
+      'components.SoftwareCatalog.genreFilter': '類型',
+      'components.SoftwareCatalog.invalidReleaseYear': '1950年到2200年',
+      'components.SoftwareCatalog.linux': 'Linux 中',
+      'components.SoftwareCatalog.macos': 'macOS',
+      'components.SoftwareCatalog.releaseYearFilter': '发布年份',
+      'components.SoftwareCatalog.windows': '視窗',
     },
   },
   {
@@ -47962,6 +48870,24 @@ export const localeData = [
     direction: 'ltr',
     messages: {
       'components.Discover.DiscoverMediaTabs.series': 'Loạt phim',
+      'components.Common.FormatRequestControl.request': 'Yêu cầu',
+      'components.ArtistDetails.requestdiscography':
+        'Yêu cầu danh mục đĩa nhạc',
+      'components.ArtistDetails.followreleases': 'Theo dõi Album mới',
+      'components.MusicDetails.requestdiscography': 'Yêu cầu danh mục đĩa nhạc',
+      'components.Settings.lidarrsettings': 'Cài đặt Lidarr',
+      'components.MusicDetails.blocklisted':
+        'Tiêu đề này nằm trong danh sách chặn.',
+      'components.MusicDetails.flacAvailable': 'Phiên bản FLAC đã sẵn sàng.',
+      'components.MusicDetails.flacPending': 'Đã có một yêu cầu FLAC đang mở.',
+      'components.MusicDetails.flacServiceUnavailable':
+        'Không có dịch vụ âm nhạc FLAC nào được cấu hình.',
+      'components.MusicDetails.mp3Available': 'Phiên bản MP3 đã sẵn sàng.',
+      'components.MusicDetails.mp3Pending': 'Đã có một yêu cầu MP3 đang mở.',
+      'components.MusicDetails.mp3ServiceUnavailable':
+        'Chưa cấu hình dịch vụ nhạc MP3 nào.',
+      'components.RequestModal.AdvancedRequester.destinationserver':
+        'Máy chủ đích',
       'components.IdentityMappingControls.change':
         'Thay đổi kết quả khớp tiêu đề',
       'components.IdentityMappingControls.match':
@@ -49404,7 +50330,11 @@ export const localeData = [
       'i18n.next': 'Tiếp theo',
       'i18n.previous': 'Trước',
       'i18n.providerDiscovery': 'Khám phá nhà cung cấp',
+      'i18n.primaryNavigation': 'Điều hướng chính',
       'i18n.searchLabel': 'Tìm kiếm',
+      'i18n.tabs': 'Thẻ',
+      'i18n.closeMenu': 'Đóng menu',
+      'i18n.moreNavigation': 'Thêm mục điều hướng',
       'i18n.unknown': 'Không biết',
       'i18n.usersettings': 'Cài đặt người dùng',
       'library.accounts': 'Quản lý tài khoản đã kết nối',
@@ -49579,6 +50509,16 @@ export const localeData = [
       'components.Discover.DiscoverAdult.title': 'Người lớn',
       'components.Discover.DiscoverAdult.unavailable':
         'Tìm kiếm cảnh người lớn hiện không khả dụng.',
+      'components.Discover.FilterPanel.filters': 'Bộ lọc',
+      'components.SoftwareCatalog.allPcPlatforms': 'Mọi nền tảng PC',
+      'components.SoftwareCatalog.allSystems': 'Mọi hệ thống',
+      'components.SoftwareCatalog.genreFilter': 'Thể loại',
+      'components.SoftwareCatalog.invalidReleaseYear':
+        'Nhập một năm giải phóng từ 1950 đến 2200.',
+      'components.SoftwareCatalog.linux': 'Linux',
+      'components.SoftwareCatalog.macos': 'MacOS',
+      'components.SoftwareCatalog.releaseYearFilter': 'Phát hành năm',
+      'components.SoftwareCatalog.windows': 'Cửa sổ',
     },
   },
 ] as const;

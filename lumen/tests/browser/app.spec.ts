@@ -1508,12 +1508,14 @@ test('person bulk requests confirm the exact unique movie list and stop on quota
 
 test('instance request settings save only changed policy flags and retain failed edits', async ({
   page,
-}) => {
+}, info) => {
   await fixtures(page);
   let enabled = false;
   let enable4k = true;
   let admin = true;
   let reject = true;
+  let staleReadback = false;
+  let staleReadbackUsed = false;
   const writes: unknown[] = [];
   await page.route('**/api/v1/auth/me', (route) =>
     route.fulfill({
@@ -1531,15 +1533,26 @@ test('instance request settings save only changed policy flags and retain failed
   );
   await page.route('**/api/v1/settings/main', (route) => {
     // Request Defaults reads the current settings when it opens
-    if (route.request().method() !== 'POST')
+    if (route.request().method() !== 'POST') {
+      if (staleReadback) {
+        staleReadback = false;
+        return route.fulfill({
+          json: { personMovieBulkRequestsEnabled: false, enable4k },
+        });
+      }
       return route.fulfill({
         json: { personMovieBulkRequestsEnabled: enabled, enable4k },
       });
+    }
     const body = route.request().postDataJSON();
     writes.push(body);
     if (reject) return route.fulfill({ status: 503, json: {} });
     enabled = body.personMovieBulkRequestsEnabled ?? enabled;
     enable4k = body.enable4k ?? enable4k;
+    if (!staleReadbackUsed) {
+      staleReadback = true;
+      staleReadbackUsed = true;
+    }
     return route.fulfill({
       json: { personMovieBulkRequestsEnabled: enabled, enable4k },
     });
@@ -1548,7 +1561,7 @@ test('instance request settings save only changed policy flags and retain failed
   await page.getByRole('link', { name: 'Request Defaults' }).click();
   await expect(page).toHaveURL(/\/admin\/requests$/);
   const flag = page.getByRole('checkbox', {
-    name: 'Bulk Movie Requests From Person Pages',
+    name: 'Allow Requesting All Movies From a Person Page',
   });
   const save = page.getByRole('button', {
     name: 'Save Instance Request Settings',
@@ -1558,14 +1571,31 @@ test('instance request settings save only changed policy flags and retain failed
   await flag.check();
   await save.click();
   await expect(
-    page.getByText('Could not save the instance request setting. Try again.')
+    page.getByText('Could not save the instance request settings. Try again.')
   ).toBeVisible();
   await expect(flag).toBeChecked();
+  await page.screenshot({
+    path: info.outputPath('request-settings-write-failure.png'),
+    fullPage: true,
+  });
   reject = false;
+  await save.click();
+  await expect(
+    page.getByText('Could not confirm the saved request settings.')
+  ).toBeVisible();
+  await expect(flag).toBeChecked();
+  await page.screenshot({
+    path: info.outputPath('request-settings-readback-failure.png'),
+    fullPage: true,
+  });
   await save.click();
   await expect(
     page.getByText('Instance request settings saved.')
   ).toBeVisible();
+  await page.screenshot({
+    path: info.outputPath('request-settings-recovered.png'),
+    fullPage: true,
+  });
   await expect(save).toBeDisabled();
   await flag.uncheck();
   await page
@@ -1576,6 +1606,7 @@ test('instance request settings save only changed policy flags and retain failed
     page.getByText('Instance request settings saved.')
   ).toBeVisible();
   expect(writes).toEqual([
+    { personMovieBulkRequestsEnabled: true },
     { personMovieBulkRequestsEnabled: true },
     { personMovieBulkRequestsEnabled: true },
     { personMovieBulkRequestsEnabled: false, enable4k: false },
@@ -4049,7 +4080,7 @@ test('Music album and artist details localize their controls and metadata', asyn
     : 'en';
   const copy = {
     en: {
-      request: 'Request album',
+      request: 'Request FLAC',
       discography: 'View Discography',
       tracks: 'Tracks',
       plays: '1K plays',
@@ -4068,7 +4099,7 @@ test('Music album and artist details localize their controls and metadata', asyn
       blocklistQuestion: 'Add to the Blocklist?',
     },
     fr: {
-      request: 'Demander l’album',
+      request: 'Demander FLAC',
       discography: 'Voir la discographie',
       tracks: 'Pistes',
       plays: '1K écoutes',
@@ -4087,7 +4118,7 @@ test('Music album and artist details localize their controls and metadata', asyn
       blocklistQuestion: 'Ajouter à la liste de blocage ?',
     },
     ar: {
-      request: 'طلب الألبوم',
+      request: 'طلب FLAC',
       discography: 'عرض تسجيلات الفنان',
       tracks: 'المقاطع',
       plays: '1K استماع',
@@ -4117,6 +4148,13 @@ test('Music album and artist details localize their controls and metadata', asyn
   await page.route('**/api/v1/settings/public', (route) =>
     route.fulfill({
       json: { musicEnabled: true, enabledMediaCategories: { music: true } },
+    })
+  );
+  await page.route('**/api/v1/service/lidarr', (route) =>
+    route.fulfill({
+      json: [
+        { id: 12, name: 'Fixture FLAC', musicQuality: 'flac', isDefault: true },
+      ],
     })
   );
   await page.route(`**/api/v1/music/${album}`, (route) =>
@@ -6507,10 +6545,12 @@ test('System Logs filters server entries and excludes non-admins', async ({
 
 test('Media Categories saves only changed instance switches and excludes non-admins', async ({
   page,
-}) => {
+}, info) => {
   await fixtures(page);
   let permissions = 2;
   let reads = 0;
+  let persistChanges = false;
+  let mismatchWriteOnce = true;
   const writes: unknown[] = [];
   const categories = { movie: true, tv: true, adult: false };
   await page.route('**/api/v1/auth/me', (route) =>
@@ -6520,7 +6560,20 @@ test('Media Categories saves only changed instance switches and excludes non-adm
     if (route.request().method() === 'POST') {
       const body = route.request().postDataJSON();
       writes.push(body);
-      Object.assign(categories, body.enabledMediaCategories);
+      if (mismatchWriteOnce) {
+        mismatchWriteOnce = false;
+        return route.fulfill({ json: { enabledMediaCategories: categories } });
+      }
+      if (persistChanges)
+        Object.assign(categories, body.enabledMediaCategories);
+      return route.fulfill({
+        json: {
+          enabledMediaCategories: {
+            ...categories,
+            ...body.enabledMediaCategories,
+          },
+        },
+      });
     } else reads++;
     return route.fulfill({ json: { enabledMediaCategories: categories } });
   });
@@ -6528,8 +6581,40 @@ test('Media Categories saves only changed instance switches and excludes non-adm
   await page.getByRole('link', { name: 'Open Media Categories' }).click();
   await page.getByRole('checkbox', { name: 'Movies', exact: true }).uncheck();
   await page.getByRole('button', { name: 'Save Categories' }).click();
+  await expect(
+    page.getByText('The server did not confirm the saved categories.', {
+      exact: true,
+    })
+  ).toBeVisible();
+  await page.screenshot({
+    path: info.outputPath('categories-write-response-failure.png'),
+    fullPage: true,
+  });
+  await page.getByRole('button', { name: 'Save Categories' }).click();
+  await expect(
+    page.getByText('The server did not confirm the saved categories.', {
+      exact: true,
+    })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('checkbox', { name: 'Movies', exact: true })
+  ).not.toBeChecked();
+  await page.screenshot({
+    path: info.outputPath('categories-readback-failure.png'),
+    fullPage: true,
+  });
+  persistChanges = true;
+  await page.getByRole('button', { name: 'Save Categories' }).click();
   await expect(page.getByText('Category settings saved.')).toBeVisible();
-  expect(writes).toEqual([{ enabledMediaCategories: { movie: false } }]);
+  await page.screenshot({
+    path: info.outputPath('categories-readback-recovered.png'),
+    fullPage: true,
+  });
+  expect(writes).toEqual([
+    { enabledMediaCategories: { movie: false } },
+    { enabledMediaCategories: { movie: false } },
+    { enabledMediaCategories: { movie: false } },
+  ]);
   await expect(page.getByRole('checkbox', { name: 'Series' })).toBeChecked();
   await page.reload();
   await expect(
@@ -6593,7 +6678,7 @@ test('Default user categories save independently of instance availability', asyn
 
 test('Instance Age Gate saves changed settings without submitting category drafts', async ({
   page,
-}) => {
+}, info) => {
   await fixtures(page);
   const ageGate = {
     defaultRestricted: false,
@@ -6602,6 +6687,7 @@ test('Instance Age Gate saves changed settings without submitting category draft
     certificationCountry: 'US',
   };
   const writes: unknown[] = [];
+  let persistAgeGate = false;
   await page.route('**/api/v1/settings/main', (route) => {
     if (route.request().method() === 'POST') {
       const body = route.request().postDataJSON();
@@ -6612,7 +6698,13 @@ test('Instance Age Gate saves changed settings without submitting category draft
           json: { message: 'Could not save settings.' },
         });
       }
-      Object.assign(ageGate, body.ageGate);
+      if (persistAgeGate) Object.assign(ageGate, body.ageGate);
+      return route.fulfill({
+        json: {
+          enabledMediaCategories: { movie: true },
+          ageGate: { ...ageGate, ...body.ageGate },
+        },
+      });
     }
     return route.fulfill({
       json: { enabledMediaCategories: { movie: true }, ageGate },
@@ -6638,8 +6730,28 @@ test('Instance Age Gate saves changed settings without submitting category draft
   );
   await expect(restricted).toBeChecked();
   await expect(country).toHaveValue('ca');
+  await page.screenshot({
+    path: info.outputPath('age-gate-write-failure.png'),
+    fullPage: true,
+  });
+  await save.click();
+  await expect(
+    page.getByText('The server did not confirm the saved Age Gate settings.', {
+      exact: true,
+    })
+  ).toBeVisible();
+  await expect(country).toHaveValue('ca');
+  await page.screenshot({
+    path: info.outputPath('age-gate-readback-failure.png'),
+    fullPage: true,
+  });
+  persistAgeGate = true;
   await save.click();
   await expect(page.getByText('Age Gate settings saved.')).toBeVisible();
+  await page.screenshot({
+    path: info.outputPath('age-gate-readback-recovered.png'),
+    fullPage: true,
+  });
   await expect(country).toHaveValue('CA');
   await expect(movies).not.toBeChecked();
   await expect(
@@ -6652,7 +6764,7 @@ test('Instance Age Gate saves changed settings without submitting category draft
       certificationCountry: 'CA',
     },
   };
-  expect(writes).toEqual([patch, patch]);
+  expect(writes).toEqual([patch, patch, patch]);
   await page.reload();
   await expect(restricted).toBeChecked();
   await expect(movieLimit).toHaveValue('PG');
@@ -6662,7 +6774,7 @@ test('Instance Age Gate saves changed settings without submitting category draft
 
 test('General Settings retains application edits after failure and saves only changed fields', async ({
   page,
-}) => {
+}, info) => {
   await fixtures(page);
   const saved = {
     applicationTitle: 'SeerrNG',
@@ -6698,8 +6810,16 @@ test('General Settings retains application edits after failure and saves only ch
     'Could not save settings.'
   );
   await expect(title).toHaveValue('Family Library');
+  await page.screenshot({
+    path: info.outputPath('general-settings-write-failure.png'),
+    fullPage: true,
+  });
   await save.click();
   await expect(page.getByText('Application settings saved.')).toBeVisible();
+  await page.screenshot({
+    path: info.outputPath('general-settings-write-recovered.png'),
+    fullPage: true,
+  });
   await expect(save).toBeDisabled();
   const address = page.getByLabel('Application URL');
   await expect(address).toHaveValue('https://seerr.example.test');
@@ -6732,6 +6852,62 @@ test('General Settings retains application edits after failure and saves only ch
   await expect(page.getByLabel('Other Users’ Availability')).toHaveValue(
     'distinguish'
   );
+});
+
+test('General Settings preserves edits when saved values fail persisted readback', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  const saved = {
+    applicationTitle: 'SeerrNG',
+    applicationUrl: 'https://seerr.example.test',
+    cacheImages: true,
+    versionCheck: true,
+    otherUsersAvailability: 'show',
+  };
+  let persistWrites = false;
+  const writes: unknown[] = [];
+  const reads: unknown[] = [];
+  await page.route('**/api/v1/settings/main', (route) => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      writes.push(body);
+      if (persistWrites) Object.assign(saved, body);
+      return route.fulfill({ json: { ...saved, ...body } });
+    }
+    reads.push({ ...saved });
+    return route.fulfill({ json: saved });
+  });
+  await page.goto('/admin/general');
+  const title = page.getByLabel('Application Title');
+  const save = page.getByRole('button', { name: 'Save Application Settings' });
+  await title.fill('Family Library');
+  await save.click();
+  await expect.poll(() => writes.length).toBe(1);
+  await expect.poll(() => reads.length).toBeGreaterThan(1);
+  expect(reads.at(-1)).toMatchObject({ applicationTitle: 'SeerrNG' });
+  await expect(page.getByRole('alert')).toContainText(
+    'Could not confirm the saved application settings.'
+  );
+  await expect(title).toHaveValue('Family Library');
+  await expect(save).toBeEnabled();
+  await page.screenshot({
+    path: info.outputPath('general-settings-readback-failure.png'),
+    fullPage: true,
+  });
+  persistWrites = true;
+  await save.click();
+  await expect(page.getByText('Application settings saved.')).toBeVisible();
+  await expect(title).toHaveValue('Family Library');
+  await expect(save).toBeDisabled();
+  await page.screenshot({
+    path: info.outputPath('general-settings-readback-recovered.png'),
+    fullPage: true,
+  });
+  expect(writes).toEqual([
+    { applicationTitle: 'Family Library' },
+    { applicationTitle: 'Family Library' },
+  ]);
 });
 
 test('General Settings selects bundled or standalone Lumen and scopes the native lock', async ({
@@ -8314,6 +8490,52 @@ test('Users edits a username without writing other profile settings', async ({
   await expect(page.getByLabel('Username')).toHaveValue('Renamed Viewer');
 });
 
+test('Users keep profile edits when a successful save response does not match', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route(/\/api\/v1\/user\?/, (route) =>
+    route.fulfill({
+      json: {
+        pageInfo: { pages: 1 },
+        results: [{ id: 19, displayName: 'Existing Viewer', permissions: 32 }],
+      },
+    })
+  );
+  let saves = 0;
+  let persistedUsername = 'Existing Viewer';
+  await page.route('**/api/v1/user/19/settings/main', (route) => {
+    if (route.request().method() !== 'POST') {
+      return route.fulfill({ json: { username: persistedUsername } });
+    }
+    expect(route.request().postDataJSON()).toEqual({
+      username: 'Renamed Viewer',
+    });
+    saves++;
+    if (saves > 1) persistedUsername = 'Renamed Viewer';
+    return route.fulfill({
+      json: { username: 'Renamed Viewer' },
+    });
+  });
+  await page.goto(testAppPath('/admin/users'));
+  await page.getByRole('link', { name: 'Manage Existing Viewer' }).click();
+  await page.getByRole('button', { name: 'Edit Profile' }).click();
+  const username = page.getByLabel('Username');
+  await username.fill('Renamed Viewer');
+  await expect(username).toHaveValue('Renamed Viewer');
+  const save = page.getByRole('button', { name: 'Save Profile' });
+  await save.click();
+  await expect(page.getByRole('alert')).toContainText(
+    'Could not save the profile.'
+  );
+  await expect(username).toHaveValue('Renamed Viewer');
+  await expect(page.getByText('Profile saved.')).toHaveCount(0);
+  await save.click();
+  await expect(page.getByText('Profile saved.')).toBeVisible();
+  await expect(username).toHaveValue('Renamed Viewer');
+  expect(saves).toBe(2);
+});
+
 test('Users edits local email and keeps Plex email provider-managed', async ({
   page,
 }) => {
@@ -8862,6 +9084,7 @@ test('Discovery region settings preserve legacy values and retry only changed fi
     originalLanguage: 'en',
   };
   const writes: unknown[] = [];
+  let staleReadbackOnce = true;
   await page.route('**/api/v1/settings/main', (route) => {
     if (route.request().method() === 'POST') {
       const body = route.request().postDataJSON();
@@ -8871,6 +9094,10 @@ test('Discovery region settings preserve legacy values and retry only changed fi
           status: 503,
           json: { message: 'Could not save regions.' },
         });
+      if (staleReadbackOnce) {
+        staleReadbackOnce = false;
+        return route.fulfill({ json: { ...saved, ...body } });
+      }
       Object.assign(saved, body);
     }
     return route.fulfill({ json: saved });
@@ -8901,9 +9128,23 @@ test('Discovery region settings preserve legacy values and retry only changed fi
   await expect(includeAdult).toBeChecked();
   await save.click();
   await expect(
+    page.getByText('Could not confirm the saved discovery settings.')
+  ).toBeVisible();
+  await expect(streaming).toHaveValue('CA');
+  await expect(language).toHaveValue('fr');
+  await expect(includeAdult).toBeChecked();
+  await expect(save).toBeEnabled();
+  await save.click();
+  await expect(
     page.getByText('Discovery region settings saved.')
   ).toBeVisible();
   expect(writes).toEqual([
+    {
+      streamingRegion: 'CA',
+      originalLanguage: 'fr',
+      hideRequested: true,
+      includeAdult: true,
+    },
     {
       streamingRegion: 'CA',
       originalLanguage: 'fr',
@@ -10508,4 +10749,97 @@ test('audiobook discovery bookmarks apply search, author and narrator and show s
   await expect(page).not.toHaveURL(
     /search=|author=|narrator=|firstPublishYear=|language=|minRating=/
   );
+});
+
+test('Streaming Subscriptions retains edits after stale persisted readback and retries', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let persisted: number[] = [];
+  let writes = 0;
+  let readsAfterWrite = 0;
+  await page.route('**/api/v1/user/1/settings/main', async (route) => {
+    if (route.request().method() === 'POST') {
+      writes += 1;
+      return route.fulfill({
+        json: { streamingSubscriptionProviderIds: [42] },
+      });
+    }
+    if (writes > 0) {
+      readsAfterWrite += 1;
+      if (writes > 1 && readsAfterWrite > 1) persisted = [42];
+    }
+    return route.fulfill({
+      json: { streamingSubscriptionProviderIds: persisted },
+    });
+  });
+  await page.route('**/api/v1/watchproviders/movies?*', (route) =>
+    route.fulfill({ json: [{ id: 42, name: 'Fixture Stream' }] })
+  );
+  await page.route('**/api/v1/watchproviders/tv?*', (route) =>
+    route.fulfill({ json: [] })
+  );
+  await page.goto('/me/account');
+  const section = page.locator('section').filter({
+    has: page.getByRole('heading', { name: 'Streaming Subscriptions' }),
+  });
+  const provider = section.getByRole('checkbox', { name: 'Fixture Stream' });
+  await provider.check();
+  const save = section.getByRole('button', {
+    name: 'Save Streaming Subscriptions',
+  });
+  await save.click();
+  await expect(
+    section.getByRole('alert').filter({
+      hasText: 'Could not confirm the saved subscriptions. Try again.',
+    })
+  ).toBeVisible();
+  await expect(provider).toBeChecked();
+  await expect(save).toBeEnabled();
+  await save.click();
+  await expect(
+    section.getByText('Streaming subscriptions saved.', { exact: true })
+  ).toBeVisible();
+  await expect(save).toBeDisabled();
+  expect(writes).toBe(2);
+});
+
+test('Metadata Credentials retains edits after stale persisted readback and retries', async ({
+  page,
+}) => {
+  await fixtures(page);
+  const persisted: Record<string, string> = {
+    comicVineApiKey: '',
+    metronToken: '',
+    googleBooksApiKey: '',
+    youtubeApiKey: '',
+  };
+  let writes = 0;
+  await page.route('**/api/v1/settings/main', async (route) => {
+    if (route.request().method() === 'POST') {
+      writes += 1;
+      if (writes > 1) persisted.comicVineApiKey = '********';
+      return route.fulfill({
+        json: { comicVineApiKey: '********' },
+      });
+    }
+    return route.fulfill({ json: persisted });
+  });
+  await page.goto('/admin/metadata');
+  const key = page.getByLabel('ComicVine API Key', { exact: true });
+  await key.fill('fixture-new-key');
+  const save = page.getByRole('button', {
+    name: 'Save Metadata Credentials',
+  });
+  await save.click();
+  await expect(
+    page.getByText('Could not confirm the saved credentials.')
+  ).toBeVisible();
+  await expect(key).toHaveValue('fixture-new-key');
+  await expect(save).toBeEnabled();
+  await save.click();
+  await expect(page.getByText('Metadata credentials saved.')).toBeVisible();
+  await expect(key).toHaveValue('');
+  await expect(save).toBeDisabled();
+  expect(writes).toBe(2);
 });
