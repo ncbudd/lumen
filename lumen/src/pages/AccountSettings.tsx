@@ -8,6 +8,7 @@ import { Section } from '../components/cards';
 import { CardTitlePreferences } from '../components/CardTitlePreferences';
 import { ExternalRequestLists } from '../components/ExternalRequestLists';
 import { ServiceNote } from '../components/extra';
+import ManagedMaturity from '../components/ManagedMaturity';
 import { RequestRootFolders } from '../components/RequestRootFolders';
 import { StreamingSubscriptions } from '../components/StreamingSubscriptions';
 import { useApi, usePublicSettings } from '../hooks';
@@ -799,7 +800,10 @@ function Settings({ id, plex }: { id: number; plex: boolean }) {
   useEffect(() => {
     if (
       hash === '#advanced-theme' ||
-      (loaded && (hash === '#password' || hash === '#account-permissions'))
+      (loaded &&
+        (hash === '#password' ||
+          hash === '#account-permissions' ||
+          hash === '#maturity-controls'))
     ) {
       document
         .getElementById(hash.slice(1))
@@ -958,24 +962,37 @@ function Settings({ id, plex }: { id: number; plex: boolean }) {
 export default function AccountSettings() {
   const { user } = useAuth();
   const { t } = useLumenLocale();
+  const canManageTheme = isAdministrator(user?.permissions);
+  const canManageUsers =
+    isAdministrator(user?.permissions) || ((user?.permissions ?? 0) & 8) !== 0;
   return (
     <>
       <header className="ph">
         <h1>{t('i18n.usersettings', 'User Settings')}</h1>
       </header>
       <div className="toolbar">
-        <Link className="btn btn-quiet btn-sm" to="#advanced-theme">
-          {t(
-            'components.UserProfile.UserSettings.menuAdvancedTheme',
-            'Advanced Theme'
-          )}
-        </Link>
+        {canManageTheme && (
+          <Link className="btn btn-quiet btn-sm" to="#advanced-theme">
+            {t(
+              'components.UserProfile.UserSettings.menuAdvancedTheme',
+              'Advanced Theme'
+            )}
+          </Link>
+        )}
         <Link className="btn btn-quiet btn-sm" to="#account-permissions">
           {t(
             'components.UserProfile.UserSettings.menuPermissions',
             'Permissions'
           )}
         </Link>
+        {canManageUsers && (
+          <Link className="btn btn-quiet btn-sm" to="#maturity-controls">
+            {t(
+              'components.UserProfile.UserSettings.menuMaturityControls',
+              'Maturity Controls'
+            )}
+          </Link>
+        )}
         <Link className="btn btn-quiet btn-sm" to="/me/account/tv-requests">
           {t('lumen.account.tvRequestSettings', 'TV Request Settings')}
         </Link>
@@ -1004,7 +1021,20 @@ export default function AccountSettings() {
       {user && (
         <Settings id={user.id} key={user.id} plex={user.userType === 1} />
       )}
-      {user && <AccountThemeOverrides key={`theme:${user.id}`} />}
+      {user && canManageUsers && (
+        <Section
+          id="maturity-controls"
+          title={t(
+            'components.UserProfile.UserSettings.menuMaturityControls',
+            'Maturity Controls'
+          )}
+        >
+          <ManagedMaturity id={user.id} />
+        </Section>
+      )}
+      {user && canManageTheme && (
+        <AccountThemeOverrides key={`theme:${user.id}`} />
+      )}
     </>
   );
 }

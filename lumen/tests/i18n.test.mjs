@@ -22,6 +22,8 @@ const lumenKeys = [
   'lumen.account.selectedCount',
   'lumen.admin.back',
   'lumen.admin.dest.requestDefaults',
+  'lumen.search.trending',
+  'lumen.search.searching',
   'lumen.gameLibrary.privateGameLibrary',
   'lumen.metadata.help.video',
   'lumen.metadata.help.music',
@@ -33,6 +35,63 @@ const lumenKeys = [
   'lumen.metadata.loadingSettings',
   'lumen.metadata.loadFailedTitle',
   'lumen.metadata.credentialsLoadFailedTitle',
+  'lumen.quickRequest.title',
+  'lumen.quickRequest.entireSeries',
+  'lumen.quickRequest.chooseDestination',
+  'lumen.quickRequest.chooseQuality',
+  'lumen.quickRequest.quotaApproval',
+  'lumen.quickRequest.requestApprovalAnyway',
+  'lumen.quickRequest.requestAnyway',
+  'lumen.cards.preferenceDescription',
+  'lumen.requestEdit.title',
+  'lumen.requestEdit.askedBy',
+  'lumen.requestEdit.seasons',
+  'lumen.requestEdit.requestedEpisodes',
+  'lumen.requestEdit.episodeCount',
+  'lumen.requestEdit.approve',
+  'lumen.requestEdit.save',
+  'lumen.requestEdit.saveAndRetry',
+  'lumen.requestEdit.approved',
+  'lumen.requestEdit.changedAndSent',
+  'lumen.requestEdit.changed',
+  'lumen.requestEdit.couldNotChange',
+  'lumen.gameContent.title',
+  'lumen.gameContent.contentToRequest',
+  'lumen.gameContent.baseGame',
+  'lumen.gameContent.selectedAddons',
+  'lumen.gameContent.completeEdition',
+  'lumen.gameContent.inLibrary',
+  'lumen.gameContent.storyContent',
+  'lumen.gameContent.nonStoryContent',
+  'lumen.gameContent.contentTypeUnknown',
+  'lumen.gameContent.itemsMissing',
+  'lumen.gameContent.editionContentsUnknown',
+  'lumen.managedPermissions.saved',
+  'lumen.managedPermissions.saveFailure',
+  'lumen.managedPermissions.loading',
+  'lumen.managedPermissions.loadFailure',
+  'lumen.managedPermissions.radarrLoadFailure',
+  'lumen.managedPermissions.sonarrLoadFailure',
+  'lumen.managedPermissions.retry',
+  'lumen.managedPermissions.title',
+  'lumen.managedPermissions.groupLabel',
+  'lumen.managedPermissions.delegationWarning',
+  'lumen.managedPermissions.adminWarning',
+  'lumen.managedPermissions.ageGate',
+  'lumen.managedPermissions.ageGate.default',
+  'lumen.managedPermissions.ageGate.restricted',
+  'lumen.managedPermissions.ageGate.unrestricted',
+  'lumen.managedPermissions.destinationsLabel',
+  'lumen.managedPermissions.save',
+  'lumen.managedPermissions.confirmTitle',
+  'lumen.managedPermissions.confirmBody',
+  'lumen.managedPermissions.goBack',
+  'lumen.permissions.group.administration',
+  'lumen.permissions.group.requests',
+  'lumen.permissions.group.auto-approve',
+  'lumen.permissions.group.auto-request-from-watchlists',
+  'lumen.permissions.group.issues-and-visibility',
+  'lumen.permissions.group.other',
 ];
 
 test('Lumen account, request, and settings labels are translated in French and Arabic', async () => {
@@ -76,5 +135,24 @@ test('visible Lumen account, administration, game-library, and metadata labels a
         `${locale} translation is not an English fallback: ${key}`
       );
     }
+  }
+});
+
+test('Lumen includes the localized native user-list menu label', async () => {
+  const keys = JSON.parse(
+    await readFile(resolve(root, 'i18n-keys.json'), 'utf8')
+  );
+  assert.ok(keys.includes('components.Layout.Sidebar.users'));
+  const english = JSON.parse(
+    await readFile(resolve(root, '../src/i18n/locale/en.json'), 'utf8')
+  );
+  for (const locale of ['fr', 'ar']) {
+    const catalog = JSON.parse(
+      await readFile(resolve(root, `../src/i18n/locale/${locale}.json`), 'utf8')
+    );
+    assert.notEqual(
+      catalog['components.Layout.Sidebar.users'],
+      english['components.Layout.Sidebar.users']
+    );
   }
 });

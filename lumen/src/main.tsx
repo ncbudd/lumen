@@ -187,16 +187,33 @@ function UserSettingsBookmark() {
     'linked-accounts': '/me/account/linked-accounts',
     'tv-request-access': '/me/account/tv-requests',
     'episode-queue': '/me/account/tv-requests',
+    maturity: '/me/account#maturity-controls',
     notifications: '/me/account/notifications',
     'client-tokens': '/me/account/client-tokens',
   };
-  if (targetIsSelf)
+  if (targetIsSelf) {
+    if (page === 'notifications') {
+      const channel = parts[1];
+      const anchor = [
+        'discord',
+        'email',
+        'pushbullet',
+        'pushover',
+        'telegram',
+        'webpush',
+      ].includes(channel ?? '')
+        ? `#notification-${channel}`
+        : '';
+      return (
+        <Navigate to={`/me/account/notifications${search}${anchor}`} replace />
+      );
+    }
+    const destination = ownDestination[page] ?? '/me/account';
+    const [path, anchor] = destination.split('#');
     return (
-      <Navigate
-        to={`${ownDestination[page] ?? '/me/account'}${search}`}
-        replace
-      />
+      <Navigate to={`${path}${search}${anchor ? `#${anchor}` : ''}`} replace />
     );
+  }
 
   if (((user?.permissions ?? 0) & (2 | 8)) === 0)
     return <Navigate to="/me" replace />;
@@ -315,6 +332,7 @@ function ProfileSettingsBookmark() {
     'client-tokens': '/me/account/client-tokens',
     'episode-queue': '/me/account/tv-requests',
     'tv-request-access': '/me/account/tv-requests',
+    maturity: '/me/account#maturity-controls',
   };
   if (page === 'notifications') {
     const channel = parts[1];

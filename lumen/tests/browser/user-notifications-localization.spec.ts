@@ -16,6 +16,7 @@ const text = {
     account: 'Account Settings',
     email: 'Email',
     emailSaved: 'Email notification settings saved successfully!',
+    emailFailure: 'Email notification settings failed to save.',
     approved: 'Request approved',
     available: 'Media available',
     saveKey: 'Save Public Key',
@@ -30,6 +31,8 @@ const text = {
     removeDevice: 'Delete Subscription',
     removeDeviceTitle: 'Remove this browser device?',
     deviceRemoved: 'Browser device removed.',
+    loadFailure: 'Could not load notification settings.',
+    retry: 'Retry',
   },
   fr: {
     title: 'Paramètres de notification',
@@ -37,6 +40,8 @@ const text = {
     email: 'E-mail',
     emailSaved:
       'Les paramètres de notification par e-mail ont été enregistrés !',
+    emailFailure:
+      "Impossible d'enregistrer les paramètres de notification par e-mail.",
     approved: 'Demande validée',
     available: 'Média demandé disponible',
     saveKey: 'Enregistrer la clé publique',
@@ -52,12 +57,15 @@ const text = {
     removeDevice: "Supprimer l'abonnement",
     removeDeviceTitle: 'Supprimer cet appareil de navigateur ?',
     deviceRemoved: 'Appareil de navigateur supprimé.',
+    loadFailure: 'Impossible de charger les paramètres de notification.',
+    retry: 'Réessayer',
   },
   ar: {
     title: 'إعدادات التنبيه',
     account: 'إعدادات الحساب',
     email: 'البريد الإلكترونيّ',
     emailSaved: 'تم حفظ إعدادات تنبيه الإيميل بنجاح!',
+    emailFailure: 'فشل حفظ إعدادات تنبيه الإيميل.',
     approved: 'تمت الموافقة على الطلب',
     available: 'المحتوى المطلوب متاح',
     saveKey: 'حفظ المفتاح العام',
@@ -72,8 +80,78 @@ const text = {
     removeDevice: 'حذف الاشتراك',
     removeDeviceTitle: 'هل تريد إزالة جهاز هذا المتصفح؟',
     deviceRemoved: 'تمت إزالة جهاز المتصفح.',
+    loadFailure: 'تعذر تحميل إعدادات الإشعارات.',
+    retry: 'إعادة المحاولة',
   },
 } as const;
+
+test('personal notification settings recover from an initial load failure', async ({
+  page,
+}) => {
+  const localized = text[locale as keyof typeof text];
+  let reads = 0;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/lumen-config.json', (route) =>
+    route.fulfill({ json: {} })
+  );
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname
+      .replace(/^\/lumen(?=\/)/, '')
+      .slice('/api/v1'.length);
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 1, displayName: 'Fixture User', permissions: 0 },
+      });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({ json: { locale } });
+    if (path === '/user/1/settings/notifications') {
+      reads++;
+      if (reads === 1)
+        return route.fulfill({
+          status: 503,
+          json: { message: 'Temporary notification failure.' },
+        });
+      return route.fulfill({
+        json: {
+          emailEnabled: true,
+          webPushEnabled: false,
+          notificationTypes: { email: 2 },
+        },
+      });
+    }
+    if (path === '/settings/public')
+      return route.fulfill({ json: { applicationTitle: 'SeerrNG' } });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/me/account/notifications'));
+  const alert = page.getByRole('alert');
+  await expect(alert).toContainText('Temporary notification failure.');
+  await expect(alert).toContainText(localized.loadFailure);
+  await expect(
+    alert.getByRole('button', { name: localized.retry, exact: true })
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
+  if (process.env.LUMEN_USER_NOTIFICATIONS_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_USER_NOTIFICATIONS_CAPTURE_DIR}/load-failure-${locale}-${page.viewportSize()?.width}.png`,
+      fullPage: true,
+    });
+  await alert
+    .getByRole('button', { name: localized.retry, exact: true })
+    .click();
+  await expect(
+    page.locator('#notification-email').getByRole('heading', {
+      name: localized.email,
+    })
+  ).toBeVisible();
+  expect(reads).toBe(2);
+});
 
 test('personal notification controls follow the account locale and preserve channel writes', async ({
   page,
@@ -107,6 +185,15 @@ test('personal notification controls follow the account locale and preserve chan
     },
   };
   const writes: Record<string, unknown>[] = [];
+  const staleReadbacks = new Set([
+    'email',
+    'webpush',
+    'pgpKey',
+    'telegram',
+    'discord',
+    'pushbullet',
+    'pushover',
+  ]);
   const devices = [
     {
       endpoint: 'https://push.example.test/fixture',
@@ -135,9 +222,38 @@ test('personal notification controls follow the account locale and preserve chan
         return route.fulfill({ json: notifications });
       const body = request.postDataJSON() as Record<string, unknown>;
       writes.push(body);
-      Object.assign(notifications, body);
       const types = body.notificationTypes as
         Record<string, number> | undefined;
+      const staleKey = types
+        ? Object.keys(types).find((channel) => staleReadbacks.has(channel))
+        : undefined;
+      const stalePreference =
+        staleKey ??
+        (body.pgpKey ? 'pgpKey' : undefined) ??
+        (body.telegramMessageThreadId ? 'telegram' : undefined) ??
+        (body.discordIds ? 'discord' : undefined) ??
+        (body.pushbulletAccessToken || types?.pushbullet !== undefined
+          ? 'pushbullet'
+          : undefined) ??
+        (body.pushoverApplicationToken ||
+        body.pushoverUserKey ||
+        types?.pushover !== undefined
+          ? 'pushover'
+          : undefined);
+      if (stalePreference && staleReadbacks.has(stalePreference)) {
+        staleReadbacks.delete(stalePreference);
+        return route.fulfill({
+          json: {
+            ...notifications,
+            ...body,
+            notificationTypes: {
+              ...notifications.notificationTypes,
+              ...types,
+            },
+          },
+        });
+      }
+      Object.assign(notifications, body);
       if (types) {
         notifications.notificationTypes = {
           ...notifications.notificationTypes,
@@ -202,15 +318,47 @@ test('personal notification controls follow the account locale and preserve chan
       fullPage: true,
     });
 
-  if (baseline) return;
-
   const email = page.locator('#notification-email');
   await email.getByLabel(localized.available, { exact: true }).check();
+  await email.getByRole('button').first().click();
+  if (baseline) {
+    await expect(
+      page.getByText(localized.emailSaved, { exact: true })
+    ).toBeVisible();
+    if (process.env.LUMEN_USER_NOTIFICATIONS_CAPTURE_DIR)
+      await page.screenshot({
+        path: `${process.env.LUMEN_USER_NOTIFICATIONS_CAPTURE_DIR}/baseline-save-${locale}-${page.viewportSize()?.width}.png`,
+        fullPage: false,
+      });
+    return;
+  }
+  await expect(email.getByRole('alert')).toHaveText(localized.emailFailure);
+  await expect(
+    email.getByLabel(localized.available, { exact: true })
+  ).toBeChecked();
+  if (process.env.LUMEN_USER_NOTIFICATIONS_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_USER_NOTIFICATIONS_CAPTURE_DIR}/candidate-save-${locale}-${page.viewportSize()?.width}.png`,
+      fullPage: false,
+    });
   await email.getByRole('button').first().click();
   await expect(
     page.getByText(localized.emailSaved, { exact: true })
   ).toBeVisible();
-  expect(writes).toEqual([{ notificationTypes: { email: 10 } }]);
+  expect(writes).toEqual([
+    { notificationTypes: { email: 10 } },
+    { notificationTypes: { email: 10 } },
+  ]);
+
+  const webPush = page.locator('#notification-webpush');
+  await webPush.getByLabel(localized.available, { exact: true }).check();
+  await webPush.getByRole('button').first().click();
+  await expect(webPush.getByRole('alert')).toBeVisible();
+  await expect(
+    webPush.getByLabel(localized.available, { exact: true })
+  ).toBeChecked();
+  await webPush.getByRole('button').first().click();
+  await expect(webPush.getByRole('status')).toBeVisible();
 
   const publicKey = [
     '-----BEGIN PGP PUBLIC KEY BLOCK-----',
@@ -218,6 +366,9 @@ test('personal notification controls follow the account locale and preserve chan
     '-----END PGP PUBLIC KEY BLOCK-----',
   ].join('\n');
   await email.locator('textarea').fill(publicKey);
+  await email.getByRole('button', { name: localized.saveKey }).click();
+  await expect(email.getByRole('alert')).toBeVisible();
+  await expect(email.locator('textarea')).toHaveValue(publicKey);
   await email.getByRole('button', { name: localized.saveKey }).click();
   await expect(
     page.getByText(localized.keySaved, { exact: true })
@@ -231,11 +382,46 @@ test('personal notification controls follow the account locale and preserve chan
   const telegram = page.locator('#notification-telegram');
   await telegram.getByLabel(localized.topicId).fill('42');
   await telegram.getByRole('button', { name: localized.saveTelegram }).click();
+  await expect(telegram.getByRole('alert')).toBeVisible();
+  await expect(telegram.getByLabel(localized.topicId)).toHaveValue('42');
+  await telegram.getByRole('button', { name: localized.saveTelegram }).click();
   await expect(
     page.getByText(localized.telegramSaved, {
       exact: true,
     })
   ).toBeVisible();
+
+  const discord = page.locator('#notification-discord');
+  await discord.locator('textarea').fill('123456789012345');
+  await discord.getByLabel(localized.available, { exact: true }).check();
+  await discord.getByRole('button').click();
+  await expect(discord.getByRole('alert')).toBeVisible();
+  await expect(discord.locator('textarea')).toHaveValue('123456789012345');
+  await expect(
+    discord.getByLabel(localized.available, { exact: true })
+  ).toBeChecked();
+  await discord.getByRole('button').click();
+  await expect(discord.getByRole('status')).toBeVisible();
+
+  const pushbullet = page.locator('#notification-pushbullet');
+  await pushbullet.getByLabel(localized.available, { exact: true }).check();
+  await pushbullet.getByRole('button').click();
+  await expect(pushbullet.getByRole('alert')).toBeVisible();
+  await expect(
+    pushbullet.getByLabel(localized.available, { exact: true })
+  ).toBeChecked();
+  await pushbullet.getByRole('button').click();
+  await expect(pushbullet.getByRole('status')).toBeVisible();
+
+  const pushover = page.locator('#notification-pushover');
+  await pushover.getByLabel(localized.available, { exact: true }).check();
+  await pushover.getByRole('button').click();
+  await expect(pushover.getByRole('alert')).toBeVisible();
+  await expect(
+    pushover.getByLabel(localized.available, { exact: true })
+  ).toBeChecked();
+  await pushover.getByRole('button').click();
+  await expect(pushover.getByRole('status')).toBeVisible();
   await page.getByRole('button', { name: localized.removeDevice }).click();
   const confirmation = page.getByRole('alertdialog');
   await expect(
@@ -250,6 +436,10 @@ test('personal notification controls follow the account locale and preserve chan
   expect(devices).toHaveLength(0);
   expect(writes).toEqual([
     { notificationTypes: { email: 10 } },
+    { notificationTypes: { email: 10 } },
+    { notificationTypes: { webpush: 10 } },
+    { notificationTypes: { webpush: 10 } },
+    { pgpKey: publicKey },
     { pgpKey: publicKey },
     { pgpKey: null },
     {
@@ -258,5 +448,23 @@ test('personal notification controls follow the account locale and preserve chan
       telegramSendSilently: false,
       notificationTypes: { telegram: 0 },
     },
+    {
+      telegramChatId: '-100',
+      telegramMessageThreadId: '42',
+      telegramSendSilently: false,
+      notificationTypes: { telegram: 0 },
+    },
+    {
+      discordIds: ['123456789012345'],
+      notificationTypes: { discord: 8 },
+    },
+    {
+      discordIds: ['123456789012345'],
+      notificationTypes: { discord: 8 },
+    },
+    { notificationTypes: { pushbullet: 8 } },
+    { notificationTypes: { pushbullet: 8 } },
+    { pushoverSound: null, notificationTypes: { pushover: 8 } },
+    { pushoverSound: null, notificationTypes: { pushover: 8 } },
   ]);
 });

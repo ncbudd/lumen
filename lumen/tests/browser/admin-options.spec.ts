@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page, type TestInfo } from '@playwright/test';
 
 // Family-install feedback: plain sign-in form, 4K-only library glyphs, server and
 // folder choice on poster quick requests, custom logo/tab icon, and the admin page
@@ -22,6 +22,7 @@ const testMount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
 const testAppPath = (path: string) => `${testMount}${path}`;
 const testApiPath = (url: string) =>
   new URL(url).pathname.replace(/^\/lumen(?=\/)/, '').replace(/^\/api\/v1/, '');
+const requestEditBaseline = process.env.LUMEN_REQUEST_EDIT_BASELINE === '1';
 
 async function fixtures(
   page: Page,
@@ -1431,22 +1432,61 @@ test('category checks are not repeated on every page load', async ({
 
 test('a page that crashes keeps the menus and offers a reload', async ({
   page,
-}) => {
+}, info: TestInfo) => {
   await fixtures(page);
+  let locale = 'en';
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale } })
+  );
   // a malformed answer that makes the Discover genre row throw
   await page.route('**/api/v1/discover/genreslider/movie', (route) =>
     route.fulfill({ json: { not: 'a list' } })
   );
-  await page.goto('/');
-  await expect(
-    page.getByText('Something went wrong on this page')
-  ).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Reload' })).toBeVisible();
-  // navigation still works
-  await page.locator('a[href="/me"]').filter({ visible: true }).first().click();
-  await expect(
-    page.getByRole('heading', { name: 'You', exact: true })
-  ).toBeVisible();
+  const labels = {
+    en: {
+      title: 'Something went wrong on this page',
+      body: 'The rest of Lumen still works. Try again, or pick another page.',
+      reload: 'Reload',
+    },
+    fr: {
+      title: 'Une erreur s’est produite sur cette page',
+      body: 'Le reste de Lumen fonctionne toujours. Réessayez ou choisissez une autre page.',
+      reload: 'Recharger',
+    },
+    ar: {
+      title: 'حدث خطأ في هذه الصفحة',
+      body: 'لا يزال باقي Lumen يعمل. حاول مجددًا أو اختر صفحة أخرى.',
+      reload: 'إعادة التحميل',
+    },
+  } as const;
+  const captureDir = process.env.LUMEN_PAGE_BOUNDARY_CAPTURE_DIR;
+  const baseline = process.env.LUMEN_PAGE_BOUNDARY_BASELINE === '1';
+  for (const selected of ['en', 'fr', 'ar'] as const) {
+    locale = selected;
+    await page.goto('/');
+    const expected = baseline ? labels.en : labels[selected];
+    const alert = page.getByRole('alert');
+    await expect(
+      alert.getByText(expected.title, { exact: true })
+    ).toBeVisible();
+    await expect(alert).toContainText(expected.body);
+    await expect(
+      alert.getByRole('button', { name: expected.reload, exact: true })
+    ).toBeVisible();
+    if (captureDir && ['desktop', 'iphone'].includes(info.project.name))
+      await page.screenshot({
+        path: `${captureDir}/page-boundary-${selected}-${info.project.name}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      });
+    // The global shell remains available after the route crashes.
+    await page
+      .locator('a[href="/me"]')
+      .filter({ visible: true })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/me$/);
+  }
 });
 
 test('categories without a connected service stay out of the menus', async ({
@@ -2650,6 +2690,83 @@ test('changing a series request picks its seasons', async ({ page }, info) => {
       { seasonNumber: 2 },
     ],
   });
+});
+
+test('series request editor labels follow the saved locale', async ({
+  page,
+}, info) => {
+  await fixtures(page, { permissions: 2 });
+  await requestRoutes(page);
+  const series = {
+    ...waitingRequest,
+    id: 79,
+    type: 'tv',
+    seasons: [{ seasonNumber: 1, episodeNumbers: [2, 5] }],
+    media: { mediaType: 'tv', tmdbId: 400, status: 2 },
+  };
+  await adminActionRoutes(page, [series]);
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale: 'fr' } })
+  );
+  await page.route('**/api/v1/tv/400', (route) =>
+    route.fulfill({
+      json: {
+        id: 400,
+        name: 'Long Show',
+        seasons: [{ seasonNumber: 1, name: 'Season 1', episodeCount: 8 }],
+      },
+    })
+  );
+  await page.route('**/api/v1/service/sonarr', (route) =>
+    route.fulfill({
+      json: [{ id: 0, name: 'Sonarr', is4k: false, isDefault: true }],
+    })
+  );
+  await page.route('**/api/v1/service/sonarr/0', (route) =>
+    route.fulfill({
+      json: {
+        profiles: [{ id: 1, name: 'HD' }],
+        rootFolders: [{ id: 1, path: '/tv' }],
+        server: { activeProfileId: 1, activeDirectory: '/tv' },
+      },
+    })
+  );
+  await page.goto('/requests?tab=everyone');
+  await page
+    .locator('.rq', { hasText: 'Long Show' })
+    .getByRole('button', { name: 'Modifier' })
+    .click();
+  const copy = requestEditBaseline
+    ? {
+        title: 'Change request for Long Show',
+        group: 'Seasons',
+        requested: '2 requested episodes',
+        approve: 'Approve',
+        save: 'Save',
+        cancel: 'Cancel',
+      }
+    : {
+        title: 'Modifier la demande pour Long Show',
+        group: 'Saisons',
+        requested: '2 épisodes demandés',
+        approve: 'Approuver',
+        save: 'Enregistrer',
+        cancel: 'Annuler',
+      };
+  const sheet = page.getByRole('dialog', { name: copy.title });
+  const seasons = sheet.getByRole('group', { name: copy.group });
+  await expect(seasons.getByRole('checkbox')).toHaveCount(1);
+  await expect(seasons.getByRole('checkbox')).toContainText(copy.requested);
+  await expect(sheet.getByRole('button', { name: copy.approve })).toBeVisible();
+  await expect(sheet.getByRole('button', { name: copy.save })).toBeVisible();
+  await expect(sheet.getByRole('button', { name: copy.cancel })).toBeVisible();
+  await settleVisuals(page);
+  const captureDir = process.env.LUMEN_REQUEST_EDIT_CAPTURE_DIR;
+  if (captureDir && ['desktop', 'iphone'].includes(info.project.name))
+    await sheet.screenshot({
+      path: `${captureDir}/${requestEditBaseline ? 'baseline' : 'candidate'}-${info.project.name}.png`,
+      animations: 'disabled',
+    });
 });
 
 test('failed requests can be retried, and Remove asks in a dialog', async ({

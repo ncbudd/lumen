@@ -8591,11 +8591,19 @@ test('Administration search brings the Steam key field into view', async ({
 
 test('override rules save multiple language and country selections', async ({
   page,
-}) => {
-  await fixtures(page);
+}, info) => {
+  const fixture = await fixtures(page);
   await page.route('**/api/v1/settings/radarr', (route) =>
     route.fulfill({ json: [{ id: 1, name: 'Test Radarr' }] })
   );
+  await page.route('**/api/v1/user?**', (route) =>
+    route.fulfill({ json: { results: [] } })
+  );
+  for (const provider of ['sonarr', 'lidarr', 'readarr']) {
+    await page.route(`**/api/v1/settings/${provider}`, (route) =>
+      route.fulfill({ json: [] })
+    );
+  }
   for (const [path, json] of [
     [
       'service/radarr/1',
@@ -8619,9 +8627,37 @@ test('override rules save multiple language and country selections', async ({
   ] as const) {
     await page.route(`**/api/v1/${path}`, (route) => route.fulfill({ json }));
   }
-  await page.route('**/api/v1/overrideRule', (route) =>
-    route.fulfill({ json: route.request().method() === 'GET' ? [] : { id: 1 } })
-  );
+  let rules: Record<string, unknown>[] = [];
+  let hideNextReadback = false;
+  let staleDeleteReadback: Record<string, unknown>[] | undefined;
+  const writes: string[] = [];
+  await page.route('**/api/v1/overrideRule**', (route) => {
+    const request = route.request();
+    const endpoint = new URL(request.url()).pathname;
+    const method = request.method();
+    if (method === 'GET') {
+      if (staleDeleteReadback) {
+        const stale = staleDeleteReadback;
+        staleDeleteReadback = undefined;
+        return route.fulfill({ json: stale });
+      }
+      if (hideNextReadback) {
+        hideNextReadback = false;
+        return route.fulfill({ json: [] });
+      }
+      return route.fulfill({ json: rules });
+    }
+    writes.push(`${method} ${endpoint}`);
+    if (method === 'DELETE') {
+      staleDeleteReadback = rules;
+      rules = [];
+      return route.fulfill({ json: { id: 1 } });
+    }
+    const saved = { ...request.postDataJSON(), id: 1 };
+    rules = [saved];
+    if (method === 'POST') hideNextReadback = true;
+    return route.fulfill({ json: saved });
+  });
   await page.goto(testAppPath('/admin/override-rules'));
   await page.getByRole('button', { name: 'New Override Rule' }).click();
   const choice = (name: string) =>
@@ -8632,6 +8668,12 @@ test('override rules save multiple language and country selections', async ({
   await choice('Production Country').selectOption({ label: 'Canada' });
   await choice('Production Country').selectOption({ label: 'United States' });
   await choice('Quality Profile').selectOption({ label: 'HD' });
+  if (process.env.LUMEN_CAPTURE_OVERRIDE) {
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.screenshot({
+      path: info.outputPath('override-before-save.png'),
+    });
+  }
   const write = page.waitForRequest(
     (request) =>
       request.method() === 'POST' &&
@@ -8644,6 +8686,51 @@ test('override rules save multiple language and country selections', async ({
     productionCountries: 'CA|US',
     profileId: 4,
   });
+  await expect(page.getByRole('alert')).toContainText(
+    'The server did not confirm the saved rule.'
+  );
+  if (process.env.LUMEN_CAPTURE_OVERRIDE) {
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.screenshot({ path: info.outputPath('override-save-error.png') });
+  }
+  const retry = page.waitForRequest(
+    (request) =>
+      request.method() === 'PUT' &&
+      new URL(request.url()).pathname === '/api/v1/overrideRule/1'
+  );
+  await page.getByRole('button', { name: 'Save Rule', exact: true }).click();
+  await retry;
+  await expect(
+    page.getByRole('heading', { name: 'Request Override Rules' })
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Delete Rule', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Delete Rule', exact: true })
+    .last()
+    .click();
+  await expect(page.getByRole('alert')).toContainText(
+    'The server did not confirm rule removal.'
+  );
+  await page
+    .getByRole('button', { name: 'Delete Rule', exact: true })
+    .last()
+    .click();
+  await expect(
+    page.getByText('No request override rules configured.')
+  ).toBeVisible();
+  expect(writes).toEqual([
+    'POST /api/v1/overrideRule',
+    'PUT /api/v1/overrideRule/1',
+    'DELETE /api/v1/overrideRule/1',
+    'DELETE /api/v1/overrideRule/1',
+  ]);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth
+    )
+  ).toBe(true);
+  expect(fixture.errors).toEqual([]);
+  expect(fixture.unknown).toEqual([]);
 });
 
 test('Administration search opens the download client polling interval', async ({
@@ -9082,7 +9169,7 @@ test('Users lets delegated managers search without exposing the directory to mem
 
 test('Users creates a local account with a password setup link', async ({
   page,
-}) => {
+}, info) => {
   await fixtures(page);
   let attempts = 0;
   const account = {
@@ -9091,6 +9178,7 @@ test('Users creates a local account with a password setup link', async ({
     email: 'member@example.test',
     permissions: 32,
   };
+  let staleReadback = true;
   await page.route(/\/api\/v1\/user\?/, (route) =>
     route.fulfill({
       json: {
@@ -9112,6 +9200,13 @@ test('Users creates a local account with a password setup link', async ({
       });
     return route.fulfill({ status: 201, json: account });
   });
+  await page.route('**/api/v1/user/9', (route) => {
+    if (staleReadback) {
+      staleReadback = false;
+      return route.fulfill({ json: { ...account, displayName: 'Stale Name' } });
+    }
+    return route.fulfill({ json: account });
+  });
   await page.goto(testAppPath('/admin/users'));
   await page.getByRole('button', { name: 'Create Local User' }).click();
   await page.getByLabel('Username', { exact: true }).fill('New Member');
@@ -9124,9 +9219,25 @@ test('Users creates a local account with a password setup link', async ({
   await expect(page.getByLabel('Email', { exact: true })).toHaveValue(
     'member@example.test'
   );
+  if (process.env.LUMEN_CAPTURE_USER_ADMIN) {
+    await page.screenshot({
+      path: info.outputPath('user-create-write-error.png'),
+    });
+  }
+  await page.getByRole('button', { name: 'Create User', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText(
+    'The server did not confirm the new account.'
+  );
+  if (process.env.LUMEN_CAPTURE_USER_ADMIN) {
+    await page.screenshot({
+      path: info.outputPath('user-create-readback-error.png'),
+    });
+  }
+  await expect(page.getByLabel('Username', { exact: true })).toBeDisabled();
   await page.getByRole('button', { name: 'Create User', exact: true }).click();
   await expect(page.getByText('Created New Member.')).toBeVisible();
   await expect(page.getByText('New Member', { exact: true })).toBeVisible();
+  expect(attempts).toBe(2);
 });
 
 test('Users sets an Episode Queue default for the selected account', async ({
@@ -9393,8 +9504,10 @@ test('Users delegates only held permissions and preserves high permission bits',
     return route.fulfill({ json: target });
   });
   await page.goto(testAppPath('/admin/users'));
-  await page.getByRole('link', { name: 'Manage Viewer' }).click();
-  await page.getByRole('button', { name: 'Permissions', exact: true }).click();
+  await page.getByRole('link', { name: 'Gérer Viewer' }).click();
+  await page
+    .getByRole('button', { name: 'Autorisations', exact: true })
+    .click();
   const settingsPermission = page.getByRole('checkbox', {
     name: 'Gérer les paramètres',
     exact: true,
@@ -9417,14 +9530,20 @@ test('Users delegates only held permissions and preserves high permission bits',
   });
   await music.check();
   await page
-    .getByRole('button', { name: 'Save Permissions', exact: true })
+    .getByRole('button', { name: 'Enregistrer les autorisations', exact: true })
     .click();
   expect(target.permissions).toBe(32);
-  await page
-    .getByRole('alertdialog')
-    .getByRole('button', { name: 'Save Permissions' })
+  const confirmation = page.getByRole('alertdialog');
+  await expect(confirmation).toContainText(
+    'Enregistrer les autorisations de Viewer\u00a0?'
+  );
+  await expect(confirmation).toContainText(
+    'Les nouvelles autorisations prennent effet immédiatement.'
+  );
+  await confirmation
+    .getByRole('button', { name: 'Enregistrer les autorisations' })
     .click();
-  await expect(page.getByText('Permissions saved.')).toBeVisible();
+  await expect(page.getByText('Autorisations enregistrées.')).toBeVisible();
   await expect(music).toBeChecked();
   expect(target.permissions).toBe(32 + requestMusic);
   const west = page.getByRole('checkbox', {
@@ -9432,24 +9551,155 @@ test('Users delegates only held permissions and preserves high permission bits',
     exact: true,
   });
   await west.check();
-  await page.getByLabel('Age Gate').selectOption('restricted');
+  await page.getByLabel('Limite d’âge').selectOption('restricted');
   await page
-    .getByRole('button', { name: 'Save Permissions', exact: true })
+    .getByRole('button', { name: 'Enregistrer les autorisations', exact: true })
     .click();
   expect(target.contentRestricted).toBeNull();
-  await page
-    .getByRole('alertdialog')
-    .getByRole('button', { name: 'Save Permissions' })
+  await expect(confirmation).toContainText(
+    'Enregistrer les autorisations de Viewer\u00a0?'
+  );
+  await expect(confirmation).toContainText(
+    'Les nouvelles autorisations prennent effet immédiatement.'
+  );
+  await confirmation
+    .getByRole('button', { name: 'Enregistrer les autorisations' })
     .click();
-  await expect(page.getByText('Permissions saved.')).toBeVisible();
+  await expect(page.getByText('Autorisations enregistrées.')).toBeVisible();
   await expect(west).toBeChecked();
   expect(target.requestServices).toEqual(['radarr:4', 'sonarr:3']);
   expect(target.contentRestricted).toBe(true);
 });
 
-test('Users protects administrators and confirms deletion of the selected member', async ({
+test('Users localizes the managed-permissions editor in Arabic', async ({
   page,
 }) => {
+  await fixtures(page);
+  await page.route('**/api/v1/user/8/settings/main', (route) =>
+    route.fulfill({ json: { locale: 'ar' } })
+  );
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({
+      json: { id: 8, displayName: 'Manager', permissions: 8 + 32 },
+    })
+  );
+  await page.route(/\/api\/v1\/user\?/, (route) =>
+    route.fulfill({
+      json: {
+        pageInfo: { pages: 1 },
+        results: [{ id: 19, displayName: 'Viewer', permissions: 32 }],
+      },
+    })
+  );
+  await page.route('**/api/v1/user/19/settings/permissions', (route) =>
+    route.fulfill({ json: { permissions: 32, requestServices: [] } })
+  );
+  await page.route('**/api/v1/service/radarr', (route) =>
+    route.fulfill({
+      json: [
+        {
+          id: 4,
+          name: 'Movies West',
+          isDefault: false,
+          requestButtonLabel: 'West',
+        },
+      ],
+    })
+  );
+  await page.route('**/api/v1/service/sonarr', (route) =>
+    route.fulfill({
+      json: [
+        {
+          id: 3,
+          name: 'Series West',
+          isDefault: false,
+          requestButtonLabel: 'West',
+        },
+      ],
+    })
+  );
+  await page.goto(testAppPath('/admin/users'));
+  await page.getByRole('link', { name: 'إدارة Viewer' }).click();
+  await page.getByRole('button', { name: 'الأذونات', exact: true }).click();
+  await expect(
+    page.getByText('الأذونات الصريحة', { exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'الطلبات', exact: true })
+  ).toBeVisible();
+  await expect(page.getByLabel('تقييد العمر')).toBeVisible();
+  await expect(
+    page.getByRole('group', { name: 'وجهات الطلبات' })
+  ).toBeVisible();
+  const setting = page.getByRole('checkbox', {
+    name: 'إدارة الإعدادات',
+    exact: true,
+  });
+  await setting.scrollIntoViewIfNeeded();
+  expect(
+    await page.locator('body').evaluate((body) => {
+      const root = document.documentElement;
+      return Math.max(body.scrollWidth, root.scrollWidth) <= root.clientWidth;
+    })
+  ).toBe(true);
+  if (process.env.LUMEN_VISUAL_CAPTURE_DIR)
+    await page.screenshot({
+      path: `${process.env.LUMEN_VISUAL_CAPTURE_DIR}/managed-permissions-ar-${page.viewportSize()?.width}.png`,
+    });
+});
+
+test('Users keeps permissions read-only outside delegated access', async ({
+  page,
+}) => {
+  await fixtures(page);
+  await page.route('**/api/v1/user/8/settings/main', (route) =>
+    route.fulfill({ json: { locale: 'fr' } })
+  );
+  await page.route('**/api/v1/auth/me', (route) =>
+    route.fulfill({
+      json: { id: 8, displayName: 'Manager', permissions: 8 },
+    })
+  );
+  await page.route(/\/api\/v1\/user\?/, (route) =>
+    route.fulfill({
+      json: {
+        pageInfo: { pages: 1 },
+        results: [{ id: 19, displayName: 'Viewer', permissions: 32 }],
+      },
+    })
+  );
+  let saves = 0;
+  await page.route('**/api/v1/user/19/settings/permissions', (route) => {
+    if (route.request().method() === 'POST') saves += 1;
+    return route.fulfill({
+      json: { id: 19, displayName: 'Viewer', permissions: 32 },
+    });
+  });
+  await page.goto(testAppPath('/admin/users'));
+  await page.getByRole('link', { name: 'Gérer Viewer' }).click();
+  await page
+    .getByRole('button', { name: 'Autorisations', exact: true })
+    .click();
+  await expect(
+    page.getByText(
+      'Ce compte possède des autorisations en dehors de votre accès délégué.'
+    )
+  ).toBeVisible();
+  await expect(
+    page.getByRole('checkbox', { name: 'Administrateur', exact: true })
+  ).toBeDisabled();
+  await expect(
+    page.getByRole('button', {
+      name: 'Enregistrer les autorisations',
+      exact: true,
+    })
+  ).toBeDisabled();
+  expect(saves).toBe(0);
+});
+
+test('Users protects administrators and confirms deletion of the selected member', async ({
+  page,
+}, info) => {
   await fixtures(page);
   await page.route('**/api/v1/auth/me', (route) =>
     route.fulfill({ json: { id: 8, displayName: 'Manager', permissions: 8 } })
@@ -9460,6 +9710,8 @@ test('Users protects administrators and confirms deletion of the selected member
     { id: 19, displayName: 'Viewer', permissions: 32 },
   ];
   let deleted = false;
+  let staleDeleteReadback = true;
+  let deleteAttempts = 0;
   await page.route(/\/api\/v1\/user\?/, (route) =>
     route.fulfill({
       json: {
@@ -9469,7 +9721,15 @@ test('Users protects administrators and confirms deletion of the selected member
     })
   );
   await page.route('**/api/v1/user/19', (route) => {
+    if (route.request().method() === 'GET') {
+      if (staleDeleteReadback) {
+        staleDeleteReadback = false;
+        return route.fulfill({ json: people[2] });
+      }
+      return route.fulfill({ status: 404, json: { message: 'Not found' } });
+    }
     expect(route.request().method()).toBe('DELETE');
+    deleteAttempts++;
     deleted = true;
     return route.fulfill({ status: 200, json: people[2] });
   });
@@ -9478,20 +9738,38 @@ test('Users protects administrators and confirms deletion of the selected member
   const remove = page.getByRole('button', { name: 'Delete User', exact: true });
   await page.getByRole('link', { name: 'Manage Second Admin' }).click();
   await expect(remove).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Permissions', exact: true })
+  ).toHaveCount(0);
   await page.getByRole('link', { name: 'All Users' }).click();
   await page.getByRole('link', { name: 'Manage Viewer' }).click();
   await expect(remove).toHaveCount(1);
   await remove.click();
   const dialog = page.getByRole('alertdialog', { name: 'Delete Viewer?' });
+  if (process.env.LUMEN_CAPTURE_USER_ADMIN) {
+    await page.screenshot({
+      path: info.outputPath('user-delete-confirmation.png'),
+    });
+  }
   await dialog.getByRole('button', { name: 'Keep User' }).click();
   expect(deleted).toBe(false);
   await remove.click();
+  await dialog.getByRole('button', { name: 'Delete User' }).click();
+  await expect(page.getByRole('alert')).toContainText(
+    'The server did not confirm removal of this account.'
+  );
+  if (process.env.LUMEN_CAPTURE_USER_ADMIN) {
+    await page.screenshot({
+      path: info.outputPath('user-delete-readback-error.png'),
+    });
+  }
   await dialog.getByRole('button', { name: 'Delete User' }).click();
   await expect(page.getByText('Deleted Viewer.')).toBeVisible();
   await expect(
     page.getByRole('listitem').filter({ hasText: 'Viewer' })
   ).toHaveCount(0);
   expect(deleted).toBe(true);
+  expect(deleteAttempts).toBe(2);
 });
 
 test('Users imports and syncs selected Emby accounts', async ({ page }) => {

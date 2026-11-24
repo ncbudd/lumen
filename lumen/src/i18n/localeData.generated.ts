@@ -148,6 +148,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'الطلبات',
       'components.Layout.Sidebar.share': 'مشاركة وتحديد',
       'components.Layout.Sidebar.swipe': 'اسحب',
+      'components.Layout.Sidebar.users': 'المستخدمين',
       'components.Layout.UserDropdown.myprofile': 'ملف التعريف',
       'components.LiveTv.FollowedTeams.choose': 'اختر الفريق',
       'components.LiveTv.FollowedTeams.description':
@@ -1690,6 +1691,13 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'العنوان غير الصحيح أو البيانات الوصفية',
       'components.IssueModal.issueOther': 'أخرى',
+      'components.RequestModal.quality': 'الجودة',
+      'components.RequestModal.requestQuotaApproval': 'طلب الموافقة',
+      'components.RequestModal.requesterror': 'حدث خطأ ما أثناء إرسال الطلب.',
+      'i18n.cancel': 'إلغاء',
+      'i18n.request': 'طلب',
+      'i18n.request4k': 'طلب بجودة 4K',
+      'i18n.requesting': 'جاري الطلب…',
       'components.IssueDetails.allepisodes': 'جميع الحلقات',
       'components.Layout.Sidebar.comingSoon': 'قريبًا',
       'components.Layout.Sidebar.watchSessions': 'جلسات المشاهدة',
@@ -2643,6 +2651,12 @@ export const localeData = [
       'lumen.adminSettings.offCanChange': 'إيقاف (يمكن للمستخدمين تشغيله)',
       'lumen.adminSettings.onCanChange': 'تشغيل (يمكن للمستخدمين إيقافه)',
       'lumen.adminSettings.preview': 'معاينة',
+      'lumen.adminSettings.requestDefaultsLink': 'إعدادات الطلبات الافتراضية',
+      'lumen.adminSettings.requestSettingsHelp':
+        'تنطبق إعدادات SeerrNG هذه على الجميع.',
+      'lumen.adminSettings.requestSettingsSummary':
+        'قواعد 4K والمواسم الجزئية والحلقات',
+      'lumen.adminSettings.requestSettingsTitle': 'إعدادات طلب المثيل',
       'lumen.adminSettings.reading': 'جارٍ القراءة…',
       'lumen.adminSettings.saveFailed': 'تعذّر الحفظ',
       'lumen.adminSettings.saveForEveryone': 'حفظ للجميع',
@@ -2721,11 +2735,15 @@ export const localeData = [
       'lumen.adminUsers.backToAccount': 'العودة إلى الحساب',
       'lumen.adminUsers.cancel': 'إلغاء',
       'lumen.adminUsers.createFailure': 'تعذر إنشاء الحساب.',
+      'lumen.adminUsers.createConfirmFailure':
+        'لم يؤكد الخادم إنشاء الحساب. أبقِ هذا النموذج مفتوحًا وحاول مرة أخرى.',
       'lumen.adminUsers.createLocalUser': 'إنشاء مستخدم محلي',
       'lumen.adminUsers.createUser': 'إنشاء مستخدم',
       'lumen.adminUsers.created': 'تم إنشاء {name}.',
       'lumen.adminUsers.creating': 'جارٍ الإنشاء…',
       'lumen.adminUsers.deleteFailure': 'تعذر حذف الحساب.',
+      'lumen.adminUsers.deleteConfirmFailure':
+        'لم يؤكد الخادم إزالة هذا الحساب. أبقِ مربع الحوار مفتوحًا وحاول مرة أخرى.',
       'lumen.adminUsers.deleteTitle': 'حذف {name}؟',
       'lumen.adminUsers.deleteUser': 'حذف المستخدم',
       'lumen.adminUsers.deleteWarning':
@@ -3510,10 +3528,12 @@ export const localeData = [
       'lumen.detail.trailer': 'الإعلان الترويجي',
       'lumen.discover.added': 'أُضيف {date}',
       'lumen.discover.browseByGenre': 'تصفح حسب النوع',
+      'lumen.discover.discoverTitles': 'عناوين للاستكشاف',
       'lumen.discover.newOn': 'جديد على {server}',
       'lumen.discover.noPopularTitles': 'لا توجد عناوين رائجة متاحة',
       'lumen.discover.popularBooks': 'كتب رائجة',
       'lumen.discover.searchVideo': 'أفلام ومسلسلات…',
+      'lumen.discover.shelfLoadFailed': 'تعذر تحميل هذا القسم.',
       'lumen.discover.trending': 'رائج',
       'lumen.discover.trendingThisWeek': 'الرائج هذا الأسبوع',
       'lumen.discoveryAccounts.accountsWhat': 'حسابات التتبع',
@@ -3621,6 +3641,10 @@ export const localeData = [
         'تعذر الوصول إلى الخادم. تحقق من اتصالك ثم حاول مجددًا.',
       'lumen.error.sessionEnded': 'انتهت جلستك. سجّل الدخول مجددًا.',
       'lumen.error.timeout': 'استغرق الخادم وقتًا طويلًا في الرد. حاول مجددًا.',
+      'lumen.pageBoundary.body':
+        'لا يزال باقي Lumen يعمل. حاول مجددًا أو اختر صفحة أخرى.',
+      'lumen.pageBoundary.reload': 'إعادة التحميل',
+      'lumen.pageBoundary.title': 'حدث خطأ في هذه الصفحة',
       'lumen.followButton.follow': 'متابعة',
       'lumen.followButton.followFutureVolumes': 'متابعة المجلدات القادمة',
       'lumen.followButton.followNarrator': 'متابعة {name}',
@@ -4426,6 +4450,8 @@ export const localeData = [
         'تم حفظ إعدادات تسجيل الدخول عبر الجسر.',
       'lumen.mediaServerConnection.chooseConnection': 'اختر اتصالاً',
       'lumen.mediaServerConnection.connection': 'اتصال {provider}',
+      'lumen.mediaServerConnection.confirmFailure':
+        'تعذّر تأكيد حفظ إعدادات الاتصال.',
       'lumen.mediaServerConnection.discover': 'اكتشاف خوادم Plex',
       'lumen.mediaServerConnection.discoverFailed':
         'تعذر اكتشاف خوادم Plex. أعد المحاولة أو أدخل العنوان يدوياً.',
@@ -4804,6 +4830,7 @@ export const localeData = [
         'تم إعداد رمز وصول. اترك حقل الاستبدال فارغًا للاحتفاظ به.',
       'lumen.notifications.keepPushoverCredentials':
         'اترك حقول بيانات الاعتماد فارغة للاحتفاظ بالبيانات الحالية.',
+      'lumen.notifications.loadFailure': 'تعذر تحميل إعدادات الإشعارات.',
       'lumen.notifications.loading': 'جارٍ تحميل إعدادات الإشعارات…',
       'lumen.notifications.loadingBrowserDevices': 'جارٍ تحميل أجهزة المتصفح…',
       'lumen.notifications.openBot': 'فتح @{bot}',
@@ -4855,6 +4882,8 @@ export const localeData = [
       'lumen.override.delete': 'حذف القاعدة',
       'lumen.override.deleteBody': 'لن تستخدم الطلبات المستقبلية هذه القاعدة.',
       'lumen.override.deleteFailed': 'تعذر حذف قاعدة تجاوز الطلبات.',
+      'lumen.override.deleteConfirmFailure':
+        'لم يؤكد الخادم إزالة القاعدة. أبقِ مربع الحوار مفتوحًا وحاول مرة أخرى.',
       'lumen.override.deleteTitle': 'حذف قاعدة التجاوز',
       'lumen.override.destinationChoices': 'خيارات الوجهة',
       'lumen.override.destinationLoadError': 'تعذر تحميل خيارات الوجهة',
@@ -4890,6 +4919,8 @@ export const localeData = [
       'lumen.override.rules': 'قواعد تجاوز الطلبات',
       'lumen.override.rulesLoadError': 'تعذر تحميل قواعد تجاوز الطلبات',
       'lumen.override.saveFailed': 'تعذر حفظ قاعدة تجاوز الطلبات.',
+      'lumen.override.saveConfirmFailure':
+        'لم يؤكد الخادم حفظ القاعدة. أبقِ هذا النموذج مفتوحًا وحاول مرة أخرى.',
       'lumen.override.saveRule': 'حفظ القاعدة',
       'lumen.override.savedValue': 'القيمة المحفوظة ({value})',
       'lumen.override.searchKeywords': 'البحث عن الكلمات المفتاحية',
@@ -5193,7 +5224,7 @@ export const localeData = [
       'lumen.search.scope.tv': 'المسلسلات',
       'lumen.search.searchEverything': 'البحث في كل شيء',
       'lumen.search.searchIn': 'البحث ضمن',
-      'lumen.search.searching': 'Searching…',
+      'lumen.search.searching': 'جارٍ البحث…',
       'lumen.search.section.albums': 'الألبومات',
       'lumen.search.section.artists': 'الفنانون',
       'lumen.search.section.audiobooks': 'الكتب الصوتية',
@@ -5233,7 +5264,7 @@ export const localeData = [
       'lumen.search.sortGroup.title': 'العنوان',
       'lumen.search.sortGroup.writer': 'الكاتب',
       'lumen.search.sortResults': 'ترتيب النتائج',
-      'lumen.search.trending': 'Trending this week',
+      'lumen.search.trending': 'الأكثر شعبية هذا الأسبوع',
       'lumen.search.tryFewerWords': 'جرّب كلمات أقل أو اسم مؤلف أو راوٍ.',
       'lumen.search.viewAllSeries': 'عرض كل نتائج السلاسل',
       'lumen.servarr.addService': 'إضافة {service}',
@@ -5316,12 +5347,16 @@ export const localeData = [
       'lumen.servarr.removeConfirmation':
         'هل تريد إزالة {service} كوجهة للطلبات؟',
       'lumen.servarr.removeFallback': 'تعذر إزالة خدمة {service}.',
+      'lumen.servarr.removeConfirmFailure':
+        'لم يؤكد الخادم إزالة خدمة {service}. أبقِ هذا النموذج مفتوحًا وحاول مرة أخرى.',
       'lumen.servarr.removeService': 'إزالة الخدمة',
       'lumen.servarr.requestButtonLabel': 'تسمية زر الطلب',
       'lumen.servarr.requestTags': 'وسوم الطلبات',
       'lumen.servarr.retry': 'إعادة المحاولة',
       'lumen.servarr.rootFolder': 'المجلد الجذر',
       'lumen.servarr.runMetadataDiagnostic': 'تشغيل تشخيص البيانات الوصفية',
+      'lumen.servarr.saveConfirmFailure':
+        'لم يؤكد الخادم حفظ إعدادات {service}. أبقِ هذا النموذج مفتوحًا وحاول مرة أخرى.',
       'lumen.servarr.saveFallback': 'تعذر حفظ خدمة {service}.',
       'lumen.servarr.saveService': 'حفظ {service}',
       'lumen.servarr.savedKey': 'المفتاح المحفوظ',
@@ -6339,6 +6374,7 @@ export const localeData = [
       'lumen.adult.bookmarkedService': 'الخادم المحفوظ',
       'lumen.adult.serverFilter': 'الخادم',
       'lumen.adult.allServices': 'الكل',
+      'lumen.adult.sceneLoadFailed': 'تعذّر تحميل هذا المشهد',
       'lumen.comics.title': 'القصص المصورة والمانغا',
       'lumen.comics.guidance':
         'اطلب سلاسل المانغا أو القصص المصورة. تصدر المجلدات والأعداد الجديدة عند نشرها؛ وتُستخدم النسخة الإنجليزية من المانغا ما لم تختر نسخة أخرى.',
@@ -7052,6 +7088,190 @@ export const localeData = [
       'lumen.tvAvailability.source4k': '{source} 4K',
       'lumen.tvAvailability.sharedHd': 'HD مشترك',
       'lumen.tvAvailability.shared4k': '4K مشترك',
+      'lumen.quickRequest.chooseDestination': 'اختر وجهته',
+      'lumen.quickRequest.chooseQuality': 'اختر الجودة',
+      'lumen.quickRequest.entireSeries': 'المسلسل بالكامل',
+      'lumen.quickRequest.quotaApproval':
+        'يتجاوز هذا الطلب حصتك. يمكنك طلب موافقة أحد مديري الطلبات عليه.',
+      'lumen.quickRequest.requestAnyway': 'طلب على أي حال',
+      'lumen.quickRequest.requestApprovalAnyway': 'طلب الموافقة على أي حال',
+      'lumen.quickRequest.title': 'طلب ⁨{title}⁩',
+      'lumen.gameContent.title': 'محتوى اللعبة',
+      'lumen.gameContent.contentToRequest': 'المحتوى المطلوب',
+      'lumen.gameContent.baseGame': 'اللعبة الأساسية',
+      'lumen.gameContent.selectedAddons': 'الإضافات المحددة',
+      'lumen.gameContent.completeEdition': 'الإصدار الكامل',
+      'lumen.gameContent.inLibrary': 'في المكتبة',
+      'lumen.gameContent.storyContent': 'محتوى قصصي',
+      'lumen.gameContent.nonStoryContent': 'محتوى غير قصصي',
+      'lumen.gameContent.contentTypeUnknown': 'نوع المحتوى غير معروف',
+      'lumen.gameContent.itemsMissing': 'ينقص مكتبتك {count} من العناصر',
+      'lumen.gameContent.editionContentsUnknown':
+        'محتوى هذا الإصدار غير معروف.',
+      'lumen.cards.preferenceDescription':
+        'اعرض العناوين أسفل ملصقات الأفلام والمسلسلات والموسيقى والكتب. يمكنك اختيار إعداد مستقل لكل نوع من إعدادات الحساب.',
+      'lumen.requestEdit.title': 'تعديل الطلب لـ {title}',
+      'lumen.requestEdit.askedBy': 'طلبتها {name}',
+      'lumen.requestEdit.seasons': 'المواسم',
+      'lumen.requestEdit.requestedEpisodes': '{count} حلقة مطلوبة',
+      'lumen.requestEdit.episodeCount': '{count} حلقات',
+      'lumen.requestEdit.approve': 'اعتماد',
+      'lumen.requestEdit.save': 'حفظ',
+      'lumen.requestEdit.saveAndRetry': 'حفظ وإعادة المحاولة',
+      'lumen.requestEdit.approved': 'تم اعتماد الطلب',
+      'lumen.requestEdit.changedAndSent': 'تم تعديل الطلب وإرساله مجددًا',
+      'lumen.requestEdit.changed': 'تم تعديل الطلب',
+      'lumen.requestEdit.couldNotChange': 'تعذّر تعديل الطلب',
+      'lumen.liveTv.airings': 'عروض التلفاز المباشر',
+      'lumen.liveTv.checkingGuide': 'جارٍ التحقق من الدليل…',
+      'lumen.liveTv.unavailable': 'التلفاز المباشر غير متاح.',
+      'lumen.liveTv.guideNotReady': 'دليل التلفاز المباشر غير جاهز بعد.',
+      'lumen.liveTv.checkAgain': 'تحقق مرة أخرى',
+      'lumen.liveTv.noAirings': 'لا توجد عروض قادمة تطابق هذا العنوان.',
+      'lumen.liveTv.viewOnly':
+        'يمكن لحسابك مشاهدة العروض، لكن لا يمكنه طلب التسجيلات.',
+      'lumen.liveTv.seriesSubmitted': 'تم إرسال طلب المسلسل',
+      'lumen.liveTv.recordSeries': 'تسجيل المسلسل',
+      'lumen.liveTv.seasonEpisode': 'الموسم {season}، الحلقة {episode}',
+      'lumen.liveTv.requestSubmitted': 'تم إرسال الطلب',
+      'lumen.liveTv.recordAiring': 'تسجيل العرض',
+      'lumen.liveTv.viewRecordings': 'عرض التسجيلات',
+      'lumen.liveTv.findAirings': 'البحث عن عروض التلفاز المباشر',
+      'lumen.liveTv.recordingPending': 'طُلب التسجيل للموافقة.',
+      'lumen.liveTv.recordingScheduled': 'تمت جدولة التسجيل.',
+      'lumen.liveTv.recordingFailed': 'تعذر طلب التسجيل.',
+      'lumen.continuation.title': 'متابعات المانغا والروايات',
+      'lumen.continuation.hideSources': 'إخفاء المصادر',
+      'lumen.continuation.findSources': 'البحث عن المصادر',
+      'lumen.continuation.season': 'الموسم',
+      'lumen.continuation.seasonLabel': 'موسم المتابعة',
+      'lumen.continuation.thisEntry': 'مدخل الأنمي هذا',
+      'lumen.continuation.seasonNumber': 'الموسم {number}',
+      'lumen.continuation.sourceMaterial': 'المصدر الأصلي',
+      'lumen.continuation.searching': 'جارٍ البحث عن المصدر الأصلي…',
+      'lumen.continuation.noSource': 'لم يُعثر على مصدر أصلي لهذا الموسم.',
+      'lumen.continuation.ordered': 'تطابق المواسم مبني على ترتيب الإصدار.',
+      'lumen.continuation.novel': 'رواية',
+      'lumen.continuation.manga': 'مانغا',
+      'lumen.continuation.confidence': 'درجة الثقة: {confidence}',
+      'lumen.continuation.confidence.high': 'مرتفعة',
+      'lumen.continuation.confidence.moderate': 'متوسطة',
+      'lumen.continuation.confidence.low': 'منخفضة',
+      'lumen.continuation.seasonEndsAt': 'ينتهي الموسم عند {position}.',
+      'lumen.continuation.seasonEndUnknown': 'موضع نهاية الموسم غير معروف.',
+      'lumen.continuation.estimated': 'متابعة تقديرية',
+      'lumen.continuation.continueAt': 'المتابعة عند',
+      'lumen.continuation.estimateHint':
+        'تقدير انطلاقًا من نهاية الموسم. لا يحدد الفهرس نقطة البداية التالية.',
+      'lumen.continuation.volumeUnconfirmed': 'مجلد المتابعة غير مؤكد.',
+      'lumen.continuation.translationPending': 'الترجمة قيد الانتظار',
+      'lumen.continuation.available': 'متاح',
+      'lumen.continuation.inLanguage': 'بلغة {language}',
+      'lumen.continuation.evidence': 'أدلة المطابقة',
+      'lumen.continuation.searchFor': 'ابحث عن {title}',
+      'lumen.continuation.volume': 'المجلد {number}',
+      'lumen.continuation.chapter': 'الفصل {number}',
+      'lumen.continuation.target.start': 'البدء من البداية',
+      'lumen.continuation.target.continuation': 'فتح مجلد المتابعة',
+      'lumen.continuation.target.series': 'فتح المصدر',
+      'lumen.managedPermissions.adminWarning': 'لدى المسؤولين جميع الأذونات.',
+      'lumen.managedPermissions.ageGate': 'تقييد العمر',
+      'lumen.managedPermissions.ageGate.default': 'إعداد الخادم الافتراضي',
+      'lumen.managedPermissions.ageGate.restricted': 'مقيّد',
+      'lumen.managedPermissions.ageGate.unrestricted': 'بلا تقييد',
+      'lumen.managedPermissions.confirmBody': 'تُطبّق الأذونات الجديدة فورًا.',
+      'lumen.managedPermissions.confirmTitle': 'حفظ أذونات {name}؟',
+      'lumen.managedPermissions.delegationWarning':
+        'يملك هذا الحساب أذونات تتجاوز صلاحياتك المفوضة.',
+      'lumen.managedPermissions.destinationsLabel': 'وجهات الطلبات',
+      'lumen.managedPermissions.goBack': 'رجوع',
+      'lumen.managedPermissions.groupLabel': 'الأذونات الصريحة',
+      'lumen.managedPermissions.loadFailure': 'تعذر تحميل الأذونات',
+      'lumen.managedPermissions.loading': 'جارٍ تحميل الأذونات…',
+      'lumen.managedPermissions.radarrLoadFailure': 'تعذر تحميل وجهات Radarr',
+      'lumen.managedPermissions.retry': 'إعادة المحاولة',
+      'lumen.managedPermissions.save': 'حفظ الأذونات',
+      'lumen.managedPermissions.saveFailure': 'تعذر حفظ الأذونات.',
+      'lumen.managedPermissions.saved': 'تم حفظ الأذونات.',
+      'lumen.managedPermissions.sonarrLoadFailure': 'تعذر تحميل وجهات Sonarr',
+      'lumen.managedPermissions.title': 'الأذونات الصريحة',
+      'lumen.permissions.group.4k': '4K',
+      'lumen.permissions.group.administration': 'الإدارة',
+      'lumen.permissions.group.auto-approve': 'الموافقة التلقائية',
+      'lumen.permissions.group.auto-request-from-watchlists':
+        'الطلب التلقائي من قوائم المتابعة',
+      'lumen.permissions.group.issues-and-visibility':
+        'المشكلات وإمكانية الظهور',
+      'lumen.permissions.group.other': 'أخرى',
+      'lumen.permissions.group.requests': 'الطلبات',
+      'lumen.accessibility.chooseEdition': 'اختيار إصدار',
+      'lumen.accessibility.chooseSeasons': 'اختيار المواسم',
+      'lumen.accessibility.browseGenre': 'تصفح {name}',
+      'lumen.accessibility.browseMoviesFromCompany': 'تصفح أفلام {name}',
+      'lumen.accessibility.browseSeriesFromCompany': 'تصفح مسلسلات {name}',
+      'lumen.accessibility.loading': 'جارٍ التحميل',
+      'lumen.accessibility.read': 'قراءة',
+      'lumen.accessibility.readInKavita': 'قراءة {title} في Kavita',
+      'lumen.accessibility.requestAnotherNarrator': 'طلب راوٍ آخر',
+      'lumen.accessibility.scrollBack': 'التمرير للخلف',
+      'lumen.accessibility.scrollForward': 'التمرير للأمام',
+      'lumen.collectionDetail.added': 'أُضيفت المجموعة إلى قائمة الحظر.',
+      'lumen.collectionDetail.blockedCount':
+        '{blocked} من {total} في قائمة الحظر',
+      'lumen.collectionDetail.blocklist': 'حظر المجموعة',
+      'lumen.collectionDetail.blocklistExplanation':
+        'سيتم حظر الطلبات الجديدة لجميع الأفلام في هذه المجموعة.',
+      'lumen.collectionDetail.changeUnconfirmed':
+        'تعذّر تأكيد التغيير. تحقق من المجموعة قبل المحاولة مرة أخرى.',
+      'lumen.collectionDetail.checkFailure': 'تعذّر التحقق من خادم الوسائط.',
+      'lumen.collectionDetail.checkingLibraries':
+        'جارٍ التحقق من مكتبات خادم الوسائط…',
+      'lumen.collectionDetail.confirmBlocklist': 'هل تريد حظر هذه المجموعة؟',
+      'lumen.collectionDetail.confirmUnblock':
+        'هل تريد إلغاء حظر هذه المجموعة؟',
+      'lumen.collectionDetail.item': 'هذه المجموعة',
+      'lumen.collectionDetail.loadFailure': 'تعذّر تحميل هذه المجموعة',
+      'lumen.collectionDetail.loading': 'جارٍ تحميل المجموعة…',
+      'lumen.collectionDetail.mediaServerCollection': 'مجموعة خادم الوسائط',
+      'lumen.collectionDetail.mediaServerLibraries': 'مكتبات خادم الوسائط',
+      'lumen.collectionDetail.movieCount': '{count} أفلام',
+      'lumen.collectionDetail.movies': 'الأفلام',
+      'lumen.collectionDetail.noMovies': 'لا توجد أفلام مدرجة.',
+      'lumen.collectionDetail.notFound': 'المجموعة غير موجودة.',
+      'lumen.collectionDetail.oneMovie': 'فيلم واحد ({count})',
+      'lumen.collectionDetail.removed': 'أُزيلت المجموعة من قائمة الحظر.',
+      'lumen.collectionDetail.retry': 'إعادة المحاولة',
+      'lumen.collectionDetail.serverUnsupported':
+        'خادم الوسائط هذا لا يدعم تعديل المجموعات.',
+      'lumen.collectionDetail.unblock': 'إلغاء حظر المجموعة',
+      'lumen.collectionDetail.unblockExplanation':
+        'سيؤدي ذلك إلى إزالة إدخالات قائمة الحظر لجميع أفلام هذه المجموعة، بما فيها الأفلام المحظورة بشكل فردي.',
+      'lumen.collectionDetail.verifyFailure':
+        'تعذّر التحقق من هذه المجموعة على خادم الوسائط.',
+      'lumen.collectionDetail.watchTrailer': 'مشاهدة الإعلان الترويجي',
+      'lumen.requestFiles.audiobook': 'كتاب صوتي',
+      'lumen.requestFiles.availableRequests': 'الطلبات المتاحة',
+      'lumen.requestFiles.checking': 'جارٍ التحقق من الملفات القابلة للتنزيل…',
+      'lumen.requestFiles.checkingRequests': 'جارٍ التحقق من طلباتك…',
+      'lumen.requestFiles.close': 'إغلاق',
+      'lumen.requestFiles.dialogLabel': 'تنزيل ملفات الطلب',
+      'lumen.requestFiles.downloadAudiobook': 'تنزيل الكتاب الصوتي',
+      'lumen.requestFiles.downloadEbook': 'تنزيل الكتاب الإلكتروني',
+      'lumen.requestFiles.ebook': 'كتاب إلكتروني',
+      'lumen.requestFiles.item': 'ملفات الطلب',
+      'lumen.requestFiles.loadFailure': 'تعذّر تحميل ملفات الطلب',
+      'lumen.requestFiles.noAvailableRequests':
+        'لا توجد طلبات متاحة لهذا الاختيار.',
+      'lumen.requestFiles.none': 'لم يتم العثور على ملفات قابلة للتنزيل.',
+      'lumen.requestFiles.request': 'الطلب',
+      'lumen.requestFiles.requestNumber': 'الطلب رقم {id}',
+      'lumen.requestFiles.requestsLoadFailure': 'تعذّر تحميل الطلبات المتاحة',
+      'lumen.requestFiles.retry': 'تحقق مرة أخرى',
+      'lumen.requestFiles.sourcesFailed': 'تعذّر التحقق من بعض المصادر.',
+      'lumen.requestFiles.title': 'تنزيل الملفات',
+      'lumen.detail.serverLoadFailed': 'تعذر تحميل خوادم الطلب.',
+      'lumen.detail.serverSettingsFailed':
+        'تعذر تحميل خيارات الطلب من {service}. تحقق من الخدمة وحاول مرة أخرى.',
     },
   },
   {
@@ -7067,6 +7287,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Сериали',
       'components.Layout.Sidebar.issues': 'Проблеми',
       'components.Layout.Sidebar.requests': 'Заявки',
+      'components.Layout.Sidebar.users': 'Потребители',
       'components.Layout.UserDropdown.myprofile': 'Профил',
       'components.MovieDetails.addtowatchlist':
         'Добавяне към списъка за гледане',
@@ -7710,6 +7931,12 @@ export const localeData = [
       'i18n.previous': 'Назад',
       'i18n.usersettings': 'Потребителски настройки',
       'components.IssueModal.issueOther': 'Друго',
+      'components.RequestModal.requesterror':
+        'Нещо се обърка при изпращането на заявката.',
+      'i18n.cancel': 'Отказ',
+      'i18n.request': 'Заявка',
+      'i18n.request4k': 'Заявка в 4K',
+      'i18n.requesting': 'Заявяване…',
     },
   },
   {
@@ -7725,6 +7952,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Sèries',
       'components.Layout.Sidebar.issues': 'Incidències',
       'components.Layout.Sidebar.requests': 'Sol·licituds',
+      'components.Layout.Sidebar.users': 'Usuaris',
       'components.Layout.UserDropdown.myprofile': 'Perfil',
       'components.Login.JellyfinQuickConnectModal.cancel': 'Cancel·la',
       'components.MovieDetails.addtowatchlist':
@@ -8252,6 +8480,12 @@ export const localeData = [
       'i18n.previous': 'Endarrere',
       'i18n.usersettings': "Configuració de l'usuari",
       'components.IssueModal.issueOther': 'Altre',
+      'components.RequestModal.requesterror':
+        "S'ha produït un error en enviar la sol·licitud.",
+      'i18n.cancel': 'Canceŀla',
+      'i18n.request': 'Sol·licita',
+      'i18n.request4k': 'Sol·licita en 4K',
+      'i18n.requesting': "S'està sol·licitant …",
     },
   },
   {
@@ -8267,6 +8501,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Seriály',
       'components.Layout.Sidebar.issues': 'Problémy',
       'components.Layout.Sidebar.requests': 'Žádosti',
+      'components.Layout.Sidebar.users': 'Uživatelé',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.MovieDetails.addtowatchlist': 'Přidat na seznam ke zhlédnutí',
       'components.MovieDetails.removefromwatchlist':
@@ -8906,6 +9141,12 @@ export const localeData = [
       'i18n.previous': 'Předchozí',
       'i18n.usersettings': 'Uživatelská nastavení',
       'components.IssueModal.issueOther': 'Jiný',
+      'components.RequestModal.requesterror':
+        'Při odesílání žádosti se něco pokazilo.',
+      'i18n.cancel': 'Zrušit',
+      'i18n.request': 'Zažádat',
+      'i18n.request4k': 'Zažádat ve 4K',
+      'i18n.requesting': 'Vyžadování…',
     },
   },
   {
@@ -8921,6 +9162,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Serier',
       'components.Layout.Sidebar.issues': 'Problemer',
       'components.Layout.Sidebar.requests': 'Anmodninger',
+      'components.Layout.Sidebar.users': 'Brugere',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.Login.JellyfinQuickConnectModal.cancel': 'Annullér',
       'components.MovieDetails.addtowatchlist': 'Føj til Se senere-liste',
@@ -9558,6 +9800,12 @@ export const localeData = [
       'i18n.previous': 'Forrige',
       'i18n.usersettings': 'Brugerindstillinger',
       'components.IssueModal.issueOther': 'Andet',
+      'components.RequestModal.requesterror':
+        'Noget gik galt under indsendelsen af anmodningen.',
+      'i18n.cancel': 'Annullér',
+      'i18n.request': 'Anmod',
+      'i18n.request4k': 'Anmod i 4K',
+      'i18n.requesting': 'Anmoder…',
     },
   },
   {
@@ -9720,6 +9968,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'Anfragen',
       'components.Layout.Sidebar.share': 'Teilen & Identifizieren',
       'components.Layout.Sidebar.swipe': 'Wischen',
+      'components.Layout.Sidebar.users': 'Benutzer',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.LiveTv.FollowedTeams.choose': 'Wählen Sie ein Team',
       'components.LiveTv.FollowedTeams.description':
@@ -11332,6 +11581,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'Falscher Titel oder falsche Metadaten',
       'components.IssueModal.issueOther': 'Sonstige',
+      'components.RequestModal.quality': 'Qualität',
+      'components.RequestModal.requestQuotaApproval': 'Genehmigung anfordern',
+      'components.RequestModal.requesterror':
+        'Beim Senden der Anfrage ist etwas schief gelaufen.',
+      'i18n.cancel': 'Abbrechen',
+      'i18n.request': 'Anfrage senden',
+      'i18n.request4k': 'In 4K anfragen',
+      'i18n.requesting': 'Anfragen…',
     },
   },
   {
@@ -11486,6 +11743,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'Requests',
       'components.Layout.Sidebar.share': 'Share & Identify',
       'components.Layout.Sidebar.swipe': 'Swipe',
+      'components.Layout.Sidebar.users': 'User List',
       'components.Layout.Sidebar.watchSessions': 'Watch Sessions',
       'components.Layout.Sidebar.you': 'You',
       'components.Layout.UserDropdown.myprofile': 'Profile',
@@ -13067,6 +13325,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'Incorrect title or metadata',
       'components.IssueModal.issueOther': 'Other',
+      'components.RequestModal.quality': 'Quality',
+      'components.RequestModal.requestQuotaApproval': 'Request approval',
+      'components.RequestModal.requesterror':
+        'Something went wrong while submitting the request.',
+      'i18n.cancel': 'Cancel',
+      'i18n.request': 'Request',
+      'i18n.request4k': 'Request in 4K',
+      'i18n.requesting': 'Requesting…',
       'lumen.account.administratorAccess':
         'This account has administrator access.',
       'lumen.account.backToSettings': 'Back to Account Settings',
@@ -14019,6 +14285,12 @@ export const localeData = [
       'lumen.adminSettings.offCanChange': 'Off (people can turn it on)',
       'lumen.adminSettings.onCanChange': 'On (people can turn it off)',
       'lumen.adminSettings.preview': 'Preview',
+      'lumen.adminSettings.requestDefaultsLink': 'Request Defaults',
+      'lumen.adminSettings.requestSettingsHelp':
+        'These are SeerrNG server settings for everyone.',
+      'lumen.adminSettings.requestSettingsSummary':
+        '4K, partial series and episode rules',
+      'lumen.adminSettings.requestSettingsTitle': 'Instance Request Settings',
       'lumen.adminSettings.reading': 'Reading…',
       'lumen.adminSettings.saveFailed': 'Couldn’t save',
       'lumen.adminSettings.saveForEveryone': 'Save for everyone',
@@ -14099,11 +14371,15 @@ export const localeData = [
       'lumen.adminUsers.backToAccount': 'Back to Account',
       'lumen.adminUsers.cancel': 'Cancel',
       'lumen.adminUsers.createFailure': 'Could not create the account.',
+      'lumen.adminUsers.createConfirmFailure':
+        'The server did not confirm the new account. Keep this form open and try again.',
       'lumen.adminUsers.createLocalUser': 'Create Local User',
       'lumen.adminUsers.createUser': 'Create User',
       'lumen.adminUsers.created': 'Created {name}.',
       'lumen.adminUsers.creating': 'Creating…',
       'lumen.adminUsers.deleteFailure': 'Could not delete the account.',
+      'lumen.adminUsers.deleteConfirmFailure':
+        'The server did not confirm removal of this account. Keep this dialog open and try again.',
       'lumen.adminUsers.deleteTitle': 'Delete {name}?',
       'lumen.adminUsers.deleteUser': 'Delete User',
       'lumen.adminUsers.deleteWarning':
@@ -14904,10 +15180,12 @@ export const localeData = [
       'lumen.detail.trailer': 'Trailer',
       'lumen.discover.added': 'Added {date}',
       'lumen.discover.browseByGenre': 'Browse by Genre',
+      'lumen.discover.discoverTitles': 'Discover Titles',
       'lumen.discover.newOn': 'New on {server}',
       'lumen.discover.noPopularTitles': 'No popular titles available',
       'lumen.discover.popularBooks': 'Popular Books',
       'lumen.discover.searchVideo': 'Movies and series…',
+      'lumen.discover.shelfLoadFailed': 'Couldn’t load this shelf',
       'lumen.discover.trending': 'Trending',
       'lumen.discover.trendingThisWeek': 'Trending This Week',
       'lumen.discoveryAccounts.accountsWhat': 'tracking accounts',
@@ -15023,6 +15301,10 @@ export const localeData = [
         'Couldn’t reach the server. Check your connection and try again.',
       'lumen.error.sessionEnded': 'Your session ended. Sign in again.',
       'lumen.error.timeout': 'The server took too long to answer. Try again.',
+      'lumen.pageBoundary.body':
+        'The rest of Lumen still works. Try again, or pick another page.',
+      'lumen.pageBoundary.reload': 'Reload',
+      'lumen.pageBoundary.title': 'Something went wrong on this page',
       'lumen.followButton.follow': 'Follow',
       'lumen.followButton.followFutureVolumes': 'Follow Future Volumes',
       'lumen.followButton.followNarrator': 'Follow {name}',
@@ -15769,6 +16051,8 @@ export const localeData = [
         'Bridge sign-in settings saved.',
       'lumen.mediaServerConnection.chooseConnection': 'Choose a Connection',
       'lumen.mediaServerConnection.connection': '{provider} Connection',
+      'lumen.mediaServerConnection.confirmFailure':
+        'Could not confirm the saved connection settings.',
       'lumen.mediaServerConnection.discover': 'Discover Plex Servers',
       'lumen.mediaServerConnection.discoverFailed':
         'Could not discover Plex servers. Retry or enter the address manually.',
@@ -16146,6 +16430,8 @@ export const localeData = [
         'An access token is configured. Leave the replacement field empty to keep it.',
       'lumen.notifications.keepPushoverCredentials':
         'Leave the credential fields empty to keep configured credentials.',
+      'lumen.notifications.loadFailure':
+        'Could not load notification settings.',
       'lumen.notifications.loading': 'Loading notification settings…',
       'lumen.notifications.loadingBrowserDevices': 'Loading browser devices…',
       'lumen.notifications.openBot': 'Open @{bot}',
@@ -16199,6 +16485,8 @@ export const localeData = [
       'lumen.override.deleteBody': 'Future requests will stop using this rule.',
       'lumen.override.deleteFailed':
         'Could not delete the request override rule.',
+      'lumen.override.deleteConfirmFailure':
+        'The server did not confirm rule removal. Keep this dialog open and try again.',
       'lumen.override.deleteTitle': 'Delete Override Rule',
       'lumen.override.destinationChoices': 'destination choices',
       'lumen.override.destinationLoadError':
@@ -16235,6 +16523,8 @@ export const localeData = [
       'lumen.override.rules': 'request override rules',
       'lumen.override.rulesLoadError': 'Could not load request override rules',
       'lumen.override.saveFailed': 'Could not save the request override rule.',
+      'lumen.override.saveConfirmFailure':
+        'The server did not confirm the saved rule. Keep this form open and try again.',
       'lumen.override.saveRule': 'Save Rule',
       'lumen.override.savedValue': 'Saved value ({value})',
       'lumen.override.searchKeywords': 'Search Keywords',
@@ -16666,12 +16956,16 @@ export const localeData = [
       'lumen.servarr.removeConfirmation':
         'Remove {service} as a request destination?',
       'lumen.servarr.removeFallback': 'Could not remove the {service} service.',
+      'lumen.servarr.removeConfirmFailure':
+        'The server did not confirm removal of this {service}. Keep this form open and try again.',
       'lumen.servarr.removeService': 'Remove Service',
       'lumen.servarr.requestButtonLabel': 'Request Button Label',
       'lumen.servarr.requestTags': 'Request Tags',
       'lumen.servarr.retry': 'Retry',
       'lumen.servarr.rootFolder': 'Root Folder',
       'lumen.servarr.runMetadataDiagnostic': 'Run Metadata Diagnostic',
+      'lumen.servarr.saveConfirmFailure':
+        'The server did not confirm the saved {service} settings. Keep this form open and try again.',
       'lumen.servarr.saveFallback': 'Could not save the {service} service.',
       'lumen.servarr.saveService': 'Save {service}',
       'lumen.servarr.savedKey': 'Saved key',
@@ -17696,6 +17990,7 @@ export const localeData = [
       'lumen.adult.bookmarkedService': 'Bookmarked service',
       'lumen.adult.serverFilter': 'Service',
       'lumen.adult.allServices': 'All',
+      'lumen.adult.sceneLoadFailed': 'Couldn’t load this scene',
       'lumen.comics.title': 'Comics/Manga',
       'lumen.comics.guidance':
         'Request a manga or comic series. New volumes and issues arrive as they come out; manga comes in its English edition unless you pick another.',
@@ -18438,6 +18733,200 @@ export const localeData = [
       'lumen.tvAvailability.source4k': '{source} 4K',
       'lumen.tvAvailability.sharedHd': 'Shared HD',
       'lumen.tvAvailability.shared4k': 'Shared 4K',
+      'lumen.quickRequest.chooseDestination': 'Choose where it goes',
+      'lumen.quickRequest.chooseQuality': 'Choose the quality',
+      'lumen.quickRequest.entireSeries': 'Entire series',
+      'lumen.quickRequest.quotaApproval':
+        'This request exceeds your quota. You can ask a request manager to approve it.',
+      'lumen.quickRequest.requestAnyway': 'Request Anyway',
+      'lumen.quickRequest.requestApprovalAnyway': 'Request Approval Anyway',
+      'lumen.quickRequest.title': 'Request {title}',
+      'lumen.gameContent.title': 'Game Content',
+      'lumen.gameContent.contentToRequest': 'Content to Request',
+      'lumen.gameContent.baseGame': 'Base Game',
+      'lumen.gameContent.selectedAddons': 'Selected Add-ons',
+      'lumen.gameContent.completeEdition': 'Complete Edition',
+      'lumen.gameContent.inLibrary': 'In Library',
+      'lumen.gameContent.storyContent': 'Story content',
+      'lumen.gameContent.nonStoryContent': 'Non-story content',
+      'lumen.gameContent.contentTypeUnknown': 'Content type unknown',
+      'lumen.gameContent.itemsMissing':
+        '{count} items missing from your library',
+      'lumen.gameContent.editionContentsUnknown':
+        'Edition contents are unknown.',
+      'lumen.cards.preferenceDescription':
+        'Show titles under posters for movies, series, music and books. Account Settings has a choice per type.',
+      'lumen.requestEdit.title': 'Change request for {title}',
+      'lumen.requestEdit.askedBy': 'Asked by {name}',
+      'lumen.requestEdit.seasons': 'Seasons',
+      'lumen.requestEdit.requestedEpisodes': '{count} requested episodes',
+      'lumen.requestEdit.episodeCount': '{count} episodes',
+      'lumen.requestEdit.approve': 'Approve',
+      'lumen.requestEdit.save': 'Save',
+      'lumen.requestEdit.saveAndRetry': 'Save and try again',
+      'lumen.requestEdit.approved': 'Request approved',
+      'lumen.requestEdit.changedAndSent': 'Request changed and sent again',
+      'lumen.requestEdit.changed': 'Request changed',
+      'lumen.requestEdit.couldNotChange': 'Couldn’t change the request',
+      'lumen.liveTv.airings': 'Live TV Airings',
+      'lumen.liveTv.checkingGuide': 'Checking the guide…',
+      'lumen.liveTv.unavailable': 'Live TV is unavailable.',
+      'lumen.liveTv.guideNotReady': 'The Live TV guide is not ready yet.',
+      'lumen.liveTv.checkAgain': 'Check Again',
+      'lumen.liveTv.noAirings': 'No upcoming airings match this title.',
+      'lumen.liveTv.viewOnly':
+        'Your account can view airings but cannot request recordings.',
+      'lumen.liveTv.seriesSubmitted': 'Series Request Submitted',
+      'lumen.liveTv.recordSeries': 'Record Series',
+      'lumen.liveTv.seasonEpisode': 'Season {season}, Episode {episode}',
+      'lumen.liveTv.requestSubmitted': 'Request Submitted',
+      'lumen.liveTv.recordAiring': 'Record Airing',
+      'lumen.liveTv.viewRecordings': 'View Recordings',
+      'lumen.liveTv.findAirings': 'Find Live TV Airings',
+      'lumen.liveTv.recordingPending': 'Recording requested for approval.',
+      'lumen.liveTv.recordingScheduled': 'Recording scheduled.',
+      'lumen.liveTv.recordingFailed': 'Could not request the recording.',
+      'lumen.continuation.title': 'Manga and Novel Continuations',
+      'lumen.continuation.hideSources': 'Hide Sources',
+      'lumen.continuation.findSources': 'Find Sources',
+      'lumen.continuation.season': 'Season',
+      'lumen.continuation.seasonLabel': 'Continuation season',
+      'lumen.continuation.thisEntry': 'This Anime Entry',
+      'lumen.continuation.seasonNumber': 'Season {number}',
+      'lumen.continuation.sourceMaterial': 'source material',
+      'lumen.continuation.searching': 'Looking for source material…',
+      'lumen.continuation.noSource':
+        'No source material found for this season.',
+      'lumen.continuation.ordered':
+        'Season matches are based on release order.',
+      'lumen.continuation.novel': 'Novel',
+      'lumen.continuation.manga': 'Manga',
+      'lumen.continuation.confidence': '{confidence} confidence',
+      'lumen.continuation.confidence.high': 'high',
+      'lumen.continuation.confidence.moderate': 'moderate',
+      'lumen.continuation.confidence.low': 'low',
+      'lumen.continuation.seasonEndsAt': 'Season ends at {position}.',
+      'lumen.continuation.seasonEndUnknown': 'Season end position unknown.',
+      'lumen.continuation.estimated': 'Estimated continuation',
+      'lumen.continuation.continueAt': 'Continue at',
+      'lumen.continuation.estimateHint':
+        'Estimated from where the season ends. The catalog does not document the next starting point.',
+      'lumen.continuation.volumeUnconfirmed':
+        'The continuation volume is unconfirmed.',
+      'lumen.continuation.translationPending': 'Translation pending',
+      'lumen.continuation.available': 'Available',
+      'lumen.continuation.inLanguage': 'in {language}',
+      'lumen.continuation.evidence': 'Match evidence',
+      'lumen.continuation.searchFor': 'Search for {title}',
+      'lumen.continuation.volume': 'Volume {number}',
+      'lumen.continuation.chapter': 'Chapter {number}',
+      'lumen.continuation.target.start': 'Start From the Beginning',
+      'lumen.continuation.target.continuation': 'Open Continuation Volume',
+      'lumen.continuation.target.series': 'Open Source',
+      'lumen.managedPermissions.adminWarning':
+        'Administrators have all permissions.',
+      'lumen.managedPermissions.ageGate': 'Age Gate',
+      'lumen.managedPermissions.ageGate.default': 'Use Server Default',
+      'lumen.managedPermissions.ageGate.restricted': 'Restricted',
+      'lumen.managedPermissions.ageGate.unrestricted': 'Unrestricted',
+      'lumen.managedPermissions.confirmBody':
+        'The new permissions take effect immediately.',
+      'lumen.managedPermissions.confirmTitle': 'Save permissions for {name}?',
+      'lumen.managedPermissions.delegationWarning':
+        'This account has permissions outside your delegated access.',
+      'lumen.managedPermissions.destinationsLabel': 'Request Destinations',
+      'lumen.managedPermissions.goBack': 'Go Back',
+      'lumen.managedPermissions.groupLabel': 'Explicit Permissions',
+      'lumen.managedPermissions.loadFailure': 'Couldn’t load permissions',
+      'lumen.managedPermissions.loading': 'Loading permissions…',
+      'lumen.managedPermissions.radarrLoadFailure':
+        'Couldn’t load Radarr destinations',
+      'lumen.managedPermissions.retry': 'Retry',
+      'lumen.managedPermissions.save': 'Save Permissions',
+      'lumen.managedPermissions.saveFailure': 'Could not save permissions.',
+      'lumen.managedPermissions.saved': 'Permissions saved.',
+      'lumen.managedPermissions.sonarrLoadFailure':
+        'Couldn’t load Sonarr destinations',
+      'lumen.managedPermissions.title': 'Explicit Permissions',
+      'lumen.permissions.group.4k': '4K',
+      'lumen.permissions.group.administration': 'Administration',
+      'lumen.permissions.group.auto-approve': 'Auto-Approve',
+      'lumen.permissions.group.auto-request-from-watchlists':
+        'Auto-Request from Watchlists',
+      'lumen.permissions.group.issues-and-visibility': 'Issues and Visibility',
+      'lumen.permissions.group.other': 'Other',
+      'lumen.permissions.group.requests': 'Requests',
+      'lumen.accessibility.chooseEdition': 'Choose edition',
+      'lumen.accessibility.chooseSeasons': 'Choose seasons',
+      'lumen.accessibility.browseGenre': 'Browse {name}',
+      'lumen.accessibility.browseMoviesFromCompany':
+        'Browse movies from {name}',
+      'lumen.accessibility.browseSeriesFromCompany':
+        'Browse series from {name}',
+      'lumen.accessibility.loading': 'Loading',
+      'lumen.accessibility.read': 'Read',
+      'lumen.accessibility.readInKavita': 'Read {title} in Kavita',
+      'lumen.accessibility.requestAnotherNarrator': 'Request another narrator',
+      'lumen.accessibility.scrollBack': 'Scroll back',
+      'lumen.accessibility.scrollForward': 'Scroll forward',
+      'lumen.collectionDetail.added': 'Collection added to the Blocklist.',
+      'lumen.collectionDetail.blockedCount': '{blocked} of {total} blocklisted',
+      'lumen.collectionDetail.blocklist': 'Blocklist Collection',
+      'lumen.collectionDetail.blocklistExplanation':
+        'New requests for all movies in this collection will be blocked.',
+      'lumen.collectionDetail.changeUnconfirmed':
+        'Could not confirm the change. Check the collection before trying again.',
+      'lumen.collectionDetail.checkFailure':
+        'Could not check the media server.',
+      'lumen.collectionDetail.checkingLibraries':
+        'Checking media-server libraries…',
+      'lumen.collectionDetail.confirmBlocklist': 'Blocklist this collection?',
+      'lumen.collectionDetail.confirmUnblock': 'Unblock this collection?',
+      'lumen.collectionDetail.item': 'this collection',
+      'lumen.collectionDetail.loadFailure': 'Could not load this collection',
+      'lumen.collectionDetail.loading': 'Loading collection…',
+      'lumen.collectionDetail.mediaServerCollection': 'Media Server Collection',
+      'lumen.collectionDetail.mediaServerLibraries': 'media-server libraries',
+      'lumen.collectionDetail.movieCount': '{count} movies',
+      'lumen.collectionDetail.movies': 'Movies',
+      'lumen.collectionDetail.noMovies': 'No movies listed.',
+      'lumen.collectionDetail.notFound': 'Collection not found.',
+      'lumen.collectionDetail.oneMovie': '{count} movie',
+      'lumen.collectionDetail.removed':
+        'Collection removed from the Blocklist.',
+      'lumen.collectionDetail.retry': 'Retry',
+      'lumen.collectionDetail.serverUnsupported':
+        'This media server does not support collection changes.',
+      'lumen.collectionDetail.unblock': 'Unblock Collection',
+      'lumen.collectionDetail.unblockExplanation':
+        'This removes Blocklist entries for all movies in this collection, including individually blocked movies.',
+      'lumen.collectionDetail.verifyFailure':
+        'Could not verify this collection on the media server.',
+      'lumen.collectionDetail.watchTrailer': 'Watch Trailer',
+      'lumen.requestFiles.audiobook': 'Audiobook',
+      'lumen.requestFiles.availableRequests': 'available requests',
+      'lumen.requestFiles.checking': 'Checking for downloadable files…',
+      'lumen.requestFiles.checkingRequests': 'Checking your requests…',
+      'lumen.requestFiles.close': 'Close',
+      'lumen.requestFiles.dialogLabel': 'Download request files',
+      'lumen.requestFiles.downloadAudiobook': 'Download Audiobook',
+      'lumen.requestFiles.downloadEbook': 'Download Ebook',
+      'lumen.requestFiles.ebook': 'Ebook',
+      'lumen.requestFiles.item': 'request files',
+      'lumen.requestFiles.loadFailure': 'Could not load request files',
+      'lumen.requestFiles.noAvailableRequests':
+        'You have no available requests for this selection.',
+      'lumen.requestFiles.none': 'No downloadable files were found.',
+      'lumen.requestFiles.request': 'Request',
+      'lumen.requestFiles.requestNumber': 'Request #{id}',
+      'lumen.requestFiles.requestsLoadFailure':
+        'Could not load available requests',
+      'lumen.requestFiles.retry': 'Check again',
+      'lumen.requestFiles.sourcesFailed': 'Some sources couldn’t be checked.',
+      'lumen.requestFiles.title': 'Download Files',
+      'lumen.detail.serverLoadFailed': 'Could not load request servers.',
+      'lumen.detail.serverSettingsFailed':
+        'Could not load {service} request options. Check the service and try again.',
     },
   },
   {
@@ -18452,6 +18941,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Σειρές',
       'components.Layout.Sidebar.issues': 'Προβλήματα',
       'components.Layout.Sidebar.requests': 'Αιτήματα',
+      'components.Layout.Sidebar.users': 'Χρήστες',
       'components.Layout.UserDropdown.myprofile': 'Προφίλ',
       'components.NotificationTypeSelector.adminissuecommentDescription':
         'Ειδοποιηθείτε όταν άλλοι χρήστες σχολιάζουν σε προβλήματα.',
@@ -18887,6 +19377,12 @@ export const localeData = [
       'i18n.previous': 'Προηγούμενο',
       'i18n.usersettings': 'Ρυθμίσεις χρήστη',
       'components.IssueModal.issueOther': 'Άλλο',
+      'components.RequestModal.requesterror':
+        'Κάτι πήγε στραβά κατά την υποβολή του αιτήματος.',
+      'i18n.cancel': 'Ακύρωση',
+      'i18n.request': 'Ζήτα το',
+      'i18n.request4k': 'Ζήτα το σε 4K',
+      'i18n.requesting': 'Γίνεται το αίτημα…',
     },
   },
   {
@@ -19051,6 +19547,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'Solicitudes',
       'components.Layout.Sidebar.share': 'Compartir e identificar',
       'components.Layout.Sidebar.swipe': 'Deslizar',
+      'components.Layout.Sidebar.users': 'Usuarios',
       'components.Layout.UserDropdown.myprofile': 'Perfil',
       'components.LiveTv.FollowedTeams.choose': 'Elige un equipo',
       'components.LiveTv.FollowedTeams.description':
@@ -20673,6 +21170,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'Título incorrecto o metadatos',
       'components.IssueModal.issueOther': 'Otro',
+      'components.RequestModal.quality': 'Calidad',
+      'components.RequestModal.requestQuotaApproval': 'Solicitar aprobación',
+      'components.RequestModal.requesterror':
+        'Se produjo un error al enviar la solicitud.',
+      'i18n.cancel': 'Cancelar',
+      'i18n.request': 'Solicitar',
+      'i18n.request4k': 'Pedir en 4K',
+      'i18n.requesting': 'Pidiendo…',
     },
   },
   {
@@ -20833,6 +21338,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'Solicitudes',
       'components.Layout.Sidebar.share': 'Compartir e identificar',
       'components.Layout.Sidebar.swipe': 'Golpe fuerte',
+      'components.Layout.Sidebar.users': 'Usuarios',
       'components.Layout.UserDropdown.myprofile': 'Perfil',
       'components.LiveTv.FollowedTeams.choose': 'Elige un equipo',
       'components.LiveTv.FollowedTeams.description':
@@ -22444,6 +22950,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'Título incorrecto o metadatos',
       'components.IssueModal.issueOther': 'Otro',
+      'components.RequestModal.quality': 'Calidad',
+      'components.RequestModal.requestQuotaApproval': 'Solicitar aprobación',
+      'components.RequestModal.requesterror':
+        'Algo fue mal al realizar la solicitud.',
+      'i18n.cancel': 'Cancelar',
+      'i18n.request': 'Solicitar',
+      'i18n.request4k': 'Pedir en 4K',
+      'i18n.requesting': 'Pidiendo…',
     },
   },
   {
@@ -22459,6 +22973,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Sarjad',
       'components.Layout.Sidebar.issues': 'Probleemid',
       'components.Layout.Sidebar.requests': 'Taotlused',
+      'components.Layout.Sidebar.users': 'Kasutajad',
       'components.Layout.UserDropdown.myprofile': 'Profiil',
       'components.MovieDetails.addtowatchlist': 'Lisa vaatamisnimekirja',
       'components.MovieDetails.removefromwatchlist':
@@ -23093,6 +23608,12 @@ export const localeData = [
       'i18n.previous': 'Eelmine',
       'i18n.usersettings': 'Kasutaja seaded',
       'components.IssueModal.issueOther': 'Muu',
+      'components.RequestModal.requesterror':
+        'Taotluse esitamisel tekkis viga.',
+      'i18n.cancel': 'Tühista',
+      'i18n.request': 'Taotle',
+      'i18n.request4k': 'Taotle 4K-s',
+      'i18n.requesting': 'Taotlemine…',
     },
   },
   {
@@ -23108,6 +23629,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Sarjat',
       'components.Layout.Sidebar.issues': 'Ongelmat',
       'components.Layout.Sidebar.requests': 'Pyynnöt',
+      'components.Layout.Sidebar.users': 'Käyttäjät',
       'components.Layout.UserDropdown.myprofile': 'Profiili',
       'components.MovieDetails.addtowatchlist': 'Lisää katselulistalle',
       'components.MovieDetails.removefromwatchlist': 'Poista katselulistalta',
@@ -23323,6 +23845,12 @@ export const localeData = [
       'i18n.previous': 'Edellinen',
       'i18n.usersettings': 'Käyttäjäasetukset',
       'components.IssueModal.issueOther': 'Muu',
+      'components.RequestModal.requesterror':
+        'Jotain meni vikaan pyynnön jättämisessä.',
+      'i18n.cancel': 'Peruuta',
+      'i18n.request': 'Pyydä',
+      'i18n.request4k': 'Pyydä 4K:na',
+      'i18n.requesting': 'Pyydetään…',
     },
   },
   {
@@ -23491,6 +24019,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'Demandes',
       'components.Layout.Sidebar.share': 'Partager & Identifier',
       'components.Layout.Sidebar.swipe': 'Balayer',
+      'components.Layout.Sidebar.users': 'Utilisateurs',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.LiveTv.FollowedTeams.choose': 'Choisir une équipe',
       'components.LiveTv.FollowedTeams.description':
@@ -25112,6 +25641,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'Titre ou métadonnées incorrects',
       'components.IssueModal.issueOther': 'Autre',
+      'components.RequestModal.quality': 'Qualité',
+      'components.RequestModal.requestQuotaApproval': 'Demander l’approbation',
+      'components.RequestModal.requesterror':
+        'Une erreur s’est produite lors de l’envoi de la demande.',
+      'i18n.cancel': 'Annuler',
+      'i18n.request': 'Demander',
+      'i18n.request4k': 'Demander en 4K',
+      'i18n.requesting': 'Demande…',
       'components.IssueDetails.allepisodes': 'Tous les épisodes',
       'components.Layout.Sidebar.comingSoon': 'À venir',
       'components.Layout.Sidebar.watchSessions': 'Séances de visionnage',
@@ -26193,6 +26730,14 @@ export const localeData = [
       'lumen.adminSettings.onCanChange':
         'Activé (les utilisateurs peuvent le désactiver)',
       'lumen.adminSettings.preview': 'Aperçu',
+      'lumen.adminSettings.requestDefaultsLink':
+        'Paramètres par défaut des demandes',
+      'lumen.adminSettings.requestSettingsHelp':
+        'Ces réglages SeerrNG s’appliquent à tout le monde.',
+      'lumen.adminSettings.requestSettingsSummary':
+        'Règles 4K, saisons partielles et épisodes',
+      'lumen.adminSettings.requestSettingsTitle':
+        'Paramètres de demande de l’instance',
       'lumen.adminSettings.reading': 'Lecture…',
       'lumen.adminSettings.saveFailed': 'Enregistrement impossible',
       'lumen.adminSettings.saveForEveryone': 'Enregistrer pour tout le monde',
@@ -26279,11 +26824,15 @@ export const localeData = [
       'lumen.adminUsers.backToAccount': 'Retour au compte',
       'lumen.adminUsers.cancel': 'Annuler',
       'lumen.adminUsers.createFailure': 'Impossible de créer le compte.',
+      'lumen.adminUsers.createConfirmFailure':
+        'Le serveur n’a pas confirmé la création du compte. Gardez ce formulaire ouvert et réessayez.',
       'lumen.adminUsers.createLocalUser': 'Créer un utilisateur local',
       'lumen.adminUsers.createUser': 'Créer l’utilisateur',
       'lumen.adminUsers.created': '{name} a été créé.',
       'lumen.adminUsers.creating': 'Création…',
       'lumen.adminUsers.deleteFailure': 'Impossible de supprimer le compte.',
+      'lumen.adminUsers.deleteConfirmFailure':
+        'Le serveur n’a pas confirmé la suppression de ce compte. Gardez cette fenêtre ouverte et réessayez.',
       'lumen.adminUsers.deleteTitle': 'Supprimer {name} ?',
       'lumen.adminUsers.deleteUser': 'Supprimer l’utilisateur',
       'lumen.adminUsers.deleteWarning':
@@ -27136,10 +27685,12 @@ export const localeData = [
       'lumen.detail.trailer': 'Bande-annonce',
       'lumen.discover.added': 'Ajouté le {date}',
       'lumen.discover.browseByGenre': 'Parcourir par genre',
+      'lumen.discover.discoverTitles': 'Titres à découvrir',
       'lumen.discover.newOn': 'Nouveautés sur {server}',
       'lumen.discover.noPopularTitles': 'Aucun titre populaire disponible',
       'lumen.discover.popularBooks': 'Livres populaires',
       'lumen.discover.searchVideo': 'Films et séries…',
+      'lumen.discover.shelfLoadFailed': 'Impossible de charger cette section.',
       'lumen.discover.trending': 'Tendances',
       'lumen.discover.trendingThisWeek': 'Tendances de la semaine',
       'lumen.discoveryAccounts.accountsWhat': 'comptes de suivi',
@@ -27267,6 +27818,10 @@ export const localeData = [
       'lumen.error.sessionEnded': 'Votre session a expiré. Reconnectez-vous.',
       'lumen.error.timeout':
         'Le serveur a mis trop de temps à répondre. Réessayez.',
+      'lumen.pageBoundary.body':
+        'Le reste de Lumen fonctionne toujours. Réessayez ou choisissez une autre page.',
+      'lumen.pageBoundary.reload': 'Recharger',
+      'lumen.pageBoundary.title': 'Une erreur s’est produite sur cette page',
       'lumen.followButton.follow': 'Suivre',
       'lumen.followButton.followFutureVolumes': 'Suivre les volumes à venir',
       'lumen.followButton.followNarrator': 'Suivre {name}',
@@ -28142,6 +28697,8 @@ export const localeData = [
         'Paramètres de connexion enregistrés.',
       'lumen.mediaServerConnection.chooseConnection': 'Choisir une connexion',
       'lumen.mediaServerConnection.connection': 'Connexion à {provider}',
+      'lumen.mediaServerConnection.confirmFailure':
+        'Impossible de confirmer les paramètres de connexion enregistrés.',
       'lumen.mediaServerConnection.discover': 'Rechercher les serveurs Plex',
       'lumen.mediaServerConnection.discoverFailed':
         'Impossible de rechercher les serveurs Plex. Réessayez ou saisissez l’adresse manuellement.',
@@ -28549,6 +29106,8 @@ export const localeData = [
         'Un jeton d’accès est configuré. Laissez le champ de remplacement vide pour le conserver.',
       'lumen.notifications.keepPushoverCredentials':
         'Laissez les champs d’identifiants vides pour conserver les identifiants configurés.',
+      'lumen.notifications.loadFailure':
+        'Impossible de charger les paramètres de notification.',
       'lumen.notifications.loading':
         'Chargement des paramètres de notification…',
       'lumen.notifications.loadingBrowserDevices':
@@ -28611,6 +29170,8 @@ export const localeData = [
         'Les demandes futures ne suivront plus cette règle.',
       'lumen.override.deleteFailed':
         'Impossible de supprimer la règle de remplacement des demandes.',
+      'lumen.override.deleteConfirmFailure':
+        'Le serveur n’a pas confirmé la suppression de la règle. Gardez cette fenêtre ouverte et réessayez.',
       'lumen.override.deleteTitle': 'Supprimer la règle de remplacement',
       'lumen.override.destinationChoices': 'choix de destination',
       'lumen.override.destinationLoadError':
@@ -28649,6 +29210,8 @@ export const localeData = [
         'Impossible de charger les règles de remplacement des demandes',
       'lumen.override.saveFailed':
         'Impossible d’enregistrer la règle de remplacement des demandes.',
+      'lumen.override.saveConfirmFailure':
+        'Le serveur n’a pas confirmé l’enregistrement de la règle. Gardez ce formulaire ouvert et réessayez.',
       'lumen.override.saveRule': 'Enregistrer la règle',
       'lumen.override.savedValue': 'Valeur enregistrée ({value})',
       'lumen.override.searchKeywords': 'Rechercher des mots-clés',
@@ -28984,7 +29547,7 @@ export const localeData = [
       'lumen.search.scope.tv': 'Séries',
       'lumen.search.searchEverything': 'Tout rechercher',
       'lumen.search.searchIn': 'Rechercher dans',
-      'lumen.search.searching': 'Searching…',
+      'lumen.search.searching': 'Recherche en cours…',
       'lumen.search.section.albums': 'Albums',
       'lumen.search.section.artists': 'Artistes',
       'lumen.search.section.audiobooks': 'Livres audio',
@@ -29024,7 +29587,7 @@ export const localeData = [
       'lumen.search.sortGroup.title': 'Titre',
       'lumen.search.sortGroup.writer': 'Scénariste',
       'lumen.search.sortResults': 'Trier les résultats',
-      'lumen.search.trending': 'Trending this week',
+      'lumen.search.trending': 'Tendances de la semaine',
       'lumen.search.tryFewerWords':
         'Essayez avec moins de mots, un auteur ou un narrateur.',
       'lumen.search.viewAllSeries': 'Voir tous les résultats de séries',
@@ -29112,6 +29675,8 @@ export const localeData = [
         'Supprimer {service} comme destination des demandes ?',
       'lumen.servarr.removeFallback':
         'Impossible de supprimer le service {service}.',
+      'lumen.servarr.removeConfirmFailure':
+        'Le serveur n’a pas confirmé la suppression de ce service {service}. Gardez ce formulaire ouvert et réessayez.',
       'lumen.servarr.removeService': 'Supprimer le service',
       'lumen.servarr.requestButtonLabel': 'Libellé du bouton de demande',
       'lumen.servarr.requestTags': 'Étiquettes des demandes',
@@ -29119,6 +29684,8 @@ export const localeData = [
       'lumen.servarr.rootFolder': 'Dossier racine',
       'lumen.servarr.runMetadataDiagnostic':
         'Lancer le diagnostic des métadonnées',
+      'lumen.servarr.saveConfirmFailure':
+        'Le serveur n’a pas confirmé l’enregistrement des paramètres {service}. Gardez ce formulaire ouvert et réessayez.',
       'lumen.servarr.saveFallback':
         'Impossible d’enregistrer le service {service}.',
       'lumen.servarr.saveService': 'Enregistrer {service}',
@@ -30216,6 +30783,7 @@ export const localeData = [
       'lumen.adult.bookmarkedService': 'Serveur enregistré',
       'lumen.adult.serverFilter': 'Serveur',
       'lumen.adult.allServices': 'Tous',
+      'lumen.adult.sceneLoadFailed': 'Impossible de charger cette scène',
       'lumen.comics.title': 'BD et mangas',
       'lumen.comics.guidance':
         'Demandez une série de mangas ou de bandes dessinées. Les nouveaux volumes et numéros arrivent à leur sortie; le manga utilise son édition anglaise sauf si vous en choisissez une autre.',
@@ -31007,6 +31575,223 @@ export const localeData = [
       'lumen.tvAvailability.source4k': '{source} 4K',
       'lumen.tvAvailability.sharedHd': 'HD partagé',
       'lumen.tvAvailability.shared4k': '4K partagé',
+      'lumen.quickRequest.chooseDestination': 'Choisissez sa destination',
+      'lumen.quickRequest.chooseQuality': 'Choisissez la qualité',
+      'lumen.quickRequest.entireSeries': 'Série complète',
+      'lumen.quickRequest.quotaApproval':
+        'Cette demande dépasse votre quota. Vous pouvez demander à un gestionnaire des demandes de l’approuver.',
+      'lumen.quickRequest.requestAnyway': 'Demander quand même',
+      'lumen.quickRequest.requestApprovalAnyway':
+        'Demander quand même l’approbation',
+      'lumen.quickRequest.title': 'Demander {title}',
+      'lumen.gameContent.title': 'Contenu du jeu',
+      'lumen.gameContent.contentToRequest': 'Contenu à demander',
+      'lumen.gameContent.baseGame': 'Jeu de base',
+      'lumen.gameContent.selectedAddons': 'Extensions sélectionnées',
+      'lumen.gameContent.completeEdition': 'Édition complète',
+      'lumen.gameContent.inLibrary': 'Dans la bibliothèque',
+      'lumen.gameContent.storyContent': 'Contenu scénaristique',
+      'lumen.gameContent.nonStoryContent': 'Contenu sans histoire',
+      'lumen.gameContent.contentTypeUnknown': 'Type de contenu inconnu',
+      'lumen.gameContent.itemsMissing':
+        '{count} éléments manquent dans votre bibliothèque',
+      'lumen.gameContent.editionContentsUnknown':
+        'Le contenu de cette édition est inconnu.',
+      'lumen.cards.preferenceDescription':
+        'Afficher les titres sous les affiches de films, séries, musique et livres. Les paramètres du compte permettent de choisir pour chaque type.',
+      'lumen.requestEdit.title': 'Modifier la demande pour {title}',
+      'lumen.requestEdit.askedBy': 'Demandée par {name}',
+      'lumen.requestEdit.seasons': 'Saisons',
+      'lumen.requestEdit.requestedEpisodes': '{count} épisodes demandés',
+      'lumen.requestEdit.episodeCount': '{count} épisodes',
+      'lumen.requestEdit.approve': 'Approuver',
+      'lumen.requestEdit.save': 'Enregistrer',
+      'lumen.requestEdit.saveAndRetry': 'Enregistrer et réessayer',
+      'lumen.requestEdit.approved': 'Demande approuvée',
+      'lumen.requestEdit.changedAndSent': 'Demande modifiée et renvoyée',
+      'lumen.requestEdit.changed': 'Demande modifiée',
+      'lumen.requestEdit.couldNotChange': 'Impossible de modifier la demande',
+      'lumen.liveTv.airings': 'Diffusions TV en direct',
+      'lumen.liveTv.checkingGuide': 'Vérification du guide…',
+      'lumen.liveTv.unavailable': 'La TV en direct est indisponible.',
+      'lumen.liveTv.guideNotReady':
+        'Le guide TV en direct n’est pas encore prêt.',
+      'lumen.liveTv.checkAgain': 'Vérifier à nouveau',
+      'lumen.liveTv.noAirings':
+        'Aucune diffusion à venir ne correspond à ce titre.',
+      'lumen.liveTv.viewOnly':
+        'Votre compte peut consulter les diffusions, mais pas demander d’enregistrement.',
+      'lumen.liveTv.seriesSubmitted': 'Demande de série envoyée',
+      'lumen.liveTv.recordSeries': 'Enregistrer la série',
+      'lumen.liveTv.seasonEpisode': 'Saison {season}, épisode {episode}',
+      'lumen.liveTv.requestSubmitted': 'Demande envoyée',
+      'lumen.liveTv.recordAiring': 'Enregistrer la diffusion',
+      'lumen.liveTv.viewRecordings': 'Voir les enregistrements',
+      'lumen.liveTv.findAirings': 'Rechercher les diffusions TV en direct',
+      'lumen.liveTv.recordingPending':
+        'Enregistrement demandé pour approbation.',
+      'lumen.liveTv.recordingScheduled': 'Enregistrement programmé.',
+      'lumen.liveTv.recordingFailed':
+        'Impossible de demander l’enregistrement.',
+      'lumen.continuation.title': 'Continuités manga et roman',
+      'lumen.continuation.hideSources': 'Masquer les sources',
+      'lumen.continuation.findSources': 'Rechercher des sources',
+      'lumen.continuation.season': 'Saison',
+      'lumen.continuation.seasonLabel': 'Saison de continuation',
+      'lumen.continuation.thisEntry': 'Cette fiche d’anime',
+      'lumen.continuation.seasonNumber': 'Saison {number}',
+      'lumen.continuation.sourceMaterial': 'source d’origine',
+      'lumen.continuation.searching': 'Recherche de la source d’origine…',
+      'lumen.continuation.noSource':
+        'Aucune source d’origine trouvée pour cette saison.',
+      'lumen.continuation.ordered':
+        'La correspondance des saisons repose sur l’ordre de sortie.',
+      'lumen.continuation.novel': 'Roman',
+      'lumen.continuation.manga': 'Manga',
+      'lumen.continuation.confidence': 'Correspondance {confidence}',
+      'lumen.continuation.confidence.high': 'élevée',
+      'lumen.continuation.confidence.moderate': 'moyenne',
+      'lumen.continuation.confidence.low': 'faible',
+      'lumen.continuation.seasonEndsAt': 'La saison se termine à {position}.',
+      'lumen.continuation.seasonEndUnknown':
+        'La position de fin de saison est inconnue.',
+      'lumen.continuation.estimated': 'Suite estimée',
+      'lumen.continuation.continueAt': 'Reprendre à',
+      'lumen.continuation.estimateHint':
+        'Estimation calculée depuis la fin de la saison. Le catalogue ne précise pas le point de départ suivant.',
+      'lumen.continuation.volumeUnconfirmed':
+        'Le volume de continuation n’est pas confirmé.',
+      'lumen.continuation.translationPending': 'Traduction en attente',
+      'lumen.continuation.available': 'Disponible',
+      'lumen.continuation.inLanguage': 'en {language}',
+      'lumen.continuation.evidence': 'Éléments de correspondance',
+      'lumen.continuation.searchFor': 'Rechercher {title}',
+      'lumen.continuation.volume': 'Tome {number}',
+      'lumen.continuation.chapter': 'Chapitre {number}',
+      'lumen.continuation.target.start': 'Commencer depuis le début',
+      'lumen.continuation.target.continuation':
+        'Ouvrir le volume de continuation',
+      'lumen.continuation.target.series': 'Ouvrir la source',
+      'lumen.managedPermissions.adminWarning':
+        'Les administrateurs disposent de toutes les autorisations.',
+      'lumen.managedPermissions.ageGate': 'Limite d’âge',
+      'lumen.managedPermissions.ageGate.default':
+        'Valeur par défaut du serveur',
+      'lumen.managedPermissions.ageGate.restricted': 'Restreint',
+      'lumen.managedPermissions.ageGate.unrestricted': 'Non restreint',
+      'lumen.managedPermissions.confirmBody':
+        'Les nouvelles autorisations prennent effet immédiatement.',
+      'lumen.managedPermissions.confirmTitle':
+        'Enregistrer les autorisations de {name} ?',
+      'lumen.managedPermissions.delegationWarning':
+        'Ce compte possède des autorisations en dehors de votre accès délégué.',
+      'lumen.managedPermissions.destinationsLabel': 'Destinations des demandes',
+      'lumen.managedPermissions.goBack': 'Retour',
+      'lumen.managedPermissions.groupLabel': 'Autorisations explicites',
+      'lumen.managedPermissions.loadFailure':
+        'Impossible de charger les autorisations',
+      'lumen.managedPermissions.loading': 'Chargement des autorisations…',
+      'lumen.managedPermissions.radarrLoadFailure':
+        'Impossible de charger les destinations Radarr',
+      'lumen.managedPermissions.retry': 'Réessayer',
+      'lumen.managedPermissions.save': 'Enregistrer les autorisations',
+      'lumen.managedPermissions.saveFailure':
+        'Impossible d’enregistrer les autorisations.',
+      'lumen.managedPermissions.saved': 'Autorisations enregistrées.',
+      'lumen.managedPermissions.sonarrLoadFailure':
+        'Impossible de charger les destinations Sonarr',
+      'lumen.managedPermissions.title': 'Autorisations explicites',
+      'lumen.permissions.group.4k': '4K',
+      'lumen.permissions.group.administration': 'Gestion',
+      'lumen.permissions.group.auto-approve': 'Approbation automatique',
+      'lumen.permissions.group.auto-request-from-watchlists':
+        'Demandes automatiques depuis les listes de suivi',
+      'lumen.permissions.group.issues-and-visibility':
+        'Signalements et visibilité',
+      'lumen.permissions.group.other': 'Autres',
+      'lumen.permissions.group.requests': 'Demandes',
+      'lumen.accessibility.chooseEdition': 'Choisir une édition',
+      'lumen.accessibility.chooseSeasons': 'Choisir les saisons',
+      'lumen.accessibility.browseGenre': 'Parcourir {name}',
+      'lumen.accessibility.browseMoviesFromCompany':
+        'Parcourir les films de {name}',
+      'lumen.accessibility.browseSeriesFromCompany':
+        'Parcourir les séries de {name}',
+      'lumen.accessibility.loading': 'Chargement',
+      'lumen.accessibility.read': 'Lire',
+      'lumen.accessibility.readInKavita': 'Lire {title} dans Kavita',
+      'lumen.accessibility.requestAnotherNarrator':
+        'Demander un autre narrateur',
+      'lumen.accessibility.scrollBack': 'Faire défiler vers l’arrière',
+      'lumen.accessibility.scrollForward': 'Faire défiler vers l’avant',
+      'lumen.collectionDetail.added':
+        'Collection ajoutée à la liste de blocage.',
+      'lumen.collectionDetail.blockedCount':
+        '{blocked} sur {total} dans la liste de blocage',
+      'lumen.collectionDetail.blocklist': 'Bloquer la collection',
+      'lumen.collectionDetail.blocklistExplanation':
+        'Les nouvelles demandes pour tous les films de cette collection seront bloquées.',
+      'lumen.collectionDetail.changeUnconfirmed':
+        'Impossible de confirmer la modification. Vérifiez la collection avant de réessayer.',
+      'lumen.collectionDetail.checkFailure':
+        'Impossible de vérifier le serveur multimédia.',
+      'lumen.collectionDetail.checkingLibraries':
+        'Vérification des bibliothèques du serveur multimédia…',
+      'lumen.collectionDetail.confirmBlocklist': 'Bloquer cette collection ?',
+      'lumen.collectionDetail.confirmUnblock': 'Débloquer cette collection ?',
+      'lumen.collectionDetail.item': 'cette collection',
+      'lumen.collectionDetail.loadFailure':
+        'Impossible de charger cette collection',
+      'lumen.collectionDetail.loading': 'Chargement de la collection…',
+      'lumen.collectionDetail.mediaServerCollection':
+        'Collection du serveur multimédia',
+      'lumen.collectionDetail.mediaServerLibraries':
+        'bibliothèques du serveur multimédia',
+      'lumen.collectionDetail.movieCount': '{count} films',
+      'lumen.collectionDetail.movies': 'Films',
+      'lumen.collectionDetail.noMovies': 'Aucun film répertorié.',
+      'lumen.collectionDetail.notFound': 'Collection introuvable.',
+      'lumen.collectionDetail.oneMovie': '{count} film',
+      'lumen.collectionDetail.removed':
+        'Collection retirée de la liste de blocage.',
+      'lumen.collectionDetail.retry': 'Réessayer',
+      'lumen.collectionDetail.serverUnsupported':
+        'Ce serveur multimédia ne prend pas en charge les modifications de collection.',
+      'lumen.collectionDetail.unblock': 'Débloquer la collection',
+      'lumen.collectionDetail.unblockExplanation':
+        'Les entrées de la liste de blocage seront supprimées pour tous les films de cette collection, y compris ceux bloqués individuellement.',
+      'lumen.collectionDetail.verifyFailure':
+        'Impossible de vérifier cette collection sur le serveur multimédia.',
+      'lumen.collectionDetail.watchTrailer': 'Regarder la bande-annonce',
+      'lumen.requestFiles.audiobook': 'Livre audio',
+      'lumen.requestFiles.availableRequests': 'demandes disponibles',
+      'lumen.requestFiles.checking':
+        'Vérification des fichiers téléchargeables…',
+      'lumen.requestFiles.checkingRequests': 'Vérification de vos demandes…',
+      'lumen.requestFiles.close': 'Fermer',
+      'lumen.requestFiles.dialogLabel':
+        'Télécharger les fichiers de la demande',
+      'lumen.requestFiles.downloadAudiobook': 'Télécharger le livre audio',
+      'lumen.requestFiles.downloadEbook': 'Télécharger le livre numérique',
+      'lumen.requestFiles.ebook': 'Livre numérique',
+      'lumen.requestFiles.item': 'fichiers de la demande',
+      'lumen.requestFiles.loadFailure':
+        'Impossible de charger les fichiers de la demande',
+      'lumen.requestFiles.noAvailableRequests':
+        'Aucune demande disponible pour cette sélection.',
+      'lumen.requestFiles.none': 'Aucun fichier téléchargeable trouvé.',
+      'lumen.requestFiles.request': 'Demande',
+      'lumen.requestFiles.requestNumber': 'Demande nº {id}',
+      'lumen.requestFiles.requestsLoadFailure':
+        'Impossible de charger les demandes disponibles',
+      'lumen.requestFiles.retry': 'Vérifier à nouveau',
+      'lumen.requestFiles.sourcesFailed':
+        'Certaines sources n’ont pas pu être vérifiées.',
+      'lumen.requestFiles.title': 'Télécharger les fichiers',
+      'lumen.detail.serverLoadFailed':
+        'Impossible de charger les serveurs de demande.',
+      'lumen.detail.serverSettingsFailed':
+        'Impossible de charger les options de demande de {service}. Vérifiez le service et réessayez.',
     },
   },
   {
@@ -31021,6 +31806,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Serije',
       'components.Layout.Sidebar.issues': 'Problemi',
       'components.Layout.Sidebar.requests': 'Zahtjevi',
+      'components.Layout.Sidebar.users': 'Korisnici',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.NotificationTypeSelector.adminissuecommentDescription':
         'Primite obavijest kada drugi korisnici komentiraju probleme.',
@@ -31451,6 +32237,12 @@ export const localeData = [
       'i18n.previous': 'Prethodno',
       'i18n.usersettings': 'Korisničke postavke',
       'components.IssueModal.issueOther': 'Ostalo',
+      'components.RequestModal.requesterror':
+        'Dogodila se greška prilikom slanja zahtjeva.',
+      'i18n.cancel': 'Odustani',
+      'i18n.request': 'Zahtjev',
+      'i18n.request4k': 'Zatraži u 4K',
+      'i18n.requesting': 'Zahtijevanje …',
     },
   },
   {
@@ -31464,6 +32256,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'סדרות',
       'components.Layout.Sidebar.issues': 'מקרים',
       'components.Layout.Sidebar.requests': 'בקשות',
+      'components.Layout.Sidebar.users': 'משתמשים',
       'components.Layout.UserDropdown.myprofile': 'פרופיל',
       'components.MovieDetails.addtowatchlist': 'הוספה לרשימת הצפייה',
       'components.MovieDetails.removefromwatchlist': 'הסרה מרשימת הצפייה',
@@ -31697,6 +32490,10 @@ export const localeData = [
       'i18n.previous': 'קודם',
       'i18n.usersettings': 'הגדרות משתמש',
       'components.IssueModal.issueOther': 'אחר',
+      'components.RequestModal.requesterror': 'משהו השתבש בזמן שליחת הבקשה.',
+      'i18n.request': 'בקשה',
+      'i18n.request4k': 'בקשה ב-4K',
+      'i18n.requesting': 'מבקש…',
     },
   },
   {
@@ -31855,6 +32652,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'अनुरोध',
       'components.Layout.Sidebar.share': 'साझा करें और पहचानें',
       'components.Layout.Sidebar.swipe': 'स्वाइप',
+      'components.Layout.Sidebar.users': 'उपयोगकर्ता सूची',
       'components.Layout.UserDropdown.myprofile': 'प्रोफ़ाइल',
       'components.LiveTv.FollowedTeams.choose': 'एक टीम चुनें',
       'components.LiveTv.FollowedTeams.description':
@@ -33413,6 +34211,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'गलत शीर्षक या मेटाडाटा',
       'components.IssueModal.issueOther': 'अन्य',
+      'components.RequestModal.quality': 'गुणवत्ता',
+      'components.RequestModal.requestQuotaApproval': 'अनुमोदन का अनुरोध करें',
+      'components.RequestModal.requesterror':
+        'अनुरोध प्रस्तुत करते समय कुछ गलत हो गया।',
+      'i18n.cancel': 'रद्द करें',
+      'i18n.request': 'अनुरोध करें',
+      'i18n.request4k': '4K में अनुरोध करें',
+      'i18n.requesting': 'अनुरोध किया जा रहा है…',
     },
   },
   {
@@ -33428,6 +34234,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Sorozatok',
       'components.Layout.Sidebar.issues': 'Problémák',
       'components.Layout.Sidebar.requests': 'Kérések',
+      'components.Layout.Sidebar.users': 'Felhasználók',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.Login.JellyfinQuickConnectModal.cancel': 'Mégsem',
       'components.MovieDetails.addtowatchlist': 'Hozzáadás figyelőlistához',
@@ -34073,6 +34880,12 @@ export const localeData = [
       'i18n.previous': 'Előző',
       'i18n.usersettings': 'Felhasználói beállítások',
       'components.IssueModal.issueOther': 'Egyéb',
+      'components.RequestModal.requesterror':
+        'Hiba történt a kérés beküldése közben.',
+      'i18n.cancel': 'Mégse',
+      'i18n.request': 'Kérés',
+      'i18n.request4k': 'Kérés 4K-ban',
+      'i18n.requesting': 'Kérés folyamatban…',
     },
   },
   {
@@ -34228,6 +35041,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'Permintaan',
       'components.Layout.Sidebar.share': 'Bagikan & Identifikasi',
       'components.Layout.Sidebar.swipe': 'Geser',
+      'components.Layout.Sidebar.users': 'Daftar Pengguna',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.LiveTv.FollowedTeams.choose': 'Pilih sebuah tim',
       'components.LiveTv.FollowedTeams.description':
@@ -35811,6 +36625,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'Judul atau metadata salah',
       'components.IssueModal.issueOther': 'Lainnya',
+      'components.RequestModal.quality': 'Kualitas',
+      'components.RequestModal.requestQuotaApproval': 'Minta persetujuan',
+      'components.RequestModal.requesterror':
+        'Terjadi kesalahan saat mengirim permintaan.',
+      'i18n.cancel': 'Batal',
+      'i18n.request': 'Minta',
+      'i18n.request4k': 'Minta dalam 4K',
+      'i18n.requesting': 'Meminta…',
     },
   },
   {
@@ -35826,6 +36648,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Serie',
       'components.Layout.Sidebar.issues': 'Segnalazioni',
       'components.Layout.Sidebar.requests': 'Richieste',
+      'components.Layout.Sidebar.users': 'Utenti',
       'components.Layout.UserDropdown.myprofile': 'Profilo',
       'components.MovieDetails.addtowatchlist':
         'Aggiungi alla lista di visione',
@@ -36460,6 +37283,12 @@ export const localeData = [
       'i18n.previous': 'Precedente',
       'i18n.usersettings': 'Impostazioni utente',
       'components.IssueModal.issueOther': 'Altro',
+      'components.RequestModal.requesterror':
+        "Qualcosa è andato storto durante l'invio della richiesta.",
+      'i18n.cancel': 'Annulla',
+      'i18n.request': 'Richiedi',
+      'i18n.request4k': 'Richiedi in 4K',
+      'i18n.requesting': 'Richiesta in corso…',
     },
   },
   {
@@ -36623,6 +37452,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'リクエスト',
       'components.Layout.Sidebar.share': '共有 & 識別',
       'components.Layout.Sidebar.swipe': 'スワイプ',
+      'components.Layout.Sidebar.users': 'ユーザー',
       'components.Layout.UserDropdown.myprofile': 'プロフィール',
       'components.LiveTv.FollowedTeams.choose': 'チームを選ぶ',
       'components.LiveTv.FollowedTeams.description':
@@ -38198,6 +39028,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'タイトルやメタデータの誤り',
       'components.IssueModal.issueOther': 'その他',
+      'components.RequestModal.quality': '品質',
+      'components.RequestModal.requestQuotaApproval': '承認を申請',
+      'components.RequestModal.requesterror':
+        'リクエストの送信中に問題が発生しました。',
+      'i18n.cancel': 'キャンセル',
+      'i18n.request': 'リクエスト',
+      'i18n.request4k': '4K をリクエスト',
+      'i18n.requesting': 'リクエスト中…',
     },
   },
   {
@@ -38355,6 +39193,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': '요청',
       'components.Layout.Sidebar.share': '공유 & 식별',
       'components.Layout.Sidebar.swipe': '스와이프',
+      'components.Layout.Sidebar.users': '사용자',
       'components.Layout.UserDropdown.myprofile': '프로필',
       'components.LiveTv.FollowedTeams.choose': '팀 선택',
       'components.LiveTv.FollowedTeams.description':
@@ -39880,6 +40719,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         '잘못된 제목 또는 메타데이터',
       'components.IssueModal.issueOther': '기타',
+      'components.RequestModal.quality': '품질',
+      'components.RequestModal.requestQuotaApproval': '승인 요청',
+      'components.RequestModal.requesterror':
+        '요청을 제출하는 동안 문제가 발생했습니다.',
+      'i18n.cancel': '취소',
+      'i18n.request': '요청',
+      'i18n.request4k': '4K로 요청',
+      'i18n.requesting': '요청 중…',
     },
   },
   {
@@ -39899,6 +40746,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Serialai',
       'components.Layout.Sidebar.issues': 'Problemos',
       'components.Layout.Sidebar.requests': 'Rezervacijos',
+      'components.Layout.Sidebar.users': 'Vartotojai',
       'components.Layout.UserDropdown.myprofile': 'Profilis',
       'components.NotificationTypeSelector.adminissuecommentDescription':
         'Gauti pranešimus kai kiti vartotojai komentuoja problemą.',
@@ -40038,6 +40886,12 @@ export const localeData = [
       'i18n.previous': 'Ankstesnis',
       'i18n.usersettings': 'Vartotojo nustatymai',
       'components.IssueModal.issueOther': 'Kita',
+      'components.RequestModal.requesterror':
+        'Kažkas nepavyko teikiant rezervaciją.',
+      'i18n.cancel': 'Atšaukti',
+      'i18n.request': 'Rezervuoti',
+      'i18n.request4k': 'Rezervuoti 4K raiška',
+      'i18n.requesting': 'Rezervuojama…',
     },
   },
   {
@@ -40052,6 +40906,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Serier',
       'components.Layout.Sidebar.issues': 'Avvik',
       'components.Layout.Sidebar.requests': 'Forespørsler',
+      'components.Layout.Sidebar.users': 'Brukere',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.MovieDetails.addtowatchlist': 'Legg til i Visningsliste',
       'components.MovieDetails.removefromwatchlist': 'Fjern fra Visningsliste',
@@ -40462,6 +41317,12 @@ export const localeData = [
       'i18n.previous': 'Forrige',
       'i18n.usersettings': 'Bruker-instillinger',
       'components.IssueModal.issueOther': 'Annet',
+      'components.RequestModal.requesterror':
+        'Noe gikk galt ved sending av forespørsel.',
+      'i18n.cancel': 'Avbryt',
+      'i18n.request': 'Forespør',
+      'i18n.request4k': 'Forespør i 4K',
+      'i18n.requesting': 'Forespør…',
     },
   },
   {
@@ -40477,6 +41338,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Series',
       'components.Layout.Sidebar.issues': 'Problemen',
       'components.Layout.Sidebar.requests': 'Aanvragen',
+      'components.Layout.Sidebar.users': 'Gebruikers',
       'components.Layout.UserDropdown.myprofile': 'Profiel',
       'components.Login.JellyfinQuickConnectModal.cancel': 'Annuleren',
       'components.MovieDetails.addtowatchlist': 'Toevoegen aan kijklijst',
@@ -41125,6 +41987,12 @@ export const localeData = [
       'i18n.previous': 'Vorige',
       'i18n.usersettings': 'Gebruikersinstellingen',
       'components.IssueModal.issueOther': 'Anders',
+      'components.RequestModal.requesterror':
+        'Er ging iets mis bij het aanvragen.',
+      'i18n.cancel': 'Annuleren',
+      'i18n.request': 'Aanvragen',
+      'i18n.request4k': 'Aanvragen in 4K',
+      'i18n.requesting': 'Aanvragen…',
     },
   },
   {
@@ -41140,6 +42008,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Seriale',
       'components.Layout.Sidebar.issues': 'Problemy',
       'components.Layout.Sidebar.requests': 'Prośby',
+      'components.Layout.Sidebar.users': 'Użytkownicy',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.Login.JellyfinQuickConnectModal.cancel': 'Anuluj',
       'components.MovieDetails.addtowatchlist': 'Dodaj do listy Do obejrzenia',
@@ -41787,6 +42656,12 @@ export const localeData = [
       'i18n.previous': 'Poprzedni',
       'i18n.usersettings': 'Ustawienia użytkownika',
       'components.IssueModal.issueOther': 'Inny',
+      'components.RequestModal.requesterror':
+        'Coś poszło nie tak podczas przesyłania prośby.',
+      'i18n.cancel': 'Anuluj',
+      'i18n.request': 'Poproś',
+      'i18n.request4k': 'Poproś o 4K',
+      'i18n.requesting': 'Prośba…',
     },
   },
   {
@@ -41951,6 +42826,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'Solicitações',
       'components.Layout.Sidebar.share': 'Compartilhar & Identificar',
       'components.Layout.Sidebar.swipe': 'Deslizar',
+      'components.Layout.Sidebar.users': 'Usuários',
       'components.Layout.UserDropdown.myprofile': 'Perfil',
       'components.LiveTv.FollowedTeams.choose': 'Escolha uma equipe.',
       'components.LiveTv.FollowedTeams.description':
@@ -43558,6 +44434,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'Título ou metadados incorretos',
       'components.IssueModal.issueOther': 'Outro',
+      'components.RequestModal.quality': 'Qualidade',
+      'components.RequestModal.requestQuotaApproval': 'Solicitar aprovação',
+      'components.RequestModal.requesterror':
+        'Algo deu errado ao enviar a solicitação.',
+      'i18n.cancel': 'Cancelar',
+      'i18n.request': 'Solicitar',
+      'i18n.request4k': 'Solicitar em 4K',
+      'i18n.requesting': 'Solicitando…',
     },
   },
   {
@@ -43573,6 +44457,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Séries',
       'components.Layout.Sidebar.issues': 'Problemas',
       'components.Layout.Sidebar.requests': 'Pedidos',
+      'components.Layout.Sidebar.users': 'Utilizadores',
       'components.Layout.UserDropdown.myprofile': 'Perfil',
       'components.MovieDetails.addtowatchlist': 'Adicionar à lista para ver',
       'components.MovieDetails.removefromwatchlist':
@@ -44194,6 +45079,12 @@ export const localeData = [
       'i18n.previous': 'Anterior',
       'i18n.usersettings': 'Utilizadores',
       'components.IssueModal.issueOther': 'Outros',
+      'components.RequestModal.requesterror':
+        'Ocorreu um erro ao submeter o pedido.',
+      'i18n.cancel': 'Cancelar',
+      'i18n.request': 'Pedir',
+      'i18n.request4k': 'Pedir em 4K',
+      'i18n.requesting': 'A Pedir…',
     },
   },
   {
@@ -44209,6 +45100,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Seriale',
       'components.Layout.Sidebar.issues': 'Probleme',
       'components.Layout.Sidebar.requests': 'Solicitări',
+      'components.Layout.Sidebar.users': 'Utilizatori',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.MovieDetails.addtowatchlist': 'Adăugați la lista de favorite',
       'components.MovieDetails.removefromwatchlist':
@@ -44536,6 +45428,11 @@ export const localeData = [
       'i18n.previous': 'Precedent',
       'i18n.usersettings': 'Setări utilizator',
       'components.IssueModal.issueOther': 'Altele',
+      'components.RequestModal.requesterror':
+        'Ceva nu a funcționat în cursul trimiterii solicitării.',
+      'i18n.request': 'Cere',
+      'i18n.request4k': 'Cere în 4K',
+      'i18n.requesting': 'Se trimite cererea…',
     },
   },
   {
@@ -44551,6 +45448,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Сериалы',
       'components.Layout.Sidebar.issues': 'Проблемы',
       'components.Layout.Sidebar.requests': 'Запросы',
+      'components.Layout.Sidebar.users': 'Пользователи',
       'components.Layout.UserDropdown.myprofile': 'Профиль',
       'components.Login.JellyfinQuickConnectModal.cancel': 'Отмена',
       'components.MovieDetails.addtowatchlist': 'Добавить в список просмотра',
@@ -45206,6 +46104,12 @@ export const localeData = [
       'i18n.previous': 'Предыдущая',
       'i18n.usersettings': 'Настройки пользователя',
       'components.IssueModal.issueOther': 'Другое',
+      'components.RequestModal.requesterror':
+        'Что-то пошло не так при отправке запроса.',
+      'i18n.cancel': 'Отмена',
+      'i18n.request': 'Запросить',
+      'i18n.request4k': 'Запросить в 4К',
+      'i18n.requesting': 'Запрос…',
     },
   },
   {
@@ -45218,6 +46122,7 @@ export const localeData = [
       'components.IssueDetails.allepisodes': 'Të gjithë Episodet',
       'components.Layout.Sidebar.issues': 'Problemet',
       'components.Layout.Sidebar.requests': 'Kërkesat',
+      'components.Layout.Sidebar.users': 'Përdoruesit',
       'components.Layout.UserDropdown.myprofile': 'Profili',
       'components.NotificationTypeSelector.adminissuecommentDescription':
         'Lajmërohu kur përdoruesit e tjerë komentojnë mbi problemet.',
@@ -45623,6 +46528,12 @@ export const localeData = [
       'i18n.previous': 'Para',
       'i18n.usersettings': 'Cilësimet e përdoruesit',
       'components.IssueModal.issueOther': 'Të tjera',
+      'components.RequestModal.requesterror':
+        'Diçka shkoi keq duke paraqitur kërkesën.',
+      'i18n.cancel': 'Anulo',
+      'i18n.request': 'Kërkesë',
+      'i18n.request4k': 'Kërkesë në 4K',
+      'i18n.requesting': 'Duke kërkuar…',
     },
   },
   {
@@ -45635,6 +46546,7 @@ export const localeData = [
       'components.IssueDetails.allepisodes': 'Sve epizode',
       'components.Layout.Sidebar.issues': 'Problemi',
       'components.Layout.Sidebar.requests': 'Zahtevi',
+      'components.Layout.Sidebar.users': 'Korisnici',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.NotificationTypeSelector.mediaapproved': 'Zahtev je odobren',
       'components.NotificationTypeSelector.mediaavailable': 'Zahtev dostupan',
@@ -45790,6 +46702,10 @@ export const localeData = [
       'i18n.previous': 'Prethodni',
       'i18n.usersettings': 'Korisnička podešavanja',
       'components.IssueModal.issueOther': 'Ostalo',
+      'i18n.cancel': 'Poništi',
+      'i18n.request': 'Zahtev',
+      'i18n.request4k': 'Zahtevaj u 4K',
+      'i18n.requesting': 'Zahteva se…',
     },
   },
   {
@@ -45805,6 +46721,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Serier',
       'components.Layout.Sidebar.issues': 'Ärenden',
       'components.Layout.Sidebar.requests': 'Förfrågningar',
+      'components.Layout.Sidebar.users': 'Användare',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.Login.JellyfinQuickConnectModal.cancel': 'Avbryt',
       'components.MovieDetails.addtowatchlist': 'Lägg till i bevakningslistan',
@@ -46449,6 +47366,12 @@ export const localeData = [
       'i18n.previous': 'Föregående',
       'i18n.usersettings': 'Användarinställningar',
       'components.IssueModal.issueOther': 'Övrigt',
+      'components.RequestModal.requesterror':
+        'Något gick fel när förfrågan skickades.',
+      'i18n.cancel': 'Avbryt',
+      'i18n.request': 'Begär',
+      'i18n.request4k': 'Begär i 4K',
+      'i18n.requesting': 'Begär…',
     },
   },
   {
@@ -46464,6 +47387,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Diziler',
       'components.Layout.Sidebar.issues': 'Sorunlar',
       'components.Layout.Sidebar.requests': 'Talepler',
+      'components.Layout.Sidebar.users': 'Kullanıcılar',
       'components.Layout.UserDropdown.myprofile': 'Profil',
       'components.MovieDetails.addtowatchlist': 'İzleme Listesine Ekle',
       'components.MovieDetails.removefromwatchlist':
@@ -47097,6 +48021,12 @@ export const localeData = [
       'i18n.previous': 'Önceki',
       'i18n.usersettings': 'Kullanıcı Ayarları',
       'components.IssueModal.issueOther': 'Diğer',
+      'components.RequestModal.requesterror':
+        'Talep gönderilirken bir sorun oluştu.',
+      'i18n.cancel': 'İptal',
+      'i18n.request': 'Talep Et',
+      'i18n.request4k': '4K Olarak Talep Et',
+      'i18n.requesting': 'Talep ediliyor…',
     },
   },
   {
@@ -47111,6 +48041,7 @@ export const localeData = [
       'components.Layout.Sidebar.browsetv': 'Серіали',
       'components.Layout.Sidebar.issues': 'Проблеми',
       'components.Layout.Sidebar.requests': 'Запити',
+      'components.Layout.Sidebar.users': 'Користувачі',
       'components.Layout.UserDropdown.myprofile': 'Профіль',
       'components.MovieDetails.addtowatchlist': 'Додати до списку перегляду',
       'components.MovieDetails.removefromwatchlist':
@@ -47713,6 +48644,12 @@ export const localeData = [
       'i18n.previous': 'Попередня',
       'i18n.usersettings': 'Налаштування користувача',
       'components.IssueModal.issueOther': 'Інше',
+      'components.RequestModal.requesterror':
+        'Щось пішло не так під час надсилання запиту.',
+      'i18n.cancel': 'Скасувати',
+      'i18n.request': 'Запит',
+      'i18n.request4k': 'Запит у 4K',
+      'i18n.requesting': 'Запит…',
     },
   },
   {
@@ -47857,6 +48794,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': '请求',
       'components.Layout.Sidebar.share': '分享与识别',
       'components.Layout.Sidebar.swipe': '滑动',
+      'components.Layout.Sidebar.users': '用户',
       'components.Layout.UserDropdown.myprofile': '个人资料',
       'components.LiveTv.FollowedTeams.choose': '选择球队',
       'components.LiveTv.FollowedTeams.description':
@@ -49326,6 +50264,13 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         '标题或元数据不正确',
       'components.IssueModal.issueOther': '其他',
+      'components.RequestModal.quality': '质量',
+      'components.RequestModal.requestQuotaApproval': '请求批准',
+      'components.RequestModal.requesterror': '提交请求中出了点问题。',
+      'i18n.cancel': '取消',
+      'i18n.request': '提交请求',
+      'i18n.request4k': '提交 4K 请求',
+      'i18n.requesting': '提交请求中…',
     },
   },
   {
@@ -49470,6 +50415,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': '請求',
       'components.Layout.Sidebar.share': '分享與識別',
       'components.Layout.Sidebar.swipe': '滑動',
+      'components.Layout.Sidebar.users': '使用者',
       'components.Layout.UserDropdown.myprofile': '個人資料',
       'components.LiveTv.FollowedTeams.choose': '選擇球隊',
       'components.LiveTv.FollowedTeams.description':
@@ -50935,6 +51881,13 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         '標題或中繼資料不正確',
       'components.IssueModal.issueOther': '其他',
+      'components.RequestModal.quality': '品質',
+      'components.RequestModal.requestQuotaApproval': '要求核准',
+      'components.RequestModal.requesterror': '提出請求時出了點問題。',
+      'i18n.cancel': '取消',
+      'i18n.request': '提出請求',
+      'i18n.request4k': '提出 4K 請求',
+      'i18n.requesting': '提出請求中…',
     },
   },
   {
@@ -51096,6 +52049,7 @@ export const localeData = [
       'components.Layout.Sidebar.requests': 'Yêu cầu',
       'components.Layout.Sidebar.share': 'Chia sẻ & Xác định',
       'components.Layout.Sidebar.swipe': 'Vuốt',
+      'components.Layout.Sidebar.users': 'Danh sách người dùng',
       'components.Layout.UserDropdown.myprofile': 'Hồ sơ',
       'components.LiveTv.FollowedTeams.choose': 'Chọn một đội',
       'components.LiveTv.FollowedTeams.description':
@@ -52668,6 +53622,14 @@ export const localeData = [
       'components.IssueModal.issueReasonIncorrectMetadata':
         'Không đúng tiêu đề hay siêu dữ liệu',
       'components.IssueModal.issueOther': 'Khác',
+      'components.RequestModal.quality': 'Chất lượng',
+      'components.RequestModal.requestQuotaApproval': 'Yêu cầu phê duyệt',
+      'components.RequestModal.requesterror':
+        'Có gì đó không ổn trong khi gửi yêu cầu.',
+      'i18n.cancel': 'Hủy',
+      'i18n.request': 'Yêu cầu',
+      'i18n.request4k': 'Yêu cầu bản 4K',
+      'i18n.requesting': 'Đang gửi yêu cầu…',
     },
   },
 ] as const;
