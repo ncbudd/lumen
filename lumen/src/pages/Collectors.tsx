@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../api';
+import { api, type MusicServiceSummary } from '../api';
+import { useAuth } from '../auth';
 import { Cover } from '../components/cards';
 import { ExtraGate, ExtraHeader, ServiceNote } from '../components/extra';
 import { useToast } from '../components/toast';
 import { friendlyError } from '../errors';
+import { hasAurralMusicService, type TrackRequestStatus } from '../extras';
 import { useApi } from '../hooks';
 import { useLumenLocale } from '../i18n';
 
@@ -22,7 +24,14 @@ const musicBrainzId = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
 
 function CollectorPicks() {
   const { t } = useLumenLocale();
+  const { user } = useAuth();
   const feed = useApi<{ available: boolean; results: Pick[] }>('/collectors');
+  const trackStatus = useApi<TrackRequestStatus>(
+    user ? '/music/track-requests/status' : null
+  );
+  const musicServices = useApi<MusicServiceSummary[]>(
+    user ? '/service/music' : null
+  );
   const toast = useToast();
   const [following, setFollowing] = useState<string[]>([]);
   const [saving, setSaving] = useState<string>();
@@ -65,12 +74,26 @@ function CollectorPicks() {
         <div className="detail-loading" aria-busy="true" />
       )}
       {feed.data && !feed.data.available && (
-        <p className="note">
-          {t(
-            'lumen.collectors.unavailable',
-            'Collector picks require slskdN with social federation enabled.'
-          )}
-        </p>
+        <div className="empty">
+          <b>
+            {t(
+              'lumen.collectors.offTitle',
+              'Collector Picks are not turned on here'
+            )}
+          </b>
+          {hasAurralMusicService(musicServices.data, trackStatus.data)
+            ? t(
+                'lumen.collectors.unavailableSocial',
+                'Collector picks require social federation to be enabled.'
+              )
+            : t(
+                'lumen.collectors.unavailable',
+                'Collector picks require slskdN with social federation enabled.'
+              )}
+          <Link className="btn btn-tonal btn-sm" to="/music">
+            {t('lumen.collectors.backToMusic', 'Back to Music')}
+          </Link>
+        </div>
       )}
       {feed.data?.available &&
         (feed.data.results.length ? (

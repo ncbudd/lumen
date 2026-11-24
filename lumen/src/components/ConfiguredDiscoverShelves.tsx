@@ -28,6 +28,7 @@ import type { Album } from '../extras';
 import { useApi, usePublicSettings } from '../hooks';
 import { AlbumCard } from '../pages/Music';
 import { PersonCard } from '../pages/People';
+import { apiQueryString } from '../searchParams';
 import {
   BookCard,
   CollectionCard,
@@ -116,7 +117,7 @@ function shelfDestination(
     endpoint.delete('sort');
     endpoint.set('page', '1');
     return {
-      endpoint: `/discover/music?${endpoint}`,
+      endpoint: `/discover/music?${apiQueryString(endpoint)}`,
       href: `/music?${query}`,
       kind: 'music',
     };
