@@ -3,8 +3,10 @@
 #
 # Lumen imports a few SeerrNG files from outside lumen/ (the @app and @server aliases, shared
 # translations, the issue constants), and its image build copies them in. This repo only
-# mirrors lumen/, so the job first fetches src/, server/, config/ and the root package.json and
-# tsconfig.json from the SeerrNG commit named in UPSTREAM, the one lumen/ was synced from.
+# mirrors lumen/, so each job first fetches src/, server/, config/ and the root package.json
+# and tsconfig.json from the SeerrNG commit named in UPSTREAM, the one lumen/ was synced from.
+#
+# The browser suite runs in four shards so each one finishes well inside the job limit.
 name: Lumen tests
 
 on:
@@ -13,6 +15,7 @@ on:
       - 'lumen/**'
       - 'UPSTREAM'
       - '.github/workflows/test.yml'
+      - '.github/scripts/fetch-seerrng-files.sh'
   push:
     branches: [main]
     paths:
@@ -24,60 +27,68 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  checks:
+    name: Type check, build, unit and image tests
     runs-on: ubuntu-24.04
-    timeout-minutes: 75
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-
       - name: Fetch the SeerrNG files Lumen builds against
-        run: |
-          sha="$(tr -d '[:space:]' < UPSTREAM)"
-          [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "UPSTREAM does not hold a commit id"; exit 1; }
-          git init -q "$RUNNER_TEMP/up"
-          cd "$RUNNER_TEMP/up"
-          git remote add origin https://github.com/snapetech-org/seerrng.git
-          git sparse-checkout set --no-cone /src/ /server/ /config/ /package.json /tsconfig.json
-          git fetch -q --depth 1 --filter=blob:none origin "$sha"
-          git checkout -q FETCH_HEAD
-          cp -r src server config package.json tsconfig.json "$GITHUB_WORKSPACE/"
-          echo "Using snapetech-org/seerrng@${sha::8}"
-
+        run: bash .github/scripts/fetch-seerrng-files.sh
       - uses: actions/setup-node@v4
         with:
           node-version-file: package.json
           cache: npm
           cache-dependency-path: lumen/package-lock.json
-
       - name: Install Lumen dependencies
         working-directory: lumen
         run: npm ci --ignore-scripts
-
       - name: Type check
         working-directory: lumen
         run: npx tsc --noEmit -p .
-
       - name: Build Lumen
         working-directory: lumen
         run: npm run build
-
       - name: Unit, image and proxy tests
         working-directory: lumen
         run: npm test
 
+  browser:
+    name: Browser tests (shard ${{ matrix.shard }}/4)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fetch the SeerrNG files Lumen builds against
+        run: bash .github/scripts/fetch-seerrng-files.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: npm
+          cache-dependency-path: lumen/package-lock.json
+      - name: Install Lumen dependencies
+        working-directory: lumen
+        run: npm ci --ignore-scripts
+      - name: Build Lumen
+        working-directory: lumen
+        run: npm run build
       - name: Install Chromium
         working-directory: lumen
         run: npx --no-install playwright install --with-deps chromium
-
       - name: Browser tests in desktop, phone and tablet viewports
         working-directory: lumen
-        run: npm run test:browser -- --workers=2
-
+        run: npm run test:browser -- --workers=2 --shard=${{ matrix.shard }}/4
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-results
+          name: playwright-results-${{ matrix.shard }}
           path: lumen/test-results
           retention-days: 7
