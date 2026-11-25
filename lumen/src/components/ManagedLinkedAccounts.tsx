@@ -61,17 +61,20 @@ export default function ManagedLinkedAccounts({
     setBusy(true);
     setFailure('');
     setNotice('');
+    let succeeded = false;
     try {
       await api(
         `${path}/${encodeURIComponent(selected.key)}`,
         { method: 'DELETE' },
         'empty'
       );
+      succeeded = true;
       setRemoved((current) => [...current, selected.key]);
       setNotice(t('lumen.managedLinkedAccounts.unlinked', 'Account unlinked.'));
       linked.reload();
       onSaved();
     } catch (error) {
+      if (succeeded) return;
       setFailure(
         friendlyError(
           error,
@@ -85,7 +88,7 @@ export default function ManagedLinkedAccounts({
       linked.reload();
       password.reload();
     } finally {
-      setSelected(undefined);
+      if (succeeded) setSelected(undefined);
       setBusy(false);
       working.current = false;
     }
@@ -111,7 +114,7 @@ export default function ManagedLinkedAccounts({
           {t('lumen.managedLinkedAccounts.loading', 'Loading linked accounts…')}
         </p>
       )}
-      {failure && (
+      {failure && !selected && (
         <p className="note" role="alert">
           {failure}
         </p>
@@ -169,7 +172,13 @@ export default function ManagedLinkedAccounts({
           onClose={() => {
             if (!working.current) setSelected(undefined);
           }}
-        />
+        >
+          {failure && (
+            <p className="note" role="alert">
+              {failure}
+            </p>
+          )}
+        </ConfirmSheet>
       )}
     </div>
   );

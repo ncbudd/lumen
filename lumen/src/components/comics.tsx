@@ -10,12 +10,14 @@ import {
   type ComicEdition,
   type ComicWork,
 } from '../extras';
+import { useApi } from '../hooks';
 import { useLumenLocale } from '../i18n';
 import { Icon } from '../icons';
 import { usePrefs } from '../settings';
 import { Cover, Glyph, StatLabel, TouchQuick, type Stat } from './cards';
-import { canRequestComic } from './detail';
-import { comicState } from './extra';
+import { ConfirmSheet } from './ConfirmSheet';
+import { canChooseRequestOptions, canRequestComic } from './detail';
+import { comicState, ServiceNote } from './extra';
 import { useToast } from './toast';
 import WatchlistButton from './WatchlistButton';
 
@@ -47,12 +49,266 @@ export const comicCardMeta = (w: ComicWork) =>
 export const editionLabel = (e: ComicEdition) =>
   [e.publisher, e.languageName].filter(Boolean).join(', ');
 
+export class ComicServiceFailure extends Error {}
+
+export interface ComicRequestOptions {
+  serverId?: number;
+  rootFolder?: string;
+}
+
+export const isComicQuotaDenial = (error: unknown) =>
+  error instanceof Error && error.message === 'Comic Quota exceeded.';
+
+interface ComicService {
+  id: number;
+  name: string;
+  isDefault: boolean;
+  backendType: 'mylar' | 'kapowarr' | 'backissue';
+}
+
+interface ComicRootFolders {
+  defaultRootFolder: string | null;
+  rootFolders: { id: number; path: string }[];
+}
+
+export function ComicRequestOptionsSheet({
+  onConfirm,
+  onClose,
+  showOptions = true,
+  requestLabel,
+}: {
+  onConfirm: (options: ComicRequestOptions) => void | Promise<void>;
+  onClose: () => void;
+  showOptions?: boolean;
+  requestLabel?: string;
+}) {
+  const { t } = useLumenLocale();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const quota = useApi<{
+    comic?: {
+      limit?: number;
+      remaining?: number;
+      days?: number;
+      restricted?: boolean;
+    };
+  }>(user?.id ? `/user/${user.id}/quota` : null, { currentPathOnly: true });
+  const quotaStatus = quota.data?.comic;
+  const quotaRestricted = quotaStatus?.restricted === true;
+  const canChoose = showOptions && canChooseRequestOptions(user?.permissions);
+  const services = useApi<ComicService[]>(canChoose ? '/service/comic' : null);
+  const [serviceId, setServiceId] = useState('');
+  const fallback =
+    services.data?.find((service) => service.isDefault) ?? services.data?.[0];
+  const service =
+    services.data?.find((item) => String(item.id) === serviceId) ?? fallback;
+  const rootPath =
+    service?.backendType === 'kapowarr'
+      ? `/service/comic/${service.id}/rootfolders`
+      : null;
+  const folders = useApi<ComicRootFolders>(rootPath);
+  const preferred = useApi<Record<string, string>>(
+    service?.backendType === 'kapowarr' && user?.id
+      ? `/user/${user.id}/settings/request-root-folders`
+      : null
+  );
+  const [rootFolder, setRootFolder] = useState('');
+  useEffect(() => {
+    setRootFolder('');
+  }, [service?.id]);
+  useEffect(() => {
+    if (!service || !folders.data || rootFolder) return;
+    const saved = preferred.data?.[`comic-kapowarr:${service.id}`];
+    if (
+      saved &&
+      saved !== folders.data.defaultRootFolder &&
+      folders.data.rootFolders.some((folder) => folder.path === saved)
+    )
+      setRootFolder(saved);
+  }, [folders.data, preferred.data, rootFolder, service]);
+  return (
+    <ConfirmSheet
+      title={
+        canChoose
+          ? t('lumen.comicDetail.requestOptionsTitle', 'Comic request options')
+          : t('lumen.comicDetail.confirmRequestTitle', 'Request Comic')
+      }
+      body={
+        canChoose
+          ? t(
+              'lumen.comicDetail.requestOptionsHelp',
+              'Choose a comics service and, for Kapowarr, a root folder.'
+            )
+          : (requestLabel ??
+            t(
+              'lumen.comicDetail.confirmRequestHelp',
+              'Review the comic quota and confirm this request.'
+            ))
+      }
+      confirm={t('lumen.comicDetail.submitRequest', 'Submit request')}
+      cancel={t('lumen.quickRequest.cancel', 'Cancel')}
+      busy={submitting}
+      confirmDisabled={
+        !quota.data ||
+        quotaRestricted ||
+        (canChoose &&
+          ((!services.data && !services.error) || services.data?.length === 0))
+      }
+      onConfirm={async () => {
+        if (submitting || quotaRestricted) return;
+        setSubmitting(true);
+        try {
+          await onConfirm({
+            ...(service && serviceId ? { serverId: service.id } : {}),
+            ...(service?.backendType === 'kapowarr' && rootFolder
+              ? { rootFolder }
+              : {}),
+          });
+        } finally {
+          setSubmitting(false);
+        }
+      }}
+      onClose={onClose}
+    >
+      <div className="pk-form">
+        {(!!quotaStatus?.limit || quotaRestricted) && (
+          <p className="note" role={quotaRestricted ? 'status' : undefined}>
+            {quotaRestricted
+              ? t(
+                  'lumen.comicDetail.quotaReached',
+                  'You have reached your comic request limit.'
+                )
+              : t(
+                  'lumen.comicDetail.quotaRemaining',
+                  '{remaining} of {limit} comic requests remaining.',
+                  {
+                    remaining: quotaStatus.remaining ?? 0,
+                    limit: quotaStatus.limit ?? 0,
+                  }
+                )}
+            {!!quotaStatus.days &&
+              ` ${t('lumen.comicDetail.quotaPeriod', 'Quota period: {days} days.', { days: quotaStatus.days })}`}
+          </p>
+        )}
+        {quotaRestricted && (
+          <button
+            className="chip"
+            type="button"
+            disabled={submitting}
+            onClick={quota.reload}
+          >
+            {t('lumen.comicDetail.recheckQuota', 'Recheck quota')}
+          </button>
+        )}
+        {quota.error && (
+          <ServiceNote
+            error={quota.error}
+            what={t('lumen.comicDetail.quota', 'comic request quota')}
+            title={t(
+              'lumen.comicDetail.quotaLoadFailure',
+              'Could not load comic request limits.'
+            )}
+            retryLabel={t('lumen.comicDetail.recheckQuota', 'Recheck quota')}
+            retry={quota.reload}
+          />
+        )}
+        {!quota.data && !quota.error && (
+          <p className="note" role="status">
+            {t(
+              'lumen.comicDetail.quotaLoading',
+              'Checking comic request quota…'
+            )}
+          </p>
+        )}
+        {canChoose && services.error && (
+          <div className="err" role="alert">
+            {t(
+              'lumen.comicDetail.serviceLoadFailure',
+              'Could not load comic service options. The request will use the default service.'
+            )}
+          </div>
+        )}
+        {canChoose && services.data?.length === 0 && (
+          <div className="err" role="alert">
+            {t(
+              'lumen.comicDetail.noComicService',
+              'No comics service is configured. Comic requests are unavailable.'
+            )}
+          </div>
+        )}
+        {canChoose && (
+          <label className="sel" data-layout="stacked">
+            <span className="lbl">
+              {t('lumen.comicDetail.service', 'Comics service')}
+            </span>
+            <select
+              value={serviceId}
+              disabled={!services.data || services.data.length < 2}
+              onChange={(event) => setServiceId(event.target.value)}
+            >
+              {fallback && (
+                <option value="">
+                  {t('lumen.comicDetail.defaultService', 'Default ({name})', {
+                    name: fallback.name,
+                  })}
+                </option>
+              )}
+              {(services.data ?? []).map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name} · {item.backendType}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        {canChoose && service?.backendType === 'kapowarr' && (
+          <label className="sel" data-layout="stacked">
+            <span className="lbl">
+              {t('lumen.comicDetail.rootFolder', 'Kapowarr root folder')}
+            </span>
+            <select
+              value={rootFolder}
+              disabled={!folders.data}
+              onChange={(event) => setRootFolder(event.target.value)}
+            >
+              <option value="">
+                {t(
+                  'lumen.comicDetail.configuredRootFolder',
+                  'Configured default ({path})',
+                  { path: folders.data?.defaultRootFolder || 'Not available' }
+                )}
+              </option>
+              {(folders.data?.rootFolders ?? [])
+                .filter(
+                  (folder) => folder.path !== folders.data?.defaultRootFolder
+                )
+                .map((folder) => (
+                  <option key={folder.id} value={folder.path}>
+                    {folder.path}
+                  </option>
+                ))}
+            </select>
+          </label>
+        )}
+      </div>
+    </ConfirmSheet>
+  );
+}
+
 /** Asks for one edition and says which in the toast. */
 export async function requestComicEdition(
   w: ComicWork,
-  e: ComicEdition
+  e: ComicEdition,
+  options: ComicRequestOptions = {}
 ): Promise<string> {
-  await requestExtra('comic', Number(e.id));
+  const result = await requestExtra(
+    'comic',
+    Number(e.id),
+    options.serverId,
+    options.rootFolder
+  );
+  if ((result as { status?: number } | null)?.status === 4)
+    throw new ComicServiceFailure();
   return `Requested ${w.title} · ${editionLabel(e) || 'edition'}`;
 }
 
@@ -61,6 +317,8 @@ export function ComicCard({ w }: { w: ComicWork }) {
   const { prefs, kavitaUrl } = usePrefs();
   const { user } = useAuth();
   const mayRequest = canRequestComic(user?.permissions);
+  const asksOptions =
+    prefs.requestOptions && canChooseRequestOptions(user?.permissions);
   const toast = useToast();
   const nav = useNavigate();
   const cs = comicState(w.mediaInfo);
@@ -73,6 +331,10 @@ export function ComicCard({ w }: { w: ComicWork }) {
       ? { k: 'wait', word: 'Requested', ico: 'clock' }
       : cs.stat;
   const [busy, setBusy] = useState(false);
+  const [optionsTarget, setOptionsTarget] = useState<{
+    work: ComicWork;
+    edition: ComicEdition;
+  } | null>(null);
   const running = useRef(false);
   // the card can scroll away (or the page change) while the lookup runs
   const mounted = useRef(true);
@@ -112,12 +374,55 @@ export function ComicCard({ w }: { w: ComicWork }) {
         nav(href + '#editions');
         return;
       }
-      const said = await requestComicEdition(work, edition);
-      toast(said);
-      if (mounted.current) setAsked(edition.id);
+      setOptionsTarget({ work, edition });
     } catch (e) {
       toast(
-        friendlyError(e, t('lumen.error.requestFailed', 'Request failed'), t)
+        e instanceof ComicServiceFailure
+          ? t(
+              'lumen.comicDetail.serviceFailure',
+              'The request was submitted, but the comics service rejected it while processing.'
+            )
+          : friendlyError(
+              e,
+              t('lumen.error.requestFailed', 'Request failed'),
+              t
+            )
+      );
+    } finally {
+      running.current = false;
+      if (mounted.current) setBusy(false);
+    }
+  };
+  const submitOptions = async (options: ComicRequestOptions) => {
+    if (!optionsTarget || running.current) return;
+    running.current = true;
+    setBusy(true);
+    try {
+      const said = await requestComicEdition(
+        optionsTarget.work,
+        optionsTarget.edition,
+        options
+      );
+      toast(said);
+      if (mounted.current) setAsked(optionsTarget.edition.id);
+      setOptionsTarget(null);
+    } catch (e) {
+      toast(
+        isComicQuotaDenial(e)
+          ? t(
+              'lumen.comicDetail.quotaReached',
+              'You have reached your comic request limit.'
+            )
+          : e instanceof ComicServiceFailure
+            ? t(
+                'lumen.comicDetail.serviceFailure',
+                'The request was submitted, but the comics service rejected it while processing.'
+              )
+            : friendlyError(
+                e,
+                t('lumen.error.requestFailed', 'Request failed'),
+                t
+              )
       );
     } finally {
       running.current = false;
@@ -163,6 +468,14 @@ export function ComicCard({ w }: { w: ComicWork }) {
   );
   return (
     <div className="poster book comic-card">
+      {optionsTarget && (
+        <ComicRequestOptionsSheet
+          showOptions={asksOptions}
+          requestLabel={`${optionsTarget.work.title} · ${editionLabel(optionsTarget.edition)}`}
+          onConfirm={submitOptions}
+          onClose={() => setOptionsTarget(null)}
+        />
+      )}
       <div className="art">
         <Cover
           src={artUrl(w.posterPath)}

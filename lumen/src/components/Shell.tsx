@@ -21,7 +21,7 @@ import {
 import { useLumenLocale } from '../i18n';
 import { Icon, type IconName } from '../icons';
 import { canSearchIndexers } from '../indexerPermissions';
-import { canReadIssues } from '../issuePermissions';
+import { canManageIssues, canReadIssues } from '../issuePermissions';
 import { useLiveTvStatus } from '../liveTv';
 import { scrollBehavior } from '../motion';
 import { normalizeSearchParams } from '../searchParams';
@@ -57,6 +57,14 @@ export const fullSeerrUrl = (configured?: string): string => {
   } catch {
     return '/seerrng';
   }
+};
+
+type VersionStatus = {
+  version: string;
+  commitTag: string;
+  updateAvailable?: boolean;
+  updateCheckSucceeded?: boolean;
+  commitsBehind?: number;
 };
 
 const EDITABLE_CONTROL =
@@ -160,8 +168,17 @@ export default function Shell({ children }: { children: ReactNode }) {
     };
   }, [moreOpen]);
   const showBlocklist = useBlocklistNavigation();
+  const administrator = isAdministrator(user?.permissions);
   const managesRequests = canManageRequests(user?.permissions);
   const [pendingRequests, setPendingRequests] = useState(0);
+  const [openIssues, setOpenIssues] = useState(0);
+  const [versionStatusEnabled, setVersionStatusEnabled] = useState(false);
+  const [versionStatus, setVersionStatus] = useState<VersionStatus | null>(
+    null
+  );
+  const [versionStatusError, setVersionStatusError] = useState(false);
+  const followsUpdates = canViewFollowing(user?.permissions);
+  const [unreadFollowUpdates, setUnreadFollowUpdates] = useState(0);
   useEffect(() => {
     if (!managesRequests) {
       setPendingRequests(0);
@@ -180,6 +197,110 @@ export default function Shell({ children }: { children: ReactNode }) {
       window.clearInterval(timer);
     };
   }, [managesRequests, loc.pathname]);
+  const managesIssues = canManageIssues(user?.permissions);
+  useEffect(() => {
+    if (!managesIssues) {
+      setOpenIssues(0);
+      return;
+    }
+    let live = true;
+    const refresh = () => {
+      api<{ open: number }>('/issue/count')
+        .then((count) => live && setOpenIssues(count.open || 0))
+        .catch(() => live && setOpenIssues(0));
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 30_000);
+    return () => {
+      live = false;
+      window.clearInterval(timer);
+    };
+  }, [managesIssues, loc.pathname]);
+  useEffect(() => {
+    if (!followsUpdates) {
+      setUnreadFollowUpdates(0);
+      return;
+    }
+    let live = true;
+    const refresh = () => {
+      api<{ unseen: number }>('/follow/events/count')
+        .then(
+          (count) =>
+            live &&
+            setUnreadFollowUpdates(
+              Number.isSafeInteger(count.unseen) && count.unseen > 0
+                ? count.unseen
+                : 0
+            )
+        )
+        .catch(() => live && setUnreadFollowUpdates(0));
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 5 * 60_000);
+    return () => {
+      live = false;
+      window.clearInterval(timer);
+    };
+  }, [followsUpdates]);
+  useEffect(() => {
+    if (!administrator) {
+      setVersionStatusEnabled(false);
+      setVersionStatus(null);
+      setVersionStatusError(false);
+      return;
+    }
+    let live = true;
+    const enable = () => live && setVersionStatusEnabled(true);
+    const requestIdle = Reflect.get(window, 'requestIdleCallback') as
+      | ((callback: () => void, options: { timeout: number }) => number)
+      | undefined;
+    if (typeof requestIdle === 'function') {
+      const idle = requestIdle.call(window, enable, { timeout: 10_000 });
+      const cancelIdle = Reflect.get(window, 'cancelIdleCallback') as
+        ((id: number) => void) | undefined;
+      return () => {
+        live = false;
+        cancelIdle?.call(window, idle);
+      };
+    }
+    const timeout = window.setTimeout(enable, 5_000);
+    return () => {
+      live = false;
+      window.clearTimeout(timeout);
+    };
+  }, [administrator]);
+  useEffect(() => {
+    if (!administrator || !versionStatusEnabled || !swipeSettings.data) return;
+    let live = true;
+    const checkUpdates = swipeSettings.data.versionCheck === true;
+    const refresh = () => {
+      if (document.visibilityState !== 'visible') return;
+      api<VersionStatus>(
+        `/status?checkUpdateAvailable=${checkUpdates ? 'true' : 'false'}`
+      )
+        .then((status) => {
+          if (
+            !status ||
+            typeof status.version !== 'string' ||
+            typeof status.commitTag !== 'string'
+          )
+            throw new Error('The server returned an invalid version status.');
+          if (!live) return;
+          setVersionStatus(status);
+          setVersionStatusError(false);
+        })
+        .catch(() => {
+          if (!live) return;
+          setVersionStatusError(true);
+        });
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 60_000);
+    return () => {
+      live = false;
+      window.clearInterval(timer);
+    };
+  }, [administrator, versionStatusEnabled, swipeSettings.data]);
   const nav = useNavigate();
   const q = useRef<HTMLInputElement>(null);
   const detail =
@@ -636,10 +757,22 @@ export default function Shell({ children }: { children: ReactNode }) {
               </span>
             )}
           </NavLink>
-          {canViewFollowing(user?.permissions) && (
+          {followsUpdates && (
             <NavLink to="/following">
               <Icon name="list" />
               {t('components.Layout.Sidebar.following', 'Following')}
+              {unreadFollowUpdates > 0 && (
+                <span
+                  className="n"
+                  aria-label={t(
+                    'lumen.nav.unreadFollowUpdates',
+                    'Unread updates: {count}',
+                    { count: unreadFollowUpdates }
+                  )}
+                >
+                  {unreadFollowUpdates > 99 ? '99+' : unreadFollowUpdates}
+                </span>
+              )}
             </NavLink>
           )}
           {canManageDownloads(user?.permissions) && (
@@ -658,6 +791,18 @@ export default function Shell({ children }: { children: ReactNode }) {
             <NavLink to="/issues">
               <Icon name="list" />
               {t('components.Layout.Sidebar.issues', 'Issues')}
+              {managesIssues && openIssues > 0 && (
+                <span
+                  className="n"
+                  aria-label={t(
+                    'lumen.nav.openIssues',
+                    'Open issues: {count}',
+                    { count: openIssues }
+                  )}
+                >
+                  {openIssues}
+                </span>
+              )}
             </NavLink>
           )}
           {showBlocklist && (
@@ -708,6 +853,62 @@ export default function Shell({ children }: { children: ReactNode }) {
               <Icon name="cal" />
               {t('components.Layout.Sidebar.comingSoon', 'Coming soon')}
             </NavLink>
+          )}
+          {administrator && versionStatus && (
+            <Link
+              className="version-status"
+              to="/admin/about"
+              onClick={() => setMoreOpen(false)}
+              aria-label={t(
+                'lumen.nav.aboutVersionStatus',
+                'About SeerrNG: {status}',
+                {
+                  status: versionStatusError
+                    ? t(
+                        'lumen.nav.versionCheckUnavailable',
+                        'Update check unavailable'
+                      )
+                    : versionStatus?.updateAvailable
+                      ? t('lumen.nav.updateAvailable', 'Update available')
+                      : versionStatus?.version || '',
+                }
+              )}
+            >
+              <Icon name="info" />
+              <span className="version-status-copy">
+                <b>
+                  {versionStatus?.commitTag === 'local'
+                    ? t('lumen.nav.localBuild', 'Local build')
+                    : versionStatus.version.startsWith('main-')
+                      ? t('lumen.nav.mainBuild', 'SeerrNG Main')
+                      : t('lumen.nav.stableBuild', 'SeerrNG Stable')}
+                </b>
+                <small>
+                  {versionStatusError ||
+                  (versionStatus?.updateCheckSucceeded === false &&
+                    swipeSettings.data?.versionCheck)
+                    ? t(
+                        'lumen.nav.versionCheckUnavailable',
+                        'Update check unavailable'
+                      )
+                    : versionStatus?.updateAvailable
+                      ? t('lumen.nav.updateAvailable', 'Update available')
+                      : versionStatus?.commitsBehind === -1
+                        ? t('lumen.nav.versionOutOfDate', 'Out of date')
+                        : (versionStatus?.commitsBehind ?? 0) > 0
+                          ? t(
+                              versionStatus?.commitsBehind === 1
+                                ? 'lumen.nav.oneCommitBehind'
+                                : 'lumen.nav.commitsBehind',
+                              versionStatus?.commitsBehind === 1
+                                ? '1 commit behind'
+                                : '{count} commits behind',
+                              { count: versionStatus?.commitsBehind ?? 0 }
+                            )
+                          : versionStatus?.version || ''}
+                </small>
+              </span>
+            </Link>
           )}
           <Link className="me" to="/me">
             <span className="avatar">

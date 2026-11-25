@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+const mount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
+const appPath = (path: string) => `${mount}${path}`;
+
 test('shell navigation landmarks and request badges follow the account locale', async ({
   page,
 }) => {
@@ -38,7 +41,7 @@ test('shell navigation landmarks and request badges follow the account locale', 
       watchlist: 'قائمة المتابعة',
     },
   }[locale];
-  await page.route('**/api/v1/**', (route) => {
+  await page.route('**/api/v1/**', async (route) => {
     const path = new URL(route.request().url()).pathname
       .replace(/^\/lumen/, '')
       .replace(/^\/api\/v1/, '');
@@ -58,8 +61,7 @@ test('shell navigation landmarks and request badges follow the account locale', 
     return route.fulfill({ json: {} });
   });
 
-  const mount = process.env.LUMEN_TEST_MOUNT === '/lumen' ? '/lumen' : '';
-  await page.goto(`${mount}/me`);
+  await page.goto(appPath('/me'));
   await expect(page.locator('.side')).toHaveAttribute(
     'aria-label',
     labels.primary
@@ -110,6 +112,275 @@ test('shell navigation landmarks and request badges follow the account locale', 
     await more.click();
     await page.locator('.mobile-nav-scrim').click({ position: { x: 4, y: 4 } });
     await expect(menu).not.toHaveAttribute('data-mobile-open', 'true');
+  }
+});
+
+test('open issue count appears only for issue managers', async ({ page }) => {
+  const permission = Number(process.env.LUMEN_TEST_ISSUE_PERMISSION ?? 1048576);
+  let issueCountRequests = 0;
+  let markCountRequested = () => {};
+  let releaseCount = () => {};
+  const countRequested = new Promise<void>((resolve) => {
+    markCountRequested = resolve;
+  });
+  const countGate = new Promise<void>((resolve) => {
+    releaseCount = resolve;
+  });
+  await page.route('**/api/v1/**', async (route) => {
+    const path = new URL(route.request().url()).pathname
+      .replace(/^\/lumen/, '')
+      .replace(/^\/api\/v1/, '');
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 1,
+          permissions: permission,
+          userType: 1,
+          displayName: 'Issue User',
+        },
+      });
+    if (path === '/issue/count') {
+      issueCountRequests++;
+      markCountRequested();
+      await countGate;
+      return route.fulfill({ json: { open: 4, total: 6 } });
+    }
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/me'));
+  if ((page.viewportSize()?.width ?? 0) < 1040)
+    await page.getByRole('button', { name: 'More navigation' }).click();
+  const sidebar = page.locator('.side');
+  const captureDir = process.env.LUMEN_MENU_CAPTURE_DIR;
+  if (permission === 1048576) {
+    const link = sidebar.getByRole('link', { name: /Issues/ });
+    await expect(link).toBeVisible();
+    await countRequested;
+    const viewportWidth = page.viewportSize()?.width ?? 0;
+    if (captureDir && ['desktop', 'iphone'].includes(test.info().project.name))
+      await page.screenshot({
+        path: `${captureDir}/issues-menu-before-${viewportWidth}.png`,
+      });
+    releaseCount();
+    await expect(link.locator('[aria-label="Open issues: 4"]')).toHaveText('4');
+    if (captureDir && ['desktop', 'iphone'].includes(test.info().project.name))
+      await page.screenshot({
+        path: `${captureDir}/issues-menu-after-${viewportWidth}.png`,
+      });
+    expect(issueCountRequests).toBeGreaterThan(0);
+  } else {
+    await expect(
+      sidebar.getByRole('link', { name: 'Issues', exact: true })
+    ).toBeVisible();
+    expect(issueCountRequests).toBe(0);
+  }
+});
+
+test('Following unread count is permission scoped and capped visually', async ({
+  page,
+}) => {
+  const permission = Number(process.env.LUMEN_TEST_FOLLOW_PERMISSION ?? 32);
+  const locale = ['en', 'fr', 'ar'].includes(process.env.LUMEN_NAV_LOCALE ?? '')
+    ? (process.env.LUMEN_NAV_LOCALE as 'en' | 'fr' | 'ar')
+    : 'en';
+  const unreadLabel = {
+    en: 'Unread updates: 123',
+    fr: 'Mises à jour non lues : 123',
+    ar: 'التحديثات غير المقروءة: 123',
+  }[locale];
+  let followCountRequests = 0;
+  let markCountRequested = () => {};
+  let releaseCount = () => {};
+  const countRequested = new Promise<void>((resolve) => {
+    markCountRequested = resolve;
+  });
+  const countGate = new Promise<void>((resolve) => {
+    releaseCount = resolve;
+  });
+  await page.route('**/api/v1/**', async (route) => {
+    const path = new URL(route.request().url()).pathname
+      .replace(/^\/lumen/, '')
+      .replace(/^\/api\/v1/, '');
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 1,
+          permissions: permission,
+          userType: 2,
+          displayName: 'Following User',
+        },
+      });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({ json: { locale } });
+    if (path === '/follow/events/count') {
+      followCountRequests++;
+      markCountRequested();
+      await countGate;
+      return route.fulfill({ json: { unseen: 123 } });
+    }
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/me'));
+  const following = page.locator(`.side a[href="${appPath('/following')}"]`);
+  if (permission & 32) {
+    await countRequested;
+    if ((page.viewportSize()?.width ?? 0) < 1040)
+      await page
+        .locator('.tabbar [aria-controls="mobile-primary-navigation"]')
+        .click();
+    if ((page.viewportSize()?.width ?? 0) < 1040)
+      await page
+        .locator('.side')
+        .evaluate((element) => (element.scrollTop = element.scrollHeight));
+    await expect(following).toBeVisible();
+    await expect(following.locator('.n')).toHaveCount(0);
+    await following.evaluate((element) =>
+      element.scrollIntoView({ block: 'center' })
+    );
+    const captureDir = process.env.LUMEN_FOLLOW_CAPTURE_DIR;
+    const width = page.viewportSize()?.width ?? 0;
+    if (captureDir)
+      await page.screenshot({ path: `${captureDir}/before-${width}.png` });
+    releaseCount();
+    await expect(following.locator('.n')).toHaveText('99+');
+    await expect(following.locator('.n')).toHaveAttribute(
+      'aria-label',
+      unreadLabel
+    );
+    if (captureDir)
+      await page.screenshot({ path: `${captureDir}/after-${width}.png` });
+  } else {
+    await expect(following).toHaveCount(0);
+    await page.waitForTimeout(100);
+    expect(followCountRequests).toBe(0);
+  }
+});
+
+test('admin sidebar exposes version status without querying for regular users', async ({
+  page,
+}) => {
+  const permission = Number(process.env.LUMEN_TEST_VERSION_PERMISSION ?? 2);
+  const locale = ['en', 'fr', 'ar'].includes(process.env.LUMEN_NAV_LOCALE ?? '')
+    ? (process.env.LUMEN_NAV_LOCALE as 'en' | 'fr' | 'ar')
+    : 'en';
+  const messages = {
+    en: {
+      main: 'SeerrNG Main',
+      update: 'Update available',
+      about: 'About SeerrNG: Update available',
+      heading: 'About SeerrNG',
+    },
+    fr: {
+      main: 'SeerrNG Main',
+      update: 'Mise à jour disponible',
+      about: 'À propos de SeerrNG : Mise à jour disponible',
+      heading: 'À propos de SeerrNG',
+    },
+    ar: {
+      main: 'SeerrNG Main',
+      update: 'يتوفر تحديث',
+      about: 'حول SeerrNG: يتوفر تحديث',
+      heading: 'حول SeerrNG',
+    },
+  }[locale];
+  let statusRequests = 0;
+  let updateCheckRequested: string | null = null;
+  let markStatusRequested = () => {};
+  let releaseStatus = () => {};
+  const statusRequested = new Promise<void>((resolve) => {
+    markStatusRequested = resolve;
+  });
+  const statusGate = new Promise<void>((resolve) => {
+    releaseStatus = resolve;
+  });
+  await page.route('**/api/v1/**', async (route) => {
+    const path = new URL(route.request().url()).pathname
+      .replace(/^\/lumen/, '')
+      .replace(/^\/api\/v1/, '');
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          id: 1,
+          permissions: permission,
+          userType: permission === 2 ? 1 : 2,
+          displayName: 'Version User',
+        },
+      });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({ json: { locale } });
+    if (path === '/settings/public')
+      return route.fulfill({
+        json: { applicationTitle: 'SeerrNG', versionCheck: true },
+      });
+    if (path === '/status') {
+      statusRequests++;
+      updateCheckRequested = new URL(route.request().url()).searchParams.get(
+        'checkUpdateAvailable'
+      );
+      markStatusRequested();
+      await statusGate;
+      return route.fulfill({
+        json: {
+          version: 'main-0123456',
+          commitTag: 'main-0123456',
+          updateAvailable: true,
+          updateCheckSucceeded: true,
+          commitsBehind: 3,
+          restartRequired: false,
+        },
+      });
+    }
+    if (path === '/settings/about')
+      return route.fulfill({
+        json: {
+          version: '3.72.40',
+          totalMediaItems: 0,
+          totalRequests: 0,
+          appDataPath: '/config',
+          tz: 'UTC',
+        },
+      });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/me'));
+  if (permission === 2) {
+    await statusRequested;
+    expect(updateCheckRequested).toBe('true');
+    if ((page.viewportSize()?.width ?? 0) < 1040)
+      await page
+        .locator('.tabbar [aria-controls="mobile-primary-navigation"]')
+        .click();
+    if ((page.viewportSize()?.width ?? 0) < 1040)
+      await page
+        .locator('.side')
+        .evaluate((element) => (element.scrollTop = element.scrollHeight));
+    const captureDir = process.env.LUMEN_VERSION_CAPTURE_DIR;
+    const width = page.viewportSize()?.width ?? 0;
+    if (captureDir)
+      await page.screenshot({ path: `${captureDir}/before-${width}.png` });
+    releaseStatus();
+    const statusLink = page.locator('.side a.version-status');
+    await expect(statusLink).toBeVisible();
+    await statusLink.evaluate((element) =>
+      element.scrollIntoView({ block: 'center' })
+    );
+    await expect(statusLink.locator('b')).toHaveText(messages.main);
+    await expect(statusLink.locator('small')).toHaveText(messages.update);
+    await expect(statusLink).toHaveAttribute('aria-label', messages.about);
+    if (captureDir)
+      await page.screenshot({ path: `${captureDir}/after-${width}.png` });
+    await statusLink.click();
+    await expect(page).toHaveURL(/\/admin\/about$/);
+    await expect(
+      page.getByRole('heading', { name: messages.heading })
+    ).toBeVisible();
+  } else {
+    await page.waitForTimeout(100);
+    expect(statusRequests).toBe(0);
+    await expect(page.locator('.side a.version-status')).toHaveCount(0);
   }
 });
 
@@ -164,7 +435,7 @@ test('More navigation filters categories and fits a compact phone', async ({
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/me');
+  await page.goto(appPath('/me'));
   await page.getByRole('button', { name: 'More navigation' }).click();
   const menu = page.locator('.side');
   await expect(menu).toHaveAttribute('data-mobile-open', 'true');
@@ -247,7 +518,7 @@ test('mobile tabs yield to long forms on scroll and return on scroll up', async 
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/admin/users');
+  await page.goto(appPath('/admin/users'));
   await expect(page.getByRole('heading', { name: 'Users' })).toBeVisible();
   const tabs = page.locator('.tabbar');
   await expect(tabs).toBeVisible();
@@ -370,7 +641,7 @@ test('mobile tabs yield on an ordinary user library screen', async ({
     return route.fulfill({ json: {} });
   });
 
-  await page.goto('/library?source=trakt');
+  await page.goto(appPath('/library?source=trakt'));
   await expect(page.getByRole('heading', { name: 'My Media' })).toBeVisible();
   await expect(page.getByText('Library Fixture 24')).toBeVisible();
   const captureDir = process.env.LUMEN_NAV_CAPTURE_DIR;

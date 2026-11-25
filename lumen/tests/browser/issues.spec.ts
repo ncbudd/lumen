@@ -35,6 +35,68 @@ test.beforeEach(async ({ page, baseURL }) => {
   await authenticateNativeComparison(page, baseURL!);
 });
 
+for (const permissions of [18, 2097152]) {
+  test(`issue detail service links follow administrator permissions ${permissions}`, async ({
+    page,
+  }, info) => {
+    await page.route('https://**/*', (route) => route.abort());
+    await page.route('**/api/v1/**', (route) => {
+      const path = testApiPath(route.request().url());
+      if (path === '/auth/me')
+        return route.fulfill({ json: { id: 2, permissions } });
+      if (path === '/issue/71')
+        return route.fulfill({
+          json: {
+            id: 71,
+            status: 1,
+            issueType: 1,
+            is4k: false,
+            media: {
+              mediaType: 'movie',
+              tmdbId: 71,
+              title: 'Service Link Fixture',
+              serviceUrl: 'https://radarr.example.test/movie/71',
+              serviceUrl4k: 'https://user:secret@radarr.example.test/movie/71',
+            },
+            createdBy: { id: 2, displayName: 'Viewer' },
+            createdAt: '2026-11-25T00:00:00Z',
+            comments: [
+              {
+                id: 72,
+                message: 'Playback fails.',
+                createdAt: '2026-11-25T00:00:00Z',
+                user: { id: 2, displayName: 'Viewer' },
+              },
+            ],
+          },
+        });
+      return route.fulfill({ json: {} });
+    });
+
+    await page.goto(testAppPath('/issues/71'));
+    await expect(
+      page.getByRole('heading', { name: 'Issue #71' })
+    ).toBeVisible();
+    if (permissions === 18) {
+      if (['desktop', 'iphone'].includes(info.project.name))
+        await page.screenshot({
+          path: info.outputPath('administrator-issue-service-link.png'),
+          fullPage: true,
+        });
+      await expect(
+        page.getByRole('link', { name: 'Open in Radarr' })
+      ).toHaveAttribute('href', 'https://radarr.example.test/movie/71');
+      await expect(
+        page.getByRole('link', { name: 'Open in Radarr 4K' })
+      ).toHaveCount(0);
+    } else {
+      await expect(
+        page.getByRole('link', { name: /Open in Radarr/ })
+      ).toHaveCount(0);
+    }
+  });
+}
+
 for (const permissions of [4194304, 2097152, 32]) {
   test(`issue discussion follows account permissions ${permissions}`, async ({
     page,
@@ -736,6 +798,7 @@ test('a reporter can edit their description and confirm removal of their own rep
     { id: 3, message: 'Someone else’s reply', user: { id: 3 } },
   ];
   const writes: string[] = [];
+  let rejectDeleteOnce = true;
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/api/v1/**', (route) => {
     const request = route.request();
@@ -762,6 +825,10 @@ test('a reporter can edit their description and confirm removal of their own rep
     }
     if (path === '/issueComment/2' && request.method() === 'DELETE') {
       writes.push('delete');
+      if (rejectDeleteOnce) {
+        rejectDeleteOnce = false;
+        return route.fulfill({ status: 503, json: {} });
+      }
       comments.splice(1, 1);
       return route.fulfill({ status: 204 });
     }
@@ -788,8 +855,95 @@ test('a reporter can edit their description and confirm removal of their own rep
     .getByRole('alertdialog')
     .getByRole('button', { name: 'Delete Comment' })
     .click();
+  const confirmation = page.getByRole('alertdialog');
+  await expect(confirmation).toBeVisible();
+  await expect(confirmation.getByRole('alert')).toBeVisible();
+  await expect(page.getByText('My reply', { exact: true })).toBeVisible();
+  await confirmation.getByRole('button', { name: 'Delete Comment' }).click();
+  await expect(confirmation).toHaveCount(0);
   await expect(page.getByText('My reply', { exact: true })).toHaveCount(0);
-  expect(writes).toEqual(['edit', 'delete']);
+  expect(writes).toEqual(['edit', 'delete', 'delete']);
+});
+
+test('issue deletion stays confirmed after a recoverable failure', async ({
+  page,
+}) => {
+  let deleteAttempts = 0;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = testApiPath(request.url());
+    if (path === '/auth/me')
+      return route.fulfill({ json: { id: 2, permissions: 4194304 } });
+    if (path === '/issue/7' && request.method() === 'DELETE') {
+      deleteAttempts++;
+      if (deleteAttempts === 1) return route.fulfill({ status: 503, json: {} });
+      return route.fulfill({ status: 204 });
+    }
+    if (path === '/issue/7')
+      return route.fulfill({
+        json: {
+          id: 7,
+          status: 1,
+          issueType: 1,
+          createdBy: { id: 2 },
+          comments: [
+            { id: 1, message: 'Original description', user: { id: 2 } },
+          ],
+        },
+      });
+    return route.fulfill({ json: { results: [] } });
+  });
+
+  await page.goto(testAppPath('/issues/7'));
+  await page.getByRole('button', { name: 'Delete Issue' }).click();
+  const confirmation = page.getByRole('alertdialog');
+  await confirmation.getByRole('button', { name: 'Delete Issue' }).click();
+  await expect(confirmation).toBeVisible();
+  await expect(confirmation.getByRole('alert')).toBeVisible();
+  await confirmation.getByRole('button', { name: 'Delete Issue' }).click();
+  await expect(page).toHaveURL(/\/issues$/);
+  expect(deleteAttempts).toBe(2);
+});
+
+test('an uncertain issue deletion closes after the fresh read confirms absence', async ({
+  page,
+}) => {
+  let deleted = false;
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const request = route.request();
+    const path = testApiPath(request.url());
+    if (path === '/auth/me')
+      return route.fulfill({ json: { id: 2, permissions: 4194304 } });
+    if (path === '/issue/7' && request.method() === 'DELETE') {
+      deleted = true;
+      return route.fulfill({ status: 503, json: {} });
+    }
+    if (path === '/issue/7')
+      return deleted
+        ? route.fulfill({ status: 404, json: { message: 'Not found' } })
+        : route.fulfill({
+            json: {
+              id: 7,
+              status: 1,
+              issueType: 1,
+              createdBy: { id: 2 },
+              comments: [
+                { id: 1, message: 'Original description', user: { id: 2 } },
+              ],
+            },
+          });
+    return route.fulfill({ json: { results: [] } });
+  });
+
+  await page.goto(testAppPath('/issues/7'));
+  await page.getByRole('button', { name: 'Delete Issue' }).click();
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Delete Issue' })
+    .click();
+  await expect(page).toHaveURL(/\/issues$/);
 });
 
 test('issue details link to exact non-video catalog titles', async ({

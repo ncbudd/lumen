@@ -170,6 +170,7 @@ function MetadataForm({
       if (generation !== sessionGeneration()) return;
       if (test || video) setStatuses(statusValues(response.tests, providers));
       if (!test) {
+        const expected = config.read(body as Record<string, unknown>);
         const values = config.read(response);
         const readback = await api<Record<string, unknown>>(config.endpoint);
         if (generation !== sessionGeneration()) return;
@@ -177,7 +178,9 @@ function MetadataForm({
         if (
           config.fields.some(
             ({ key }) =>
-              values[key] === 'undefined' || values[key] !== persisted[key]
+              expected[key] === 'undefined' ||
+              values[key] !== expected[key] ||
+              persisted[key] !== expected[key]
           )
         ) {
           setFailure(
@@ -308,6 +311,7 @@ function MetadataForm({
           <button
             type="button"
             className="btn btn-quiet btn-sm"
+            data-label-wrap
             disabled={busy}
             onClick={() => void submit(true)}
           >

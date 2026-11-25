@@ -739,6 +739,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': 'الغاء الطلب',
       'components.Settings.SettingsJobsCache.command': 'أمر',
       'components.Settings.SettingsJobsCache.disabled': 'معطّل',
+      'components.Settings.SettingsJobsCache.disablejob': 'تعطيل',
       'components.Settings.SettingsJobsCache.dnsCache':
         'ذاكرة تخزين DNS المؤقتة',
       'components.Settings.SettingsJobsCache.dnscachehits': 'إصابات DNS',
@@ -748,6 +749,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         'تحميل إعادة تعيين الدمج',
       'components.Settings.SettingsJobsCache.enabled': 'تم التمكين',
+      'components.Settings.SettingsJobsCache.enablejob': 'تفعيل',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'مزامنة قائمة الطلبات الخارجية',
       'components.Settings.SettingsJobsCache.failures': 'الإخفاقات',
@@ -799,6 +801,12 @@ export const localeData = [
         'مزامنة مجموعة BookOrbit Kobo',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'تاريخ الإصدار',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} تم إلغاء هذه المهمة.',
+      'components.Settings.SettingsJobsCache.jobdisabled': '{jobname} معاق',
+      'components.Settings.SettingsJobsCache.jobenabled': '{jobname} مُتاح',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} بدأ عمل هذه المهمة.',
       'components.Settings.SettingsJobsCache.runnow': 'تنفيذ " الآن "',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'طلب البرمجيات',
@@ -2400,6 +2408,8 @@ export const localeData = [
         'جارٍ الفحص{library} · {progress} من {total}',
       'lumen.adminMediaLibraries.settings': 'إعدادات خادم الوسائط',
       'lumen.adminMediaLibraries.settingsUpdated': 'تم تحديث إعدادات المكتبة.',
+      'lumen.adminMediaLibraries.confirmFailure':
+        'تعذر تأكيد حفظ إعدادات المكتبة. احتفظ بالحالة الحالية ثم أعد المحاولة.',
       'lumen.adminMediaLibraries.startScan': 'بدء الفحص الكامل',
       'lumen.adminMediaLibraries.tautulliLoadFailure':
         'تعذر تحميل إعدادات Tautulli',
@@ -2511,6 +2521,8 @@ export const localeData = [
       'lumen.adminReaderDelivery.removeSavedCredentials':
         'إزالة بيانات اعتماد {provider} المحفوظة',
       'lumen.adminReaderDelivery.removeShelf': 'إزالة الرف',
+      'lumen.adminReaderDelivery.removeShelfConfirmFailure':
+        'تعذر تأكيد إزالة الرف المُدار. اترك هذه النافذة مفتوحة ثم أعد المحاولة.',
       'lumen.adminReaderDelivery.removeShelfBody':
         'سيؤدي هذا إلى إزالة رف القارئ. ستبقى ملفات المكتبة كما هي.',
       'lumen.adminReaderDelivery.removeShelfTitle': 'إزالة {name}؟',
@@ -3389,6 +3401,8 @@ export const localeData = [
       'lumen.calendar.noReturned': 'لم تُرجع المصادر التي استجابت أي إصدارات.',
       'lumen.calendar.partialSources':
         'تعذر الوصول إلى بعض مصادر الإصدارات. قد تكون إصداراتها غير ظاهرة.',
+      'lumen.calendar.partialTitle': 'تعذر الوصول إلى بعض مصادر الإصدارات.',
+      'lumen.calendar.partialBody': 'قد تكون إصداراتها غير ظاهرة.',
       'lumen.calendar.previousMonth': 'الشهر السابق',
       'lumen.calendar.releases': 'الإصدارات',
       'lumen.calendar.requestedFor': 'مطلوب لمنصة {platform}',
@@ -4826,6 +4840,18 @@ export const localeData = [
       'lumen.nav.games': 'ألعاب',
       'lumen.manageVideo.open': 'إدارة',
       'lumen.manageVideo.title': 'إدارة {title}',
+      'lumen.manageVideo.notAvailable': 'غير متاح',
+      'lumen.manageVideo.mediaFormat': 'الوسيط والتنسيق',
+      'lumen.manageVideo.movie': 'فيلم',
+      'lumen.manageVideo.series': 'مسلسل',
+      'lumen.manageVideo.releaseDate': 'تاريخ الإصدار',
+      'lumen.manageVideo.runtime': 'المدة',
+      'lumen.manageVideo.genres': 'الأنواع',
+      'lumen.manageVideo.director': 'المخرج',
+      'lumen.manageVideo.creator': 'المنشئ',
+      'lumen.manageVideo.studio': 'الاستوديو',
+      'lumen.manageVideo.network': 'الشبكة',
+      'lumen.manageVideo.titleDetails': 'تفاصيل العنوان',
       'lumen.manageVideo.pending': 'مطلوب',
       'lumen.manageVideo.processing': 'قيد المعالجة',
       'lumen.manageVideo.partial': 'متاح جزئيًا',
@@ -4908,6 +4934,17 @@ export const localeData = [
       'lumen.nav.lumenSettings': 'إعدادات Lumen',
       'lumen.nav.more': 'المزيد',
       'lumen.nav.pendingRequests': 'الطلبات المعلّقة: {count}',
+      'lumen.nav.openIssues': 'المشكلات المفتوحة: {count}',
+      'lumen.nav.unreadFollowUpdates': 'التحديثات غير المقروءة: {count}',
+      'lumen.nav.aboutVersionStatus': 'حول SeerrNG: {status}',
+      'lumen.nav.stableBuild': 'SeerrNG المستقر',
+      'lumen.nav.mainBuild': 'SeerrNG Main',
+      'lumen.nav.localBuild': 'نسخة محلية',
+      'lumen.nav.updateAvailable': 'يتوفر تحديث',
+      'lumen.nav.versionCheckUnavailable': 'تعذر التحقق من التحديثات',
+      'lumen.nav.versionOutOfDate': 'قديم',
+      'lumen.nav.oneCommitBehind': 'متأخر بتغيير واحد',
+      'lumen.nav.commitsBehind': 'متأخر بـ {count} تغييرات',
       'lumen.nav.seerrAdministration': 'إدارة SeerrNG',
       'lumen.nav.signedIn': 'تم تسجيل الدخول',
       'lumen.notifications.accountSettings': 'إعدادات الحساب',
@@ -5939,6 +5976,7 @@ export const localeData = [
       'lumen.tvRequests.episodeOption.one': '{count} حلقة',
       'lumen.tvRequests.episodeOption.other': '{count} حلقة',
       'lumen.tvRequests.episodeOption.two': '{count} حلقتين',
+      'lumen.tvRequests.cancel': 'إلغاء',
       'lumen.tvRequests.loadingAccess': 'جارٍ تحميل إعدادات طلبات التلفاز…',
       'lumen.videoCredits.backToDetails': 'العودة إلى التفاصيل',
       'lumen.videoCredits.cast': 'طاقم التمثيل',
@@ -6380,6 +6418,12 @@ export const localeData = [
       'lumen.games.waitingApproval': 'بانتظار الموافقة',
       'lumen.games.requestedTitle': 'تم طلب {title}',
       'lumen.games.quotaReached': 'لقد وصلت إلى الحد الأقصى لطلبات الألعاب.',
+      'lumen.games.softwareQuota': 'حد طلبات البرامج',
+      'lumen.games.softwareQuotaLoadFailure': 'تعذر تحميل حدود طلبات البرامج.',
+      'lumen.games.softwareQuotaReached': 'لقد وصلت إلى حد طلبات البرامج.',
+      'lumen.games.softwareQuotaRemaining':
+        'متبقي {remaining} من أصل {limit} طلبات برامج.',
+      'lumen.games.recheckQuota': 'إعادة التحقق من الحد',
       'lumen.games.gameWhat': 'هذه اللعبة',
       'lumen.sports.followed': 'تمت متابعتها',
       'lumen.sports.catalogTitle': 'الرياضة',
@@ -6493,6 +6537,19 @@ export const localeData = [
       'lumen.adult.serverFilter': 'الخادم',
       'lumen.adult.allServices': 'الكل',
       'lumen.adult.sceneLoadFailed': 'تعذّر تحميل هذا المشهد',
+      'lumen.adult.quota': 'حصة طلبات المحتوى للبالغين',
+      'lumen.adult.quotaLoadFailure': 'تعذّر تحميل حصة طلبات المحتوى للبالغين.',
+      'lumen.adult.quotaLoading': 'جارٍ التحقق من حصة طلبات المحتوى للبالغين…',
+      'lumen.adult.quotaReached': 'تم بلوغ حصة طلبات المحتوى للبالغين.',
+      'lumen.adult.quotaRemaining':
+        'المتبقي {remaining} من أصل {limit} من طلبات المحتوى للبالغين.',
+      'lumen.adult.quotaPeriod': 'مدة الحصة: {days} يومًا.',
+      'lumen.adult.recheckQuota': 'إعادة التحقق من الحصة',
+      'lumen.adult.requestTitle': 'طلب مشهد للبالغين',
+      'lumen.adult.requestBackendFailure':
+        'فشل طلب المحتوى للبالغين أثناء المعالجة.',
+      'lumen.adult.requestFailure': 'تعذّر إرسال طلب المحتوى للبالغين.',
+      'lumen.adult.requestSubmitted': 'تم إرسال طلب المحتوى للبالغين.',
       'lumen.comics.title': 'القصص المصورة والمانغا',
       'lumen.comics.guidance':
         'اطلب سلاسل المانغا أو القصص المصورة. تصدر المجلدات والأعداد الجديدة عند نشرها؛ وتُستخدم النسخة الإنجليزية من المانغا ما لم تختر نسخة أخرى.',
@@ -6606,6 +6663,8 @@ export const localeData = [
       'lumen.comicDetail.editionLookupFailed':
         'تعذر البحث عن النسخ الآن. أعد المحاولة بعد دقيقة.',
       'lumen.comicDetail.editions': 'النسخ',
+      'lumen.comicDetail.configuredRootFolder': 'الافتراضي المضبوط ({path})',
+      'lumen.comicDetail.defaultService': 'الافتراضي ({name})',
       'lumen.comicDetail.finished': 'مكتملة',
       'lumen.comicDetail.inLibrary': 'في المكتبة',
       'lumen.comicDetail.issue': 'العدد',
@@ -6616,6 +6675,21 @@ export const localeData = [
       'lumen.comicDetail.lookingUpEditions': 'جارٍ البحث عن النسخ…',
       'lumen.comicDetail.manga': 'مانغا',
       'lumen.comicDetail.mangaLanguageEdition': 'مانغا، نسخة {language}',
+      'lumen.comicDetail.noComicService':
+        'لم يتم إعداد خدمة للقصص المصورة. طلب القصص المصورة غير متاح.',
+      'lumen.comicDetail.quota': 'حصة طلبات القصص المصورة',
+      'lumen.comicDetail.quotaLoadFailure':
+        'تعذر تحميل حدود طلبات القصص المصورة.',
+      'lumen.comicDetail.quotaReached': 'لقد وصلت إلى حد طلبات القصص المصورة.',
+      'lumen.comicDetail.quotaRemaining':
+        'متبقي {remaining} من أصل {limit} طلبات قصص مصورة.',
+      'lumen.comicDetail.quotaPeriod': 'مدة الحصة: {days} يومًا.',
+      'lumen.comicDetail.quotaLoading':
+        'جارٍ التحقق من حصة طلبات القصص المصورة…',
+      'lumen.comicDetail.recheckQuota': 'إعادة التحقق من الحصة',
+      'lumen.comicDetail.confirmRequestTitle': 'طلب قصة مصورة',
+      'lumen.comicDetail.confirmRequestHelp':
+        'تحقق من حصة القصص المصورة وأكد هذا الطلب.',
       'lumen.comicDetail.noComicVineEdition':
         'لا تتوفر نسخة من هذه السلسلة على ComicVine بعد، لذا لا يمكن طلبها.',
       'lumen.comicDetail.noEdition': 'لا توجد نسخة لطلبها بعد',
@@ -6628,8 +6702,18 @@ export const localeData = [
       'lumen.comicDetail.recommended': 'موصى بها',
       'lumen.comicDetail.requestEdition': 'طلب · {edition}',
       'lumen.comicDetail.requestFailed': 'فشل الطلب',
+      'lumen.comicDetail.requestOptionsHelp':
+        'اختر خدمة للقصص المصورة ومجلدًا جذريًا في Kapowarr عند استخدامه.',
+      'lumen.comicDetail.requestOptionsTitle': 'خيارات طلب القصص المصورة',
       'lumen.comicDetail.requestManga': 'طلب المانغا',
       'lumen.comicDetail.requestSeries': 'طلب السلسلة',
+      'lumen.comicDetail.serviceFailure':
+        'وقد قُدِّم الطلب، غير أن دائرة الصور المصورة رفضته أثناء تجهيزه.',
+      'lumen.comicDetail.service': 'خدمة القصص المصورة',
+      'lumen.comicDetail.serviceLoadFailure':
+        'تعذر تحميل خيارات خدمة القصص المصورة. سيستخدم الطلب الخدمة الافتراضية.',
+      'lumen.comicDetail.rootFolder': 'المجلد الجذري في Kapowarr',
+      'lumen.comicDetail.submitRequest': 'إرسال الطلب',
       'lumen.comicDetail.started': 'بدأت',
       'lumen.comicDetail.status': 'الحالة',
       'lumen.comicDetail.theIssues': 'الأعداد',
@@ -7880,6 +7964,10 @@ export const localeData = [
         'Обработване на блокираните етикети',
       'components.Settings.SettingsJobsCache.radarr-scan':
         'Сканиране на Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        'Задачата {jobname} е отменена.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        'Задачата {jobname} стартира.',
       'components.Settings.SettingsJobsCache.runnow': 'Изпълни сега',
       'components.Settings.SettingsJobsCache.sonarr-scan':
         'Сканиране на Sonarr',
@@ -8561,6 +8649,10 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Processa les etiquetes bloquejades',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Escaneig de Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        "{jobname} s'ha cancel·lat.",
+      'components.Settings.SettingsJobsCache.jobstarted':
+        "S'ha iniciat {jobname}.",
       'components.Settings.SettingsJobsCache.runnow': 'Executa-ho ara',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Escaneig de Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -9093,6 +9185,9 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Zpracovat štítky blokování',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Prohledat Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} zrušeno.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} spuštěno.',
       'components.Settings.SettingsJobsCache.runnow': 'Spustit nyní',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Prohledat Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -9755,6 +9850,9 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Behandl skjulnings-tags',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr-scanning',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} annulleret.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} startet.',
       'components.Settings.SettingsJobsCache.runnow': 'Kør nu',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr-scanning',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -10807,6 +10905,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': 'Aufgabe abbrechen',
       'components.Settings.SettingsJobsCache.command': 'Befehl',
       'components.Settings.SettingsJobsCache.disabled': 'Deaktiviert',
+      'components.Settings.SettingsJobsCache.disablejob': 'Deaktivieren',
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS-Cache',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Zugriffe',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Fehlschläge',
@@ -10817,6 +10916,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         'Download Synchronisierung Zurücksetzen',
       'components.Settings.SettingsJobsCache.enabled': 'Aktiviert',
+      'components.Settings.SettingsJobsCache.enablejob': 'Aktivieren',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'Synchronisation der externen Anforderungsliste',
       'components.Settings.SettingsJobsCache.failures': 'Fehlschläge',
@@ -10869,6 +10969,14 @@ export const localeData = [
         'BookOrbit Kobo-Bibliothek-Synchronisation',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'Verlauf des Veröffentlichungskalenders',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} abgebrochen.',
+      'components.Settings.SettingsJobsCache.jobdisabled':
+        '{jobname} deaktiviert.',
+      'components.Settings.SettingsJobsCache.jobenabled':
+        '{jobname} aktiviert.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} gestartet.',
       'components.Settings.SettingsJobsCache.runnow': 'Jetzt ausführen',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'Software-Anforderungsabgleich',
@@ -12582,6 +12690,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': 'Cancel Job',
       'components.Settings.SettingsJobsCache.command': 'Command',
       'components.Settings.SettingsJobsCache.disabled': 'Disabled',
+      'components.Settings.SettingsJobsCache.disablejob': 'Disable',
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS Cache',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Hits',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Misses',
@@ -12591,6 +12700,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         'Download Sync Reset',
       'components.Settings.SettingsJobsCache.enabled': 'Enabled',
+      'components.Settings.SettingsJobsCache.enablejob': 'Enable',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'External Request List Sync',
       'components.Settings.SettingsJobsCache.failures': 'Failures',
@@ -12641,6 +12751,12 @@ export const localeData = [
         'BookOrbit Kobo Collection Sync',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'Release Calendar History',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} canceled.',
+      'components.Settings.SettingsJobsCache.jobdisabled':
+        '{jobname} disabled.',
+      'components.Settings.SettingsJobsCache.jobenabled': '{jobname} enabled.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} started.',
       'components.Settings.SettingsJobsCache.runnow': 'Run Now',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'Software Request Reconciliation',
@@ -14256,6 +14372,8 @@ export const localeData = [
         'Scanning{library} · {progress} of {total}',
       'lumen.adminMediaLibraries.settings': 'media server settings',
       'lumen.adminMediaLibraries.settingsUpdated': 'Library settings updated.',
+      'lumen.adminMediaLibraries.confirmFailure':
+        'Could not confirm saved media library settings. Keep the current state and try again.',
       'lumen.adminMediaLibraries.startScan': 'Start Full Scan',
       'lumen.adminMediaLibraries.tautulliLoadFailure':
         'Couldn’t Load Tautulli Settings',
@@ -14371,6 +14489,8 @@ export const localeData = [
       'lumen.adminReaderDelivery.removeSavedCredentials':
         'Remove Saved {provider} Credentials',
       'lumen.adminReaderDelivery.removeShelf': 'Remove Shelf',
+      'lumen.adminReaderDelivery.removeShelfConfirmFailure':
+        'Could not confirm the managed shelf was removed. Keep this dialog open and try again.',
       'lumen.adminReaderDelivery.removeShelfBody':
         'This removes the reader shelf. Library files are kept.',
       'lumen.adminReaderDelivery.removeShelfTitle': 'Remove {name}?',
@@ -15274,6 +15394,9 @@ export const localeData = [
         'No releases were returned by the sources that responded.',
       'lumen.calendar.partialSources':
         'Some release sources could not be reached. Their releases may be missing.',
+      'lumen.calendar.partialTitle':
+        'Some release sources could not be reached.',
+      'lumen.calendar.partialBody': 'Their releases may be missing.',
       'lumen.calendar.previousMonth': 'Previous Month',
       'lumen.calendar.releases': 'releases',
       'lumen.calendar.requestedFor': 'Requested for {platform}',
@@ -16659,6 +16782,18 @@ export const localeData = [
       'lumen.nav.games': 'Games',
       'lumen.manageVideo.open': 'Manage',
       'lumen.manageVideo.title': 'Manage {title}',
+      'lumen.manageVideo.notAvailable': 'Not Available',
+      'lumen.manageVideo.mediaFormat': 'Media & Format',
+      'lumen.manageVideo.movie': 'Movie',
+      'lumen.manageVideo.series': 'Series',
+      'lumen.manageVideo.releaseDate': 'Release Date',
+      'lumen.manageVideo.runtime': 'Runtime',
+      'lumen.manageVideo.genres': 'Genres',
+      'lumen.manageVideo.director': 'Director',
+      'lumen.manageVideo.creator': 'Creator',
+      'lumen.manageVideo.studio': 'Studio',
+      'lumen.manageVideo.network': 'Network',
+      'lumen.manageVideo.titleDetails': 'Title Details',
       'lumen.manageVideo.pending': 'Requested',
       'lumen.manageVideo.processing': 'Processing',
       'lumen.manageVideo.partial': 'Partially available',
@@ -16742,6 +16877,17 @@ export const localeData = [
       'lumen.nav.lumenSettings': 'Lumen Settings',
       'lumen.nav.more': 'More',
       'lumen.nav.pendingRequests': 'Pending requests: {count}',
+      'lumen.nav.openIssues': 'Open issues: {count}',
+      'lumen.nav.unreadFollowUpdates': 'Unread updates: {count}',
+      'lumen.nav.aboutVersionStatus': 'About SeerrNG: {status}',
+      'lumen.nav.stableBuild': 'SeerrNG Stable',
+      'lumen.nav.mainBuild': 'SeerrNG Main',
+      'lumen.nav.localBuild': 'Local build',
+      'lumen.nav.updateAvailable': 'Update available',
+      'lumen.nav.versionCheckUnavailable': 'Update check unavailable',
+      'lumen.nav.versionOutOfDate': 'Out of date',
+      'lumen.nav.oneCommitBehind': '1 commit behind',
+      'lumen.nav.commitsBehind': '{count} commits behind',
       'lumen.nav.seerrAdministration': 'SeerrNG Administration',
       'lumen.nav.signedIn': 'Signed in',
       'lumen.notifications.accountSettings': 'Account Settings',
@@ -17783,6 +17929,7 @@ export const localeData = [
       'lumen.tvRequests.episodeAhead.other': '{count} episodes ahead',
       'lumen.tvRequests.episodeOption.one': '{count} episode',
       'lumen.tvRequests.episodeOption.other': '{count} episodes',
+      'lumen.tvRequests.cancel': 'Cancel',
       'lumen.tvRequests.loadingAccess': 'Loading TV request access…',
       'lumen.videoCredits.backToDetails': 'Back to Details',
       'lumen.videoCredits.cast': 'Cast',
@@ -18230,6 +18377,14 @@ export const localeData = [
       'lumen.games.waitingApproval': 'Waiting for approval',
       'lumen.games.requestedTitle': 'Requested {title}',
       'lumen.games.quotaReached': 'You’ve reached your game request limit.',
+      'lumen.games.softwareQuota': 'software request quota',
+      'lumen.games.softwareQuotaLoadFailure':
+        'Could not load software request limits.',
+      'lumen.games.softwareQuotaReached':
+        'You have reached your software request limit.',
+      'lumen.games.softwareQuotaRemaining':
+        '{remaining} of {limit} software requests remaining.',
+      'lumen.games.recheckQuota': 'Recheck quota',
       'lumen.games.gameWhat': 'this game',
       'lumen.sports.followed': 'Followed',
       'lumen.sports.catalogTitle': 'Sports',
@@ -18344,6 +18499,19 @@ export const localeData = [
       'lumen.adult.serverFilter': 'Service',
       'lumen.adult.allServices': 'All',
       'lumen.adult.sceneLoadFailed': 'Couldn’t load this scene',
+      'lumen.adult.quota': 'Adult request quota',
+      'lumen.adult.quotaLoadFailure': 'Could not load Adult request quota.',
+      'lumen.adult.quotaLoading': 'Checking Adult request quota…',
+      'lumen.adult.quotaReached': 'Adult request quota reached.',
+      'lumen.adult.quotaRemaining':
+        '{remaining} of {limit} Adult requests remaining.',
+      'lumen.adult.quotaPeriod': 'Quota period: {days} days.',
+      'lumen.adult.recheckQuota': 'Recheck quota',
+      'lumen.adult.requestTitle': 'Request Adult Scene',
+      'lumen.adult.requestBackendFailure':
+        'The Adult request failed while processing.',
+      'lumen.adult.requestFailure': 'The Adult request could not be submitted.',
+      'lumen.adult.requestSubmitted': 'Adult request submitted.',
       'lumen.comics.title': 'Comics/Manga',
       'lumen.comics.guidance':
         'Request a manga or comic series. New volumes and issues arrive as they come out; manga comes in its English edition unless you pick another.',
@@ -18460,6 +18628,8 @@ export const localeData = [
       'lumen.comicDetail.editionLookupFailed':
         'Couldn’t look up the editions right now. Try again in a minute.',
       'lumen.comicDetail.editions': 'Editions',
+      'lumen.comicDetail.configuredRootFolder': 'Configured default ({path})',
+      'lumen.comicDetail.defaultService': 'Default ({name})',
       'lumen.comicDetail.finished': 'Finished',
       'lumen.comicDetail.inLibrary': 'In library',
       'lumen.comicDetail.issue': 'Issue',
@@ -18470,6 +18640,21 @@ export const localeData = [
       'lumen.comicDetail.lookingUpEditions': 'Looking up editions…',
       'lumen.comicDetail.manga': 'Manga',
       'lumen.comicDetail.mangaLanguageEdition': 'Manga, {language} edition',
+      'lumen.comicDetail.noComicService':
+        'No comics service is configured. Comic requests are unavailable.',
+      'lumen.comicDetail.quota': 'comic request quota',
+      'lumen.comicDetail.quotaLoadFailure':
+        'Could not load comic request limits.',
+      'lumen.comicDetail.quotaReached':
+        'You have reached your comic request limit.',
+      'lumen.comicDetail.quotaRemaining':
+        '{remaining} of {limit} comic requests remaining.',
+      'lumen.comicDetail.quotaPeriod': 'Quota period: {days} days.',
+      'lumen.comicDetail.quotaLoading': 'Checking comic request quota…',
+      'lumen.comicDetail.recheckQuota': 'Recheck quota',
+      'lumen.comicDetail.confirmRequestTitle': 'Request Comic',
+      'lumen.comicDetail.confirmRequestHelp':
+        'Review the comic quota and confirm this request.',
       'lumen.comicDetail.noComicVineEdition':
         'ComicVine has no edition of this series yet, so it can’t be requested.',
       'lumen.comicDetail.noEdition': 'No edition to request yet',
@@ -18482,8 +18667,18 @@ export const localeData = [
       'lumen.comicDetail.recommended': 'Recommended',
       'lumen.comicDetail.requestEdition': 'Request · {edition}',
       'lumen.comicDetail.requestFailed': 'Request failed',
+      'lumen.comicDetail.requestOptionsHelp':
+        'Choose a comics service and, for Kapowarr, a root folder.',
+      'lumen.comicDetail.requestOptionsTitle': 'Comic request options',
       'lumen.comicDetail.requestManga': 'Request manga',
       'lumen.comicDetail.requestSeries': 'Request series',
+      'lumen.comicDetail.serviceFailure':
+        'The request was submitted, but the comics service rejected it while processing.',
+      'lumen.comicDetail.service': 'Comics service',
+      'lumen.comicDetail.serviceLoadFailure':
+        'Could not load comic service options. The request will use the default service.',
+      'lumen.comicDetail.rootFolder': 'Kapowarr root folder',
+      'lumen.comicDetail.submitRequest': 'Submit request',
       'lumen.comicDetail.started': 'Started',
       'lumen.comicDetail.status': 'Status',
       'lumen.comicDetail.theIssues': 'the issues',
@@ -19688,6 +19883,9 @@ export const localeData = [
         'Συγχρονισμός λίστας παρακολούθησης Plex',
       'components.Settings.SettingsJobsCache.process': 'Διεργασία',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Σάρωση Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} ακυρώθηκε.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} ξεκίνησε.',
       'components.Settings.SettingsJobsCache.runnow': 'Τρέξε τώρα',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Σάρωση Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -20617,6 +20815,7 @@ export const localeData = [
         'Cancelar Tarea Programada',
       'components.Settings.SettingsJobsCache.command': 'Comando',
       'components.Settings.SettingsJobsCache.disabled': 'Desactivado',
+      'components.Settings.SettingsJobsCache.disablejob': 'Deshabilitar',
       'components.Settings.SettingsJobsCache.dnsCache': 'Caché DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Aciertos',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Fallos',
@@ -20627,6 +20826,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         'Reiniciar Descarga Sincronizada',
       'components.Settings.SettingsJobsCache.enabled': 'Activado',
+      'components.Settings.SettingsJobsCache.enablejob': 'Habilitar',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'Sincronización de lista de solicitudes externas',
       'components.Settings.SettingsJobsCache.failures': 'Fallos',
@@ -20682,6 +20882,14 @@ export const localeData = [
         'Sincronización de colección Kobo de BookOrbit',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'Historia del calendario de lanzamiento',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} cancelada.',
+      'components.Settings.SettingsJobsCache.jobdisabled':
+        '{jobname} discapacitados.',
+      'components.Settings.SettingsJobsCache.jobenabled':
+        '{jobname} habilitado.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} comenzada.',
       'components.Settings.SettingsJobsCache.runnow': 'Ejecutar Ahora',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'Solicitud de software',
@@ -22404,6 +22612,7 @@ export const localeData = [
         'Cancelar Tarea Programada',
       'components.Settings.SettingsJobsCache.command': 'Comando',
       'components.Settings.SettingsJobsCache.disabled': 'Desactivado',
+      'components.Settings.SettingsJobsCache.disablejob': 'Deshabilitar',
       'components.Settings.SettingsJobsCache.dnsCache': 'Caché DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Golpes',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'falla',
@@ -22414,6 +22623,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         'Reiniciar Descarga Sincronizada',
       'components.Settings.SettingsJobsCache.enabled': 'Activado',
+      'components.Settings.SettingsJobsCache.enablejob': 'Habilitar',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'Sincronización de lista de solicitudes externas',
       'components.Settings.SettingsJobsCache.failures': 'Fallos',
@@ -22469,6 +22679,14 @@ export const localeData = [
         'Sincronización de colección Kobo de BookOrbit',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'Historia del calendario de lanzamiento',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} cancelada.',
+      'components.Settings.SettingsJobsCache.jobdisabled':
+        '{jobname} discapacitados.',
+      'components.Settings.SettingsJobsCache.jobenabled':
+        '{jobname} habilitado.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} comenzada.',
       'components.Settings.SettingsJobsCache.runnow': 'Ejecutar Ahora',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'Solicitud de software',
@@ -23812,6 +24030,10 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Töötle mustas nimekirjas olevaid silte',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Radarri skannimine',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} tühistati.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} käivitati.',
       'components.Settings.SettingsJobsCache.runnow': 'Käivita kohe',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarri skannimine',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -25111,6 +25333,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': 'Annuler la tâche',
       'components.Settings.SettingsJobsCache.command': 'Commande',
       'components.Settings.SettingsJobsCache.disabled': 'Désactivé',
+      'components.Settings.SettingsJobsCache.disablejob': 'Désactiver',
       'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Succès',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Manquées',
@@ -25121,6 +25344,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         'Reset de la synchronisation des téléchargements',
       'components.Settings.SettingsJobsCache.enabled': 'Activé',
+      'components.Settings.SettingsJobsCache.enablejob': 'Activer',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'Synchronisation de la liste de demandes externe',
       'components.Settings.SettingsJobsCache.failures': 'Échecs',
@@ -25174,6 +25398,12 @@ export const localeData = [
         'Synchronisation de la collection Kobo BookOrbit',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'Historique du calendrier de publication',
+      'components.Settings.SettingsJobsCache.jobcancelled': '{jobname} annulé.',
+      'components.Settings.SettingsJobsCache.jobdisabled':
+        '{jobname} handicapés.',
+      'components.Settings.SettingsJobsCache.jobenabled': '{jobname} activé.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} a commencé.',
       'components.Settings.SettingsJobsCache.runnow': 'Exécuter',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'Rapprochement des demandes de logiciels',
@@ -26913,6 +27143,8 @@ export const localeData = [
       'lumen.adminMediaLibraries.settings': 'paramètres du serveur multimédia',
       'lumen.adminMediaLibraries.settingsUpdated':
         'Paramètres de la bibliothèque mis à jour.',
+      'lumen.adminMediaLibraries.confirmFailure':
+        'Impossible de confirmer l’enregistrement des paramètres de bibliothèque. Conservez l’état actuel et réessayez.',
       'lumen.adminMediaLibraries.startScan': 'Lancer l’analyse complète',
       'lumen.adminMediaLibraries.tautulliLoadFailure':
         'Impossible de charger les paramètres Tautulli',
@@ -27038,6 +27270,8 @@ export const localeData = [
       'lumen.adminReaderDelivery.removeSavedCredentials':
         'Supprimer les identifiants enregistrés de {provider}',
       'lumen.adminReaderDelivery.removeShelf': 'Supprimer le rayon',
+      'lumen.adminReaderDelivery.removeShelfConfirmFailure':
+        'Impossible de confirmer la suppression du rayon géré. Gardez cette fenêtre ouverte et réessayez.',
       'lumen.adminReaderDelivery.removeShelfBody':
         'Cette action supprime le rayon. Les fichiers de la bibliothèque sont conservés.',
       'lumen.adminReaderDelivery.removeShelfTitle': 'Supprimer {name} ?',
@@ -28007,6 +28241,9 @@ export const localeData = [
         'Les sources qui ont répondu n’ont renvoyé aucune sortie.',
       'lumen.calendar.partialSources':
         'Certaines sources de sorties sont inaccessibles. Leurs sorties peuvent manquer.',
+      'lumen.calendar.partialTitle':
+        'Certaines sources de sorties sont inaccessibles.',
+      'lumen.calendar.partialBody': 'Leurs sorties peuvent manquer.',
       'lumen.calendar.previousMonth': 'Mois précédent',
       'lumen.calendar.releases': 'sorties',
       'lumen.calendar.requestedFor': 'Demandé pour {platform}',
@@ -29570,6 +29807,18 @@ export const localeData = [
       'lumen.nav.games': 'Jeux',
       'lumen.manageVideo.open': 'Gérer',
       'lumen.manageVideo.title': 'Gérer {title}',
+      'lumen.manageVideo.notAvailable': 'Non Disponible',
+      'lumen.manageVideo.mediaFormat': 'Média et Format',
+      'lumen.manageVideo.movie': 'Film',
+      'lumen.manageVideo.series': 'Série',
+      'lumen.manageVideo.releaseDate': 'Date de Sortie',
+      'lumen.manageVideo.runtime': 'Durée',
+      'lumen.manageVideo.genres': 'Genres',
+      'lumen.manageVideo.director': 'Réalisateur',
+      'lumen.manageVideo.creator': 'Créateur',
+      'lumen.manageVideo.studio': 'Studio',
+      'lumen.manageVideo.network': 'Réseau',
+      'lumen.manageVideo.titleDetails': 'Détails du Titre',
       'lumen.manageVideo.pending': 'Demandé',
       'lumen.manageVideo.processing': 'En cours',
       'lumen.manageVideo.partial': 'Partiellement disponible',
@@ -29659,6 +29908,18 @@ export const localeData = [
       'lumen.nav.lumenSettings': 'Paramètres de Lumen',
       'lumen.nav.more': 'Plus',
       'lumen.nav.pendingRequests': 'Demandes en attente : {count}',
+      'lumen.nav.openIssues': 'Problèmes ouverts : {count}',
+      'lumen.nav.unreadFollowUpdates': 'Mises à jour non lues : {count}',
+      'lumen.nav.aboutVersionStatus': 'À propos de SeerrNG : {status}',
+      'lumen.nav.stableBuild': 'SeerrNG stable',
+      'lumen.nav.mainBuild': 'SeerrNG Main',
+      'lumen.nav.localBuild': 'Version locale',
+      'lumen.nav.updateAvailable': 'Mise à jour disponible',
+      'lumen.nav.versionCheckUnavailable':
+        'Vérification des mises à jour indisponible',
+      'lumen.nav.versionOutOfDate': 'Obsolète',
+      'lumen.nav.oneCommitBehind': '1 commit de retard',
+      'lumen.nav.commitsBehind': '{count} commits de retard',
       'lumen.nav.seerrAdministration': 'Administration de SeerrNG',
       'lumen.nav.signedIn': 'Connecté',
       'lumen.notifications.accountSettings': 'Paramètres du compte',
@@ -30774,6 +31035,7 @@ export const localeData = [
       'lumen.tvRequests.episodeAhead.other': '{count} épisodes à venir',
       'lumen.tvRequests.episodeOption.one': '{count} épisode',
       'lumen.tvRequests.episodeOption.other': '{count} épisodes',
+      'lumen.tvRequests.cancel': 'Annuler',
       'lumen.tvRequests.loadingAccess':
         'Chargement des autorisations de demande TV…',
       'lumen.videoCredits.backToDetails': 'Retour aux détails',
@@ -31262,6 +31524,14 @@ export const localeData = [
       'lumen.games.requestedTitle': 'Demande envoyée : {title}',
       'lumen.games.quotaReached':
         'Vous avez atteint votre limite de demandes de jeux.',
+      'lumen.games.softwareQuota': 'quota des demandes de logiciels',
+      'lumen.games.softwareQuotaLoadFailure':
+        'Impossible de charger les limites de demandes de logiciels.',
+      'lumen.games.softwareQuotaReached':
+        'Vous avez atteint votre limite de demandes de logiciels.',
+      'lumen.games.softwareQuotaRemaining':
+        'Il reste {remaining} demande(s) de logiciels sur {limit}.',
+      'lumen.games.recheckQuota': 'Vérifier à nouveau le quota',
       'lumen.games.gameWhat': 'ce jeu',
       'lumen.sports.followed': 'Suivie',
       'lumen.sports.catalogTitle': 'Sports',
@@ -31380,6 +31650,23 @@ export const localeData = [
       'lumen.adult.serverFilter': 'Serveur',
       'lumen.adult.allServices': 'Tous',
       'lumen.adult.sceneLoadFailed': 'Impossible de charger cette scène',
+      'lumen.adult.quota': 'Quota de demandes de contenu adulte',
+      'lumen.adult.quotaLoadFailure':
+        'Impossible de charger le quota de demandes de contenu adulte.',
+      'lumen.adult.quotaLoading':
+        'Vérification du quota de demandes de contenu adulte…',
+      'lumen.adult.quotaReached':
+        'Le quota de demandes de contenu adulte est atteint.',
+      'lumen.adult.quotaRemaining':
+        'Il reste {remaining} demande(s) de contenu adulte sur {limit}.',
+      'lumen.adult.quotaPeriod': 'Période du quota : {days} jours.',
+      'lumen.adult.recheckQuota': 'Vérifier à nouveau le quota',
+      'lumen.adult.requestTitle': 'Demander une scène pour adultes',
+      'lumen.adult.requestBackendFailure':
+        'La demande de contenu adulte a échoué pendant son traitement.',
+      'lumen.adult.requestFailure':
+        'Impossible d’envoyer la demande de contenu adulte.',
+      'lumen.adult.requestSubmitted': 'Demande de contenu adulte envoyée.',
       'lumen.comics.title': 'BD et mangas',
       'lumen.comics.guidance':
         'Demandez une série de mangas ou de bandes dessinées. Les nouveaux volumes et numéros arrivent à leur sortie; le manga utilise son édition anglaise sauf si vous en choisissez une autre.',
@@ -31504,6 +31791,9 @@ export const localeData = [
       'lumen.comicDetail.editionLookupFailed':
         'Impossible de rechercher les éditions pour le moment. Réessayez dans une minute.',
       'lumen.comicDetail.editions': 'Éditions',
+      'lumen.comicDetail.configuredRootFolder':
+        'Valeur par défaut configurée ({path})',
+      'lumen.comicDetail.defaultService': 'Par défaut ({name})',
       'lumen.comicDetail.finished': 'Terminée',
       'lumen.comicDetail.inLibrary': 'Dans la bibliothèque',
       'lumen.comicDetail.issue': 'Numéro',
@@ -31514,6 +31804,22 @@ export const localeData = [
       'lumen.comicDetail.lookingUpEditions': 'Recherche des éditions…',
       'lumen.comicDetail.manga': 'Manga',
       'lumen.comicDetail.mangaLanguageEdition': 'Manga, édition {language}',
+      'lumen.comicDetail.noComicService':
+        "Aucun service de bande dessinée n'est configuré. Les demandes de bande dessinée sont indisponibles.",
+      'lumen.comicDetail.quota': 'quota des demandes de bandes dessinées',
+      'lumen.comicDetail.quotaLoadFailure':
+        'Impossible de charger les limites de demandes de bandes dessinées.',
+      'lumen.comicDetail.quotaReached':
+        'Vous avez atteint votre limite de demandes de bandes dessinées.',
+      'lumen.comicDetail.quotaRemaining':
+        'Il reste {remaining} demande(s) de bandes dessinées sur {limit}.',
+      'lumen.comicDetail.quotaPeriod': 'Période du quota : {days} jours.',
+      'lumen.comicDetail.quotaLoading':
+        'Vérification du quota de demandes de bandes dessinées…',
+      'lumen.comicDetail.recheckQuota': 'Vérifier à nouveau le quota',
+      'lumen.comicDetail.confirmRequestTitle': 'Demander une bande dessinée',
+      'lumen.comicDetail.confirmRequestHelp':
+        'Vérifiez le quota de bandes dessinées et confirmez cette demande.',
       'lumen.comicDetail.noComicVineEdition':
         'ComicVine ne propose pas encore d’édition de cette série, qui ne peut donc pas être demandée.',
       'lumen.comicDetail.noEdition': 'Aucune édition à demander pour le moment',
@@ -31526,8 +31832,19 @@ export const localeData = [
       'lumen.comicDetail.recommended': 'Recommandée',
       'lumen.comicDetail.requestEdition': 'Demander · {edition}',
       'lumen.comicDetail.requestFailed': 'Échec de la demande',
+      'lumen.comicDetail.requestOptionsHelp':
+        'Choisissez un service de bande dessinée et, pour Kapowarr, un dossier racine.',
+      'lumen.comicDetail.requestOptionsTitle':
+        'Options de demande de bande dessinée',
       'lumen.comicDetail.requestManga': 'Demander le manga',
       'lumen.comicDetail.requestSeries': 'Demander la série',
+      'lumen.comicDetail.serviceFailure':
+        "La demande a été présentée, mais le service de bande dessinée l'a rejetée pendant le traitement.",
+      'lumen.comicDetail.service': 'Service de bande dessinée',
+      'lumen.comicDetail.serviceLoadFailure':
+        'Impossible de charger les services de bande dessinée. La demande utilisera le service par défaut.',
+      'lumen.comicDetail.rootFolder': 'Dossier racine Kapowarr',
+      'lumen.comicDetail.submitRequest': 'Envoyer la demande',
       'lumen.comicDetail.started': 'Début',
       'lumen.comicDetail.status': 'Statut',
       'lumen.comicDetail.theIssues': 'les numéros',
@@ -32795,6 +33112,10 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process': 'Obrada',
       'components.Settings.SettingsJobsCache.radarr-scan':
         'Radarr pretraživanje',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        'Zadatak {jobname} prekinut.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        'Zadatak {jobname} je pokrenut.',
       'components.Settings.SettingsJobsCache.runnow': 'Pokreni sada',
       'components.Settings.SettingsJobsCache.sonarr-scan':
         'Sonarr pretraživanje',
@@ -33945,6 +34266,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': 'नौकरी रद्द करना',
       'components.Settings.SettingsJobsCache.command': 'कमान',
       'components.Settings.SettingsJobsCache.disabled': 'अक्षम',
+      'components.Settings.SettingsJobsCache.disablejob': 'अक्षम',
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS कैश',
       'components.Settings.SettingsJobsCache.dnscachehits': 'हिट',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'मिस',
@@ -33953,6 +34275,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         'Sync रीसेट डाउनलोड करें',
       'components.Settings.SettingsJobsCache.enabled': 'सक्षम',
+      'components.Settings.SettingsJobsCache.enablejob': 'सक्षम करें',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'बाहरी अनुरोध सूची सिंक',
       'components.Settings.SettingsJobsCache.failures': 'विफलता',
@@ -34003,6 +34326,12 @@ export const localeData = [
         'BookOrbit Kobo संग्रह सिंक',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'रिलीज कैलेंडर इतिहास',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} रद्द करना',
+      'components.Settings.SettingsJobsCache.jobdisabled': '{jobname} विकलांग',
+      'components.Settings.SettingsJobsCache.jobenabled': '{jobname} सक्षम',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} शुरू किया।',
       'components.Settings.SettingsJobsCache.runnow': 'अब चलायें',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'सॉफ्टवेयर अनुरोध पारस्परिकता',
@@ -35318,6 +35647,9 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Tiltólistázott címkék feldolgozása',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr szkennelés',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} megszakítva.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} elindult.',
       'components.Settings.SettingsJobsCache.runnow': 'Futtatás most',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr szkennelés',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -36353,6 +36685,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': 'Batalkan Tugas',
       'components.Settings.SettingsJobsCache.command': 'Perintah',
       'components.Settings.SettingsJobsCache.disabled': 'Dinonaktifkan',
+      'components.Settings.SettingsJobsCache.disablejob': 'Matikan',
       'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Pukulan',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Hilang',
@@ -36361,6 +36694,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync': 'Unduh Selaraskan',
       'components.Settings.SettingsJobsCache.download-sync-reset': 'undo-type',
       'components.Settings.SettingsJobsCache.enabled': 'Diaktifkan',
+      'components.Settings.SettingsJobsCache.enablejob': 'Aktifkan',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'Sinkronisasi Daftar Permintaan Eksternal',
       'components.Settings.SettingsJobsCache.failures': 'Gagal',
@@ -36414,6 +36748,13 @@ export const localeData = [
         'Sinkronisasi Koleksi BookOrbit Kobo',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'Rilis Riwayat Kalender',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} dibatalkan.',
+      'components.Settings.SettingsJobsCache.jobdisabled':
+        '{jobname} dinonaktifkan.',
+      'components.Settings.SettingsJobsCache.jobenabled':
+        '{jobname} diaktifkan.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} dimulai.',
       'components.Settings.SettingsJobsCache.runnow': 'Jalankan Sekarang',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'Permintaan Software Rekonsiliasi',
@@ -37738,6 +38079,9 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Processa i Tag bloccati',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Scansione Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} annullato.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} avviato.',
       'components.Settings.SettingsJobsCache.runnow': 'Esegui ora',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Scansione Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -38768,6 +39112,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': 'ジョブのキャンセル',
       'components.Settings.SettingsJobsCache.command': 'コマンド',
       'components.Settings.SettingsJobsCache.disabled': '無効',
+      'components.Settings.SettingsJobsCache.disablejob': '無効化',
       'components.Settings.SettingsJobsCache.dnsCache': 'DNSキャッシュ',
       'components.Settings.SettingsJobsCache.dnscachehits': 'ヒット数',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'ミス',
@@ -38777,6 +39122,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         'ダウンロード同期のリセット',
       'components.Settings.SettingsJobsCache.enabled': '有効化',
+      'components.Settings.SettingsJobsCache.enablejob': '有効化',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         '外部リクエストリスト同期',
       'components.Settings.SettingsJobsCache.failures': '失敗',
@@ -38831,6 +39177,14 @@ export const localeData = [
         'BookOrbit Koboコレクション同期',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'リリースカレンダー履歴',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} がキャンセルされました。',
+      'components.Settings.SettingsJobsCache.jobdisabled':
+        '{jobname} 無効です。',
+      'components.Settings.SettingsJobsCache.jobenabled':
+        '{jobname} 有効にします。',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} が開始されました。',
       'components.Settings.SettingsJobsCache.runnow': '今すぐ実行',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'ソフトウェア要求の承諾',
@@ -40491,6 +40845,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': '작업 취소',
       'components.Settings.SettingsJobsCache.command': '명령',
       'components.Settings.SettingsJobsCache.disabled': '비활성화됨',
+      'components.Settings.SettingsJobsCache.disablejob': '비활성화',
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS 캐시',
       'components.Settings.SettingsJobsCache.dnscachehits': '적중 수',
       'components.Settings.SettingsJobsCache.dnscachemisses': '실패',
@@ -40500,6 +40855,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         '다운로드 동기화 재설정',
       'components.Settings.SettingsJobsCache.enabled': '활성화됨',
+      'components.Settings.SettingsJobsCache.enablejob': '활성화',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         '외부 요청 목록 동기화',
       'components.Settings.SettingsJobsCache.failures': '실패',
@@ -40550,6 +40906,13 @@ export const localeData = [
         'BookOrbit Kobo 컬렉션 동기화',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         '릴리스 일정 기록',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname}이(가) 취소되었습니다.',
+      'components.Settings.SettingsJobsCache.jobdisabled': '{jobname} 이용안내',
+      'components.Settings.SettingsJobsCache.jobenabled':
+        '{jobname}가 활성화되었습니다.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname}이(가) 시작되었습니다.',
       'components.Settings.SettingsJobsCache.runnow': '지금 실행',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         '소프트웨어 요청 재구성',
@@ -41923,6 +42286,9 @@ export const localeData = [
         'Synkronisering av Plex Visningsliste',
       'components.Settings.SettingsJobsCache.process': 'Prosess',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr-skann',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} stanset.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} startet.',
       'components.Settings.SettingsJobsCache.runnow': 'Kjør nå',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr-skann',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -42453,6 +42819,9 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Geblokkeerde labels verwerken',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr-scan',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} geannuleerd.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} gestart.',
       'components.Settings.SettingsJobsCache.runnow': 'Nu uitvoeren',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr-scan',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -43128,6 +43497,10 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Przetwarzaj tagi czarnej listy',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Skan Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} anulowane.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} rozpoczęte.',
       'components.Settings.SettingsJobsCache.runnow': 'Uruchom teraz',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Skanowanie Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -44182,6 +44555,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': 'Cancelar Tarefa',
       'components.Settings.SettingsJobsCache.command': 'Comando',
       'components.Settings.SettingsJobsCache.disabled': 'Desativado',
+      'components.Settings.SettingsJobsCache.disablejob': 'Desativar',
       'components.Settings.SettingsJobsCache.dnsCache': 'Cache DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Acertos',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Falhas',
@@ -44192,6 +44566,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         'Limpar Sincronização de Download',
       'components.Settings.SettingsJobsCache.enabled': 'Activado',
+      'components.Settings.SettingsJobsCache.enablejob': 'Activar',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'Sincronização de Lista de Solicitações Externa',
       'components.Settings.SettingsJobsCache.failures': 'Falhas',
@@ -44249,6 +44624,13 @@ export const localeData = [
         'Sincronização de Coleção Kobo BookOrbit',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'Histórico do calendário de lançamento',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} cancelado(a).',
+      'components.Settings.SettingsJobsCache.jobdisabled':
+        '{jobname} Deficiente.',
+      'components.Settings.SettingsJobsCache.jobenabled': '{jobname} Ativado.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} iniciado(a).',
       'components.Settings.SettingsJobsCache.runnow': 'Executar Agora',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'Solicitação de Software Reconciliação',
@@ -45563,6 +45945,10 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Processar tags bloqueadas',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Sincronizar Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} cancelado(a).',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} iniciado(a).',
       'components.Settings.SettingsJobsCache.runnow': 'Executar Agora',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Sincronizar Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -46585,6 +46971,10 @@ export const localeData = [
         'Обработать заблокированные теги',
       'components.Settings.SettingsJobsCache.radarr-scan':
         'Сканирование Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        'Задание "{jobname}" отменено.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        'Задание "{jobname}" запущено.',
       'components.Settings.SettingsJobsCache.runnow': 'Выполнить сейчас',
       'components.Settings.SettingsJobsCache.sonarr-scan':
         'Сканирование Sonarr',
@@ -47162,6 +47552,9 @@ export const localeData = [
         'Skanimi i të shtuarave kohët e fundit nga Plex',
       'components.Settings.SettingsJobsCache.process': 'Procesi',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Skanimi i Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} u anulua.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} filloi.',
       'components.Settings.SettingsJobsCache.runnow': 'Nise Tani',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Skanimi i Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -47398,6 +47791,10 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.flushcache': 'Obriši keš',
       'components.Settings.SettingsJobsCache.process': 'Proces',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr skeniranje',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} je otkazan.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} je započeo.',
       'components.Settings.SettingsJobsCache.runnow': 'Pokreni sada',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr skeniranje',
       'components.Settings.SettingsLogs.filterDebug': 'Otklanjanje grešaka',
@@ -47862,6 +48259,9 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Bearbeta blockerade taggar',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr-skanning',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} avbrutet.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} startat.',
       'components.Settings.SettingsJobsCache.runnow': 'Kör nu',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr-skanning',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -48521,6 +48921,10 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.process-blocklisted-tags':
         'Engellenen Etiketleri İşle',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Radarr Taraması',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname} iptal edildi.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} başlatıldı.',
       'components.Settings.SettingsJobsCache.runnow': 'Şimdi Çalıştır',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Sonarr Taraması',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -49161,6 +49565,10 @@ export const localeData = [
         'Синхронізація списку перегляду Plex',
       'components.Settings.SettingsJobsCache.process': 'Процес',
       'components.Settings.SettingsJobsCache.radarr-scan': 'Сканування Radarr',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        'Завдання "{jobname}" скасовано.',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        'Завдання "{jobname}" запущено.',
       'components.Settings.SettingsJobsCache.runnow': 'Виконати зараз',
       'components.Settings.SettingsJobsCache.sonarr-scan': 'Сканування Sonarr',
       'components.Settings.SettingsLogs.copiedLogMessage':
@@ -50122,6 +50530,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': '取消作业',
       'components.Settings.SettingsJobsCache.command': '命令',
       'components.Settings.SettingsJobsCache.disabled': '已禁用',
+      'components.Settings.SettingsJobsCache.disablejob': '禁用',
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS 缓存',
       'components.Settings.SettingsJobsCache.dnscachehits': '点击数',
       'components.Settings.SettingsJobsCache.dnscachemisses': '错过',
@@ -50130,6 +50539,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         '下载状态同步复位',
       'components.Settings.SettingsJobsCache.enabled': '已启用',
+      'components.Settings.SettingsJobsCache.enablejob': '启用',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         '外部请求列表同步',
       'components.Settings.SettingsJobsCache.failures': '失败',
@@ -50178,6 +50588,12 @@ export const localeData = [
         'BookOrbit Kobo 合集同步',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         '发布日历历史',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname}已被取消。',
+      'components.Settings.SettingsJobsCache.jobdisabled': '{jobname} 已禁用。',
+      'components.Settings.SettingsJobsCache.jobenabled': '{jobname} 已启用。',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} 已开始运行。',
       'components.Settings.SettingsJobsCache.runnow': '执行',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         '软件请求调节',
@@ -51750,6 +52166,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': '取消作業',
       'components.Settings.SettingsJobsCache.command': '指令',
       'components.Settings.SettingsJobsCache.disabled': '已禁用',
+      'components.Settings.SettingsJobsCache.disablejob': '禁用',
       'components.Settings.SettingsJobsCache.dnsCache': 'DNS 快取',
       'components.Settings.SettingsJobsCache.dnscachehits': '命中',
       'components.Settings.SettingsJobsCache.dnscachemisses': '失誤',
@@ -51758,6 +52175,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync-reset':
         '下載狀態同步復位',
       'components.Settings.SettingsJobsCache.enabled': '已開啟',
+      'components.Settings.SettingsJobsCache.enablejob': '開啟',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         '外部請求清單同步',
       'components.Settings.SettingsJobsCache.failures': '失敗',
@@ -51805,6 +52223,12 @@ export const localeData = [
         'BookOrbit Kobo 收藏同步',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         '釋放行事曆歷史',
+      'components.Settings.SettingsJobsCache.jobcancelled':
+        '{jobname}已被取消。',
+      'components.Settings.SettingsJobsCache.jobdisabled': '{jobname} 已禁用。',
+      'components.Settings.SettingsJobsCache.jobenabled': '{jobname} 啟動 。',
+      'components.Settings.SettingsJobsCache.jobstarted':
+        '{jobname} 已開始運行。',
       'components.Settings.SettingsJobsCache.runnow': '執行',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         '軟體要求對應',
@@ -53432,6 +53856,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.canceljob': 'Thôi công việc',
       'components.Settings.SettingsJobsCache.command': 'Câu lệnh',
       'components.Settings.SettingsJobsCache.disabled': 'Tắt',
+      'components.Settings.SettingsJobsCache.disablejob': 'Tắt',
       'components.Settings.SettingsJobsCache.dnsCache': 'Bộ nhớ tạm DNS',
       'components.Settings.SettingsJobsCache.dnscachehits': 'Trúng',
       'components.Settings.SettingsJobsCache.dnscachemisses': 'Bỏ lỡ',
@@ -53439,6 +53864,7 @@ export const localeData = [
       'components.Settings.SettingsJobsCache.download-sync': 'Đồng bộ tải về',
       'components.Settings.SettingsJobsCache.download-sync-reset': 'Tải về',
       'components.Settings.SettingsJobsCache.enabled': 'Bật',
+      'components.Settings.SettingsJobsCache.enablejob': 'Bật',
       'components.Settings.SettingsJobsCache.external-request-list-sync':
         'Đồng bộ danh sách yêu cầu bên ngoài',
       'components.Settings.SettingsJobsCache.failures': 'Lỗi',
@@ -53492,6 +53918,10 @@ export const localeData = [
         'Đồng bộ bộ sưu tập Kobo của BookOrbit',
       'components.Settings.SettingsJobsCache.release-calendar-history':
         'Lịch sử ra đời',
+      'components.Settings.SettingsJobsCache.jobcancelled': '{jobname} hủy bỏ.',
+      'components.Settings.SettingsJobsCache.jobdisabled': '{jobname} Vô hiệu.',
+      'components.Settings.SettingsJobsCache.jobenabled': '{jobname} đã bật.',
+      'components.Settings.SettingsJobsCache.jobstarted': '{jobname} Bắt đầu.',
       'components.Settings.SettingsJobsCache.runnow': 'Chạy ngay',
       'components.Settings.SettingsJobsCache.software-request-reconciliation':
         'Yêu cầu hòa giải phần mềm',

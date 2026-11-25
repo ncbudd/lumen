@@ -37,6 +37,46 @@
 .topbar {
   display: none;
 }
+.side a .n {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  padding: 0 6px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 11px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+.side a.version-status,
+.side[data-mobile-open='true'] a.version-status {
+  height: auto;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.side .version-status-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+.side .version-status-copy b,
+.side .version-status-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.side .version-status-copy b {
+  font-size: 12px;
+}
+.side .version-status-copy small {
+  color: var(--ink-3);
+  font-size: 11px;
+}
 
 .tabbar {
   --navigation-surface: var(--glass);
@@ -1743,6 +1783,12 @@ a.person:hover {
   border-radius: var(--r-lg);
   box-shadow: 0 0 0 1px var(--line);
 }
+.empty[data-tone='warning'] {
+  box-shadow: 0 0 0 1px var(--wait);
+}
+.empty[data-tone='warning'] b {
+  color: var(--wait);
+}
 .empty b {
   display: block;
   color: var(--ink);
@@ -2436,19 +2482,6 @@ body.is-detail .toast {
   .side a[aria-current='page'] {
     background: var(--accent-soft);
     color: var(--accent-soft-ink);
-  }
-  .side a .n {
-    margin-left: auto;
-    min-width: 20px;
-    height: 20px;
-    border-radius: 10px;
-    padding: 0 6px;
-    background: var(--accent);
-    color: var(--accent-ink);
-    font-size: 11px;
-    font-weight: 800;
-    display: grid;
-    place-items: center;
   }
   .side .lbl {
     font-size: 12px;
@@ -3393,4 +3426,68 @@ details:not(.adv)[open] > * + * {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+}
+
+/* Compact native-equivalent title summary inside the management sheet. */
+.manager-summary {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+.manager-summary-poster {
+  position: relative;
+  width: 64px;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--r-sm);
+}
+.manager-summary-poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.manager-summary-poster .nocover {
+  width: 100%;
+  height: 100%;
+}
+.manager-summary-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-content: start;
+  gap: 5px 10px;
+  min-width: 0;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.manager-summary-row {
+  display: contents;
+}
+.manager-summary-row dt {
+  color: var(--ink-1);
+  font-weight: 600;
+}
+.manager-summary-row dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.manager-summary-row a {
+  color: inherit;
+}
+@media (min-width: 640px) {
+  .manager-summary {
+    grid-template-columns: 80px minmax(0, 1fr);
+  }
+  .manager-summary-poster {
+    width: 80px;
+  }
 }

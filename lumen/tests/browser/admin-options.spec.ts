@@ -1016,7 +1016,7 @@ test('late category probes remain scoped to the account that started them', asyn
     } else
       await route.fulfill({ json: { results: [], comicVineConfigured: true } });
   });
-  await page.goto('/me');
+  await page.goto(testAppPath('/me'));
   await expect.poll(() => started).toBe(true);
   await page.getByRole('button', { name: 'Sign out', exact: true }).click();
   await page
@@ -1463,7 +1463,7 @@ test('a page that crashes keeps the menus and offers a reload', async ({
   const baseline = process.env.LUMEN_PAGE_BOUNDARY_BASELINE === '1';
   for (const selected of ['en', 'fr', 'ar'] as const) {
     locale = selected;
-    await page.goto('/');
+    await page.goto(testAppPath('/'));
     const expected = baseline ? labels.en : labels[selected];
     const alert = page.getByRole('alert');
     await expect(
@@ -1481,11 +1481,11 @@ test('a page that crashes keeps the menus and offers a reload', async ({
       });
     // The global shell remains available after the route crashes.
     await page
-      .locator('a[href="/me"]')
+      .locator(`a[href="${testAppPath('/me')}"]`)
       .filter({ visible: true })
       .first()
       .click();
-    await expect(page).toHaveURL(/\/me$/);
+    await page.waitForURL((url) => url.pathname === testAppPath('/me'));
   }
 });
 
@@ -3321,7 +3321,7 @@ test('4K poster feedback names the requested tier', async ({ page }, info) => {
   await expect(
     page
       .locator('.poster', { hasText: 'Fresh Pick' })
-      .locator('[title="4K Requested"]')
+      .getByRole('img', { name: '4K: Requested' })
   ).toHaveCount(1);
   await page.screenshot({
     path: info.outputPath('4k-poster-feedback.png'),

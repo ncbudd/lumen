@@ -6,8 +6,15 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import { isIssueSubtypeForMediaType } from '../../../server/constants/issue';
-import { api, artUrl, tmdbImg, type DetailDisclosurePins } from '../api';
-import { useAuth } from '../auth';
+import { getSafeHref } from '../../../src/utils/safeUrl';
+import {
+  api,
+  ApiError,
+  artUrl,
+  tmdbImg,
+  type DetailDisclosurePins,
+} from '../api';
+import { isAdministrator, useAuth } from '../auth';
 import { ConfirmSheet } from '../components/ConfirmSheet';
 import { Pill } from '../components/detail';
 import { ServiceNote } from '../components/extra';
@@ -33,6 +40,8 @@ interface IssueMedia {
   title?: string;
   name?: string;
   posterPath?: string;
+  serviceUrl?: string | null;
+  serviceUrl4k?: string | null;
   identifiers?: { provider: string; value: string }[];
 }
 
@@ -955,6 +964,7 @@ function Discussion({
 }) {
   const { locale, t } = useLumenLocale();
   const { user } = useAuth();
+  const admin = isAdministrator(user?.permissions);
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const listParams = new URLSearchParams(params);
@@ -1033,8 +1043,10 @@ function Discussion({
     submitting.current = true;
     setBusy(true);
     setFailure('');
+    let confirmed = false;
     try {
       await api(endpoint, init);
+      confirmed = true;
       if (action.kind === 'delete-issue') {
         navigate(issueList, { replace: true });
         return;
@@ -1043,21 +1055,61 @@ function Discussion({
       if (action.kind === 'edit-comment') setEdit(undefined);
       refresh();
     } catch {
-      reload();
-      setFailure(
-        t(
-          'lumen.issues.updateUnconfirmed',
-          'Could not confirm the update. Check the discussion before trying again.'
-        )
-      );
+      if (action.kind === 'delete-comment') {
+        try {
+          const latest = await api<Issue>(path, { cache: 'no-store' });
+          if (!latest.comments?.some(({ id }) => id === action.commentId)) {
+            confirmed = true;
+            refresh();
+          }
+        } catch {
+          // Keep the confirmation open when the fresh read cannot establish the result.
+        }
+      } else if (action.kind === 'delete-issue') {
+        try {
+          await api<Issue>(path, { cache: 'no-store' });
+        } catch (error) {
+          if (error instanceof ApiError && error.status === 404) {
+            confirmed = true;
+            navigate(issueList, { replace: true });
+          }
+        }
+      }
+      if (!confirmed) {
+        reload();
+        setFailure(
+          t(
+            'lumen.issues.updateUnconfirmed',
+            'Could not confirm the update. Check the discussion before trying again.'
+          )
+        );
+      }
     } finally {
-      setConfirmation(undefined);
+      if (
+        confirmed ||
+        (action.kind !== 'delete-issue' && action.kind !== 'delete-comment')
+      )
+        setConfirmation(undefined);
       submitting.current = false;
       setBusy(false);
     }
   }
 
   const titleLink = issueTitleLink(data?.media);
+  const serviceLinks =
+    admin &&
+    (data?.media?.mediaType === 'movie' || data?.media?.mediaType === 'tv')
+      ? [
+          {
+            quality: 'HD',
+            url: getSafeHref(data.media.serviceUrl),
+          },
+          {
+            quality: '4K',
+            url: getSafeHref(data.media.serviceUrl4k),
+          },
+        ].filter((item) => item.url)
+      : [];
 
   return (
     <>
@@ -1081,7 +1133,7 @@ function Discussion({
           {t('lumen.issues.loadingIssue', 'Loading issue…')}
         </p>
       )}
-      {failure && (
+      {failure && !confirmation && (
         <p className="note" role="alert">
           {failure}
         </p>
@@ -1110,9 +1162,19 @@ function Discussion({
               : t('lumen.issues.deleteComment', 'Delete Comment')
           }
           busy={busy}
+          children={
+            failure ? (
+              <p className="note" role="alert">
+                {failure}
+              </p>
+            ) : undefined
+          }
           onConfirm={() => void submit(confirmation)}
           onClose={() => {
-            if (!submitting.current) setConfirmation(undefined);
+            if (!submitting.current) {
+              setConfirmation(undefined);
+              setFailure('');
+            }
           }}
         />
       )}
@@ -1144,6 +1206,19 @@ function Discussion({
                 })}
               </Link>
             )}
+            {serviceLinks.map(({ quality, url }) => (
+              <a
+                className="btn btn-quiet btn-sm"
+                key={quality}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('lumen.manageVideo.openService', 'Open in {service}', {
+                  service: `${data?.media?.mediaType === 'tv' ? 'Sonarr' : 'Radarr'}${quality === '4K' ? ' 4K' : ''}`,
+                })}
+              </a>
+            ))}
             {editable && (
               <button
                 className="btn btn-quiet btn-sm"
