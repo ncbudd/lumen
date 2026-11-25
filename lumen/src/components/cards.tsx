@@ -54,6 +54,7 @@ import {
 import { canRequestBook } from './detail';
 import { useQuickRequest } from './requestSheet';
 import { useToast } from './toast';
+import { VideoRatingsPopover } from './VideoRatings';
 import WatchlistButton from './WatchlistButton';
 
 // A stable theme-owned tone per title keeps drawn covers consistent between visits.
@@ -188,6 +189,68 @@ export const Glyph = ({ s }: { s: Stat }) => {
   ) : null;
 };
 
+export type CardQuality = 'HD' | '4K' | 'MP3' | 'FLAC';
+export type QualityStatus = { quality?: CardQuality; s: Stat };
+
+function videoQualityStatuses(
+  media: MediaInfo | undefined,
+  serverName: string,
+  availability: AvailabilityMode
+): QualityStatus[] {
+  if (!media) return [];
+  const standard = statusOf(
+    { ...media, status4k: undefined, downloadStatus4k: undefined },
+    false,
+    serverName,
+    availability
+  );
+  if (standard?.word === 'Blocklisted') return [{ s: standard }];
+  const fourK = statusOf(
+    { ...media, status: undefined, downloadStatus: undefined },
+    false,
+    serverName,
+    availability
+  );
+  const statuses: QualityStatus[] = [
+    ...(standard ? [{ quality: 'HD' as const, s: standard }] : []),
+    ...(fourK ? [{ quality: '4K' as const, s: fourK }] : []),
+  ];
+  return statuses;
+}
+
+export function QualityStatusGlyphs({
+  statuses,
+}: {
+  statuses: QualityStatus[];
+}) {
+  const { t } = useLumenLocale();
+  if (!statuses.length) return null;
+  return (
+    <span className="glyph-stack">
+      {statuses.map(({ quality, s }) => {
+        if (!s) return null;
+        const qualityLabel = quality;
+        const label = qualityLabel
+          ? `${qualityLabel}: ${statusLabel(s, t)}`
+          : statusLabel(s, t);
+        return (
+          <span
+            key={quality ?? 'blocklisted'}
+            className={`glyph ${s.k}`}
+            data-quality={quality}
+            title={label}
+            role="img"
+            aria-label={label}
+          >
+            {quality && <span className="glyph-quality">{qualityLabel}</span>}
+            <Icon name={s.ico} />
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 export function statusLabel(
   s: { word: string } | null,
   t: ReturnType<typeof useLumenLocale>['t']
@@ -196,6 +259,7 @@ export function statusLabel(
   if (s.word === 'Blocklisted') return t('lumen.status.blocklisted', s.word);
   if (s.word === 'In library') return t('lumen.status.inLibrary', s.word);
   if (s.word === 'Requested') return t('lumen.status.requested', s.word);
+  if (s.word === 'Processing') return t('lumen.status.processing', s.word);
   if (s.word === 'Waiting for approval')
     return t('lumen.status.waitingApproval', s.word);
   if (s.word === 'Approved') return t('lumen.status.approved', s.word);
@@ -397,6 +461,34 @@ export function TitleCard({
   const requestMedia = withoutPending4k(media);
   // Presentation never changes whether the server already has or is acquiring a copy.
   const shown = statusOf(media, false, serverName, availability);
+  const [requestedQuality, setRequestedQuality] = useState<CardQuality>();
+  const videoStatuses = videoQualityStatuses(media, serverName, availability);
+  const visibleVideoStatuses: QualityStatus[] = videoStatuses.map((item) =>
+    requestedQuality && item.quality === requestedQuality
+      ? {
+          ...item,
+          s: {
+            k: 'wait' as const,
+            word: 'Requested',
+            ico: 'clock' as const,
+          },
+        }
+      : item
+  );
+  if (
+    requestedQuality &&
+    !videoStatuses.some(({ quality }) => quality === requestedQuality) &&
+    videoStatuses.every(({ quality }) => quality)
+  ) {
+    visibleVideoStatuses.push({
+      quality: requestedQuality,
+      s: {
+        k: 'wait',
+        word: 'Requested',
+        ico: 'clock',
+      },
+    });
+  }
   const [s, markRequested] = useRequested(
     statusOf(requestMedia, false, serverName)
   );
@@ -430,6 +522,7 @@ export function TitleCard({
     .join(' · ');
   const quick = useQuickRequest(it, (is4k, series, quotaException) => {
     markRequested(is4k ? '4K Requested' : 'Requested');
+    setRequestedQuality(is4k ? '4K' : 'HD');
     toast(
       quotaException
         ? `Approval requested for ${titleOf(it)}`
@@ -523,6 +616,7 @@ export function TitleCard({
   return (
     <div
       className={hold ? 'poster hold' : 'poster'}
+      data-media-type={tv ? 'tv' : 'movie'}
       data-title-mode={it.posterPath ? titleMode : undefined}
     >
       <div className="art">
@@ -532,7 +626,13 @@ export function TitleCard({
           sub={yearOf(it)}
           icon={tv ? 'tv' : 'film'}
         />
-        <Glyph s={visibleRequestStatus || shown} />
+        <QualityStatusGlyphs
+          statuses={
+            visibleVideoStatuses.length || (!visibleRequestStatus && !shown)
+              ? visibleVideoStatuses
+              : [...visibleVideoStatuses, { s: visibleRequestStatus || shown }]
+          }
+        />
         <Link
           className="hit"
           to={detailHref}
@@ -581,7 +681,16 @@ export function TitleCard({
       >
         {titleOf(it)}
       </Link>
-      <div className="m">{m}</div>
+      <div className="m">
+        <span className="card-meta">{m}</span>
+        <VideoRatingsPopover
+          mediaType={tv ? 'tv' : 'movie'}
+          id={it.id}
+          voteAverage={it.voteAverage}
+          voteCount={it.voteCount}
+          title={titleOf(it)}
+        />
+      </div>
       {quick.sheet}
     </div>
   );
@@ -645,7 +754,9 @@ export function BookCard({ b }: { b: BookResult }) {
       dropBookStates();
       toast(`Requested ${b.title} · ${audio ? 'audiobook' : 'ebook'}`);
     } catch (e) {
-      toast(friendlyError(e, 'Request failed'));
+      toast(
+        friendlyError(e, t('lumen.error.requestFailed', 'Request failed'), t)
+      );
     }
   };
   const [request, busy] = useBusy(go);
@@ -1043,6 +1154,7 @@ export function MoreOnScroll({
   retry?: () => void;
   labels?: { error: string; retry: string; loading: string };
 }) {
+  const { t } = useLumenLocale();
   const ref = useRef<HTMLDivElement>(null);
   const latest = useRef({ done, loading, more });
   latest.current = { done, loading, more };
@@ -1071,16 +1183,19 @@ export function MoreOnScroll({
   if (error && retry)
     return (
       <div className="more-scroll" role="alert">
-        {labels?.error ?? 'Couldn’t load more.'}{' '}
+        {labels?.error ??
+          t('lumen.browse.loadMoreFailure', 'Couldn’t load more.')}{' '}
         <button className="btn btn-tonal btn-sm" onClick={retry}>
-          {labels?.retry ?? 'Retry'}
+          {labels?.retry ?? t('lumen.common.retry', 'Retry')}
         </button>
       </div>
     );
   if (done) return null;
   return (
     <div ref={ref} className="more-scroll" aria-live="polite">
-      {loading ? (labels?.loading ?? 'Loading more…') : ''}
+      {loading
+        ? (labels?.loading ?? t('lumen.browse.loadingMore', 'Loading more…'))
+        : ''}
     </div>
   );
 }

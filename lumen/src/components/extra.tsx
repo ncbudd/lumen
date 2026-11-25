@@ -16,9 +16,11 @@ import type { ManagedMediaType } from '../mediaIdentity';
 import { usePrefs } from '../settings';
 import {
   Glyph,
+  QualityStatusGlyphs,
   StatLabel,
   statusOf,
   useCardTitleMode,
+  type QualityStatus,
   type Stat,
 } from './cards';
 import { Pill } from './detail';
@@ -134,6 +136,7 @@ export function ExtraCard({
   pct,
   titleKind,
   watchlist,
+  statusBadges,
 }: {
   href: string;
   img?: string;
@@ -146,6 +149,7 @@ export function ExtraCard({
   titleKind?: CardTitleKind;
   watchlist?: { mediaType: ManagedMediaType; id: string | number };
   pct?: number; // a download progress bar along the bottom of the art
+  statusBadges?: QualityStatus[];
 }) {
   const titleMode = useCardTitleMode(titleKind);
   const safeImage = artUrl(img);
@@ -167,7 +171,11 @@ export function ExtraCard({
             <Icon name={icon} />
           </span>
         )}
-        <Glyph s={stat || null} />
+        {statusBadges?.length ? (
+          <QualityStatusGlyphs statuses={statusBadges} />
+        ) : (
+          <Glyph s={stat || null} />
+        )}
         {pct != null && (
           <span className="bar" aria-hidden="true">
             <i style={{ width: `${pct}%` }} />
@@ -326,6 +334,7 @@ export const StatPill = ({ s }: { s: Stat }) =>
 
 // wraps a category's pages: waits for settings, then shows the page or why it isn't there
 export function ExtraGate({ k, children }: { k: Extra; children: ReactNode }) {
+  const { t } = useLumenLocale();
   const x = useExtras();
   const { seerrPublicUrl } = usePrefs();
   const { user } = useAuth();
@@ -334,7 +343,11 @@ export function ExtraGate({ k, children }: { k: Extra; children: ReactNode }) {
     !isAdministrator(user?.permissions);
   if (!x.ready)
     return x.error ? (
-      <ServiceNote error={x.error} what="this page" retry={x.retry} />
+      <ServiceNote
+        error={x.error}
+        what={t('lumen.error.what.thisPage', 'this page')}
+        retry={x.retry}
+      />
     ) : (
       <div className="detail-loading" aria-busy="true" />
     );
@@ -390,10 +403,13 @@ export function ServiceNote({
   retry?: () => void;
   retryDisabled?: boolean;
 }) {
+  const { t } = useLumenLocale();
   if (!error) return null;
   return (
     <div className="empty" role={retry ? 'alert' : undefined}>
-      <b>{title ?? `Couldn’t load ${what}`}</b>
+      <b>
+        {title ?? t('lumen.error.loadWhat', 'Couldn’t load {what}', { what })}
+      </b>
       {retry ? <p>{error}</p> : error}
       {retry && (
         <button
@@ -401,7 +417,7 @@ export function ServiceNote({
           onClick={retry}
           disabled={retryDisabled}
         >
-          {retryLabel ?? 'Retry'}
+          {retryLabel ?? t('lumen.common.retry', 'Retry')}
         </button>
       )}
     </div>

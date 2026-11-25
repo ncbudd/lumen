@@ -29,6 +29,7 @@ import { ConfirmSheet } from '../components/ConfirmSheet';
 import {
   ActionBar,
   AdvancedOptions,
+  canManageRequests,
   canRequestSeries,
   CreditsDisclosure,
   DetailTop,
@@ -47,6 +48,7 @@ import { EpisodeAvailabilityPanel } from '../components/EpisodeAvailabilityPanel
 import { ServiceNote } from '../components/extra';
 import IndexerSearchLink from '../components/IndexerSearchLink';
 import LiveTvAirings from '../components/LiveTvAirings';
+import { ManageVideoSheet } from '../components/ManageVideoSheet';
 import MediaServerCollectionsButton from '../components/MediaServerCollectionsButton';
 import MediaServerSavedItemButton from '../components/MediaServerSavedItemButton';
 import ReportIssueButton from '../components/ReportIssueButton';
@@ -55,6 +57,7 @@ import { useToast } from '../components/toast';
 import TvCollectionLinks from '../components/TvCollectionLinks';
 import TvEpisodeRequestSheet from '../components/TvEpisodeRequestSheet';
 import VideoPlaybackButton from '../components/VideoPlaybackButton';
+import VideoRatings from '../components/VideoRatings';
 import WatchlistButton from '../components/WatchlistButton';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
@@ -95,6 +98,7 @@ export default function TvDetail() {
   ).data;
 
   const { id } = useParams();
+  const [manageOpen, setManageOpen] = useState(false);
   const loc = useLocation();
   const navigate = useNavigate();
   const {
@@ -108,6 +112,7 @@ export default function TvDetail() {
     keepDuringRefresh: true,
   });
   const like = useApi<Paged<TitleResult>>(`/tv/${id}/recommendations`).data;
+  const similar = useApi<Paged<TitleResult>>(`/tv/${id}/similar`).data;
   const progressMedia = useLiveMediaProgress(
     t?.mediaInfo,
     isAdministrator(user?.permissions)
@@ -273,7 +278,17 @@ export default function TvDetail() {
   }, [loaded, id, anchor]);
 
   if (error && !t)
-    return <ServiceNote error={error} what="this series" retry={reload} />;
+    return (
+      <ServiceNote
+        error={error}
+        what="this series"
+        title={translate(
+          'lumen.detail.loadSeries',
+          'Couldn’t load this series'
+        )}
+        retry={reload}
+      />
+    );
   if (!t) return <div className="detail-loading" aria-busy="true" />;
 
   const n = sel.size;
@@ -404,7 +419,11 @@ export default function TvDetail() {
             }),
         });
       } else {
-        setEpisodeError(friendlyError(error, 'Could not request episodes'));
+        setEpisodeError(
+          friendlyError(error, 'Could not request episodes', (id, fallback) =>
+            translate(id, fallback)
+          )
+        );
       }
       if (error instanceof ApiError && error.code === 'REQUEST_NOT_CONFIRMED')
         refresh();
@@ -452,7 +471,8 @@ export default function TvDetail() {
           selection: selectionKey,
           message: friendlyError(
             e,
-            'Could not verify the previous season. Try again.'
+            'Could not verify the previous season. Try again.',
+            (id, fallback) => translate(id, fallback)
           ),
           needsAccount: e.reason === 'account-required',
         });
@@ -460,7 +480,11 @@ export default function TvDetail() {
           .getElementById('seasons')
           ?.scrollIntoView({ behavior: scrollBehavior() });
       } else {
-        toast(friendlyError(e, 'Request failed'));
+        toast(
+          friendlyError(e, 'Request failed', (id, fallback) =>
+            translate(id, fallback)
+          )
+        );
         if (e instanceof ApiError && e.code === 'REQUEST_NOT_CONFIRMED')
           refresh();
       }
@@ -597,7 +621,15 @@ export default function TvDetail() {
         ]}
       />
       <div className="dbody">
-        <ServiceNote error={error} what="this series" retry={reload} />
+        <ServiceNote
+          error={error}
+          what="this series"
+          title={translate(
+            'lumen.detail.loadSeries',
+            'Couldn’t load this series'
+          )}
+          retry={reload}
+        />
         <div className="dstatus">
           {episodeQueue && (
             <Pill
@@ -647,11 +679,12 @@ export default function TvDetail() {
                   )}
             </Pill>
           )}
-          {!!t.voteAverage && (
-            <Pill k="neutral" icon="star">
-              {t.voteAverage.toFixed(1)} / 10
-            </Pill>
-          )}
+          <VideoRatings
+            mediaType="tv"
+            id={t.id}
+            voteAverage={t.voteAverage}
+            voteCount={t.voteCount}
+          />
           <LiveTvAirings
             key={`live-tv:${t.id}`}
             tmdbId={t.id}
@@ -719,6 +752,16 @@ export default function TvDetail() {
         )}
         <TvCollectionLinks key={t.id} id={t.id} />
         <div className="dacts pc">
+          {t.mediaInfo?.id && canManageRequests(user?.permissions) && (
+            <button
+              className="btn btn-tonal"
+              type="button"
+              onClick={() => setManageOpen(true)}
+            >
+              <Icon name="list" />
+              {translate('lumen.manageVideo.open', 'Manage')}
+            </button>
+          )}
           {main}
           {trailer && <TrailerButton href={trailer} />}
           {canPlay && missing.length > 0 && (
@@ -916,6 +959,9 @@ export default function TvDetail() {
                 <TvEpisodeRequestSheet
                   key={String(is4k)}
                   tvId={t.id}
+                  title={t.name ?? ''}
+                  posterPath={t.posterPath}
+                  year={t.firstAirDate?.slice(0, 4)}
                   seasons={episodeSeasons}
                   initialSeason={
                     seasonAnchor === undefined
@@ -1190,11 +1236,6 @@ export default function TvDetail() {
             translate('lumen.tv.recommendations', 'Recommendations'),
             `/tv/${id}/recommendations`,
           ]}
-          action={
-            <Link to={`/tv/${id}/similar`}>
-              {translate('lumen.tv.similar', 'Similar Series')}
-            </Link>
-          }
         >
           <div className="toolbar">
             <AssociationLink mediaType="tv" id={id} />
@@ -1210,6 +1251,21 @@ export default function TvDetail() {
             </Rail>
           )}
         </Section>
+        {!!similar?.results.length && (
+          <Section
+            title={translate('lumen.tv.similar', 'Similar Series')}
+            link={[
+              translate('lumen.tv.similar', 'Similar Series'),
+              `/tv/${id}/similar`,
+            ]}
+          >
+            <Rail>
+              {similar.results.map((item) => (
+                <TitleCard key={item.id} it={{ ...item, mediaType: 'tv' }} />
+              ))}
+            </Rail>
+          </Section>
+        )}
       </div>
       <ActionBar
         title={t.name || ''}
@@ -1220,6 +1276,16 @@ export default function TvDetail() {
           })
         }
       >
+        {t.mediaInfo?.id && canManageRequests(user?.permissions) && (
+          <button
+            className="btn btn-tonal"
+            type="button"
+            onClick={() => setManageOpen(true)}
+          >
+            <Icon name="list" />
+            {translate('lumen.manageVideo.open', 'Manage')}
+          </button>
+        )}
         {/* phones only get this bar: keep a way to watch the seasons already there */}
         {canPlay && missing.length > 0 && (
           <a
@@ -1237,6 +1303,20 @@ export default function TvDetail() {
         )}
         {main}
       </ActionBar>
+      {manageOpen && t.mediaInfo?.id && (
+        <ManageVideoSheet
+          kind="tv"
+          title={t.name || ''}
+          year={t.firstAirDate?.slice(0, 4)}
+          media={
+            t.mediaInfo as NonNullable<typeof t.mediaInfo> & { id: number }
+          }
+          onClose={() => setManageOpen(false)}
+          onUpdated={refresh}
+          mediaServerType={pub?.mediaServerType}
+          tmdbId={t.id}
+        />
+      )}
       {streamingOverride?.seriesId === t.id && (
         <ConfirmSheet
           title={translate(

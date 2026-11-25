@@ -57,10 +57,18 @@ async function show(
   permissions = 2,
   quota?: { limit: number; remaining: number; restricted: boolean },
   settings: Record<string, unknown> = {},
-  seriesSeasons: typeof seasons = seasons
+  seriesSeasons: typeof seasons = seasons,
+  locale?: string,
+  failRequest = false
 ) {
   await page.route('https://**/*', (r) => r.abort());
   await page.route('**/lumen-config.json', (r) => r.fulfill({ json: {} }));
+  await page.route('**/imageproxy/tmdb/**', (r) =>
+    r.fulfill({
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 84"><rect width="56" height="84" fill="#38435c"/><path d="M0 60 20 35l12 14 9-10 15 21v24H0" fill="#687bad"/><circle cx="39" cy="20" r="8" fill="#d8b56b"/></svg>',
+    })
+  );
   await page.route('**/api/v1/**', (r) => {
     const path = apiPath(new URL(r.request().url()).pathname);
     if (r.request().method() !== 'GET')
@@ -70,8 +78,15 @@ async function show(
         json: { id: 1, displayName: 'alex', permissions },
       });
     if (path === '/settings/public') return r.fulfill({ json: settings });
+    if (locale && path === '/user/1/settings/main')
+      return r.fulfill({ json: { locale } });
     if (quota && path === '/user/1/quota')
       return r.fulfill({ json: { tv: quota } });
+    if (path === '/request' && r.request().method() === 'POST' && failRequest)
+      return r.fulfill({
+        status: 500,
+        json: { message: 'Internal Server Error' },
+      });
     if (path === '/request' && r.request().method() === 'POST')
       return r.fulfill({
         json: { id: 44, status: 1, quotaException: !!quota },
@@ -81,6 +96,7 @@ async function show(
         json: {
           id: 84773,
           name: 'The Rings of Power',
+          posterPath: '/rings-poster.jpg',
           externalIds: { tvdbId: 80 },
           overview: 'Rings.',
           genres: [],
@@ -97,6 +113,63 @@ async function show(
     return r.fulfill({ json: { results: [] } });
   });
   await page.goto(appPath('/tv/84773'));
+}
+
+for (const locale of ['en', 'fr', 'ar'] as const) {
+  test(`TV detail request failures follow ${locale} locale`, async ({
+    page,
+  }, testInfo) => {
+    const serverFailure = {
+      en: 'The server had a problem. Try again in a moment.',
+      fr: 'Le serveur a rencontré un problème. Réessayez dans un instant.',
+      ar: 'حدثت مشكلة في الخادم. حاول مجددًا بعد قليل.',
+    }[locale];
+    await show(
+      page,
+      { id: 2074, status: 2, requests: [], seasons: [] },
+      [],
+      32,
+      undefined,
+      {},
+      seasons,
+      locale,
+      true
+    );
+    const requestButton = page
+      .locator(
+        (page.viewportSize()?.width ?? 0) < 1040
+          ? '.actionbar .btn-primary'
+          : '.dacts.pc .btn-primary'
+      )
+      .first();
+    await expect(requestButton).toBeEnabled();
+    if ((page.viewportSize()?.width ?? 0) < 1040) {
+      const bounds = await requestButton.boundingBox();
+      expect(bounds).not.toBeNull();
+      await page.mouse.click(
+        bounds!.x + bounds!.width / 2,
+        bounds!.y + bounds!.height / 2
+      );
+    } else await requestButton.click();
+    const toast = page.getByRole('status');
+    await expect(toast).toHaveClass(/show/);
+    const toastBounds = await toast.boundingBox();
+    expect(toastBounds).not.toBeNull();
+    if ((page.viewportSize()?.width ?? 0) >= 1040) {
+      const requestBounds = await requestButton.boundingBox();
+      expect(requestBounds).not.toBeNull();
+      expect(toastBounds!.y).toBeGreaterThanOrEqual(
+        requestBounds!.y + requestBounds!.height
+      );
+    }
+    const capture = process.env.LUMEN_TV_ERROR_CAPTURE;
+    if (capture && testInfo.project.name === 'desktop')
+      await page.screenshot({
+        path: `${capture}-${locale}-desktop.png`,
+        animations: 'disabled',
+      });
+    await expect(toast).toContainText(serverFailure);
+  });
 }
 
 test('a fully requested series shows Requested and its request, not the request button @tv-request-visual', async ({
@@ -612,7 +685,7 @@ test('TV detail can request missing episodes from a partly requested season', as
 
 test('large-series episode metadata uses small bounded batches and preserves deep-linked selection on retry', async ({
   page,
-}) => {
+}, info) => {
   const posts: RecordedPost[] = [];
   const largeSeriesSeasons = Array.from({ length: 15 }, (_, index) => ({
     seasonNumber: index + 1,
@@ -658,8 +731,23 @@ test('large-series episode metadata uses small bounded batches and preserves dee
   });
   await open.click();
   const sheet = page.getByRole('dialog', { name: 'Request Episodes' });
+  await expect(
+    sheet.getByRole('heading', { name: 'The Rings of Power', exact: true })
+  ).toBeVisible();
+  await expect(
+    sheet.getByText('2022 · 15 seasons', { exact: true })
+  ).toBeVisible();
+  await expect(sheet.locator('.pk-head img')).toHaveAttribute(
+    'src',
+    '/imageproxy/tmdb/t/p/w342/rings-poster.jpg'
+  );
   await expect(sheet.getByText('Could not load episodes')).toBeVisible();
-  expect(batchQueries).toEqual(['1,2,3,4,5', '6,7,8,9,10', '11,12,13,14,15']);
+  expect(batchQueries).toEqual([
+    '1,2,3,4,5',
+    '6,7,8,9,10',
+    '11,12,13,14,15',
+    '15',
+  ]);
   const initialBatchCount = batchQueries.length;
   retrying = true;
   await sheet.getByRole('button', { name: 'Retry' }).click();
@@ -673,6 +761,11 @@ test('large-series episode metadata uses small bounded batches and preserves dee
   });
   await expect(selectedEpisode).toBeChecked();
   expect(batchQueries.slice(initialBatchCount)).toEqual(['15']);
+  if (['desktop', 'iphone'].includes(info.project.name))
+    await page.screenshot({
+      path: info.outputPath(`tv-request-context-${info.project.name}.png`),
+      fullPage: false,
+    });
   await sheet
     .getByRole('button', { name: 'Request Selected Episodes' })
     .click();
@@ -873,7 +966,12 @@ test('partial large-series metadata still permits exact requests from loaded sea
       fullPage: true,
     });
   }
-  expect(batchQueries).toEqual(['1,2,3,4,5', '6,7,8,9,10', '11,12,13,14,15']);
+  expect(batchQueries).toEqual([
+    '1,2,3,4,5',
+    '6,7,8,9,10',
+    '11,12,13,14,15',
+    '15',
+  ]);
   await submit.click();
   await expect.poll(() => posts.length).toBe(1);
   expect(posts).toEqual([

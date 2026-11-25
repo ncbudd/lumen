@@ -2,8 +2,15 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { api, MediaStatus, type RequestOptions } from '../api';
 import { isAdministrator, useAuth } from '../auth';
+import AlbumLibraryHealth from '../components/AlbumLibraryHealth';
 import BlocklistButton from '../components/BlocklistButton';
-import { MoreOnScroll, Section } from '../components/cards';
+import {
+  MoreOnScroll,
+  Rail,
+  Section,
+  statusOf,
+  type QualityStatus,
+} from '../components/cards';
 import { ConfirmSheet } from '../components/ConfirmSheet';
 import {
   AdvancedOptions,
@@ -27,6 +34,8 @@ import {
 import FollowButton from '../components/FollowButton';
 import { GenrePicker } from '../components/GenrePicker';
 import IndexerSearchLink from '../components/IndexerSearchLink';
+import MusicEditionCompare from '../components/MusicEditionCompare';
+import MusicRatings from '../components/MusicRatings';
 import OpenIssueReports from '../components/OpenIssueReports';
 import ReportIssueButton from '../components/ReportIssueButton';
 import { useToast } from '../components/toast';
@@ -79,6 +88,36 @@ const SORTS = [
     'This year (ascending)',
   ],
 ] as const;
+
+type SimilarArtist = {
+  id: string;
+  name: string;
+  type?: string;
+  artistThumb?: string | null;
+};
+
+function SimilarArtists({ path }: { path: string }) {
+  const { t } = useLumenLocale();
+  const { data } = useApi<{ results: SimilarArtist[] }>(path);
+  if (!data?.results.length) return null;
+  return (
+    <Section title={t('lumen.music.similarArtists', 'Similar Artists')}>
+      <Rail>
+        {data.results.map((artist) => (
+          <ExtraCard
+            key={artist.id}
+            href={`/artist/${encodeURIComponent(artist.id)}`}
+            img={artist.artistThumb ?? undefined}
+            title={artist.name}
+            meta={artist.type}
+            shape="sq"
+            icon="music"
+          />
+        ))}
+      </Rail>
+    </Section>
+  );
+}
 
 interface MusicService {
   id: number;
@@ -665,21 +704,52 @@ const big = (n?: number) =>
         ? `${Math.round(n / 1e3)}K`
         : String(n);
 
-export const AlbumCard = ({ a }: { a: Album }) => (
-  <ExtraCard
-    href={`/music/${a.id}`}
-    img={a.posterPath}
-    title={a.title}
-    shape="sq"
-    titleKind="album"
-    icon="music"
-    stat={extraStat(a.mediaInfo)}
-    watchlist={{ mediaType: 'music', id: a.id }}
-    meta={[artistOf(a), (a['first-release-date'] || '').slice(0, 4)]
-      .filter(Boolean)
-      .join(' · ')}
-  />
-);
+export const AlbumCard = ({ a }: { a: Album }) => {
+  const source = a.qualityStatuses?.length
+    ? a.qualityStatuses
+    : (a.availableQualities ?? []).map((quality) => ({
+        quality,
+        status: MediaStatus.AVAILABLE,
+      }));
+  const statusBadges: QualityStatus[] = source.flatMap(
+    ({ quality, status }) => {
+      const stat =
+        status === MediaStatus.PENDING
+          ? {
+              k: 'wait' as const,
+              word: 'Waiting for approval',
+              ico: 'clock' as const,
+            }
+          : status === MediaStatus.PROCESSING
+            ? { k: 'dl' as const, word: 'Processing', ico: 'down' as const }
+            : status === MediaStatus.PARTIAL
+              ? {
+                  k: 'ok' as const,
+                  word: 'Partly in library',
+                  ico: 'check' as const,
+                }
+              : statusOf({ status }, true);
+      return stat ? [{ quality, s: stat }] : [];
+    }
+  );
+
+  return (
+    <ExtraCard
+      href={`/music/${a.id}`}
+      img={a.posterPath}
+      title={a.title}
+      shape="sq"
+      titleKind="album"
+      icon="music"
+      stat={extraStat(a.mediaInfo)}
+      statusBadges={statusBadges}
+      watchlist={{ mediaType: 'music', id: a.id }}
+      meta={[artistOf(a), (a['first-release-date'] || '').slice(0, 4)]
+        .filter(Boolean)
+        .join(' · ')}
+    />
+  );
+};
 
 // Music: albums from MusicBrainz and ListenBrainz charts; requests go to Lidarr
 export function Music() {
@@ -1139,6 +1209,7 @@ export function AlbumDetail() {
             )}
           </VideoDisclosure>
           <div className="dacts pc">{main}</div>
+          <AlbumLibraryHealth releaseGroupId={a.id} />
           <div className="dcols">
             <div>
               <OpenIssueReports
@@ -1171,6 +1242,7 @@ export function AlbumDetail() {
               )}
             </div>
             <aside>
+              <MusicRatings albumId={a.id} />
               <VideoDisclosure
                 media="music"
                 panel="details"
@@ -1202,6 +1274,10 @@ export function AlbumDetail() {
           {main}
         </div>
       </article>
+      <SimilarArtists
+        path={`/music/${encodeURIComponent(id ?? '')}/artist-similar`}
+      />
+      <MusicEditionCompare releaseGroupId={a.id} />
     </ExtraGate>
   );
 }
@@ -1360,7 +1436,10 @@ export function Artist() {
             <IndexerSearchLink category="music" title={a.artist.name} />
             <AssociationLink mediaType="artist" id={id} />
           </div>
-          {a.wikipedia?.extract && <p className="ov">{a.wikipedia.extract}</p>}
+          {(a.wikipedia?.content || a.wikipedia?.extract) && (
+            <p className="ov">{a.wikipedia.content || a.wikipedia.extract}</p>
+          )}
+          <SimilarArtists path={`/artist/${encodeURIComponent(id)}/similar`} />
           {groups.map(({ type, title }) => {
             const releases = a.releaseGroups.filter(
               (release) =>

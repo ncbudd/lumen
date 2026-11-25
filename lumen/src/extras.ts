@@ -300,6 +300,8 @@ export interface Album {
   'artist-credit'?: { name: string; artist?: { id: string; name: string } }[];
   posterPath?: string;
   needsCoverArt?: boolean;
+  availableQualities?: ('MP3' | 'FLAC')[];
+  qualityStatuses?: { quality: 'MP3' | 'FLAC'; status: number }[];
   mediaInfo?: MediaInfo;
 }
 export interface AlbumDetails {
@@ -342,7 +344,12 @@ export interface ArtistDetails {
     type?: string;
     beginYear?: number;
   };
-  wikipedia?: { extract?: string } | null;
+  wikipedia?: {
+    content?: string;
+    extract?: string;
+    title?: string;
+    url?: string;
+  } | null;
   artistThumb?: string;
   artistBackdrop?: string;
   releaseGroups: Album[];

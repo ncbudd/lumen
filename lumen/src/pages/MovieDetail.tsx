@@ -29,6 +29,7 @@ import { ConfirmSheet } from '../components/ConfirmSheet';
 import {
   ActionBar,
   AdvancedOptions,
+  canManageRequests,
   canRequest4k,
   canRequestMovies,
   CreditsDisclosure,
@@ -46,10 +47,12 @@ import {
 import { ServiceNote } from '../components/extra';
 import IndexerSearchLink from '../components/IndexerSearchLink';
 import LiveTvAirings from '../components/LiveTvAirings';
+import { ManageVideoSheet } from '../components/ManageVideoSheet';
 import ReportIssueButton from '../components/ReportIssueButton';
 import { useVideoRequestQuota } from '../components/requestSheet';
 import { useToast } from '../components/toast';
 import VideoPlaybackButton from '../components/VideoPlaybackButton';
+import VideoRatings from '../components/VideoRatings';
 import WatchlistButton from '../components/WatchlistButton';
 import { localToday } from '../dates';
 import { friendlyError } from '../errors';
@@ -121,6 +124,7 @@ export default function MovieDetail() {
   const { t } = useLumenLocale();
   const serverName = useMediaServerName();
   const { id } = useParams();
+  const [manageOpen, setManageOpen] = useState(false);
   const [quality] = useSearchParams();
   const {
     data: m,
@@ -140,6 +144,7 @@ export default function MovieDetail() {
     revalidate
   );
   const like = useApi<Paged<TitleResult>>(`/movie/${id}/recommendations`).data;
+  const similar = useApi<Paged<TitleResult>>(`/movie/${id}/similar`).data;
   const pub = usePublicSettings();
   const { user } = useAuth();
   const { ratingRegion, streamingProviders } = useTitleRegions(
@@ -167,7 +172,14 @@ export default function MovieDetail() {
   const onOpts = useCallback((o: RequestOptions) => setOpts(o), []);
 
   if (error && !m)
-    return <ServiceNote error={error} what="this movie" retry={reload} />;
+    return (
+      <ServiceNote
+        error={error}
+        what="this movie"
+        title={t('lumen.detail.loadMovie', 'Couldn’t load this movie')}
+        retry={reload}
+      />
+    );
   if (!m) return <div className="detail-loading" aria-busy="true" />;
 
   const regionReleases =
@@ -251,7 +263,11 @@ export default function MovieDetail() {
       ) {
         setOverride({ movieId: m.id, options, message: error.message });
       } else {
-        toast(friendlyError(error, 'Request failed'));
+        toast(
+          friendlyError(error, 'Request failed', (id, fallback) =>
+            t(id, fallback)
+          )
+        );
       }
     } finally {
       setBusy(false);
@@ -361,7 +377,12 @@ export default function MovieDetail() {
         ]}
       />
       <div className="dbody">
-        <ServiceNote error={error} what="this movie" retry={reload} />
+        <ServiceNote
+          error={error}
+          what="this movie"
+          title={t('lumen.detail.loadMovie', 'Couldn’t load this movie')}
+          retry={reload}
+        />
         {selected4k && !fourKPlayback?.href && (
           <p className="note" role="status">
             {t(
@@ -407,11 +428,12 @@ export default function MovieDetail() {
               )}
             </Pill>
           )}
-          {!!m.voteAverage && (
-            <Pill k="neutral" icon="star">
-              {m.voteAverage.toFixed(1)} / 10
-            </Pill>
-          )}
+          <VideoRatings
+            mediaType="movie"
+            id={m.id}
+            voteAverage={m.voteAverage}
+            voteCount={m.voteCount}
+          />
           <LiveTvAirings
             key={`live-tv:${m.id}`}
             tmdbId={m.id}
@@ -452,6 +474,16 @@ export default function MovieDetail() {
             )}
         </div>
         <div className="dacts pc">
+          {m.mediaInfo?.id && canManageRequests(user?.permissions) && (
+            <button
+              className="btn btn-tonal"
+              type="button"
+              onClick={() => setManageOpen(true)}
+            >
+              <Icon name="list" />
+              {t('lumen.manageVideo.open', 'Manage')}
+            </button>
+          )}
           {main}
           {fourK}
           {trailerBtn}
@@ -482,7 +514,10 @@ export default function MovieDetail() {
         <div className="dcols">
           <div style={{ display: 'grid', gap: 22 }}>
             {m.tagline && <p className="tagline">{m.tagline}</p>}
-            <p className="ov">{m.overview}</p>
+            <p className="ov">
+              {m.overview ||
+                t('lumen.detail.overviewUnavailable', 'Overview unavailable')}
+            </p>
             <CreditsDisclosure
               key={`cast-${m.id}`}
               media="movie"
@@ -611,11 +646,6 @@ export default function MovieDetail() {
         <Section
           title={t('lumen.movie.relatedTitles', 'Related Titles')}
           link={['Recommendations', `/movie/${id}/recommendations`]}
-          action={
-            <Link to={`/movie/${id}/similar`}>
-              {t('lumen.movie.similar', 'Similar Movies')}
-            </Link>
-          }
         >
           <div className="toolbar">
             <AssociationLink mediaType="movie" id={id} />
@@ -628,13 +658,52 @@ export default function MovieDetail() {
             </Rail>
           )}
         </Section>
+        {!!similar?.results.length && (
+          <Section
+            title={t('lumen.movie.similar', 'Similar Movies')}
+            link={[
+              t('lumen.movie.similar', 'Similar Movies'),
+              `/movie/${id}/similar`,
+            ]}
+          >
+            <Rail>
+              {similar.results.map((item) => (
+                <TitleCard key={item.id} it={{ ...item, mediaType: 'movie' }} />
+              ))}
+            </Rail>
+          </Section>
+        )}
       </div>
       <ActionBar
         title={m.title || ''}
         meta={[fmtRun(m.runtime), certification].filter(Boolean).join(' · ')}
       >
+        {m.mediaInfo?.id && canManageRequests(user?.permissions) && (
+          <button
+            className="btn btn-tonal"
+            type="button"
+            onClick={() => setManageOpen(true)}
+          >
+            <Icon name="list" />
+            {t('lumen.manageVideo.open', 'Manage')}
+          </button>
+        )}
         {main}
       </ActionBar>
+      {manageOpen && m.mediaInfo?.id && (
+        <ManageVideoSheet
+          kind="movie"
+          title={m.title || ''}
+          year={m.releaseDate?.slice(0, 4)}
+          media={
+            m.mediaInfo as NonNullable<typeof m.mediaInfo> & { id: number }
+          }
+          onClose={() => setManageOpen(false)}
+          onUpdated={refresh}
+          mediaServerType={pub?.mediaServerType}
+          tmdbId={m.id}
+        />
+      )}
       {override?.movieId === m.id && (
         <ConfirmSheet
           title={t('lumen.movie.policy.title', 'Streaming Request Policy')}

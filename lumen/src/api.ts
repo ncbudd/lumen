@@ -164,6 +164,10 @@ export interface MediaInfo {
   readerUrl?: string;
   status?: number;
   status4k?: number;
+  serviceUrl?: string | null;
+  serviceUrl4k?: string | null;
+  tautulliUrl?: string | null;
+  tautulliUrl4k?: string | null;
   mediaAddedAt?: string;
   mediaUrl?: string;
   mediaUrl4k?: string;
@@ -182,6 +186,7 @@ export interface TitleResult {
   releaseDate?: string;
   firstAirDate?: string;
   voteAverage?: number;
+  voteCount?: number;
   directors?: string[];
   writers?: string[];
   genreIds?: number[];
@@ -963,6 +968,49 @@ export interface TvDetails extends TitleResult {
     seasons?: { seasonNumber: number; status: number; status4k?: number }[];
   };
 }
+
+export interface LibraryRemovalTarget {
+  key: string;
+  serviceId: number;
+  serviceType:
+    | 'radarr'
+    | 'sonarr'
+    | 'lidarr'
+    | 'readarr'
+    | 'mylar'
+    | 'kapowarr'
+    | 'backissue'
+    | 'lazylibrarian';
+  externalId: number | string;
+  service: string;
+  quality: string;
+  url: string;
+}
+
+export interface LibraryRemovalPlan {
+  targets: LibraryRemovalTarget[];
+  token: string;
+  verifiedServices: number;
+  staleAvailabilityQualities?: ('HD' | '4K')[];
+}
+
+export interface MediaWatchCounts {
+  users: { id: number; displayName: string; avatar?: string }[];
+  playCount: number;
+  playCount7Days: number;
+  playCount30Days: number;
+}
+
+export interface MediaWatchDataResponse {
+  data?: MediaWatchCounts;
+  data4k?: MediaWatchCounts;
+}
+
+export interface JellystatPlaybackSummary {
+  plays: number;
+  playbackSeconds: number;
+}
+
 export interface BookDetails extends BookResult {
   onUserWatchlist?: boolean;
   description?: string;
@@ -996,6 +1044,8 @@ export interface DownloadItem {
   size: number;
   sizeLeft: number;
   timeLeft?: string; // "hh:mm:ss"
+  estimatedCompletionTime?: string | null;
+  downloadClient?: string;
   status?: string;
 }
 export interface RequestItem {

@@ -5,14 +5,15 @@ const appPath = (path: string) => `${mount}${path}`;
 const apiPath = (pathname: string) =>
   pathname.slice(pathname.indexOf('/api/v1') + '/api/v1'.length);
 
-test('large TV requests retry a transient season batch before showing a load error', async ({
+test('330-episode TV requests retry a transient season batch without losing selection', async ({
   page,
 }, testInfo) => {
   const batches: string[] = [];
   let failedFirstBatch = false;
+  const episodesPerSeason = 22;
   const seasons = Array.from({ length: 15 }, (_, index) => ({
     seasonNumber: index + 1,
-    episodeCount: 1,
+    episodeCount: episodesPerSeason,
     name: `Season ${index + 1}`,
     airDate: '2020-01-01',
   }));
@@ -61,15 +62,13 @@ test('large TV requests retry a transient season batch before showing a load err
         return route.fulfill({
           json: numbers.map((seasonNumber) => ({
             seasonNumber,
-            episodes: [
-              {
-                episodeNumber: 1,
-                name: `Episode from season ${seasonNumber}`,
-                ...(seasonNumber === 1
-                  ? { availabilitySources: [{ hd: true, fourK: false }] }
-                  : {}),
-              },
-            ],
+            episodes: Array.from({ length: episodesPerSeason }, (_, index) => ({
+              episodeNumber: index + 1,
+              name: `Episode ${index + 1} from season ${seasonNumber}`,
+              ...(seasonNumber === 1
+                ? { availabilitySources: [{ hd: true, fourK: false }] }
+                : {}),
+            })),
           })),
         });
       }
@@ -96,7 +95,7 @@ test('large TV requests retry a transient season batch before showing a load err
   await expect(firstSeason).toHaveAttribute('open', '');
   await expect(
     sheet.getByRole('checkbox', {
-      name: /E1 Episode from season 1/,
+      name: /E1 Episode 1 from season 1/,
     })
   ).toBeDisabled();
   await sheet.getByText('Season 1', { exact: true }).click();
@@ -110,9 +109,9 @@ test('large TV requests retry a transient season batch before showing a load err
       exact: true,
     })
   ).toHaveAttribute('aria-checked', 'true');
-  await expect(sheet.getByText('Selected: 14')).toBeVisible();
+  await expect(sheet.getByText('Selected: 308')).toBeVisible();
   await sheet.getByTestId('select-latest-requestable-season').click();
-  await expect(sheet.getByText('Selected: 1')).toBeVisible();
+  await expect(sheet.getByText('Selected: 22')).toBeVisible();
   await expect(
     sheet.getByRole('checkbox', {
       name: 'Deselect all requestable episodes in Season 15',
@@ -120,14 +119,14 @@ test('large TV requests retry a transient season batch before showing a load err
   ).toHaveAttribute('aria-checked', 'true');
 
   await selectAll.click();
-  await expect(sheet.getByText('Selected: 14')).toBeVisible();
+  await expect(sheet.getByText('Selected: 308')).toBeVisible();
 
   const deselectFirstSeason = sheet.getByRole('checkbox', {
     name: 'Deselect all requestable episodes in Season 2',
   });
   await deselectFirstSeason.click();
   await expect(firstSeason).not.toHaveAttribute('open', '');
-  await expect(sheet.getByText('Selected: 13')).toBeVisible();
+  await expect(sheet.getByText('Selected: 286')).toBeVisible();
   await expect(
     sheet.getByRole('checkbox', {
       name: 'Select all requestable episodes in Season 2',
@@ -136,7 +135,7 @@ test('large TV requests retry a transient season batch before showing a load err
   ).toHaveAttribute('aria-checked', 'false');
 
   await selectAll.click();
-  await expect(sheet.getByText('Selected: 14')).toBeVisible();
+  await expect(sheet.getByText('Selected: 308')).toBeVisible();
   const capture = process.env.LUMEN_TV_BULK_CAPTURE;
   if (capture && ['desktop', 'iphone'].includes(testInfo.project.name)) {
     const { mkdir } = await import('node:fs/promises');
@@ -155,7 +154,85 @@ test('large TV requests retry a transient season batch before showing a load err
   });
   await selectSecondSeason.click();
   await expect(selectSecondSeason).toHaveAttribute('aria-checked', 'true');
-  await expect(sheet.getByText('Selected: 1')).toBeVisible();
+  await expect(sheet.getByText('Selected: 22')).toBeVisible();
+});
+
+test('closing a large-series picker cancels remaining episode metadata batches', async ({
+  page,
+}) => {
+  const batches: string[] = [];
+  const seasons = Array.from({ length: 30 }, (_, index) => ({
+    seasonNumber: index + 1,
+    episodeCount: 20,
+    name: `Season ${index + 1}`,
+  }));
+  let releaseFirstBatch!: () => void;
+  const firstBatch = new Promise<void>((resolve) => {
+    releaseFirstBatch = resolve;
+  });
+
+  await page.route('**/lumen-config.json', (route) =>
+    route.fulfill({ json: {} })
+  );
+  await page.route('**/api/v1/**', async (route) => {
+    const url = new URL(route.request().url());
+    const path = apiPath(url.pathname);
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 1, displayName: 'Viewer', permissions: 2 },
+      });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({ json: { locale: 'en' } });
+    if (path === '/settings/public')
+      return route.fulfill({ json: { partialRequestsEnabled: true } });
+    if (path === '/tv/84773')
+      return route.fulfill({
+        json: {
+          id: 84773,
+          name: 'Long Running Fixture',
+          externalIds: { tvdbId: 80 },
+          overview: 'Thirty seasons.',
+          genres: [],
+          firstAirDate: '2005-01-01',
+          contentRatings: { results: [] },
+          seasons,
+          numberOfSeasons: seasons.length,
+          mediaInfo: { seasons: [], requests: [] },
+        },
+      });
+    if (path === '/tv/84773/seasons') {
+      const requested = url.searchParams.get('seasonNumbers') ?? '';
+      batches.push(requested);
+      if (batches.length === 1) await firstBatch;
+      try {
+        return await route.fulfill({
+          json: requested
+            .split(',')
+            .map(Number)
+            .map((seasonNumber) => ({
+              seasonNumber,
+              episodes: [],
+            })),
+        });
+      } catch {
+        // Closing the picker aborts its in-flight metadata request.
+      }
+    }
+    return route.fulfill({ json: { results: [] } });
+  });
+
+  await page.goto(appPath('/tv/84773'));
+  await page
+    .getByRole('button', { name: 'Request Episodes', exact: true })
+    .click();
+  const sheet = page.getByRole('dialog', { name: 'Request Episodes' });
+  await expect.poll(() => batches.length).toBe(1);
+  expect(batches).toEqual(['1,2,3,4,5']);
+  await sheet.getByRole('button', { name: 'Close', exact: true }).click();
+  releaseFirstBatch();
+  await expect(sheet).toHaveCount(0);
+  await page.waitForTimeout(500);
+  expect(batches).toEqual(['1,2,3,4,5']);
 });
 
 test('large TV requests load in bounded batches and recover only the failed seasons', async ({
@@ -302,4 +379,8 @@ test('large TV requests load in bounded batches and recover only the failed seas
       ],
     },
   ]);
+  await expect(
+    page.getByText('Episodes requested for Long Running Fixture')
+  ).toBeVisible();
+  await expect(sheet).toHaveCount(0);
 });

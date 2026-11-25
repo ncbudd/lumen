@@ -18,6 +18,7 @@ const movie = {
   credits: { cast: [], crew: [] },
   runtime: 100,
   voteAverage: 7.5,
+  voteCount: 1250,
 };
 const available = {
   id: 10,
@@ -41,6 +42,7 @@ async function fixtures(page: Page) {
   let pending: Promise<void> | undefined;
   const unknown: string[] = [];
   const errors: string[] = [];
+  const requests: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.route('https://**/*', (route) => route.abort());
   await page.route(/(?:image\.tmdb\.org|\/imageproxy\/tmdb)\//, (route) =>
@@ -55,6 +57,7 @@ async function fixtures(page: Page) {
   await page.route('**/api/v1/**', async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname.slice('/api/v1'.length);
+    requests.push(`${request.method()} ${path}`);
     let body: unknown;
     let status = 200;
     if (path === '/request/status')
@@ -69,6 +72,8 @@ async function fixtures(page: Page) {
         : { message: 'Sign in' };
     } else if (/^\/user\/\d+\/settings\/main$/.test(path)) {
       body = {};
+    } else if (/^\/user\/\d+\/settings\/discover-book-sections$/.test(path)) {
+      body = [];
     } else if (path === '/auth/logout') {
       user = '';
       status = 204;
@@ -108,6 +113,32 @@ async function fixtures(page: Page) {
       body = { total: 0, pending: 0, approved: 0, processing: 0, available: 0 };
     else if (path === '/movie/101/recommendations') body = paged([]);
     else if (path === '/tv/202/recommendations') body = paged([]);
+    else if (path === '/movie/101/ratingscombined')
+      body = {
+        rt: {
+          criticsScore: 0,
+          audienceScore: 92,
+          url: 'http://ratings.invalid/movie',
+        },
+        imdb: { criticsScore: 8.2, url: 'https://www.imdb.com/title/tt123' },
+        mdblist: { metacriticRating: 77, traktRating: 7.4 },
+      };
+    else if (path === '/tv/202/ratingscombined')
+      body = {
+        rt: {
+          criticsScore: 81,
+          audienceScore: 88,
+          url: 'https://www.rottentomatoes.com/tv/test',
+        },
+        imdb: { criticsScore: 11 },
+        mdblist: {
+          imdbId: 'tt456',
+          imdbRating: 7.9,
+          rtRating: 81,
+          metacriticRating: 73,
+          traktRating: 7.1,
+        },
+      };
     else if (path === '/tv/202')
       body = {
         ...movie,
@@ -140,6 +171,7 @@ async function fixtures(page: Page) {
   return {
     unknown,
     errors,
+    requests,
     hold() {
       holdFriend = true;
       pending = new Promise<void>((r) => {
@@ -245,6 +277,286 @@ test('catalogue, Plex device links, requests and responsive layout', async ({
   });
   expect(fixture.errors).toEqual([]);
   expect(fixture.unknown).toEqual([]);
+});
+
+test('movie and TV details show valid available ratings and safe links', async ({
+  page,
+}) => {
+  const qa = await fixtures(page);
+  await page.goto('/movie/101');
+  await expect(
+    page.getByTitle('Rotten Tomatoes critics: 0%', { exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByTitle('Rotten Tomatoes audience: 92%', { exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByTitle('IMDb: 8.2/10', { exact: true })
+  ).toHaveAttribute('href', 'https://www.imdb.com/title/tt123');
+  await expect(
+    page.getByTitle('Metacritic: 77%', { exact: true })
+  ).toBeVisible();
+  await expect(page.getByTitle('Trakt: 7.4/10', { exact: true })).toBeVisible();
+  await expect(
+    page.getByTitle('TMDB: 7.5/10', { exact: true })
+  ).toHaveAttribute('href', 'https://www.themoviedb.org/movie/101');
+  await expect(
+    page.locator('a[href="http://ratings.invalid/movie"]')
+  ).toHaveCount(0);
+  const movieDimensions = await page.evaluate(() => ({
+    viewport: window.innerWidth,
+    page: document.documentElement.scrollWidth,
+  }));
+  expect(movieDimensions.page).toBeLessThanOrEqual(movieDimensions.viewport);
+  if (movieDimensions.viewport < 700) {
+    const ratingsDimensions = await page
+      .getByTestId('video-ratings')
+      .evaluate((element) => ({
+        viewport: element.clientWidth,
+        content: element.scrollWidth,
+      }));
+    expect(ratingsDimensions.content).toBeGreaterThan(
+      ratingsDimensions.viewport
+    );
+  }
+  await page.goto('/tv/202');
+  await expect(
+    page.getByTitle('Rotten Tomatoes critics: 81%', { exact: true })
+  ).toHaveAttribute('href', 'https://www.rottentomatoes.com/tv/test');
+  await expect(
+    page.getByTitle('IMDb: 7.9/10', { exact: true })
+  ).toHaveAttribute('href', 'https://www.imdb.com/title/tt456');
+  await expect(
+    page.getByTitle('TMDB: 7.5/10', { exact: true })
+  ).toHaveAttribute('href', 'https://www.themoviedb.org/tv/202');
+  const tvDimensions = await page.evaluate(() => ({
+    viewport: window.innerWidth,
+    page: document.documentElement.scrollWidth,
+  }));
+  expect(tvDimensions.page).toBeLessThanOrEqual(tvDimensions.viewport);
+  expect(qa.unknown.filter((path) => path.includes('ratingscombined'))).toEqual(
+    []
+  );
+  expect(qa.errors).toEqual([]);
+});
+
+test('movie cards load a bounded rating popover after it is opened', async ({
+  page,
+}, testInfo) => {
+  const qa = await fixtures(page);
+  await page.clock.install();
+  await page.route(/\/api\/v1\/discover\/tv(\/upcoming)?(\?|$)/, (route) =>
+    route.fulfill({
+      json: paged([
+        {
+          ...movie,
+          id: 202,
+          mediaType: 'tv',
+          title: undefined,
+          name: 'The Test Series',
+          releaseDate: undefined,
+          firstAirDate: '2018-01-01',
+        },
+      ]),
+    })
+  );
+  await page.goto('/');
+  const projectWidth = page.viewportSize()?.width ?? 1440;
+  const projectHeight = page.viewportSize()?.height ?? 900;
+  for (const width of [...new Set([320, projectWidth])]) {
+    const height = width === 320 ? 800 : projectHeight;
+    await page.setViewportSize({ width, height });
+    if (process.env.LUMEN_RATING_CARD_CAPTURE_DIR) {
+      await page.screenshot({
+        path: `${process.env.LUMEN_RATING_CARD_CAPTURE_DIR}/candidate-discover-${testInfo.project.name}-${width}.png`,
+        fullPage: true,
+      });
+    }
+    const trigger = page
+      .getByRole('button', {
+        name: 'Show ratings for The Test Film',
+      })
+      .first();
+    await expect(trigger).toBeVisible();
+    if (width === 320)
+      expect(
+        qa.requests.filter(
+          (request) => request === 'GET /movie/101/ratingscombined'
+        )
+      ).toHaveLength(0);
+
+    await trigger.click();
+    const dialog = page.getByRole('dialog', {
+      name: 'Show ratings for The Test Film',
+    });
+    await expect(dialog).toBeVisible();
+    if (width === 320) {
+      await page.clock.fastForward(299);
+      expect(
+        qa.requests.filter(
+          (request) => request === 'GET /movie/101/ratingscombined'
+        )
+      ).toHaveLength(0);
+      await page.clock.fastForward(1);
+    } else {
+      await page.clock.fastForward(300);
+    }
+    await expect(
+      dialog.getByTitle('Rotten Tomatoes audience: 92%', { exact: true })
+    ).toBeVisible();
+    expect(
+      qa.requests.filter(
+        (request) => request === 'GET /movie/101/ratingscombined'
+      )
+    ).toHaveLength(1);
+
+    const dimensions = await page.evaluate(() => {
+      const popover = document.querySelector('.video-rating-popover')!;
+      const rect = popover.getBoundingClientRect();
+      return {
+        viewport: innerWidth,
+        viewportHeight: innerHeight,
+        page: document.documentElement.scrollWidth,
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+        content: popover.scrollWidth,
+        client: popover.clientWidth,
+      };
+    });
+    expect(dimensions.page).toBeLessThanOrEqual(dimensions.viewport);
+    expect(dimensions.left).toBeGreaterThanOrEqual(0);
+    expect(dimensions.right).toBeLessThanOrEqual(dimensions.viewport);
+    expect(dimensions.top).toBeGreaterThanOrEqual(0);
+    expect(dimensions.bottom).toBeLessThanOrEqual(dimensions.viewportHeight);
+    expect(dimensions.content).toBeLessThanOrEqual(dimensions.client);
+    await expect(dialog.locator('.chips.wrap')).toBeVisible();
+    if (process.env.LUMEN_RATING_CARD_CAPTURE_DIR) {
+      await page.screenshot({
+        path: `${process.env.LUMEN_RATING_CARD_CAPTURE_DIR}/candidate-${testInfo.project.name}-${width}.png`,
+      });
+    }
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(trigger).toBeFocused();
+
+    const tvTrigger = page
+      .getByRole('button', {
+        name: 'Show ratings for The Test Series',
+      })
+      .first();
+    await expect(tvTrigger).toBeVisible();
+    if (width === 320)
+      expect(
+        qa.requests.filter(
+          (request) => request === 'GET /tv/202/ratingscombined'
+        )
+      ).toHaveLength(0);
+    await tvTrigger.click();
+    const tvDialog = page.getByRole('dialog', {
+      name: 'Show ratings for The Test Series',
+    });
+    await page.clock.fastForward(300);
+    await expect(
+      tvDialog.getByTitle('Rotten Tomatoes critics: 81%', { exact: true })
+    ).toBeVisible();
+    expect(
+      qa.requests.filter((request) => request === 'GET /tv/202/ratingscombined')
+    ).toHaveLength(1);
+    await page.keyboard.press('Escape');
+    await expect(tvDialog).toHaveCount(0);
+  }
+  expect(qa.errors).toEqual([]);
+  expect(qa.unknown).toEqual([]);
+});
+
+test('movie rating popovers explain unavailable ratings and load failures', async ({
+  page,
+}) => {
+  const qa = await fixtures(page);
+  await page.route(/\/api\/v1\/discover\/(trending|movies)(\?|$)/, (route) =>
+    route.fulfill({
+      json: paged([
+        { ...movie, voteAverage: undefined, voteCount: 0 },
+        {
+          ...movie,
+          id: 102,
+          title: 'The Failing Film',
+          voteAverage: undefined,
+          voteCount: 0,
+        },
+      ]),
+    })
+  );
+  await page.route('**/api/v1/movie/101/ratingscombined', (route) =>
+    route.fulfill({ json: {} })
+  );
+  await page.route('**/api/v1/movie/102/ratingscombined', (route) =>
+    route.fulfill({ status: 503, json: { message: 'Provider unavailable' } })
+  );
+  await page.goto('/');
+  const trigger = page
+    .getByRole('button', {
+      name: 'Show ratings for The Test Film',
+    })
+    .first();
+  await expect(trigger).toHaveText('Ratings');
+  await trigger.click();
+  await expect(
+    page.getByRole('dialog', { name: 'Show ratings for The Test Film' })
+  ).toContainText('No ratings available');
+
+  await page
+    .getByRole('button', { name: 'Show ratings for The Failing Film' })
+    .first()
+    .click();
+  await expect(
+    page.getByRole('dialog', { name: 'Show ratings for The Failing Film' })
+  ).toContainText('Ratings could not be loaded.');
+  expect(qa.errors).toEqual([]);
+});
+
+test('movie card rating controls use saved French and Arabic locales', async ({
+  page,
+}) => {
+  const qa = await fixtures(page);
+  let locale = 'fr';
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale } })
+  );
+  await page.clock.install();
+  for (const item of [
+    {
+      locale: 'fr',
+      trigger: 'Afficher les évaluations de The Test Film',
+      heading: 'Évaluations',
+      close: 'Fermer les évaluations',
+    },
+    {
+      locale: 'ar',
+      trigger: 'عرض تقييمات The Test Film',
+      heading: 'التقييمات',
+      close: 'إغلاق التقييمات',
+    },
+  ]) {
+    locale = item.locale;
+    await page.goto('/');
+    const trigger = page.getByRole('button', { name: item.trigger }).first();
+    await expect(trigger).toBeVisible();
+    await trigger.click();
+    const dialog = page.getByRole('dialog', { name: item.trigger });
+    await expect(dialog).toContainText(item.heading);
+    await page.clock.fastForward(300);
+    await expect(
+      dialog.getByRole('button', { name: item.close })
+    ).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+  }
+  expect(qa.errors).toEqual([]);
+  expect(qa.unknown).toEqual([]);
 });
 
 test('New on Plex keeps all recent videos when other media types share the library', async ({
@@ -872,8 +1184,247 @@ test('movie posters distinguish or hide shared copies without offering duplicate
   await expect(poster.locator('.glyph')).toHaveCount(0);
   await expect(
     poster.getByRole('link', { name: 'Shared Movie', exact: true })
-  ).toHaveAttribute('href', '/movie/90');
+  ).toHaveAttribute('href', /^\/movie\/90(?:\?discoverContext=[^&]+)?$/);
   await expect(poster.getByRole('button', { name: /request/i })).toHaveCount(0);
+});
+
+test('movie cards show both independent quality statuses', async ({ page }) => {
+  await fixtures(page);
+  await page.route(/\/api\/v1\/discover\/movies(?:\?|$)/, (route) =>
+    route.fulfill({
+      json: paged([
+        {
+          ...movie,
+          id: 90,
+          title: 'Dual Quality Movie',
+          mediaInfo: { status: 5, status4k: 5 },
+        },
+        {
+          ...movie,
+          id: 91,
+          title: 'Mixed Quality Movie',
+          mediaInfo: { status: 5, status4k: 2 },
+        },
+      ]),
+    })
+  );
+  await page.goto('/movies');
+
+  const dual = page.locator('.poster').filter({
+    has: page.getByRole('link', { name: 'Dual Quality Movie', exact: true }),
+  });
+  const mixed = page.locator('.poster').filter({
+    has: page.getByRole('link', { name: 'Mixed Quality Movie', exact: true }),
+  });
+  await expect(dual.locator('.glyph[data-quality]')).toHaveCount(2);
+  await expect(dual.locator('.glyph[data-quality="HD"]')).toHaveAttribute(
+    'aria-label',
+    'HD: On Plex'
+  );
+  await expect(dual.locator('.glyph[data-quality="4K"]')).toHaveAttribute(
+    'aria-label',
+    '4K: On Plex'
+  );
+  await expect(mixed.locator('.glyph[data-quality]')).toHaveCount(2);
+  await expect(mixed.locator('.glyph[data-quality="HD"]')).toHaveAttribute(
+    'aria-label',
+    'HD: On Plex'
+  );
+  await expect(mixed.locator('.glyph[data-quality="4K"]')).toHaveAttribute(
+    'aria-label',
+    '4K: Requested'
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth
+    )
+  ).toBe(true);
+
+  if (process.env.LUMEN_CARD_STATUS_VISUAL === '1') {
+    const output = process.env.LUMEN_VISUAL_EVIDENCE;
+    if (!output) throw new Error('LUMEN_VISUAL_EVIDENCE is required');
+    if (process.env.LUMEN_CARD_STATUS_VIEWPORT === '320')
+      await page.setViewportSize({ width: 320, height: 900 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth
+      )
+    ).toBe(true);
+    await page.screenshot({
+      path: output,
+      fullPage: true,
+      animations: 'disabled',
+    });
+  }
+
+  await page.route(/\/api\/v1\/discover\/tv(?:\?|$)/, (route) =>
+    route.fulfill({
+      json: paged([
+        {
+          ...movie,
+          id: 202,
+          title: 'Dual Quality Series',
+          mediaType: 'tv',
+          name: 'Dual Quality Series',
+          mediaInfo: { status: 2, status4k: 5 },
+        },
+      ]),
+    })
+  );
+  await page.goto('/series');
+  const series = page.locator('.poster').filter({
+    has: page.getByRole('link', { name: 'Dual Quality Series', exact: true }),
+  });
+  await expect(series.locator('.glyph[data-quality]')).toHaveCount(2);
+  await expect(series.locator('.glyph[data-quality="HD"]')).toHaveAttribute(
+    'aria-label',
+    'HD: Requested'
+  );
+  await expect(series.locator('.glyph[data-quality="4K"]')).toHaveAttribute(
+    'aria-label',
+    '4K: On Plex'
+  );
+});
+
+test('music cards preserve format-specific status badges', async ({ page }) => {
+  const qa = await fixtures(page);
+  const locale = process.env.LUMEN_MUSIC_STATUS_LOCALE || 'en';
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale } })
+  );
+  await page.route('**/api/v1/settings/public', (route) =>
+    route.fulfill({
+      json: {
+        applicationTitle: 'SeerrNG',
+        enabledMediaCategories: { music: true },
+        mediaServerType: 1,
+      },
+    })
+  );
+  await page.route('**/api/v1/service/lidarr', (route) =>
+    route.fulfill({
+      json: [
+        { id: 1, name: 'Fixture MP3', musicQuality: 'mp3' },
+        { id: 2, name: 'Fixture FLAC', musicQuality: 'flac' },
+      ],
+    })
+  );
+  await page.route(/\/api\/v1\/discover\/music(?:\?|$)/, (route) =>
+    route.fulfill({
+      json: paged([
+        {
+          id: 'fixture-album',
+          mediaType: 'album',
+          title: 'Dual Format Album',
+          'primary-type': 'Album',
+          'first-release-date': '2020-01-01',
+          'artist-credit': [{ name: 'Fixture Artist' }],
+          posterPath: '/qa-poster.png',
+          availableQualities: ['MP3'],
+          qualityStatuses: [
+            { quality: 'MP3', status: 5 },
+            { quality: 'FLAC', status: 2 },
+          ],
+          mediaInfo: { status: 5 },
+        },
+        {
+          id: 'processing-album',
+          mediaType: 'album',
+          title: 'Processing Album',
+          'primary-type': 'Album',
+          'artist-credit': [{ name: 'Fixture Artist' }],
+          qualityStatuses: [{ quality: 'FLAC', status: 3 }],
+        },
+        {
+          id: 'fallback-album',
+          mediaType: 'album',
+          title: 'Fallback Album',
+          'primary-type': 'Album',
+          'artist-credit': [{ name: 'Fixture Artist' }],
+          availableQualities: ['MP3'],
+          qualityStatuses: [],
+        },
+        {
+          id: 'aggregate-album',
+          mediaType: 'album',
+          title: 'Aggregate Album',
+          'primary-type': 'Album',
+          'artist-credit': [{ name: 'Fixture Artist' }],
+          qualityStatuses: [{ quality: 'FLAC', status: 1 }],
+          mediaInfo: { status: 2 },
+        },
+      ]),
+    })
+  );
+  await page.goto('/music');
+  const album = page.locator('.poster').filter({
+    has: page.getByRole('link', { name: 'Dual Format Album', exact: true }),
+  });
+  const messages = {
+    en: {
+      available: 'MP3: In library',
+      waiting: 'FLAC: Waiting for approval',
+      processing: 'FLAC: Processing',
+    },
+    fr: {
+      available: 'MP3: Dans la bibliothèque',
+      waiting: 'FLAC: En attente d’approbation',
+      processing: 'FLAC: Traitement en cours',
+    },
+    ar: {
+      available: 'MP3: في المكتبة',
+      waiting: 'FLAC: بانتظار الموافقة',
+      processing: 'FLAC: قيد المعالجة',
+    },
+  } as const;
+  const expected = messages[locale as keyof typeof messages];
+  await expect(album.locator('.glyph[data-quality]')).toHaveCount(2);
+  await expect(album.locator('.glyph[data-quality="MP3"]')).toHaveAttribute(
+    'aria-label',
+    expected.available
+  );
+  await expect(album.locator('.glyph[data-quality="FLAC"]')).toHaveAttribute(
+    'aria-label',
+    expected.waiting
+  );
+  const processing = page.locator('.poster').filter({
+    has: page.getByRole('link', { name: 'Processing Album', exact: true }),
+  });
+  await expect(
+    processing.locator('.glyph[data-quality="FLAC"]')
+  ).toHaveAttribute('aria-label', expected.processing);
+  const fallback = page.locator('.poster').filter({
+    has: page.getByRole('link', { name: 'Fallback Album', exact: true }),
+  });
+  await expect(fallback.locator('.glyph[data-quality="MP3"]')).toHaveAttribute(
+    'aria-label',
+    expected.available
+  );
+  const aggregate = page.locator('.poster').filter({
+    has: page.getByRole('link', { name: 'Aggregate Album', exact: true }),
+  });
+  await expect(aggregate.locator('.glyph')).toHaveAttribute(
+    'title',
+    locale === 'en' ? 'Requested' : locale === 'fr' ? 'Demandé' : 'تم طلبه'
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth
+    )
+  ).toBe(true);
+  expect(qa.unknown).toEqual([]);
+
+  if (process.env.LUMEN_MUSIC_STATUS_VISUAL === '1') {
+    const output = process.env.LUMEN_VISUAL_EVIDENCE;
+    if (!output) throw new Error('LUMEN_VISUAL_EVIDENCE is required');
+    if (process.env.LUMEN_MUSIC_STATUS_VIEWPORT === '320')
+      await page.setViewportSize({ width: 320, height: 900 });
+    await page.screenshot({
+      path: output,
+      fullPage: true,
+      animations: 'disabled',
+    });
+  }
 });
 
 test('movie details keep shared HD and viewer 4K availability separate', async ({
@@ -3580,6 +4131,70 @@ test('movie studio details open the matching discovery query', async ({
   await expect(page).toHaveURL(/\/movies$/);
 });
 
+test('native studio and network bookmarks show company artwork in Browse', async ({
+  page,
+}, info) => {
+  await fixtures(page);
+  await page.route('**/api/v1/studio/42', (route) =>
+    route.fulfill({
+      json: {
+        id: 42,
+        name: 'Fixture Studio',
+        logoPath: '/fixture-studio.png',
+      },
+    })
+  );
+  await page.route('**/imageproxy/tmdb/t/p/w780/**', (route) =>
+    route.fulfill({
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="780" height="440" viewBox="0 0 780 440"><text x="390" y="240" fill="#f1f3f7" font-family="Arial" font-size="72" font-weight="700" text-anchor="middle">COMPANY</text></svg>',
+    })
+  );
+  await page.route('**/api/v1/languages', (route) =>
+    route.fulfill({ json: [] })
+  );
+  await page.route('**/api/v1/watchproviders/regions', (route) =>
+    route.fulfill({
+      json: [{ iso_3166_1: 'US', english_name: 'United States' }],
+    })
+  );
+  await page.goto('/movies?studio=42');
+  const studioImage = page.getByRole('img', { name: 'Fixture Studio' });
+  await expect(studioImage).toBeVisible();
+  await expect(studioImage).toHaveAttribute(
+    'src',
+    '/imageproxy/tmdb/t/p/w780/fixture-studio.png'
+  );
+  await expect(
+    page.getByRole('button', { name: 'Clear Studio Fixture Studio' })
+  ).toBeVisible();
+  const moreFilters = page.locator('details.more-filters');
+  await expect(moreFilters).not.toHaveAttribute('open', '');
+  await page.screenshot({
+    path: info.outputPath('studio-company-banner.png'),
+    fullPage: true,
+  });
+  await moreFilters.locator('summary').click();
+  await expect(
+    page.getByRole('button', { name: 'Production Studios' })
+  ).toBeVisible();
+
+  await page.goto('/series?network=213');
+  const networkImage = page.getByRole('img', { name: 'Netflix' });
+  await expect(networkImage).toBeVisible();
+  await expect(networkImage).toHaveAttribute(
+    'src',
+    '/imageproxy/tmdb/t/p/w780/wwemzKWzjKYJFfCeiB57q3r4Bcm.png'
+  );
+  await expect(
+    page.getByRole('button', { name: 'Clear Network Netflix' })
+  ).toBeVisible();
+  await page.screenshot({
+    path: info.outputPath('network-company-banner.png'),
+    fullPage: true,
+  });
+});
+
 test('movie studio search can select and exclude a studio', async ({
   page,
 }) => {
@@ -3878,7 +4493,18 @@ test('related video lists preserve media type, paginate, and retry', async ({
 }) => {
   await fixtures(page);
   await page.route('**/api/v1/tv/202', (route) =>
-    route.fulfill({ json: { id: 202, name: 'Fixture Series', seasons: [] } })
+    route.fulfill({
+      json: {
+        ...movie,
+        id: 202,
+        name: 'Fixture Series',
+        title: undefined,
+        firstAirDate: '2020-01-01',
+        status: 'Returning Series',
+        seasons: [],
+        mediaInfo: null,
+      },
+    })
   );
   let pageTwoAttempts = 0;
   await page.route(
@@ -3912,6 +4538,29 @@ test('related video lists preserve media type, paginate, and retry', async ({
   );
 
   await page.goto('/movie/101');
+  await expect(
+    page.getByRole('heading', { name: 'The Test Film' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Similar Movies', exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Similar Film 1' })
+  ).toHaveAttribute('href', '/movie/301');
+  await expect(
+    page.getByRole('link', { name: 'Recommended Film 1' })
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth
+    )
+  ).toBeTruthy();
+  if (process.env.LUMEN_MOVIE_SIMILAR_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_MOVIE_SIMILAR_CAPTURE}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
   await page.getByRole('link', { name: 'Similar Movies' }).click();
   await expect(
     page.getByRole('heading', { name: 'Similar Movies' })
@@ -3931,6 +4580,28 @@ test('related video lists preserve media type, paginate, and retry', async ({
   await expect(
     page.getByRole('link', { name: 'Recommended Film 1' })
   ).toBeVisible();
+
+  await page.goto('/tv/202');
+  await expect(
+    page.getByRole('heading', { name: 'Fixture Series' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Similar Series', exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Similar Series 1' })
+  ).toHaveAttribute('href', '/tv/301');
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth
+    )
+  ).toBeTruthy();
+  if (process.env.LUMEN_MOVIE_SIMILAR_CAPTURE) {
+    await page.screenshot({
+      path: `${process.env.LUMEN_MOVIE_SIMILAR_CAPTURE}-tv-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
 
   await page.goto('/tv/202/recommendations');
   await expect(
@@ -5115,8 +5786,20 @@ test('Music album and artist details localize their controls and metadata', asyn
       filter: 'Filter Music by Artist',
       search: 'Search Prowlarr',
       associations: 'Explore Associations',
+      albumDetails: 'Album Details',
+      similarArtists: 'Similar Artists',
       blocklist: 'Add to Blocklist',
       blocklistQuestion: 'Add to the Blocklist?',
+      editionCompare: 'Compare Editions',
+      missingTracks: 'Missing tracks: Bonus Track',
+      extraTracks: 'Additional tracks: Bonus Track, Demo',
+      requestEdition: 'Request this edition',
+      libraryHealth: 'Library Health',
+      healthIssue: 'Suspected transcode',
+      healthReason: 'The lossless file may be transcoded.',
+      healthFix: 'Fix 1 issue with Soulseek',
+      musicBrainzRating: 'MusicBrainz: 4.2/5 from 128 votes',
+      discogsFailure: 'Discogs: temporarily unavailable',
     },
     fr: {
       request: 'Demander FLAC',
@@ -5135,8 +5818,20 @@ test('Music album and artist details localize their controls and metadata', asyn
       filter: 'Filtrer la musique par artiste',
       search: 'Rechercher avec Prowlarr',
       associations: 'Explorer les associations',
+      albumDetails: 'Détails de l’album',
+      similarArtists: 'Artistes similaires',
       blocklist: 'Ajouter à la liste de blocage',
       blocklistQuestion: 'Ajouter à la liste de blocage ?',
+      editionCompare: 'Comparer les éditions',
+      missingTracks: 'Pistes manquantes : Bonus Track',
+      extraTracks: 'Pistes supplémentaires : Bonus Track, Demo',
+      requestEdition: 'Demander cette édition',
+      libraryHealth: 'Santé de la bibliothèque',
+      healthIssue: 'Transcodage suspecté',
+      healthReason: 'The lossless file may be transcoded.',
+      healthFix: 'Corriger 1 problème avec Soulseek',
+      musicBrainzRating: 'MusicBrainz : 4.2/5, 128 votes',
+      discogsFailure: 'Discogs : temporairement indisponible',
     },
     ar: {
       request: 'طلب FLAC',
@@ -5155,17 +5850,30 @@ test('Music album and artist details localize their controls and metadata', asyn
       filter: 'تصفية الموسيقى حسب الفنان',
       search: 'البحث في Prowlarr',
       associations: 'استكشاف الارتباطات',
+      albumDetails: 'تفاصيل الألبوم',
+      similarArtists: 'فنانون مشابهون',
       blocklist: 'إضافة إلى قائمة الحظر',
       blocklistQuestion: 'إضافة إلى قائمة الحظر؟',
+      editionCompare: 'مقارنة الإصدارات',
+      missingTracks: 'مقاطع مفقودة: Bonus Track',
+      extraTracks: 'مقاطع إضافية: Bonus Track, Demo',
+      requestEdition: 'طلب هذا الإصدار',
+      libraryHealth: 'سلامة المكتبة',
+      healthIssue: 'اشتباه بتحويل الترميز',
+      healthReason: 'The lossless file may be transcoded.',
+      healthFix: 'إصلاح مشكلة واحدة باستخدام Soulseek',
+      musicBrainzRating: 'MusicBrainz: ‏4.2/5 من 128 تقييمًا',
+      discogsFailure: 'Discogs: غير متاح مؤقتًا',
     },
   }[locale];
   const album = '397b4ce9-89a1-41f8-9599-68983ee4a767';
   const artist = '934ebb1e-9e64-4a2d-abc2-8aea39d7b50c';
+  let musicPermissions = 268435474;
   await page.route('**/api/v1/user/1/settings/main', (route) =>
     route.fulfill({ json: { locale, enabledMediaCategories: { music: true } } })
   );
   await page.route('**/api/v1/auth/me', (route) =>
-    route.fulfill({ json: { id: 1, permissions: 268435474 } })
+    route.fulfill({ json: { id: 1, permissions: musicPermissions } })
   );
   await page.route('**/api/v1/settings/public', (route) =>
     route.fulfill({
@@ -5200,6 +5908,86 @@ test('Music album and artist details localize their controls and metadata', asyn
       },
     })
   );
+  await page.route(`**/api/v1/music/${album}/rating`, (route) =>
+    route.fulfill({
+      json: {
+        ratings: [
+          {
+            source: 'musicbrainz',
+            score: 4.2,
+            scale: 5,
+            votes: 128,
+            url: 'https://musicbrainz.org/release-group/fixture',
+          },
+        ],
+        failedSources: ['discogs'],
+      },
+    })
+  );
+  await page.route(`**/api/v1/collectors/variants/${album}`, (route) =>
+    route.fulfill({
+      json: {
+        variants: [
+          {
+            releaseId: '11111111-1111-4111-8111-111111111111',
+            title: 'Fixture Album',
+            year: 2024,
+            formats: ['CD'],
+            edition: 'standard',
+            trackCount: 10,
+            extraTracks: [],
+            missingTracks: ['Bonus Track'],
+            evidence: [],
+            isStandard: true,
+          },
+          {
+            releaseId: '22222222-2222-4222-8222-222222222222',
+            title: 'Fixture Album Deluxe',
+            disambiguation: 'Deluxe Edition',
+            year: 2024,
+            formats: ['CD', 'Digital Media'],
+            edition: 'deluxe',
+            trackCount: 12,
+            extraTracks: ['Bonus Track', 'Demo'],
+            missingTracks: [],
+            evidence: ['Includes two additional tracks.'],
+            isStandard: false,
+          },
+        ],
+      },
+    })
+  );
+  await page.route('**/api/v1/soulseek/status', (route) =>
+    route.fulfill({ json: { configured: true, canRequest: false } })
+  );
+  const remediationCalls: { issueIds: string[] }[] = [];
+  await page.route(`**/api/v1/soulseek/albums/${album}/issues`, (route) =>
+    route.fulfill({
+      json: {
+        issues: [
+          {
+            issueId: 'health-fix-1',
+            type: 'SuspectedTranscode',
+            severity: 'high',
+            status: 'open',
+            title: 'Fixture Track',
+            reason: 'The lossless file may be transcoded.',
+            canAutoFix: true,
+          },
+        ],
+      },
+    })
+  );
+  await page.route(`**/api/v1/soulseek/albums/${album}/remediate`, (route) => {
+    remediationCalls.push(route.request().postDataJSON());
+    return route.fulfill({ json: { issueCount: 1 } });
+  });
+  const requestedMusicVariants: string[] = [];
+  await page.route('**/api/v1/request', (route) => {
+    const body = route.request().postDataJSON();
+    if (body?.variantKey) requestedMusicVariants.push(body.variantKey);
+    return route.fulfill({ json: { id: 42 } });
+  });
   await page.route(`**/api/v1/blocklist/${album}?mediaType=music`, (route) =>
     route.fulfill({ status: 404, json: { message: 'Not blocklisted' } })
   );
@@ -5226,10 +6014,34 @@ test('Music album and artist details localize their controls and metadata', asyn
       },
     })
   );
+  const similarArtists = {
+    page: 1,
+    pageSize: 20,
+    totalPages: 1,
+    totalResults: 1,
+    results: [
+      {
+        id: 'similar-artist-1',
+        name: 'Similar Fixture Artist',
+        mediaType: 'artist',
+        type: 'Group',
+        'sort-name': 'Similar Fixture Artist',
+        artistThumb: '/similar-artist.png',
+      },
+    ],
+  };
+  let albumSimilarRequests = 0;
+  await page.route(`**/api/v1/music/${album}/artist-similar`, (route) => {
+    albumSimilarRequests++;
+    return route.fulfill({ json: similarArtists });
+  });
+  await page.route(`**/api/v1/artist/${artist}/similar`, (route) =>
+    route.fulfill({ json: similarArtists })
+  );
 
   await page.goto(testAppPath(`/music/${album}`));
   await expect(
-    page.getByRole('heading', { name: 'Fixture Album' })
+    page.locator('h1').getByText('Fixture Album', { exact: true })
   ).toBeVisible();
   await expect(page.getByRole('button', { name: copy.request })).toBeVisible();
   await expect(page.getByRole('link', { name: copy.search })).toBeVisible();
@@ -5252,6 +6064,56 @@ test('Music album and artist details localize their controls and metadata', asyn
   await expect(page.getByText(copy.tracks, { exact: true })).toBeVisible();
   await expect(page.getByText(copy.plays, { exact: true })).toBeVisible();
   await expect(page.getByText(copy.trackCount, { exact: true })).toBeVisible();
+  await expect(page.getByTestId('music-ratings')).toContainText(
+    copy.musicBrainzRating
+  );
+  await expect(page.getByTestId('music-ratings')).toContainText(
+    copy.discogsFailure
+  );
+  await expect(
+    page.getByTestId('music-ratings').getByRole('link')
+  ).toHaveAttribute('href', 'https://musicbrainz.org/release-group/fixture');
+  await expect.poll(() => albumSimilarRequests).toBe(1);
+  await expect(
+    page.getByRole('heading', { name: copy.similarArtists, exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Similar Fixture Artist' })
+  ).toHaveAttribute('href', '/artist/similar-artist-1');
+  await expect(
+    page.getByRole('heading', { name: copy.editionCompare })
+  ).toBeVisible();
+  await expect(page.getByText(copy.missingTracks)).toBeVisible();
+  await expect(page.getByText(copy.extraTracks)).toBeVisible();
+  const ratingsCapture = process.env.LUMEN_MUSIC_RATINGS_CAPTURE_DIR;
+  if (
+    ratingsCapture &&
+    ['desktop', 'iphone'].includes(test.info().project.name)
+  ) {
+    if (process.env.LUMEN_MUSIC_RATINGS_BASELINE === 'true') {
+      const baselineStyle = await page.addStyleTag({
+        content:
+          '#music-ratings, #music-edition-compare, #music-library-health { display: none !important; }',
+      });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.screenshot({
+        path: `${ratingsCapture}/${locale}-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+      await baselineStyle.evaluate((element) => element.remove());
+    } else {
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.screenshot({
+        path: `${ratingsCapture}/${locale}-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+    }
+  }
+  await page.getByRole('button', { name: copy.requestEdition }).last().click();
+  await expect
+    .poll(() => requestedMusicVariants)
+    .toEqual(['22222222-2222-4222-8222-222222222222']);
+  await page.getByText(copy.albumDetails, { exact: true }).click();
   for (const label of [copy.artist, copy.released, copy.label, copy.type])
     await expect(page.getByText(label, { exact: true })).toBeVisible();
   expect(
@@ -5263,6 +6125,36 @@ test('Music album and artist details localize their controls and metadata', asyn
       fullPage: true,
     });
   }
+
+  await page.getByRole('button', { name: copy.libraryHealth }).click();
+  await expect(page.getByText(copy.healthIssue)).toBeVisible();
+  await expect(page.getByText(copy.healthReason)).toBeVisible();
+  const healthCapture = process.env.LUMEN_MUSIC_HEALTH_CAPTURE_DIR;
+  if (
+    healthCapture &&
+    ['desktop', 'iphone'].includes(test.info().project.name)
+  ) {
+    const hideToast = await page.addStyleTag({
+      content: '.toast { display: none !important; }',
+    });
+    await page.screenshot({
+      path: `${healthCapture}/${locale}-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+    await hideToast.evaluate((element) => element.remove());
+  }
+  await page.getByRole('button', { name: copy.healthFix }).click();
+  await expect
+    .poll(() => remediationCalls)
+    .toEqual([{ issueIds: ['health-fix-1'] }]);
+  musicPermissions = 4294967296;
+  await page.reload();
+  await expect(
+    page.locator('h1').getByText('Fixture Album', { exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: copy.libraryHealth })
+  ).toHaveCount(0);
 
   await page.goto(testAppPath(`/artist/${artist}`));
   await expect(
@@ -5278,6 +6170,12 @@ test('Music album and artist details localize their controls and metadata', asyn
     page.getByText(copy.releaseCount, { exact: true })
   ).toBeVisible();
   await expect(page.getByRole('button', { name: copy.showAll })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: copy.similarArtists, exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Similar Fixture Artist' })
+  ).toHaveAttribute('href', '/artist/similar-artist-1');
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth)
   ).toBeLessThanOrEqual(test.info().project.use.viewport?.width ?? 1440);
@@ -5347,6 +6245,11 @@ test('artist detail groups secondary release types and loads the rest of a relea
           area: 'Fixture City',
           beginYear: 1990,
         },
+        wikipedia: {
+          title: 'Fixture Artist',
+          url: 'https://en.wikipedia.org/wiki/Fixture_Artist',
+          content: 'A fixture biography for the artist detail page.',
+        },
         releaseGroups,
         typeCounts: { Album: 21, Live: 1, Compilation: 1 },
       },
@@ -5359,6 +6262,11 @@ test('artist detail groups secondary release types and loads the rest of a relea
     page.getByRole('heading', { name: 'Albums (21)' })
   ).toBeVisible();
   await expect(page.getByText('23 releases', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('A fixture biography for the artist detail page.', {
+      exact: true,
+    })
+  ).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Live (1)' })).toBeVisible();
   await expect(
     page.getByRole('heading', { name: 'Compilation (1)' })
