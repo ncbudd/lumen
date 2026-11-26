@@ -77,6 +77,20 @@ const COMIC_SORTS = [
   ['title', 'A–Z'],
 ] as const;
 
+function comicVineUrl(value?: string) {
+  try {
+    const url = new URL(value ?? '');
+    return url.protocol === 'https:' &&
+      url.hostname === 'comicvine.gamespot.com' &&
+      !url.username &&
+      !url.password
+      ? url.href
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 const DEFAULT_GENRES = [
   'Action',
   'Adventure',
@@ -698,7 +712,7 @@ export function Comics() {
 
 // the chosen edition's volumes or issues, as ComicVine lists them
 function ComicIssues({ id, manga }: { id: string; manga: boolean }) {
-  const { t } = useLumenLocale();
+  const { t, locale } = useLumenLocale();
   const issues = usePaged<ComicIssue>(`/comic/${id}/issues`);
   const heading = manga
     ? t('lumen.comicDetail.volumes', 'Volumes')
@@ -732,7 +746,8 @@ function ComicIssues({ id, manga }: { id: string; manga: boolean }) {
               </b>
               {i.coverDate && (
                 <small>
-                  {shortDate(i.coverDate, false)}, {i.coverDate.slice(0, 4)}
+                  {shortDate(i.coverDate, false, locale)},{' '}
+                  {i.coverDate.slice(0, 4)}
                 </small>
               )}
             </span>
@@ -816,6 +831,7 @@ export function ComicDetail() {
     chosen ? `/comic/${chosen.id}` : null
   );
   const c = edition?.id === chosen?.id ? edition : undefined;
+  const comicVineDetailUrl = comicVineUrl(c?.siteDetailUrl);
   // Keep queue progress tied to the selected edition.
   const shown = chosen
     ? (chosen.mediaInfo ??
@@ -990,6 +1006,19 @@ export function ComicDetail() {
               category="comic"
               title={chosen?.title || work.title}
             />
+            {comicVineDetailUrl && (
+              <a
+                className="btn btn-quiet"
+                href={comicVineDetailUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t(
+                  'components.ComicDetails.viewOnComicVine',
+                  'View on ComicVine'
+                )}
+              </a>
+            )}
             <BlocklistButton
               mediaType="comic"
               id={c?.id}

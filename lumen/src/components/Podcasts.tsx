@@ -171,6 +171,35 @@ interface PodcastGenre {
   name: string;
 }
 
+const PODCAST_GENRE_TRANSLATIONS: Record<number, { fr: string; ar: string }> = {
+  1301: { fr: 'Arts', ar: 'الفنون' },
+  1304: { fr: 'Éducation', ar: 'التعليم' },
+  1303: { fr: 'Comédie', ar: 'كوميديا' },
+  1305: { fr: 'Enfants et famille', ar: 'الأطفال والعائلة' },
+  1310: { fr: 'Musique', ar: 'الموسيقى' },
+  1314: { fr: 'Religion et spiritualité', ar: 'الدين والروحانية' },
+  1318: { fr: 'Technologie', ar: 'التقنية' },
+  1321: { fr: 'Affaires', ar: 'الأعمال' },
+  1324: { fr: 'Société et culture', ar: 'المجتمع والثقافة' },
+  1488: { fr: 'Crimes et enquêtes', ar: 'جرائم حقيقية' },
+  1483: { fr: 'Fiction', ar: 'الخيال' },
+  1487: { fr: 'Histoire', ar: 'التاريخ' },
+  1489: { fr: 'Actualités', ar: 'الأخبار' },
+  1502: { fr: 'Loisirs', ar: 'الترفيه' },
+  1511: { fr: 'Gouvernement', ar: 'الحكومة' },
+  1512: { fr: 'Santé et forme', ar: 'الصحة واللياقة' },
+  1533: { fr: 'Sciences', ar: 'العلوم' },
+  1545: { fr: 'Sports', ar: 'الرياضة' },
+  1309: { fr: 'Télévision et cinéma', ar: 'التلفزيون والأفلام' },
+};
+
+function podcastGenreName(id: number, name: string, locale: string) {
+  const translations = PODCAST_GENRE_TRANSLATIONS[id];
+  if (locale === 'fr') return translations?.fr ?? name;
+  if (locale === 'ar') return translations?.ar ?? name;
+  return name;
+}
+
 interface LatestEpisode {
   id: string;
   title: string;
@@ -400,7 +429,7 @@ function NewEpisodes({ episodes }: { episodes: LatestEpisode[] }) {
 }
 
 function PodcastDiscover({ shows }: { shows: LibraryPodcast[] | null }) {
-  const { t } = useLumenLocale();
+  const { t, locale } = useLumenLocale();
   const [genre, setGenre] = useState<number | null>(null);
   const genres = list<PodcastGenre>(
     useApi<{ genres: PodcastGenre[] }>('/podcast/genres').data?.genres
@@ -432,7 +461,9 @@ function PodcastDiscover({ shows }: { shows: LibraryPodcast[] | null }) {
     .filter((show) => !show.inLibrary)
     .slice(0, 12);
   const charted = list<SearchPodcast>(chart.data?.results);
-  const genreName = genres.find((g) => g.id === genre)?.name;
+  const genreInfo = genres.find((g) => g.id === genre);
+  const genreName =
+    genreInfo && podcastGenreName(genreInfo.id, genreInfo.name, locale);
 
   return (
     <>
@@ -480,7 +511,7 @@ function PodcastDiscover({ shows }: { shows: LibraryPodcast[] | null }) {
                 aria-pressed={genre === g.id}
                 onClick={() => setGenre(g.id)}
               >
-                {g.name}
+                {podcastGenreName(g.id, g.name, locale)}
               </button>
             ))}
           </div>
@@ -512,7 +543,7 @@ function PodcastDiscover({ shows }: { shows: LibraryPodcast[] | null }) {
       {favourite && recommended.length > 0 && (
         <Section
           title={t('lumen.podcasts.becauseGenre', 'More {genre} shows', {
-            genre: favourite.name,
+            genre: podcastGenreName(favourite.id, favourite.name, locale),
           })}
         >
           <Rail>
@@ -578,7 +609,7 @@ function CategoryRail({ id, name }: { id: number; name: string }) {
 }
 
 function CategoryRailShows({ id, name }: { id: number; name: string }) {
-  const { t } = useLumenLocale();
+  const { t, locale } = useLumenLocale();
   const chart = useApi<{ results: SearchPodcast[] }>(
     `/podcast/discover?limit=20&genre=${id}`
   );
@@ -589,7 +620,9 @@ function CategoryRailShows({ id, name }: { id: number; name: string }) {
   if (!shows.length) return null;
   return (
     <Section
-      title={t('lumen.podcasts.topInGenre', 'Top in {genre}', { genre: name })}
+      title={t('lumen.podcasts.topInGenre', 'Top in {genre}', {
+        genre: podcastGenreName(id, name, locale),
+      })}
     >
       <Rail>
         {shows.map((show, index) => (

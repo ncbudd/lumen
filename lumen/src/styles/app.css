@@ -1260,6 +1260,9 @@ a.person:hover {
   .dacts.pc {
     display: none;
   }
+  body.is-detail .view > .ph .ph-row {
+    padding-top: calc(52px + env(safe-area-inset-top));
+  }
   .actionbar:has(> .sel) {
     gap: 6px;
   }
@@ -2991,6 +2994,11 @@ section section,
   .toolbar > .sel select,
   .toolbar > .sel input {
     flex: 1 1 auto;
+  }
+  /* Keep the discovery reset action above the fixed phone tab bar. */
+  .browse-toolbar > .filters-clear {
+    order: -1;
+    margin-left: 0;
   }
   .toolbar-search {
     flex-basis: 100%;

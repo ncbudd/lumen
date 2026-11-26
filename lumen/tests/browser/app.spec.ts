@@ -426,6 +426,64 @@ test('movie and TV details show valid available ratings and safe links', async (
   expect(qa.errors).toEqual([]);
 });
 
+test('saved French locale formats movie currency and rating numbers', async ({
+  page,
+}, testInfo) => {
+  const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+  const captureDir = process.env.LUMEN_FORMAT_CAPTURE_DIR;
+  await fixtures(page);
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale: 'fr' } })
+  );
+  await page.route('**/api/v1/movie/101', (route) =>
+    route.fulfill({
+      json: {
+        ...movie,
+        budget: 1_000_000,
+        mediaInfo: available,
+      },
+    })
+  );
+  await page.route('**/api/v1/movie/101/ratingscombined', (route) =>
+    route.fulfill({ json: { mdblist: { imdbRating: 8.2 } } })
+  );
+
+  await page.goto(testAppPath('/movie/101'));
+  await page.locator('details#details > summary').click();
+  const budget = await page.evaluate(
+    (isBaseline) =>
+      new Intl.NumberFormat(isBaseline ? undefined : 'fr', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+      }).format(1_000_000),
+    baseline
+  );
+  const score = await page.evaluate(
+    (isBaseline) =>
+      new Intl.NumberFormat(isBaseline ? undefined : 'fr', {
+        maximumFractionDigits: 1,
+      }).format(8.2),
+    baseline
+  );
+  await expect(page.getByText(budget, { exact: true })).toBeVisible();
+  await expect(
+    page.getByTitle(`IMDb: ${score}/10`, { exact: true })
+  ).toBeVisible();
+  if (captureDir && ['desktop', 'iphone'].includes(testInfo.project.name)) {
+    const { mkdir } = await import('node:fs/promises');
+    const { join } = await import('node:path');
+    await mkdir(captureDir, { recursive: true });
+    await page.screenshot({
+      path: join(
+        captureDir,
+        `${baseline ? 'baseline' : 'candidate'}-${testInfo.project.name}.png`
+      ),
+      fullPage: false,
+    });
+  }
+});
+
 test('movie cards load a bounded rating popover after it is opened', async ({
   page,
 }, testInfo) => {
@@ -1570,6 +1628,159 @@ test('movie details keep shared HD and viewer 4K availability separate', async (
   await expect(
     page.getByRole('button', { name: 'Request', exact: true })
   ).toHaveCount(0);
+});
+
+test('movie release type labels use the saved locale', async ({ page }) => {
+  await fixtures(page);
+  let locale = 'fr';
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale } })
+  );
+  await page.route('**/api/v1/movie/101', (route) =>
+    route.fulfill({
+      json: {
+        ...movie,
+        releases: {
+          results: [
+            {
+              iso_3166_1: 'US',
+              release_dates: [
+                { type: 3, release_date: '2020-01-01T00:00:00.000Z' },
+                { type: 4, release_date: '2020-02-01T00:00:00.000Z' },
+                { type: 5, release_date: '2020-03-01T00:00:00.000Z' },
+              ],
+            },
+          ],
+        },
+      },
+    })
+  );
+  for (const item of [
+    {
+      locale: 'fr',
+      labels: ['Sortie en salles', 'Numérique', 'Physique'],
+    },
+    {
+      locale: 'ar',
+      labels: ['إصدار سينمائي', 'رقمية', 'إصدار مادي'],
+    },
+  ]) {
+    locale = item.locale;
+    await page.goto(testAppPath('/movie/101'));
+    await page.locator('details#details > summary').click();
+    for (const label of item.labels)
+      await expect(page.getByText(label)).toBeVisible();
+  }
+});
+
+test('movie and series language and country facts follow the saved locale', async ({
+  page,
+}) => {
+  await fixtures(page);
+  let locale = 'en';
+  await page.route('**/api/v1/user/1/settings/main', (route) =>
+    route.fulfill({ json: { locale } })
+  );
+  await page.route('**/api/v1/movie/101', (route) =>
+    route.fulfill({
+      json: {
+        ...movie,
+        originalLanguage: 'ja',
+        productionCountries: [
+          { iso_3166_1: 'US', name: 'Provider Country Name' },
+        ],
+        releases: {
+          results: [
+            {
+              iso_3166_1: 'US',
+              release_dates: [
+                { type: 3, release_date: '2030-01-01T00:00:00.000Z' },
+              ],
+            },
+          ],
+        },
+      },
+    })
+  );
+  await page.route('**/api/v1/tv/202', (route) =>
+    route.fulfill({
+      json: {
+        ...movie,
+        id: 202,
+        mediaType: 'tv',
+        name: 'The Test Series',
+        originalLanguage: 'ja',
+        firstAirDate: '2020-01-01',
+        seasons: [
+          {
+            id: 1,
+            seasonNumber: 1,
+            name: 'Season 1',
+            episodeCount: 1,
+            airDate: '2030-01-01',
+          },
+        ],
+        productionCountries: [
+          { iso_3166_1: 'US', name: 'Provider Country Name' },
+        ],
+        mediaInfo: undefined,
+      },
+    })
+  );
+  const cases = [
+    {
+      locale: 'en',
+      language: 'Japanese',
+      country: 'United States',
+      date: 'Jan 1',
+    },
+    {
+      locale: 'fr',
+      language: 'japonais',
+      country: 'États-Unis',
+      date: '1 janv.',
+    },
+    {
+      locale: 'ar',
+      language: 'اليابانية',
+      country: 'الولايات المتحدة',
+      date: '1 يناير',
+    },
+  ];
+  for (const item of cases) {
+    locale = item.locale;
+    for (const [path, mediaPath] of [
+      ['/movie/101', '/movies'],
+      ['/tv/202', '/series'],
+    ]) {
+      await page.goto(testAppPath(path));
+      await page.locator('details#details > summary').click();
+      const language = page.getByRole('link', {
+        name: item.language,
+        exact: true,
+      });
+      const country = page.getByRole('link', {
+        name: item.country,
+        exact: true,
+      });
+      await expect(language).toHaveAttribute(
+        'href',
+        `${mediaPath}?language=ja`
+      );
+      await expect(country).toHaveAttribute('href', `${mediaPath}?country=US`);
+      await expect(page.getByText('Provider Country Name')).toHaveCount(0);
+      await expect(
+        path.startsWith('/movie')
+          ? page.locator('details#details')
+          : page.locator('#seasons')
+      ).toContainText(item.date);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth
+        )
+      ).toBe(true);
+    }
+  }
 });
 
 test('series details hide or mark shared seasons without reopening requests', async ({
@@ -4342,6 +4553,18 @@ test('movie studio search can select and exclude a studio', async ({
     .getByRole('button', { name: 'Exclude Studio', exact: true })
     .click();
   await query;
+  if (page.viewportSize()!.width <= 1039) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const clearFilters = page.getByRole('button', {
+      name: 'Clear Discovery Filters',
+    });
+    const clearBounds = await clearFilters.boundingBox();
+    const tabsBounds = await page.locator('.tabbar').boundingBox();
+    expect(clearBounds).not.toBeNull();
+    expect(tabsBounds).not.toBeNull();
+    expect(clearBounds!.y).toBeGreaterThanOrEqual(0);
+    expect(clearBounds!.y + clearBounds!.height).toBeLessThan(tabsBounds!.y);
+  }
   await page.reload();
   await expect(
     page.getByRole('button', { name: 'Exclude Studio', exact: true })
@@ -8302,7 +8525,10 @@ test('Playlist Import reviews matches and retries only failed requests', async (
   const copy = {
     en: {
       title: 'Import Playlist',
+      subtitle:
+        'Paste a playlist link to see which songs you already have and get the rest. Deezer links open straight away; Spotify needs a one-time connection first.',
       url: 'Spotify or YouTube Playlist URL',
+      linkPlaceholder: 'https://www.deezer.com/playlist/… or Spotify / YouTube',
       preview: 'Preview Matches',
       matched: 'Matched',
       unmatched: 'Unmatched',
@@ -8314,7 +8540,10 @@ test('Playlist Import reviews matches and retries only failed requests', async (
     },
     fr: {
       title: 'Importer une playlist',
+      subtitle:
+        'Collez le lien d’une playlist pour voir les titres déjà disponibles et demander les autres. Les liens Deezer s’ouvrent directement ; Spotify nécessite une connexion unique.',
       url: 'URL de playlist Spotify ou YouTube',
+      linkPlaceholder: 'https://www.deezer.com/playlist/… ou Spotify / YouTube',
       preview: 'Aperçu des correspondances',
       matched: 'Correspondance trouvée',
       unmatched: 'Sans correspondance',
@@ -8326,7 +8555,10 @@ test('Playlist Import reviews matches and retries only failed requests', async (
     },
     ar: {
       title: 'استيراد قائمة تشغيل',
+      subtitle:
+        'ألصق رابط قائمة تشغيل لمعرفة الأغاني المتوفرة وطلب البقية. تُفتح روابط Deezer مباشرة؛ ويتطلب Spotify ربط الحساب مرة واحدة.',
       url: 'رابط قائمة تشغيل Spotify أو YouTube',
+      linkPlaceholder: 'https://www.deezer.com/playlist/… أو Spotify / YouTube',
       preview: 'معاينة التطابقات',
       matched: 'متطابق',
       unmatched: 'غير متطابق',
@@ -8391,6 +8623,25 @@ test('Playlist Import reviews matches and retries only failed requests', async (
   );
   await page.goto(testAppPath('/music/playlist-import'));
   await expect(page.getByRole('heading', { name: copy.title })).toBeVisible();
+  const captureDir = process.env.LUMEN_I18N_CAPTURE_DIR;
+  if (captureDir && ['desktop', 'iphone'].includes(test.info().project.name)) {
+    const { mkdir } = await import('node:fs/promises');
+    const { join } = await import('node:path');
+    await mkdir(captureDir, { recursive: true });
+    await page.screenshot({
+      path: join(
+        captureDir,
+        `playlist-${locale}-${test.info().project.name}.png`
+      ),
+      fullPage: true,
+    });
+  }
+  if (process.env.LUMEN_I18N_CAPTURE_ONLY === '1') return;
+  await expect(page.getByText(copy.subtitle)).toBeVisible();
+  await expect(page.getByLabel(copy.url)).toHaveAttribute(
+    'placeholder',
+    copy.linkPlaceholder
+  );
   await page
     .getByLabel(copy.url)
     .fill('https://www.youtube.com/playlist?list=fixture');
@@ -10047,7 +10298,10 @@ test('Scheduled Jobs runs immediately and saves an edited schedule', async ({
   await page.getByLabel('Frequency').selectOption('20');
   await expect(page.getByLabel('Cron Schedule')).toHaveValue('0 */20 * * * *');
   await page.getByRole('button', { name: 'Save Schedule' }).click();
-  await expect(page.getByText('0 */20 * * * *', { exact: true })).toBeVisible();
+  await expect.poll(() => job.cronSchedule).toBe('0 */20 * * * *');
+  await expect(
+    page.getByText('Every 20 minutes', { exact: true })
+  ).toBeVisible();
 });
 
 test('Scheduled Jobs describes calendar presets and preserves existing custom schedules', async ({

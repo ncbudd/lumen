@@ -146,6 +146,8 @@ const GENRE_WORDS: Record<string, string> = {
   edm: 'EDM',
   uk: 'UK',
 };
+
+const MUSICBRAINZ_UUID = /^[a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}$/i;
 const genreLabel = (tag: string) =>
   GENRE_WORDS[tag.toLowerCase()] ??
   tag.replace(
@@ -249,7 +251,7 @@ function MusicRequestSheet({
   onComplete: () => void;
 }) {
   const { user } = useAuth();
-  const { t } = useLumenLocale();
+  const { t, locale } = useLumenLocale();
   const toast = useToast();
   const canChoose = canChooseRequestOptions(user?.permissions);
   const [options, setOptions] = useState<RequestOptions>({
@@ -398,7 +400,9 @@ function MusicRequestSheet({
           <dt>
             {t('components.RequestModal.Music.trackCount', 'Track Count')}
           </dt>
-          <dd>{new Intl.NumberFormat().format(album.tracks?.length ?? 0)}</dd>
+          <dd>
+            {new Intl.NumberFormat(locale).format(album.tracks?.length ?? 0)}
+          </dd>
         </div>
         {album.releaseDate && (
           <div>
@@ -484,10 +488,10 @@ function MusicRequestSheet({
                 'lumen.music.requestsRemaining',
                 '{remaining} of {limit} Music requests remaining.',
                 {
-                  remaining: new Intl.NumberFormat().format(
+                  remaining: new Intl.NumberFormat(locale).format(
                     quotaInfo.remaining ?? 0
                   ),
-                  limit: new Intl.NumberFormat().format(quotaInfo.limit),
+                  limit: new Intl.NumberFormat(locale).format(quotaInfo.limit),
                 }
               )}
         </p>
@@ -971,7 +975,7 @@ const isSearchable = (term: string) =>
   term.length >= 2 || /[^\u0020-\u024f]/u.test(term);
 
 export function Music() {
-  const { t } = useLumenLocale();
+  const { t, locale } = useLumenLocale();
   const navigate = useNavigate();
   const releaseTypeOptions = RELEASE_TYPES.map(({ value, label }) => ({
     value,
@@ -1937,11 +1941,15 @@ export function Music() {
                             '{count} albums',
                             {
                               count:
-                                libraryOverview.data.totalAlbums.toLocaleString(),
+                                libraryOverview.data.totalAlbums.toLocaleString(
+                                  locale
+                                ),
                             }
                           )}
                         >
-                          {libraryOverview.data.totalAlbums.toLocaleString()}
+                          {libraryOverview.data.totalAlbums.toLocaleString(
+                            locale
+                          )}
                         </span>
                       )}
                     {key === 'activity' && downloadingCount > 0 && (
@@ -2960,6 +2968,23 @@ function AlbumDetailPage() {
                 <Facts
                   rows={[
                     [
+                      t(
+                        'components.MusicDetails.Layout.musicBrainz',
+                        'MusicBrainz'
+                      ),
+                      MUSICBRAINZ_UUID.test(a.id) ? (
+                        <a
+                          href={`https://musicbrainz.org/release-group/${a.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {a.id}
+                        </a>
+                      ) : (
+                        ''
+                      ),
+                    ],
+                    [
                       t('lumen.music.fact.artist', 'Artist'),
                       <Link
                         key="a"
@@ -2974,7 +2999,27 @@ function AlbumDetailPage() {
                     ],
                     [t('lumen.music.fact.released', 'Released'), a.releaseDate],
                     [t('lumen.music.fact.label', 'Label'), a.recordLabel],
-                    [t('lumen.music.fact.from', 'From'), a.artist.area],
+                    [
+                      t(
+                        'components.MusicDetails.Layout.artistType',
+                        'Artist Type'
+                      ),
+                      a.artist.type,
+                    ],
+                    [
+                      t('components.MusicDetails.Layout.origin', 'Origin'),
+                      a.artist.area ? (
+                        <a
+                          href={`https://musicbrainz.org/search?${new URLSearchParams({ query: a.artist.area, type: 'area', method: 'indexed' })}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {a.artist.area}
+                        </a>
+                      ) : (
+                        ''
+                      ),
+                    ],
                     [t('lumen.music.fact.type', 'Type'), a.type],
                   ]}
                 />

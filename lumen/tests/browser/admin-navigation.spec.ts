@@ -153,6 +153,17 @@ for (const locale of [
     all: 'Tous les paramètres et outils',
     group: 'Télévision et films',
     groupHeading: 'Télévision et films',
+    homeGroups: [
+      'Général',
+      'Demandes et découverte',
+      'Serveurs multimédias et liseuses',
+      'Indexeurs et téléchargements',
+      'Télévision et films',
+      'Livres, livres audio et bandes dessinées',
+      'Musique',
+      'Logiciels et jeux',
+      'Système',
+    ],
     homeSearch: 'Rechercher des films, séries, livres et mangas…',
     back: 'Retour',
     profile: 'Profil',
@@ -163,6 +174,7 @@ for (const locale of [
     serverWarning:
       'Déconnectez-vous depuis Vous, puis reconnectez-vous avec votre compte Jellyfin ou Emby pour rétablir la disponibilité et la lecture de votre bibliothèque.',
     openYou: 'Ouvrir Vous',
+    aurralServices: 'Services Aurral',
   },
   {
     tag: 'ar',
@@ -177,6 +189,17 @@ for (const locale of [
     all: 'كل الإعدادات والأدوات',
     group: 'التلفزيون والأفلام',
     groupHeading: 'التلفزيون والأفلام',
+    homeGroups: [
+      'عام',
+      'الطلبات والاستكشاف',
+      'خوادم الوسائط وأجهزة القراءة',
+      'الفهارس والتنزيلات',
+      'التلفزيون والأفلام',
+      'الكتب والكتب الصوتية والقصص المصورة',
+      'الموسيقى',
+      'البرامج والألعاب',
+      'النظام',
+    ],
     homeSearch: 'ابحث عن الأفلام والمسلسلات والكتب والمانغا…',
     back: 'عودة',
     profile: 'ملف التعريف',
@@ -187,6 +210,7 @@ for (const locale of [
     serverWarning:
       'سجّل الخروج من صفحة «أنت»، ثم سجّل الدخول مجددًا باستخدام حساب Jellyfin أو Emby لاستعادة مكتبتك وإمكانية التشغيل.',
     openYou: 'فتح صفحة «أنت»',
+    aurralServices: 'خدمات Aurral',
   },
 ]) {
   test(`administrator directory uses ${locale.tag} messages on You and Administration`, async ({
@@ -247,6 +271,48 @@ for (const locale of [
     ).toBeLessThanOrEqual(page.viewportSize()!.width);
 
     await page.goto(testAppPath('/admin'));
+    const captureDir = process.env.LUMEN_I18N_CAPTURE_DIR;
+    const baselineCapture = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    const aurralLabel =
+      process.env.LUMEN_I18N_CAPTURE_ONLY === '1'
+        ? 'Aurral Services'
+        : locale.aurralServices;
+    const aurralLink = page.getByRole('link', {
+      name: `${locale.tag === 'fr' ? 'Ouvrir' : 'فتح'} ${aurralLabel}`,
+      exact: true,
+    });
+    await expect(aurralLink).toBeVisible();
+    const homeGroupHeadings = baselineCapture
+      ? [
+          'General',
+          'Requests and Discovery',
+          'Media Servers and Readers',
+          'Indexers and Downloads',
+          'TV and Movies',
+          'Books, Audiobooks and Comics',
+          'Music',
+          'Software and Games',
+          'System',
+        ]
+      : locale.homeGroups;
+    for (const heading of homeGroupHeadings)
+      await expect(
+        page.getByRole('heading', { name: heading, exact: true })
+      ).toBeVisible();
+    if (captureDir && ['desktop', 'iphone'].includes(info.project.name)) {
+      const { mkdir } = await import('node:fs/promises');
+      const { join } = await import('node:path');
+      await mkdir(captureDir, { recursive: true });
+      await page.screenshot({
+        path: join(
+          captureDir,
+          `admin-home-${locale.tag}-${info.project.name}.png`
+        ),
+        fullPage: true,
+      });
+    }
+    if (baselineCapture) return;
+    if (process.env.LUMEN_I18N_CAPTURE_ONLY === '1') return;
     await expect(page.getByLabel(locale.search, { exact: true })).toBeVisible();
     await expect(
       page.getByRole('link', { name: locale.all, exact: true })

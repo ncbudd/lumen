@@ -107,7 +107,7 @@ const activityItem = (
     : { kind: 'request', name: null },
 });
 
-async function mockMusic(page: Page, seen: Seen) {
+async function mockMusic(page: Page, seen: Seen, locale = 'en') {
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/lumen-config.json', (route) =>
     route.fulfill({ json: {} })
@@ -137,7 +137,7 @@ async function mockMusic(page: Page, seen: Seen) {
         seen.saved.push(body.lumenPreferences);
         lumenPreferences = body.lumenPreferences ?? {};
       }
-      return route.fulfill({ json: { lumenPreferences } });
+      return route.fulfill({ json: { locale, lumenPreferences } });
     }
     if (path === '/service/music')
       return route.fulfill({
@@ -263,7 +263,14 @@ async function mockMusic(page: Page, seen: Seen) {
               matchPercent: 90,
             },
           ],
-          trending: [],
+          trending: [
+            {
+              mbid: 'bbbbbbbb-1111-2222-3333-444444444444',
+              name: 'Rising Artist',
+              image: null,
+              label: 'Top',
+            },
+          ],
         },
       });
     if (path === '/music/discover/playlists')
@@ -543,6 +550,167 @@ test('a preview asks SeerrNG for the clip and shows the preview bar', async ({
   await expect(bar).toHaveCount(0);
 });
 
+for (const [
+  locale,
+  playerLabel,
+  playOpensLabel,
+  settingsTitle,
+  handoff,
+  previews,
+  previewLabel,
+  noPreview,
+  previewRegionLabel,
+  previewProgressLabel,
+  closePreviewLabel,
+  doneLabel,
+  baselinePlayOpensLabel,
+  baselineSettingsTitle,
+  baselineHandoff,
+  baselinePreviews,
+  baselinePreviewLabel,
+  baselineNoPreview,
+  baselinePreviewRegionLabel,
+  baselinePreviewProgressLabel,
+  baselineClosePreviewLabel,
+  baselineDoneLabel,
+] of [
+  [
+    'fr',
+    'Application Shelf',
+    'La lecture s’ouvre dans : Aurral',
+    'Quand vous appuyez sur Lire',
+    'Lumen ouvre dans votre application musicale les morceaux que vous possédez.',
+    'Extraits de 30 secondes',
+    'Écouter un extrait de Missing Song',
+    'Aucun extrait disponible pour ce morceau',
+    'Lecteur d’extraits',
+    'Progression de l’extrait',
+    'Fermer l’extrait',
+    'Terminé',
+    'Play opens in: Aurral',
+    'When you press Play',
+    'Lumen hands songs you have to your music app.',
+    '30-second previews',
+    'Preview Missing Song',
+    'No preview for this song',
+    'Preview player',
+    'Preview progress',
+    'Close preview',
+    'Done',
+  ],
+  [
+    'ar',
+    'تطبيق Shelf',
+    'يفتح التشغيل في: Aurral',
+    'عند الضغط على تشغيل',
+    'يفتح Lumen الأغاني المتوفرة لديك في تطبيق الموسيقى.',
+    'مقاطع معاينة مدتها 30 ثانية',
+    'معاينة Missing Song',
+    'لا تتوفر معاينة لهذه الأغنية',
+    'مشغل المعاينة',
+    'تقدم المعاينة',
+    'إغلاق المعاينة',
+    'تم',
+    'Play opens in: Aurral',
+    'When you press Play',
+    'Lumen hands songs you have to your music app.',
+    '30-second previews',
+    'Preview Missing Song',
+    'No preview for this song',
+    'Preview player',
+    'Preview progress',
+    'Close preview',
+    'Done',
+  ],
+] as const) {
+  test(`music playback controls use the saved ${locale} locale`, async ({
+    page,
+  }, testInfo) => {
+    const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    await mockMusic(page, { previews: [], saved: [] }, locale);
+    await page.goto(testAppPath('/music'));
+    await page
+      .getByRole('button', {
+        name: baseline ? baselinePlayOpensLabel : playOpensLabel,
+      })
+      .click();
+    const sheet = page.getByRole('dialog', {
+      name: baseline ? baselineSettingsTitle : settingsTitle,
+    });
+    await expect(sheet).toBeVisible();
+    await expect(
+      sheet.getByText(baseline ? baselineHandoff : handoff)
+    ).toBeVisible();
+    await expect(
+      sheet.getByRole('radio', {
+        name: baseline ? 'Shelf app' : playerLabel,
+      })
+    ).toBeDisabled();
+    await expect(
+      sheet.getByText(baseline ? baselinePreviews : previews)
+    ).toBeVisible();
+    await expect(
+      sheet.getByText(
+        locale === 'fr'
+          ? 'Recherche dans Plex dans le même onglet réutilisé.'
+          : 'يبحث عنه في Plex باستخدام علامة التبويب نفسها.'
+      )
+    ).toBeVisible();
+    await expect(
+      sheet.getByText(
+        locale === 'fr'
+          ? 'L’application mobile Shelf. Disponible lorsque l’application pourra ouvrir des liens.'
+          : 'تطبيق Shelf للهاتف. سيتوفر عند دعم فتح الروابط في التطبيق.'
+      )
+    ).toBeVisible();
+    await page.screenshot({
+      path: testInfo.outputPath('music-playback-settings.png'),
+      fullPage: false,
+    });
+    await sheet
+      .getByRole('button', { name: baseline ? baselineDoneLabel : doneLabel })
+      .click();
+
+    await page
+      .locator('li', { hasText: 'Missing Song' })
+      .getByRole('button', {
+        name: baseline ? baselinePreviewLabel : previewLabel,
+      })
+      .click();
+    const preview = page.getByRole('region', {
+      name: baseline ? baselinePreviewRegionLabel : previewRegionLabel,
+    });
+    await expect(
+      preview.getByText(baseline ? baselineNoPreview : noPreview)
+    ).toBeVisible();
+    await expect(
+      preview.getByRole('button', {
+        name: baseline ? baselinePreviewLabel : previewLabel,
+      })
+    ).toBeDisabled();
+    await expect(
+      preview.getByRole('progressbar', {
+        name: baseline ? baselinePreviewProgressLabel : previewProgressLabel,
+      })
+    ).toBeVisible();
+    await expect(
+      preview.getByRole('button', {
+        name: baseline ? baselineClosePreviewLabel : closePreviewLabel,
+      })
+    ).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+    await page.screenshot({
+      path: testInfo.outputPath('music-preview-error.png'),
+      fullPage: false,
+    });
+  });
+}
+
 test('Play opens in: picking Plex is saved and changes the links', async ({
   page,
 }) => {
@@ -641,6 +809,257 @@ test('Activity lists downloads in order with why each one is there', async ({
   );
 });
 
+for (const [
+  locale,
+  sortLabel,
+  filterPlaceholder,
+  artistsLabel,
+  activityLabels,
+] of [
+  [
+    'fr',
+    'Trier',
+    'Album, artiste ou chanson',
+    'Artistes',
+    ['En cours de téléchargement', 'À suivre (2)', 'Téléchargés récemment'],
+  ],
+  [
+    'ar',
+    'ترتيب',
+    'الألبوم أو الفنان أو الأغنية',
+    'الفنانون',
+    ['قيد التنزيل الآن', 'التالي (2)', 'تم تنزيلها مؤخرًا'],
+  ],
+] as const) {
+  test(`music library and activity use the saved ${locale} locale`, async ({
+    page,
+  }, testInfo) => {
+    const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    await mockMusic(page, { previews: [], saved: [] }, locale);
+    await page.goto(testAppPath('/music?tab=library'));
+    await expect(
+      page.getByText(baseline ? 'Sort' : sortLabel, { exact: true })
+    ).toBeVisible();
+    await expect(
+      page.getByPlaceholder(
+        baseline ? 'Album, artist or song' : filterPlaceholder
+      )
+    ).toBeVisible();
+    await page
+      .getByRole('button', { name: baseline ? 'Artists' : artistsLabel })
+      .click();
+    await expect(
+      page.getByRole('button', { name: baseline ? 'Artists' : artistsLabel })
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+    await page.screenshot({
+      path: testInfo.outputPath('music-library.png'),
+      fullPage: false,
+    });
+
+    await page.goto(testAppPath('/music?tab=activity'));
+    const expectedActivity = baseline
+      ? ['Downloading now', 'Up next (2)', 'Recently downloaded']
+      : activityLabels;
+    for (const label of expectedActivity) {
+      await expect(page.getByText(label, { exact: true })).toBeVisible();
+    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+    await page.screenshot({
+      path: testInfo.outputPath('music-activity.png'),
+      fullPage: false,
+    });
+  });
+}
+
+for (const [locale, heading, emptyState] of [
+  ['fr', 'Vos demandes de musique', 'Aucune demande musicale pour le moment.'],
+  ['ar', 'طلباتك الموسيقية', 'لا توجد طلبات موسيقية بعد.'],
+] as const) {
+  test(`music request summary uses the saved ${locale} locale`, async ({
+    page,
+  }, info) => {
+    const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    await mockMusic(page, { previews: [], saved: [] }, locale);
+    await page.goto(testAppPath('/music?tab=activity'));
+    const requests = page.getByRole('heading', {
+      name: baseline ? 'Your music requests' : heading,
+    });
+    await requests.scrollIntoViewIfNeeded();
+    await expect(requests).toBeVisible();
+    await expect(
+      page.getByText(baseline ? 'No music requests yet.' : emptyState, {
+        exact: true,
+      })
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+    if (['desktop', 'iphone'].includes(info.project.name))
+      await page.screenshot({
+        path: info.outputPath(`music-requests-${locale}.png`),
+        fullPage: false,
+      });
+  });
+}
+
+for (const [
+  locale,
+  searchPlaceholder,
+  noResults,
+  noResultsHelp,
+  searchListLabel,
+  trendingSongsLabel,
+  genresLabel,
+  madeForYouLabel,
+  browseCatalogLabel,
+] of [
+  [
+    'fr',
+    'Rechercher des chansons, albums et artistes…',
+    'Aucun résultat pour « Missing query »',
+    'Vérifiez l’orthographe ou recherchez uniquement l’artiste ou la chanson.',
+    'Résultats de recherche',
+    'Chansons tendance',
+    'Vos genres musicaux',
+    'Pour vous sur Aurral',
+    'Parcourir le catalogue',
+  ],
+  [
+    'ar',
+    'ابحث عن الأغاني والألبومات والفنانين…',
+    'لم يتم العثور على نتائج لـ «Missing query»',
+    'تحقق من الإملاء أو جرّب البحث باسم الفنان أو الأغنية فقط.',
+    'نتائج البحث',
+    'الأغاني الرائجة',
+    'أنواعك الموسيقية',
+    'مخصص لك على Aurral',
+    'تصفح الفهرس',
+  ],
+] as const) {
+  test(`music search and discovery use the saved ${locale} locale`, async ({
+    page,
+  }, testInfo) => {
+    const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    await mockMusic(page, { previews: [], saved: [] }, locale);
+    await page.route('**/api/v1/music/search?**', (route) =>
+      route.fulfill({
+        json: { artists: [], albums: [], tracks: [], top: null },
+      })
+    );
+    await page.goto(testAppPath('/music?q=Missing%20query'));
+    const visibleSearchPlaceholder = baseline
+      ? 'Search songs, albums and artists…'
+      : searchPlaceholder;
+    const searchFields = page.getByPlaceholder(visibleSearchPlaceholder);
+    await expect(searchFields.first()).toHaveAttribute(
+      'placeholder',
+      visibleSearchPlaceholder
+    );
+    await expect(searchFields.last()).toHaveAttribute(
+      'placeholder',
+      visibleSearchPlaceholder
+    );
+    await expect(
+      page.getByRole('tablist', { name: searchListLabel })
+    ).toBeVisible();
+    await expect(page.getByText(noResults, { exact: true })).toBeVisible();
+    await expect(page.getByText(noResultsHelp)).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+    await page.screenshot({
+      path: testInfo.outputPath('music-search-empty.png'),
+      fullPage: false,
+    });
+    const visibleSearchField = page
+      .locator('input[type="search"]:visible')
+      .last();
+    await expect(visibleSearchField).toHaveAttribute(
+      'placeholder',
+      visibleSearchPlaceholder
+    );
+    await visibleSearchField.fill('');
+    if (['desktop', 'iphone'].includes(testInfo.project.name))
+      await page.screenshot({
+        path: testInfo.outputPath('music-search-placeholder.png'),
+        fullPage: false,
+      });
+    if (baseline) return;
+
+    await page.goto(testAppPath('/music'));
+    for (const [baselineLabel, translatedLabel, changedThisBatch] of [
+      ['Trending songs', trendingSongsLabel, false],
+      ['Your genres', genresLabel, false],
+      ['Made for you in Aurral', madeForYouLabel, false],
+      ['Browse catalog', browseCatalogLabel, false],
+      [
+        'Recommended for you',
+        locale === 'fr' ? 'Recommandé pour vous' : 'مقترحة لك',
+        true,
+      ],
+      [
+        'Trending artists',
+        locale === 'fr' ? 'Artistes tendance' : 'الفنانون الرائجون',
+        true,
+      ],
+      [
+        'Playlists to explore',
+        locale === 'fr' ? 'Playlists à découvrir' : 'قوائم تشغيل لاستكشافها',
+        true,
+      ],
+    ]) {
+      await expect(
+        page.getByText(
+          baseline && changedThisBatch ? baselineLabel : translatedLabel,
+          {
+            exact: true,
+          }
+        )
+      ).toBeVisible();
+    }
+    await expect(
+      page.getByRole('group', {
+        name: baseline
+          ? 'Playlist genre'
+          : locale === 'fr'
+            ? 'Genre de playlist'
+            : 'نوع قائمة التشغيل',
+      })
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        baseline
+          ? 'Because you have Owned Artist'
+          : locale === 'fr'
+            ? 'Parce que vous avez Owned Artist'
+            : 'لأن لديك Owned Artist'
+      )
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+    await page.screenshot({
+      path: testInfo.outputPath('music-discovery.png'),
+      fullPage: false,
+    });
+  });
+}
+
 test('a playlist page gets every missing song in one go', async ({ page }) => {
   const seen: Seen = { previews: [], saved: [], trackRequests: [] };
   await mockMusic(page, seen);
@@ -660,6 +1079,70 @@ test('a playlist page gets every missing song in one go', async ({ page }) => {
     tracks: [{ title: 'Wanted Song', artist: 'Wanted Artist' }],
   });
 });
+
+for (const [locale, filter, getMissing, confirmTitle, confirmBody, confirm] of [
+  [
+    'fr',
+    'Absents de la bibliothèque',
+    'Obtenir le morceau manquant',
+    'Obtenir 1 morceau ?',
+    'Aurral télécharge les morceaux un par un. Suivez leur progression dans Activité.',
+    'Les obtenir',
+  ],
+  [
+    'ar',
+    'غير موجودة في المكتبة',
+    'تنزيل الأغنية المتبقية',
+    'تنزيل أغنية واحدة؟',
+    'ينزّل Aurral الأغاني واحدة تلو الأخرى. يمكنك متابعة تقدمها في النشاط.',
+    'تنزيلها',
+  ],
+] as const) {
+  test(`playlist request actions use the saved ${locale} locale`, async ({
+    page,
+  }, info) => {
+    const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    await mockMusic(page, { previews: [], saved: [] }, locale);
+    await page.goto(testAppPath('/music/playlist/deezer/123'));
+    const filters = page.getByRole('group', {
+      name: baseline
+        ? 'Show songs'
+        : locale === 'fr'
+          ? 'Afficher les morceaux'
+          : 'عرض الأغاني',
+    });
+    await expect(filters).toBeVisible();
+    await expect(
+      filters.getByRole('button', {
+        name: baseline ? 'Not in library' : filter,
+      })
+    ).toBeVisible();
+    await page.screenshot({
+      path: info.outputPath(`music-playlist-${locale}.png`),
+      fullPage: false,
+    });
+
+    await page
+      .getByRole('button', {
+        name: baseline ? 'Get the missing song' : getMissing,
+      })
+      .click();
+    const confirmDialog = page.getByRole('alertdialog', {
+      name: baseline ? 'Get 1 song?' : confirmTitle,
+    });
+    await expect(confirmDialog).toBeVisible();
+    await expect(
+      confirmDialog.getByText(
+        baseline
+          ? 'Aurral downloads each song one after another. You can follow them in Activity.'
+          : confirmBody
+      )
+    ).toBeVisible();
+    await confirmDialog
+      .getByRole('button', { name: baseline ? 'Get them' : confirm })
+      .click();
+  });
+}
 
 test('previews of playlist songs use the Deezer clip id', async ({ page }) => {
   const seen: Seen = { previews: [], saved: [] };
@@ -722,6 +1205,154 @@ test('an artist page follows the artist and gets every missing release, singles 
     page.getByRole('button', { name: /Get (all|the) .* releases/ })
   ).toHaveCount(0);
 });
+
+for (const [
+  locale,
+  albumsOwned,
+  getMissing,
+  title,
+  summary,
+  aurral,
+  followHelp,
+] of [
+  [
+    'fr',
+    'Albums dans votre bibliothèque : 1 sur 3',
+    'Demander les 3 sorties manquantes',
+    'Demander toutes les sorties de Fixture Band ?',
+    '2 albums et 1 single ou EP de Fixture Band seront demandés.',
+    'Aurral les téléchargera une par une.',
+    'Suivez cet artiste pour télécharger automatiquement ses nouveaux albums et singles.',
+  ],
+  [
+    'ar',
+    'الألبومات في مكتبتك: 1 من 3',
+    'طلب الإصدارات المتبقية (3)',
+    'طلب جميع إصدارات Fixture Band؟',
+    'سيتم طلب 2 ألبومات وأغنية منفردة أو EP واحدة للفنان Fixture Band.',
+    'سيحمّلها Aurral واحدة تلو الأخرى.',
+    'تابع الفنان لتنزيل ألبوماته وأغانيه الجديدة تلقائيًا.',
+  ],
+] as const) {
+  test(`artist request and follow flow uses the saved ${locale} locale`, async ({
+    page,
+  }, info) => {
+    const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    const seen: Seen = {
+      previews: [],
+      saved: [],
+      albumRequests: [],
+      follows: [],
+    };
+    await mockMusic(page, seen, locale);
+    await page.goto(testAppPath(`/artist/${ARTIST_MBID}`));
+    await expect(page.getByText(albumsOwned, { exact: true })).toBeVisible();
+    await expect(page.getByText(followHelp)).toBeVisible();
+    await page.screenshot({
+      path: info.outputPath(`music-artist-${locale}.png`),
+      fullPage: false,
+    });
+
+    await page
+      .getByRole('button', { name: locale === 'fr' ? 'Suivre' : 'متابعة' })
+      .click();
+    await expect.poll(() => seen.follows?.length).toBe(1);
+    await expect(
+      page.getByRole('button', {
+        name: locale === 'fr' ? 'Suivi' : 'تتابع',
+      })
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        locale === 'fr'
+          ? 'Vous suivez Fixture Band : ses nouveautés seront téléchargées'
+          : 'تتابع Fixture Band؛ ستُنزل إصداراته الجديدة تلقائيًا'
+      )
+    ).toBeVisible();
+
+    await page
+      .getByRole('button', {
+        name: getMissing,
+      })
+      .click();
+    const dialog = page.getByRole('alertdialog', {
+      name: title,
+    });
+    await expect(dialog.getByText(summary, { exact: false })).toBeVisible();
+    await expect(dialog.getByText(aurral)).toBeVisible();
+    await dialog
+      .getByRole('button', {
+        name: locale === 'ar' ? 'تنزيلها' : 'Les obtenir',
+      })
+      .click();
+    await expect.poll(() => seen.albumRequests?.length).toBe(3);
+
+    await page
+      .getByRole('button', {
+        name: locale === 'fr' ? 'Suivi' : 'تتابع',
+      })
+      .click();
+    const unfollowDialog = page.getByRole('alertdialog', {
+      name: baseline
+        ? 'Stop following Fixture Band?'
+        : locale === 'fr'
+          ? 'Ne plus suivre Fixture Band ?'
+          : 'إلغاء متابعة Fixture Band؟',
+    });
+    await expect(
+      unfollowDialog.getByText(
+        baseline
+          ? 'New releases will no longer download. Music you already have stays in your library.'
+          : locale === 'fr'
+            ? 'Les nouvelles sorties ne seront plus téléchargées. Votre musique actuelle reste dans votre bibliothèque.'
+            : 'لن تُنزّل الإصدارات الجديدة بعد الآن. وستبقى الموسيقى الموجودة لديك في مكتبتك.'
+      )
+    ).toBeVisible();
+    await unfollowDialog
+      .getByRole('button', {
+        name: locale === 'fr' ? 'Ne plus suivre' : 'إلغاء المتابعة',
+      })
+      .click();
+    await expect.poll(() => seen.follows?.length).toBe(2);
+    await expect(
+      page.getByText(
+        baseline
+          ? 'Stopped following Fixture Band'
+          : locale === 'fr'
+            ? 'Vous ne suivez plus Fixture Band'
+            : 'لم تعد تتابع Fixture Band'
+      )
+    ).toBeVisible();
+  });
+}
+
+for (const locale of ['fr', 'ar'] as const) {
+  test(`artist loading message uses the saved ${locale} locale`, async ({
+    page,
+  }, info) => {
+    const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    await mockMusic(page, { previews: [], saved: [] }, locale);
+    await page.route(`**/api/v1/music/artist/${ARTIST_MBID}`, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await route.fallback();
+    });
+    await page.goto(testAppPath(`/artist/${ARTIST_MBID}`));
+    await expect(
+      page.getByText(
+        baseline
+          ? 'Loading…'
+          : locale === 'fr'
+            ? 'Chargement…'
+            : 'جارٍ التحميل…',
+        { exact: true }
+      )
+    ).toBeVisible();
+    await page.screenshot({
+      path: info.outputPath(`music-artist-loading-${locale}.png`),
+      fullPage: false,
+    });
+  });
+}
 
 test('getting every release keeps going when one fails and says how many failed', async ({
   page,
@@ -983,6 +1614,161 @@ test('an artist page hides other editions and covered singles until asked, and s
     .click();
   await expect(page).not.toHaveURL(/others=1/);
 });
+
+for (const [
+  locale,
+  toggleShow,
+  toggleHide,
+  title,
+  groups,
+  editionReason,
+  openRelease,
+  coveredReason,
+  promoReason,
+] of [
+  [
+    'fr',
+    'Afficher 3 autres éditions et singles',
+    'Masquer les autres éditions et singles',
+    'Autres éditions et singles',
+    [
+      'Autres éditions',
+      'Morceaux déjà présents sur les albums',
+      'Éditions promotionnelles et non officielles',
+    ],
+    'Autre édition de Release 2',
+    'Ouvrir Release 2',
+    'Sur Release 1',
+    'Édition promotionnelle',
+  ],
+  [
+    'ar',
+    'عرض 3 من الإصدارات والأغاني المنفردة الأخرى',
+    'إخفاء الإصدارات والأغاني المنفردة الأخرى',
+    'إصدارات وأغانٍ منفردة أخرى',
+    ['إصدارات أخرى', 'أغانٍ موجودة في الألبومات', 'إصدارات ترويجية وغير رسمية'],
+    'إصدار آخر من Release 2',
+    'فتح Release 2',
+    'ضمن Release 1',
+    'إصدار ترويجي',
+  ],
+] as const) {
+  test(`artist release explanations use the saved ${locale} locale`, async ({
+    page,
+  }, info) => {
+    const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    await mockMusic(page, { previews: [], saved: [] }, locale);
+    await page.route(`**/api/v1/music/artist/${ARTIST_MBID}`, (route) =>
+      route.fulfill({
+        json: {
+          mbid: ARTIST_MBID,
+          name: 'Fixture Band',
+          type: 'Group',
+          country: 'US',
+          beginYear: 2010,
+          endYear: null,
+          genres: [],
+          bio: null,
+          releaseGroups: [
+            rg(1, 'Album', true),
+            rg(2, 'Album'),
+            rg(3, 'Album'),
+            rg(4, 'Single'),
+            {
+              ...rg(5, 'Album'),
+              title: 'Release 2 (Deluxe)',
+              redundant: {
+                code: 'sameAlbum',
+                reason: 'Another edition of Release 2',
+                coveredBy: { mbid: rg(2, 'Album').id, title: 'Release 2' },
+              },
+            },
+            {
+              ...rg(6, 'Single'),
+              redundant: {
+                code: 'covered',
+                reason: 'On Release 1',
+                coveredBy: { mbid: rg(1, 'Album').id, title: 'Release 1' },
+              },
+            },
+            {
+              ...rg(7, 'Single'),
+              title: 'Release 7 Promo CD',
+              redundant: { code: 'unofficial', reason: 'Promo release.' },
+            },
+          ],
+        },
+      })
+    );
+    await page.goto(testAppPath(`/artist/${ARTIST_MBID}`));
+    await page
+      .getByRole('button', {
+        name: baseline ? 'Show 3 other editions and singles' : toggleShow,
+      })
+      .click();
+    const hidden = page.locator('.music-hidden-releases');
+    await expect(
+      hidden.getByRole('heading', {
+        name: baseline ? 'Other editions and singles' : title,
+      })
+    ).toBeVisible();
+    for (const [index, label] of groups.entries()) {
+      await expect(
+        hidden.getByText(
+          baseline
+            ? [
+                'Other editions',
+                'Songs already on the albums',
+                'Promo and unofficial releases',
+              ][index]
+            : label,
+          { exact: true }
+        )
+      ).toBeVisible();
+    }
+    const edition = hidden.locator('.poster', {
+      hasText: 'Release 2 (Deluxe)',
+    });
+    await expect(
+      edition.getByText(
+        baseline ? 'Another edition of Release 2' : editionReason
+      )
+    ).toBeVisible();
+    await expect(
+      edition.getByRole('link', {
+        name: baseline ? 'Open Release 2' : openRelease,
+      })
+    ).toBeVisible();
+    const covered = hidden.locator('.poster', { hasText: 'Release 6' });
+    await expect(
+      covered.getByText(baseline ? 'On Release 1' : coveredReason)
+    ).toBeVisible();
+    const promo = hidden.locator('.poster', { hasText: 'Release 7 Promo CD' });
+    await expect(
+      promo.getByText(baseline ? 'Promo release' : promoReason)
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    ).toBe(true);
+    if (['desktop', 'iphone'].includes(info.project.name))
+      await page.screenshot({
+        path: info.outputPath(`music-hidden-releases-${locale}.png`),
+        fullPage: false,
+      });
+    await hidden
+      .getByRole('button', {
+        name: baseline ? 'Hide other editions and singles' : toggleHide,
+      })
+      .click();
+    await expect(
+      hidden.getByRole('heading', {
+        name: baseline ? 'Other editions and singles' : title,
+      })
+    ).toHaveCount(0);
+  });
+}
 
 test('an album page of a covered single points at its album and asks before getting it anyway', async ({
   page,
@@ -1925,6 +2711,146 @@ test('Podcasts is its own section with Discover, search, your shows and activity
     page.locator('a[href*="/podcasts/preview?feed="]').first()
   ).toBeAttached();
 });
+
+for (const [
+  locale,
+  expectedTitle,
+  expectedNavigation,
+  expectedSearch,
+  expectedCategories,
+  expectedTop,
+  discoverTab,
+  openLibrary,
+  expectedNews,
+  expectedComedy,
+  expectedMoreHeading,
+  expectedEpisodeCount,
+  expectedBusiness,
+  expectedTechnology,
+] of [
+  [
+    'fr',
+    'Podcasts',
+    'Podcasts',
+    'Rechercher des podcasts…',
+    'Catégories',
+    'Meilleurs podcasts',
+    'Découvrir',
+    'Ouvrir Audiobookshelf',
+    'Actualités',
+    'Comédie',
+    'Plus d’émissions Actualités',
+    'Fixture Charts · 300 épisodes',
+    'Affaires',
+    'Technologie',
+  ],
+  [
+    'ar',
+    'البودكاست',
+    'البودكاست',
+    'ابحث عن البودكاست…',
+    'الفئات',
+    'أفضل البودكاست',
+    'اكتشف',
+    'فتح Audiobookshelf',
+    'الأخبار',
+    'كوميديا',
+    'المزيد من برامج الأخبار',
+    'Fixture Charts · 300 حلقة',
+    'الأعمال',
+    'التقنية',
+  ],
+] as const) {
+  test(`podcast discovery uses the saved ${locale} locale`, async ({
+    page,
+  }, info) => {
+    const baseline = process.env.LUMEN_CAPTURE_BASELINE === '1';
+    await mockMusic(page, { previews: [], saved: [] }, locale);
+    await mockPodcasts(page, { subscribed: [], downloads: [], auto: [] });
+    await page.route('**/api/v1/podcast/genres', (route) =>
+      route.fulfill({
+        json: {
+          genres: [
+            { id: 1303, name: 'Comedy' },
+            { id: 1318, name: 'Technology' },
+            { id: 1321, name: 'Business' },
+            { id: 1489, name: 'News' },
+          ],
+        },
+      })
+    );
+    await page.goto(testAppPath('/podcasts'));
+    const visibleNavigation = baseline ? 'Podcasts' : expectedNavigation;
+    const visibleSearch = baseline ? 'Search podcasts…' : expectedSearch;
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expect(
+      page.getByRole('heading', { name: expectedTitle, level: 1 })
+    ).toBeVisible();
+    if ((page.viewportSize()?.width ?? 1440) < 1040)
+      await page.locator('.tabbar button').last().click();
+    await expect(
+      page.getByRole('link', { name: visibleNavigation, exact: true }).first()
+    ).toBeVisible();
+    await expect(page.getByPlaceholder(visibleSearch)).toHaveAttribute(
+      'placeholder',
+      visibleSearch
+    );
+    await expect(
+      page.getByRole('heading', { name: expectedTop })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('group', { name: expectedCategories })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: expectedNews })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: expectedComedy })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: expectedBusiness })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: expectedTechnology })
+    ).toBeVisible();
+    await expect(page.getByText(expectedEpisodeCount).first()).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: expectedMoreHeading })
+    ).toBeVisible();
+    await expect(page.getByRole('tab', { name: discoverTab })).toBeVisible();
+    await expect(page.getByRole('link', { name: openLibrary })).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute(
+      'dir',
+      locale === 'ar' ? 'rtl' : 'ltr'
+    );
+    if (['iphone', 'android'].includes(info.project.name)) {
+      const genreRail = page.locator('.pod-genres');
+      expect(
+        await genreRail.evaluate(
+          (element) => element.scrollWidth > element.clientWidth
+        )
+      ).toBe(true);
+      const firstGenre = page.getByRole('button', { name: expectedNews });
+      await firstGenre.scrollIntoViewIfNeeded();
+      const [railBox, genreBox] = await Promise.all([
+        genreRail.boundingBox(),
+        firstGenre.boundingBox(),
+      ]);
+      expect(railBox).not.toBeNull();
+      expect(genreBox).not.toBeNull();
+      expect(genreBox!.x).toBeGreaterThanOrEqual(railBox!.x - 1);
+      expect(genreBox!.x + genreBox!.width).toBeLessThanOrEqual(
+        railBox!.x + railBox!.width + 1
+      );
+    }
+    await expect(page.locator('body')).not.toHaveCSS('overflow-x', 'scroll');
+    if (['desktop', 'iphone'].includes(info.project.name))
+      await page.screenshot({
+        path: info.outputPath(`podcast-discovery-${locale}.png`),
+        fullPage: false,
+      });
+  });
+}
 
 test('following a podcast asks first, then opens the show', async ({
   page,

@@ -64,21 +64,13 @@ import { useLiveMediaProgress } from '../useLiveDownloadProgress';
 import { isSharedVideoCopy, videoPlaybackMedia } from '../videoAvailability';
 import { AssociationLink } from './Associations';
 
-const releaseKinds = new Map([
-  [3, 'Theatrical'],
-  [4, 'Digital'],
-  [5, 'Physical'],
-]);
-
-const usd = new Intl.NumberFormat(undefined, {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0,
-});
-
-function movieCurrency(value?: number) {
+function movieCurrency(value: number | undefined, locale: string) {
   return typeof value === 'number' && Number.isFinite(value) && value > 0
-    ? usd.format(value)
+    ? new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+      }).format(value)
     : '';
 }
 
@@ -121,7 +113,7 @@ function MovieCollectionSummary({ id, name }: { id: number; name: string }) {
 }
 
 export default function MovieDetail() {
-  const { t } = useLumenLocale();
+  const { t, locale } = useLumenLocale();
   const serverName = useMediaServerName();
   const { id } = useParams();
   const [manageOpen, setManageOpen] = useState(false);
@@ -185,6 +177,11 @@ export default function MovieDetail() {
   const regionReleases =
     m.releases?.results.find((release) => release.iso_3166_1 === ratingRegion)
       ?.release_dates ?? [];
+  const releaseKinds = new Map([
+    [3, t('components.MovieDetails.Layout.theatrical', 'Theatrical')],
+    [4, t('components.MovieDetails.Layout.digital', 'Digital')],
+    [5, t('components.MovieDetails.Layout.physical', 'Physical')],
+  ]);
   const certification = regionReleases.find(
     (release) => release.certification
   )?.certification;
@@ -249,8 +246,20 @@ export default function MovieDetail() {
       const result = await requestMovie(m.id, options);
       toast(
         result.quotaException
-          ? `Approval requested for ${m.title}`
-          : `Requested ${m.title}${options.is4k ? ' in 4K' : ''}`
+          ? t(
+              'lumen.requestSummary.approvalRequested',
+              'Approval requested for {title}',
+              {
+                title: m.title || 'this movie',
+              }
+            )
+          : t(
+              options.is4k
+                ? 'lumen.requestSummary.movieRequested4k'
+                : 'lumen.requestSummary.movieRequested',
+              options.is4k ? 'Requested {title} in 4K' : 'Requested {title}',
+              { title: m.title || 'this movie' }
+            )
       );
       refresh();
       quota.refresh();
@@ -364,7 +373,7 @@ export default function MovieDetail() {
         line={[
           unreleased
             ? t('lumen.movie.theaters', 'In theaters {date}', {
-                date: shortDate(date),
+                date: shortDate(date, true, locale),
               })
             : date.slice(0, 4),
           certification && <span className="cert">{certification}</span>,
@@ -559,14 +568,18 @@ export default function MovieDetail() {
                   ],
                   [
                     t('lumen.movie.fact.originalLanguage', 'Original Language'),
-                    originalLanguageLink(m.originalLanguage, '/movies'),
+                    originalLanguageLink(m.originalLanguage, '/movies', locale),
                   ],
                   [
                     t(
                       'lumen.movie.fact.productionCountries',
                       'Production Countries'
                     ),
-                    productionCountryLinks(m.productionCountries, '/movies'),
+                    productionCountryLinks(
+                      m.productionCountries,
+                      '/movies',
+                      locale
+                    ),
                   ],
                   [
                     t(
@@ -592,11 +605,11 @@ export default function MovieDetail() {
                   [t('lumen.movie.fact.runtime', 'Runtime'), fmtRun(m.runtime)],
                   [
                     t('lumen.movie.fact.budget', 'Budget'),
-                    movieCurrency(m.budget),
+                    movieCurrency(m.budget, locale),
                   ],
                   [
                     t('lumen.movie.fact.revenue', 'Revenue'),
-                    movieCurrency(m.revenue),
+                    movieCurrency(m.revenue, locale),
                   ],
                   [
                     releaseDates.size > 1
@@ -607,13 +620,13 @@ export default function MovieDetail() {
                           ({ label, date }, index) => (
                             <span key={label}>
                               {index > 0 && <br />}
-                              {label} · {shortDate(date, false)},{' '}
+                              {label} · {shortDate(date, false, locale)},{' '}
                               {date.slice(0, 4)}
                             </span>
                           )
                         )
                       : date
-                        ? `${shortDate(date, false)}, ${date.slice(0, 4)}`
+                        ? `${shortDate(date, false, locale)}, ${date.slice(0, 4)}`
                         : '',
                   ],
                   [t('lumen.movie.fact.director', 'Director'), director],

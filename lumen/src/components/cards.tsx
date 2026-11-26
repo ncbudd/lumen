@@ -455,7 +455,7 @@ export function TitleCard({
   discoverContextId?: string;
   discoverItems?: DiscoverNavigationItem[];
 }) {
-  const { t } = useLumenLocale();
+  const { t, locale } = useLumenLocale();
   const serverName = useMediaServerName();
   const toast = useToast();
   const { prefs } = usePrefs();
@@ -516,11 +516,18 @@ export function TitleCard({
   };
   const m =
     meta ||
-    [unreleased ? shortDate(date) : yearOf(it), tv ? 'Series' : '']
+    [
+      unreleased ? shortDate(date, true, locale) : yearOf(it),
+      tv ? t('components.Search.series', 'Series') : '',
+    ]
       .filter(Boolean)
       .join(' · ');
   const qm = [
-    unreleased ? 'Out ' + shortDate(date) : yearOf(it),
+    unreleased
+      ? t('lumen.cards.outOn', 'Out {date}', {
+          date: shortDate(date, true, locale),
+        })
+      : yearOf(it),
     it.voteAverage ? '★ ' + it.voteAverage.toFixed(1) : '',
   ]
     .filter(Boolean)
@@ -530,10 +537,22 @@ export function TitleCard({
     setRequestedQuality(is4k ? '4K' : 'HD');
     toast(
       quotaException
-        ? `Approval requested for ${titleOf(it)}`
+        ? t(
+            'lumen.requestSummary.approvalRequested',
+            'Approval requested for {title}',
+            {
+              title: titleOf(it),
+            }
+          )
         : tv
-          ? seriesRequestSummary(titleOf(it), series, is4k)
-          : `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}`
+          ? seriesRequestSummary(titleOf(it), series, is4k, t)
+          : t(
+              is4k
+                ? 'lumen.requestSummary.movieRequested4k'
+                : 'lumen.requestSummary.movieRequested',
+              is4k ? 'Requested {title} in 4K' : 'Requested {title}',
+              { title: titleOf(it) }
+            )
     );
   });
   const [request, busy] = useBusy(quick.request);
@@ -600,7 +619,9 @@ export function TitleCard({
           onClick={request}
         >
           <Icon name="plus" size="sm" />
-          {unreleased ? 'Request early' : 'Request'}
+          {unreleased
+            ? t('lumen.cards.requestEarly', 'Request early')
+            : t('components.Common.FormatRequestControl.request', 'Request')}
         </button>
         {tv && (
           <Link
@@ -712,6 +733,9 @@ export function BookCard({ b }: { b: BookResult }) {
   const states = useBookStates();
   const format = audio ? 'audiobook' : 'ebook';
   const library = useOwnedBooks(format);
+  const formatLabel = audio
+    ? t('lumen.cards.audiobook', 'audiobook')
+    : t('lumen.cards.ebook', 'ebook');
   const known = states?.get(b.id)?.[format];
   const media = bookMediaWithLibrary(b, format, library);
   const libraryStatus = statusOf(media, true);
@@ -757,7 +781,12 @@ export function BookCard({ b }: { b: BookResult }) {
       );
       markRequested();
       dropBookStates();
-      toast(`Requested ${b.title} · ${audio ? 'audiobook' : 'ebook'}`);
+      toast(
+        t('lumen.cards.bookRequested', 'Requested {title} · {format}', {
+          title: b.title,
+          format: formatLabel,
+        })
+      );
     } catch (e) {
       toast(
         friendlyError(e, t('lumen.error.requestFailed', 'Request failed'), t)
@@ -790,8 +819,16 @@ export function BookCard({ b }: { b: BookResult }) {
             <TouchQuick
               label={
                 ownershipUnknown
-                  ? `Request ${b.title} anyway; library status is unknown`
-                  : `Request ${b.title} (${audio ? 'audiobook' : 'ebook'})`
+                  ? t(
+                      'lumen.cards.requestBookAnywayLabel',
+                      'Request {title} anyway; library status is unknown',
+                      { title: b.title }
+                    )
+                  : t(
+                      'lumen.cards.requestBookFormatLabel',
+                      'Request {title} ({format})',
+                      { title: b.title, format: formatLabel }
+                    )
               }
               onClick={request}
               busy={busy}
@@ -826,7 +863,9 @@ export function BookCard({ b }: { b: BookResult }) {
                       aria-hidden="true"
                     >
                       <Icon name={audio ? 'play' : 'book'} size="sm" />
-                      {audio ? 'Listen' : 'Read'}
+                      {audio
+                        ? t('lumen.cards.listen', 'Listen')
+                        : t('lumen.cards.read', 'Read')}
                     </Link>
                     {audio && prefs.narratorChoice && (
                       <Link
@@ -854,10 +893,10 @@ export function BookCard({ b }: { b: BookResult }) {
                   <button className="qbtn go" disabled={busy} onClick={request}>
                     <Icon name="plus" size="sm" />
                     {ownershipUnknown
-                      ? 'Request anyway'
-                      : audio
-                        ? 'Request audiobook'
-                        : 'Request ebook'}
+                      ? t('lumen.cards.requestAnyway', 'Request anyway')
+                      : t('lumen.cards.requestFormat', 'Request {format}', {
+                          format: formatLabel,
+                        })}
                   </button>
                 ) : (
                   <Link
@@ -867,7 +906,7 @@ export function BookCard({ b }: { b: BookResult }) {
                     aria-hidden="true"
                   >
                     <Icon name="headphones" size="sm" />
-                    Choose narrator
+                    {t('lumen.cards.chooseNarrator', 'Choose narrator')}
                   </Link>
                 )}
               </div>
@@ -886,7 +925,7 @@ export function BookCard({ b }: { b: BookResult }) {
         {b.title}
       </Link>
       <div className="m">
-        {b.author || (audio ? 'Audiobook' : 'Ebook')}
+        {b.author || formatLabel}
         {b.firstPublishYear ? ' · ' + b.firstPublishYear : ''}
       </div>
     </div>
@@ -915,7 +954,9 @@ export function FeatCard({
   const [done, setDone] = useState('');
   const mm = [
     yearOf(it),
-    tv ? 'Series' : 'Movie',
+    tv
+      ? t('components.Search.series', 'Series')
+      : t('components.Requests.movie', 'Movie'),
     it.voteAverage ? '★ ' + it.voteAverage.toFixed(1) : '',
   ]
     .filter(Boolean)
@@ -924,10 +965,22 @@ export function FeatCard({
     setDone(is4k ? '4K Requested' : 'Requested');
     toast(
       quotaException
-        ? `Approval requested for ${titleOf(it)}`
+        ? t(
+            'lumen.requestSummary.approvalRequested',
+            'Approval requested for {title}',
+            {
+              title: titleOf(it),
+            }
+          )
         : tv
-          ? seriesRequestSummary(titleOf(it), series, is4k)
-          : `Requested ${titleOf(it)}${is4k ? ' in 4K' : ''}`
+          ? seriesRequestSummary(titleOf(it), series, is4k, t)
+          : t(
+              is4k
+                ? 'lumen.requestSummary.movieRequested4k'
+                : 'lumen.requestSummary.movieRequested',
+              is4k ? 'Requested {title} in 4K' : 'Requested {title}',
+              { title: titleOf(it) }
+            )
     );
   });
   const [request, busy] = useBusy(quick.request);
@@ -957,12 +1010,24 @@ export function FeatCard({
                 {...mediaLink(playbackMedia, false, tv ? 'tv' : 'movie')}
               >
                 <Icon name="play" size="sm" />
-                Watch
+                {t(
+                  'components.Common.MediaServerPlayButton.playOnServer',
+                  'Play on {mediaServerName}',
+                  {
+                    mediaServerName: serverName,
+                  }
+                )}
               </a>
             ) : (
               <Link className="btn go" to={`/${tv ? 'tv' : 'movie'}/${it.id}`}>
                 <Icon name="play" size="sm" />
-                Watch
+                {t(
+                  'components.Common.MediaServerPlayButton.playOnServer',
+                  'Play on {mediaServerName}',
+                  {
+                    mediaServerName: serverName,
+                  }
+                )}
               </Link>
             )
           ) : s || done ? (
@@ -980,7 +1045,15 @@ export function FeatCard({
           ) : quick.allowed ? (
             <button className="btn go" disabled={busy} onClick={request}>
               <Icon name="plus" size="sm" />
-              {tv ? 'Request series' : 'Request'}
+              {tv
+                ? t(
+                    'components.RequestModal.requestseriestitle',
+                    'Request Series'
+                  )
+                : t(
+                    'components.Common.FormatRequestControl.request',
+                    'Request'
+                  )}
             </button>
           ) : null}
         </span>

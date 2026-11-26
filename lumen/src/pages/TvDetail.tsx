@@ -90,7 +90,7 @@ const stateOf = (status?: number): SeasonState =>
 const live = (status?: number) => status === 1 || status === 2;
 
 export default function TvDetail() {
-  const { t: translate } = useLumenLocale();
+  const { t: translate, locale } = useLumenLocale();
   const serverName = useMediaServerName();
   const { user } = useAuth();
   const episodeQueue = useApi<{ defaultEpisodeCount: number }>(
@@ -397,8 +397,20 @@ export default function TvDetail() {
       );
       toast(
         result.quotaException
-          ? `Approval requested for ${t.name || 'this series'}`
-          : `Episodes requested for ${t.name || 'this series'}`
+          ? translate(
+              'lumen.requestSummary.approvalRequested',
+              'Approval requested for {title}',
+              {
+                title: t.name || 'this series',
+              }
+            )
+          : translate(
+              'lumen.requestSummary.episodesRequested',
+              'Episodes requested for {title}',
+              {
+                title: t.name || 'this series',
+              }
+            )
       );
       setEpisodesOpen(false);
       refresh();
@@ -444,11 +456,18 @@ export default function TvDetail() {
       const result = await requestSeries(t.id, requestedSeasons, options);
       toast(
         result.quotaException
-          ? `Approval requested for ${t.name || 'this series'}`
+          ? translate(
+              'lumen.requestSummary.approvalRequested',
+              'Approval requested for {title}',
+              {
+                title: t.name || 'this series',
+              }
+            )
           : seriesRequestSummary(
               t.name || 'this series',
               result,
-              !!options.is4k
+              !!options.is4k,
+              translate
             )
       );
       refresh();
@@ -801,14 +820,14 @@ export default function TvDetail() {
                   {r.createdAt
                     ? ' · ' +
                       translate('lumen.tv.requestedOn', 'on {date}', {
-                        date: shortDate(r.createdAt),
+                        date: shortDate(r.createdAt, true, locale),
                       })
                     : ''}
                   {ss.length
                     ? ' · ' +
                       (ss.length === seasons.length
                         ? translate('lumen.tv.entireSeries', 'Entire series')
-                        : seasonList(ss))
+                        : seasonList(ss, translate))
                     : ''}
                 </li>
               );
@@ -1000,7 +1019,7 @@ export default function TvDetail() {
                   const yr = s.airDate
                     ? s.airDate > today
                       ? translate('lumen.tv.premieres', 'Premieres {date}', {
-                          date: shortDate(s.airDate),
+                          date: shortDate(s.airDate, true, locale),
                         })
                       : s.airDate.slice(0, 4)
                     : translate('lumen.tv.tba', 'TBA');
@@ -1140,14 +1159,39 @@ export default function TvDetail() {
                       'lumen.tv.fact.originalLanguage',
                       'Original Language'
                     ),
-                    originalLanguageLink(t.originalLanguage, '/series'),
+                    originalLanguageLink(t.originalLanguage, '/series', locale),
                   ],
                   [
                     translate(
                       'lumen.tv.fact.productionCountries',
                       'Production Countries'
                     ),
-                    productionCountryLinks(t.productionCountries, '/series'),
+                    productionCountryLinks(
+                      t.productionCountries,
+                      '/series',
+                      locale
+                    ),
+                  ],
+                  [
+                    translate('lumen.tv.fact.firstAirDate', 'First Air Date'),
+                    shortDate(t.firstAirDate, true, locale),
+                  ],
+                  [
+                    translate('lumen.tv.fact.genres', 'Genres'),
+                    t.genres?.length
+                      ? t.genres.map(({ id, name }, index) => (
+                          <span key={`${id}:${name}`}>
+                            {index > 0 && ', '}
+                            {Number.isSafeInteger(id) &&
+                            id > 0 &&
+                            id <= 1_000_000_000 ? (
+                              <Link to={`/series?genre=${id}`}>{name}</Link>
+                            ) : (
+                              name
+                            )}
+                          </span>
+                        ))
+                      : null,
                   ],
                   [
                     translate('lumen.tv.fact.network', 'Network'),
@@ -1166,6 +1210,10 @@ export default function TvDetail() {
                           </span>
                         ))
                       : null,
+                  ],
+                  [
+                    translate('lumen.tv.fact.seriesType', 'Series Type'),
+                    t.type,
                   ],
                   [
                     translate('lumen.tv.fact.status', 'Status'),
@@ -1202,18 +1250,30 @@ export default function TvDetail() {
                   ],
                   [
                     translate('lumen.tv.fact.createdBy', 'Created by'),
-                    t.createdBy?.map((c) => c.name).join(', '),
+                    t.createdBy?.map(({ id, name }, index) => (
+                      <span key={`${id ?? name}:${index}`}>
+                        {index > 0 && ', '}
+                        {id !== undefined &&
+                        Number.isSafeInteger(id) &&
+                        id > 0 &&
+                        id <= 1_000_000_000 ? (
+                          <Link to={`/person/${id}`}>{name}</Link>
+                        ) : (
+                          name
+                        )}
+                      </span>
+                    )),
                   ],
                   [
                     translate('lumen.tv.fact.lastAired', 'Last aired'),
                     t.lastEpisodeToAir
-                      ? `S${t.lastEpisodeToAir.seasonNumber} E${t.lastEpisodeToAir.episodeNumber} · ${shortDate(t.lastEpisodeToAir.airDate)}`
+                      ? `S${t.lastEpisodeToAir.seasonNumber} E${t.lastEpisodeToAir.episodeNumber} · ${shortDate(t.lastEpisodeToAir.airDate, true, locale)}`
                       : '',
                   ],
                   [
                     translate('lumen.tv.fact.nextEpisode', 'Next episode'),
                     t.nextEpisodeToAir
-                      ? `S${t.nextEpisodeToAir.seasonNumber} E${t.nextEpisodeToAir.episodeNumber} · ${shortDate(t.nextEpisodeToAir.airDate)}`
+                      ? `S${t.nextEpisodeToAir.seasonNumber} E${t.nextEpisodeToAir.episodeNumber} · ${shortDate(t.nextEpisodeToAir.airDate, true, locale)}`
                       : '',
                   ],
                 ]}

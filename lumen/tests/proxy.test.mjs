@@ -150,16 +150,29 @@ async function check(settings, clientIp, scheme, headers = {}) {
       ['/users/19/', '/household/19'],
       ['/profile/', '/household/me'],
       ['/profile/settings/', '/me/account'],
+      ['/profile/settings/?from=native', '/me/account?from=native'],
       ['/profile/settings/permissions', '/me/account#account-permissions'],
       ['/profile/settings/password/', '/me/account#password'],
+      [
+        '/profile/settings/password?from=native',
+        '/me/account?from=native#password',
+      ],
       ['/profile/advanced-theme/', '/me/account#advanced-theme'],
       [
         '/profile/settings/episode-queue/',
         '/me/account/tv-requests#episode-queue',
       ],
       [
+        '/profile/settings/episode-queue?from=native',
+        '/me/account/tv-requests?from=native#episode-queue',
+      ],
+      [
         '/profile/settings/notifications/webpush',
         '/me/account/notifications#notification-webpush',
+      ],
+      [
+        '/profile/settings/notifications/webpush?from=native',
+        '/me/account/notifications?from=native#notification-webpush',
       ],
       ['/profile/watchlist/?page=2', '/watchlist?page=2'],
       ['/users/19/watchlist/?page=2', '/watchlist/user/19?page=2'],
@@ -245,15 +258,29 @@ async function check(settings, clientIp, scheme, headers = {}) {
       ['/settings/logs?page=0', '/admin/logs'],
       [
         '/settings/main?settingsSearchTarget=spotifyClientId',
-        '/admin/general#spotifyClientId',
+        '/admin/general?settingsSearchTarget=spotifyClientId#spotifyClientId',
       ],
-      ['/settings/main?settingsSearchTarget=apiKey', '/admin/general#apiKey'],
+      [
+        '/settings/main?settingsSearchTarget=apiKey',
+        '/admin/general?settingsSearchTarget=apiKey#apiKey',
+      ],
       [
         '/settings/main?settingsSearchTarget=enable4k',
-        '/admin/general#enable4k',
+        '/admin/requests?settingsSearchTarget=enable4k#enable4k',
+      ],
+      [
+        '/settings/main?settingsSearch=4K&settingsSearchTarget=enable4k',
+        '/admin/requests?settingsSearch=4K&settingsSearchTarget=enable4k#enable4k',
       ],
       ['/settings/main', '/admin/general'],
-      ['/settings/users/', '/admin/general#default-request-quotas'],
+      [
+        '/settings/users/',
+        '/admin/requests#default-request-quotas',
+      ],
+      [
+        '/settings/users/?settingsSearch=4K',
+        '/admin/requests?settingsSearch=4K#default-request-quotas',
+      ],
       ['/settings/categories', '/admin/categories'],
       ['/settings/network/', '/admin/network'],
       ['/settings/discovery', '/admin/discovery'],
@@ -273,7 +300,14 @@ async function check(settings, clientIp, scheme, headers = {}) {
       ],
       ['/settings/plex', '/admin/media-libraries'],
       ['/settings/jellyfin/', '/admin/media-libraries'],
-      ['/settings/services?settingsSearchTarget=prowlarr', '/admin/prowlarr'],
+      [
+        '/settings/services?settingsSearchTarget=prowlarr',
+        '/admin/prowlarr?settingsSearchTarget=prowlarr',
+      ],
+      [
+        '/settings/services?settingsSearch=Indexers&settingsSearchTarget=prowlarr',
+        '/admin/prowlarr?settingsSearch=Indexers&settingsSearchTarget=prowlarr',
+      ],
       ...[
         ['prowlarr-settings-title', 'prowlarr'],
         ['download-clients-settings-title', 'download-clients'],
@@ -286,10 +320,13 @@ async function check(settings, clientIp, scheme, headers = {}) {
         ['reader-settings-title', 'reader-delivery'],
         ['readmeabook-settings-title', 'readmeabook'],
         ['steamApiKey', 'software-acquisition#steam-library-import'],
-      ].map(([searchTarget, service]) => [
-        `/settings/services?settingsSearchTarget=${searchTarget}`,
-        `/admin/${service}`,
-      ]),
+      ].map(([searchTarget, service]) => {
+        const [servicePath, fragment] = service.split('#');
+        return [
+          `/settings/services?settingsSearchTarget=${searchTarget}`,
+          `/admin/${servicePath}?settingsSearchTarget=${searchTarget}${fragment ? `#${fragment}` : ''}`,
+        ];
+      }),
     ]) {
       const response = await fetch(base + path, { redirect: 'manual' });
       assert.equal(response.status, 302, path);

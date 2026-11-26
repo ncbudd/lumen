@@ -1022,6 +1022,7 @@ export interface TvDetails extends TitleResult {
   numberOfSeasons: number;
   episodeRunTime?: number[];
   networks?: { id?: number; name: string }[];
+  type?: string;
   status?: string;
   credits?: Credits;
   keywords?: SubjectTag[];
@@ -1088,7 +1089,15 @@ export interface JellystatPlaybackSummary {
 export interface BookDetails extends BookResult {
   onUserWatchlist?: boolean;
   description?: string;
-  isbnCandidates?: string[];
+  numberOfPages?: number;
+  editionCount?: number;
+  isbnCandidates?: {
+    isbn: string;
+    editionId?: string;
+    title?: string;
+    format?: string;
+    languages?: string[];
+  }[];
 }
 export interface Edition {
   id: string;
@@ -1113,6 +1122,8 @@ export interface EditionList {
 }
 export interface DownloadItem {
   percent?: number;
+  title?: string;
+  episode?: { seasonNumber: number; episodeNumber: number };
   liveDownloadToken?: string;
   downloadId?: string;
   size: number;

@@ -138,13 +138,31 @@ export default function Shell({ children }: { children: ReactNode }) {
     '/books': 'ebook',
     '/audiobooks': 'audiobook',
   };
+  const bookFormatServiceEnabled = (format: 'ebook' | 'audiobook') => {
+    const settings = swipeSettings.data;
+    if (!settings) return false;
+    if (format === 'ebook')
+      return settings.ebookServiceEnabled ?? settings.booksEnabled;
+    if (
+      settings.readmeabookEnabled !== undefined ||
+      settings.audiobookServiceEnabled !== undefined
+    )
+      return (
+        settings.readmeabookEnabled === true ||
+        settings.audiobookServiceEnabled === true
+      );
+    return settings.booksEnabled;
+  };
   const categoryVisible = (h: string) => {
     const key = navCategory[h];
-    return (
+    const format =
+      h === '/books' ? 'ebook' : h === '/audiobooks' ? 'audiobook' : undefined;
+    const serviceVisible = !format || bookFormatServiceEnabled(format);
+    const categoryEnabled =
       !key ||
       (swipeSettings.data?.enabledMediaCategories?.[key] !== false &&
-        personalCategories.data?.enabledMediaCategories?.[key] !== false)
-    );
+        personalCategories.data?.enabledMediaCategories?.[key] !== false);
+    return serviceVisible && categoryEnabled;
   };
   const loc = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -614,18 +632,28 @@ export default function Shell({ children }: { children: ReactNode }) {
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
       if (
-        e.key === '/' &&
-        !/INPUT|TEXTAREA|SELECT/.test(
-          (document.activeElement as HTMLElement)?.tagName
-        )
-      ) {
-        e.preventDefault();
-        q.current?.focus();
-      }
+        e.key !== '/' ||
+        e.ctrlKey ||
+        e.metaKey ||
+        e.altKey ||
+        e.defaultPrevented ||
+        document.querySelector('[aria-modal="true"]')
+      )
+        return;
+      const target = e.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target.closest('input, textarea, select, [role="textbox"]'))
+      )
+        return;
+      e.preventDefault();
+      if (q.current?.getClientRects().length) q.current.focus();
+      else nav('/search');
     };
     document.addEventListener('keydown', k);
     return () => document.removeEventListener('keydown', k);
-  }, []);
+  }, [nav]);
 
   return (
     <>
