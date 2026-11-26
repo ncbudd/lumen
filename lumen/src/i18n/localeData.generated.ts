@@ -3700,7 +3700,12 @@ export const localeData = [
       'lumen.followButton.updateFailed': 'تعذر تحديث المتابعة',
       'lumen.following.accessRequired':
         'يلزم توفر إذن الطلبات لاستخدام المتابعة.',
+      'lumen.following.description':
+        'أخبار شخصية عن الأشخاص وشركات الإنتاج والشبكات والأنواع والرواة والمسلسلات والألعاب والفنانين والمشاريع التي تتابعها. يوضح كل عنصر سبب ظهوره هنا.',
       'lumen.following.from': 'من {subject}',
+      'lumen.following.howBody':
+        'اضغط على «متابعة» لشخص أو شركة إنتاج أو شبكة أو نوع أو راوٍ أو مسلسل أو لعبة أو فنان أو مشروع ترقيع. قد يعرض الفحص الأول ما يصل إلى ثلاثة عناوين قادمة لكل نوع وسائط؛ وتضيف الفحوص اللاحقة عناصر جديدة حديثة أو قادمة. يتحقق SeerrNG كل 30 دقيقة تقريبًا. لا يؤكد تاريخ الإصدار المدرج توفر العمل في المكتبة. لن يُطلب أي شيء تلقائيًا إلا إذا فعّلت «الطلب تلقائيًا»، وهي ميزة مقتصرة على الكتب.',
+      'lumen.following.howHeading': 'كيف تعمل ميزة المتابعة',
       'lumen.following.loadingSubscriptions': 'جارٍ تحميل الاشتراكات…',
       'lumen.following.loadingUpdates': 'جارٍ تحميل التحديثات…',
       'lumen.following.markAllSeen': 'وضع علامة المشاهدة على الكل ({count})',
@@ -3744,7 +3749,7 @@ export const localeData = [
       'lumen.following.saveFailure': 'تعذر حفظ التغيير',
       'lumen.following.stopFollowing': 'إيقاف المتابعة',
       'lumen.following.stopFollowingSubject': 'إيقاف متابعة {subject}',
-      'lumen.following.updates': 'التحديثات',
+      'lumen.following.updates': 'جديد لك',
       'lumen.following.whatYouFollow': 'ما تتابعه',
       'lumen.franchise.addError': 'تعذرت إضافة العلاقة',
       'lumen.franchise.addRelationship': 'إضافة علاقة',
@@ -4765,6 +4770,8 @@ export const localeData = [
       'lumen.music.sort.yearAscending': 'هذا العام (تصاعديًا)',
       'lumen.music.subtitle': 'اطلب ألبومًا لإضافته إلى مكتبتك الموسيقية.',
       'lumen.music.title': 'الموسيقى',
+      'lumen.music.oneSong': 'أغنية واحدة',
+      'lumen.music.playCount': '{count} استماع',
       'lumen.music.trackCountMany': '{count} مقاطع',
       'lumen.music.trackCountOne': '{count} مقطع',
       'lumen.music.trackRequests': 'طلبات المقاطع',
@@ -13661,7 +13668,7 @@ export const localeData = [
       'components.SoftwareCatalog.windows': 'Windows',
       'components.RequestModal.Music.requestmusic': 'Request Music',
       'components.RequestModal.Music.backendRequestFailed':
-        'The request was submitted, but Lidarr rejected it while processing.',
+        'The request was submitted, but the music service rejected it while processing.',
       'components.RequestModal.Music.requesterror':
         'Something went wrong while submitting the request.',
       'components.IssueList.IssueItem.issuereason': 'Reason',
@@ -15703,7 +15710,12 @@ export const localeData = [
       'lumen.followButton.updateFailed': 'Couldn’t update Following',
       'lumen.following.accessRequired':
         'Request access is required to use Following.',
+      'lumen.following.description':
+        'Personal news about the people, production companies, networks, genres, narrators, series, games, artists, and projects you follow. Each item explains why it appeared.',
       'lumen.following.from': 'From {subject}',
+      'lumen.following.howBody':
+        'Press Follow on a person, production company, network, genre, narrator, series, game, artist, or patch project. The first check can show up to three current upcoming titles per media type; later checks add new recent or upcoming items. SeerrNG checks about every 30 minutes. A listed release date does not confirm library availability. Nothing is requested for you unless you turn on Request Automatically, which is limited to books.',
+      'lumen.following.howHeading': 'How Following Works',
       'lumen.following.loadingSubscriptions': 'Loading subscriptions…',
       'lumen.following.loadingUpdates': 'Loading updates…',
       'lumen.following.markAllSeen': 'Mark All Seen ({count})',
@@ -15746,7 +15758,7 @@ export const localeData = [
       'lumen.following.saveFailure': 'Couldn’t save the change',
       'lumen.following.stopFollowing': 'Stop Following',
       'lumen.following.stopFollowingSubject': 'Stop Following: {subject}',
-      'lumen.following.updates': 'Updates',
+      'lumen.following.updates': 'New for You',
       'lumen.following.whatYouFollow': 'What You Follow',
       'lumen.franchise.addError': 'Couldn’t add the relationship',
       'lumen.franchise.addRelationship': 'Add Relationship',
@@ -16708,6 +16720,8 @@ export const localeData = [
       'lumen.music.subtitle':
         'Request an album and it lands in your music library.',
       'lumen.music.title': 'Music',
+      'lumen.music.oneSong': '1 song',
+      'lumen.music.playCount': '{count} plays',
       'lumen.music.trackCountMany': '{count} tracks',
       'lumen.music.trackCountOne': '{count} track',
       'lumen.music.trackRequests': 'Track Requests',
@@ -19571,6 +19585,56 @@ export const localeData = [
       'lumen.videoRating.loadFailed': 'Ratings could not be loaded.',
       'lumen.manageVideo.downloadClient': 'Client: {name}',
       'lumen.manageVideo.liveSeeds': 'Seeds: {count}',
+      'lumen.admin.dest.aurral': 'Aurral Services',
+      'lumen.collectors.unavailableSocial':
+        'Collector picks require social federation to be enabled.',
+      'lumen.music.all': 'All',
+      'lumen.music.artists': 'Artists',
+      'lumen.music.browseCatalog': 'Browse catalog',
+      'lumen.music.genres': 'Genres',
+      'lumen.music.genresArtists': '{genre} artists',
+      'lumen.music.newReleases': 'New releases',
+      'lumen.music.noGenreMatches': 'No artists found for this genre.',
+      'lumen.music.noRequests': 'No music requests yet.',
+      'lumen.music.noResults': 'Try another artist, album, or song.',
+      'lumen.music.noResultsTitle': 'Nothing found',
+      'lumen.music.requestSong': 'Request song',
+      'lumen.music.requestTrack': 'Request Track',
+      'lumen.music.requestingTrack': 'Requesting…',
+      'lumen.music.requestedSongToast': 'Requested {title}',
+      'lumen.music.requestSongFailed': 'Could not request this song.',
+      'lumen.music.requestStatus.searching': 'Searching',
+      'lumen.music.requestStatus.declined': 'Declined',
+      'lumen.music.requestStatus.failed': 'Failed',
+      'lumen.music.requestStatus.cancelled': 'Cancelled',
+      'lumen.music.searchPlaceholderAurral':
+        'Search songs, albums, and artists…',
+      'lumen.music.seeAllSongs': 'See all songs',
+      'lumen.music.shortcuts': 'Music shortcuts',
+      'lumen.music.singlesEps': 'Singles & EPs',
+      'lumen.music.songs': 'Songs',
+      'lumen.music.subtitleAurral':
+        'Request an album and Aurral adds it to your music library.',
+      'lumen.music.topResult': 'Top result',
+      'lumen.music.topSongs': 'Top songs',
+      'lumen.music.trendingArtists': 'Trending artists',
+      'lumen.music.trendingSongs': 'Trending songs',
+      'lumen.music.type.album': 'Album',
+      'lumen.music.type.artist': 'Artist',
+      'lumen.music.type.song': 'Song',
+      'lumen.music.viewAll': 'View all',
+      'lumen.music.yourRequests': 'Your music requests',
+      'lumen.requests.openInAurral': 'Open in Aurral',
+      'lumen.requests.openTrackRequests': 'Open Track Requests',
+      'lumen.shell.searchMusic': 'Search albums and artists…',
+      'lumen.songIdentify.unavailable':
+        'Song identification requires an administrator to connect slskdN.',
+      'lumen.songIdentify.unavailableAurral':
+        'Song identification is unavailable until an administrator enables track requests in Aurral.',
+      'lumen.trackRequests.unavailable':
+        'Track requests are unavailable until an administrator connects Aurral or slskdN.',
+      'lumen.trackRequests.unavailableAurral':
+        'Track requests are unavailable until an administrator enables them in Aurral.',
     },
   },
   {
@@ -28572,7 +28636,12 @@ export const localeData = [
       'lumen.followButton.updateFailed': 'Impossible de modifier le suivi',
       'lumen.following.accessRequired':
         'L’accès aux demandes est requis pour utiliser le suivi.',
+      'lumen.following.description':
+        'Actualités personnelles sur les personnes, sociétés de production, réseaux, genres, narrateurs, séries, jeux, artistes et projets que vous suivez. Chaque élément explique sa présence ici.',
       'lumen.following.from': 'De {subject}',
+      'lumen.following.howBody':
+        "Suivez une personne, une société de production, un réseau, un genre, un narrateur, une série, un jeu, un artiste ou un projet de correctif. La première vérification peut afficher jusqu'à trois titres à venir par type de média. Les vérifications suivantes ajoutent des nouveautés récentes ou à venir. SeerrNG vérifie environ toutes les 30 minutes. Une date de sortie indiquée ne confirme pas la disponibilité dans la bibliothèque. Aucune demande n'est effectuée automatiquement, sauf si vous activez cette option, réservée aux livres.",
+      'lumen.following.howHeading': 'Fonctionnement du suivi',
       'lumen.following.loadingSubscriptions': 'Chargement des abonnements…',
       'lumen.following.loadingUpdates': 'Chargement des mises à jour…',
       'lumen.following.markAllSeen': 'Tout marquer comme vu ({count})',
@@ -28617,7 +28686,7 @@ export const localeData = [
         'Impossible d’enregistrer cette modification',
       'lumen.following.stopFollowing': 'Ne plus suivre',
       'lumen.following.stopFollowingSubject': 'Ne plus suivre : {subject}',
-      'lumen.following.updates': 'Mises à jour',
+      'lumen.following.updates': 'Nouveautés pour vous',
       'lumen.following.whatYouFollow': 'Vos abonnements',
       'lumen.franchise.addError': 'Impossible d’ajouter la relation',
       'lumen.franchise.addRelationship': 'Ajouter une relation',
@@ -29723,6 +29792,8 @@ export const localeData = [
       'lumen.music.subtitle':
         'Demandez un album pour l’ajouter à votre bibliothèque musicale.',
       'lumen.music.title': 'Musique',
+      'lumen.music.oneSong': '1 chanson',
+      'lumen.music.playCount': '{count} écoutes',
       'lumen.music.trackCountMany': '{count} pistes',
       'lumen.music.trackCountOne': '{count} piste',
       'lumen.music.trackRequests': 'Demandes de titres',

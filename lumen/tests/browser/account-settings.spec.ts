@@ -121,6 +121,65 @@ test('password and Episode Queue bookmarks scroll to the selected section after 
   ).toBeVisible();
 });
 
+test('Classic self-service settings bookmarks open every matching Lumen section', async ({
+  page,
+}) => {
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const { pathname } = new URL(route.request().url());
+    const responses: Record<string, object> = {
+      '/api/v1/auth/me': {
+        id: 2,
+        displayName: 'Manager',
+        permissions: 2,
+        userType: 2,
+      },
+      '/api/v1/settings/public': { enabledMediaCategories: {} },
+      '/api/v1/user/2/settings/main': { username: 'Manager' },
+      '/api/v1/user/2/settings/password': { hasPassword: true },
+      '/api/v1/user/2/settings/tv-season-watch-gate': {
+        status: 'off',
+        globallyEnabled: false,
+      },
+      '/api/v1/user/2/settings/episode-queue': { defaultEpisodeCount: 2 },
+    };
+    return route.fulfill({ json: responses[pathname] ?? {} });
+  });
+
+  for (const [bookmark, destination] of [
+    ['/settings/password?from=native', '/me/account?from=native#password'],
+    [
+      '/settings/permissions?from=native',
+      '/me/account?from=native#account-permissions',
+    ],
+    [
+      '/settings/maturity?from=native',
+      '/me/account?from=native#maturity-controls',
+    ],
+    [
+      '/settings/client-tokens?from=native',
+      '/me/account/client-tokens?from=native',
+    ],
+    [
+      '/settings/linked-accounts?from=native',
+      '/me/account/linked-accounts?from=native',
+    ],
+    [
+      '/settings/tv-request-access?from=native',
+      '/me/account/tv-requests?from=native',
+    ],
+    [
+      '/settings/episode-queue?from=native',
+      '/me/account/tv-requests?from=native#episode-queue',
+    ],
+  ] as const) {
+    await page.goto(appPath(bookmark));
+    await expect(page).toHaveURL(
+      new URL(appPath(destination), page.url()).href
+    );
+  }
+});
+
 test('advanced theme controls are limited to administrator accounts', async ({
   page,
 }) => {
@@ -227,6 +286,9 @@ test('user managers can open and confirm their own maturity controls', async ({
   await page.goto(appPath('/users/2/settings/maturity?from=native'));
   await expect(page).toHaveURL(/\/me\/account\?from=native#maturity-controls$/);
   await expect(page.getByLabel('Movie Rating Limit')).toHaveValue('PG-13');
+  await page.goto(appPath('/settings/maturity?from=native'));
+  await expect(page).toHaveURL(/\/me\/account\?from=native#maturity-controls$/);
+  await expect(page.getByLabel('Movie Rating Limit')).toHaveValue('PG-13');
 });
 
 test('regular accounts do not load user maturity controls', async ({
@@ -261,6 +323,10 @@ test('regular accounts do not load user maturity controls', async ({
   await expect(page.locator('#maturity-controls')).toHaveCount(0);
   expect(maturityReads).toBe(0);
   await page.goto(appPath('/users/2/settings/maturity?from=native'));
+  await expect(page).toHaveURL(/\/me\/account\?from=native#maturity-controls$/);
+  await expect(page.locator('#maturity-controls')).toHaveCount(0);
+  expect(maturityReads).toBe(0);
+  await page.goto(appPath('/settings/maturity?from=native'));
   await expect(page).toHaveURL(/\/me\/account\?from=native#maturity-controls$/);
   await expect(page.locator('#maturity-controls')).toHaveCount(0);
   expect(maturityReads).toBe(0);
@@ -962,10 +1028,13 @@ test('display language persists and localizes the shell and account settings', a
   // The mobile tab bar yields while scrolling through this long form. Return to
   // its visible state before checking the newly localized navigation labels.
   await page.evaluate(() => window.scrollTo(0, 0));
-  await expect(page.getByRole('link', { name: 'Découvrir' })).toBeVisible();
+  const primaryNavigation = page.locator('#mobile-primary-navigation');
   await expect(
-    page.getByRole('link', { name: 'Demandes' }).first()
-  ).toBeVisible();
+    primaryNavigation.locator('a').filter({ hasText: /^Découvrir$/ })
+  ).toHaveCount(1);
+  await expect(
+    primaryNavigation.locator('a').filter({ hasText: /^Demandes$/ })
+  ).toHaveCount(1);
   await expect(
     page.getByRole('heading', { name: 'Paramètres utilisateur' })
   ).toBeVisible();

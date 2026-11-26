@@ -316,6 +316,8 @@ body.is-detail .tabbar {
   color: var(--ink);
   outline: none;
   min-width: 0;
+  /* a long placeholder ends in an ellipsis on narrow phones instead of a cut letter */
+  text-overflow: ellipsis;
 }
 .search input::placeholder,
 .search .ph-text {
@@ -364,6 +366,7 @@ body.is-detail .tabbar {
   flex: 1 0 auto;
 }
 .seg [aria-pressed='true'],
+.seg [aria-selected='true'],
 .seg [aria-current='page'] {
   background: var(--surface);
   color: var(--ink);
@@ -439,6 +442,16 @@ body.is-detail .tabbar {
 }
 .sel[data-layout='stacked'] select {
   width: 100%;
+}
+@media (max-width: 699px) {
+  .sel[data-layout='stacked-mobile'] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .sel[data-layout='stacked-mobile'] select {
+    width: 100%;
+  }
 }
 .sel input[type='month'] {
   min-width: 0;
