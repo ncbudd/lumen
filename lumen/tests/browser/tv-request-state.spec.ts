@@ -30,6 +30,11 @@ const req = (nums: number[], status = 2, is4k = false) => ({
 });
 type RecordedPost = { path: string; body: unknown };
 const isBaseline = process.env.LUMEN_TV_REQUEST_BASELINE === 'true';
+const shortcutLabels = {
+  en: { latest: 'Latest season only', clear: 'Clear' },
+  fr: { latest: 'Uniquement la dernière saison', clear: 'Effacer' },
+  ar: { latest: 'الموسم الأخير فقط', clear: 'مسح' },
+} as const;
 
 async function captureRequestState(
   page: Page,
@@ -59,8 +64,10 @@ async function show(
   settings: Record<string, unknown> = {},
   seriesSeasons: typeof seasons = seasons,
   locale?: string,
-  failRequest = false
+  failRequest = false,
+  failSavedItemRead = false
 ) {
+  let mediaServerSaved = false;
   await page.route('https://**/*', (r) => r.abort());
   await page.route('**/lumen-config.json', (r) => r.fulfill({ json: {} }));
   await page.route('**/imageproxy/tmdb/**', (r) =>
@@ -82,6 +89,32 @@ async function show(
       return r.fulfill({ json: { status: 'off', defaultEpisodeCount: 0 } });
     if (path === '/user/1/settings/tv-season-watch-gate')
       return r.fulfill({ json: { status: 'off', globallyEnabled: false } });
+    if (path === '/tv/84773/media-server-saved-item') {
+      if (failSavedItemRead)
+        return r.fulfill({
+          status: 503,
+          json: { message: 'Internal Server Error' },
+        });
+      if (r.request().method() === 'POST') {
+        mediaServerSaved = !!r.request().postDataJSON().saved;
+        return r.fulfill({
+          json: {
+            serverType: 1,
+            kind: 'watchlist',
+            available: true,
+            saved: mediaServerSaved,
+          },
+        });
+      }
+      return r.fulfill({
+        json: {
+          serverType: 1,
+          kind: 'watchlist',
+          available: true,
+          saved: mediaServerSaved,
+        },
+      });
+    }
     if (locale && path === '/user/1/settings/main')
       return r.fulfill({ json: { locale } });
     if (quota && path === '/user/1/quota')
@@ -117,6 +150,168 @@ async function show(
     return r.fulfill({ json: { results: [] } });
   });
   await page.goto(appPath('/tv/84773'));
+}
+
+for (const locale of ['en', 'fr', 'ar'] as const) {
+  test(`TV season selection shortcuts are localized and functional in ${locale}`, async ({
+    page,
+  }, testInfo) => {
+    const rows = page.locator('.srow');
+    await show(
+      page,
+      { status: 1, seasons: [], requests: [] },
+      [],
+      2,
+      undefined,
+      {},
+      seasons,
+      locale
+    );
+    await expect(rows).toHaveCount(3);
+    await captureRequestState(page, testInfo, `season-shortcuts-${locale}`);
+    if (isBaseline) return;
+
+    const labels = shortcutLabels[locale];
+    const shortcuts = page.locator('.shortcuts');
+    await shortcuts.getByRole('button', { name: labels.latest }).click();
+    await expect(rows.nth(0)).toHaveAttribute('aria-checked', 'false');
+    await expect(rows.nth(1)).toHaveAttribute('aria-checked', 'false');
+    await expect(rows.nth(2)).toHaveAttribute('aria-checked', 'true');
+
+    await shortcuts.getByRole('button', { name: labels.clear }).click();
+    for (let index = 0; index < 3; index++)
+      await expect(rows.nth(index)).toHaveAttribute('aria-checked', 'false');
+  });
+}
+
+for (const locale of ['en', 'fr', 'ar'] as const) {
+  test(`TV media-server save read failure is localized and retryable in ${locale}`, async ({
+    page,
+  }) => {
+    await show(
+      page,
+      { id: 2074, status: 3, requests: [], seasons: [] },
+      [],
+      32,
+      undefined,
+      { mediaServerType: 1 },
+      seasons,
+      locale,
+      false,
+      true
+    );
+    const strings = {
+      en: {
+        alert: 'The server had a problem. Try again in a moment.',
+        retry: 'Retry Plex Watchlist status',
+        button: 'Retry saved state',
+      },
+      fr: {
+        alert: 'Le serveur a rencontré un problème. Réessayez dans un instant.',
+        retry: 'Réessayer l’état de liste de suivi sur Plex',
+        button: 'Réessayer',
+      },
+      ar: {
+        alert: 'حدثت مشكلة في الخادم. حاول مجددًا بعد قليل.',
+        retry: 'إعادة التحقق من قائمة المتابعة في Plex',
+        button: 'إعادة المحاولة',
+      },
+    }[locale];
+    await page
+      .getByTestId('tv-media-server')
+      .locator('summary')
+      .first()
+      .click();
+    await expect(page.getByRole('alert')).toContainText(strings.alert);
+    const retry = page.getByRole('button', { name: strings.retry });
+    await expect(retry).toContainText(strings.button);
+    await retry.click();
+    await expect(page.getByRole('alert')).toContainText(strings.alert);
+  });
+}
+
+for (const locale of ['en', 'fr', 'ar'] as const) {
+  test(`TV media-server save control localizes its confirmed add in ${locale}`, async ({
+    page,
+  }, testInfo) => {
+    await show(
+      page,
+      { id: 2074, status: 3, requests: [], seasons: [] },
+      [],
+      32,
+      undefined,
+      { mediaServerType: 1 },
+      seasons,
+      locale
+    );
+    const strings = {
+      en: {
+        add: 'Add The Rings of Power to Plex Watchlist',
+        remove: 'Remove The Rings of Power from Plex Watchlist',
+        addButton: 'Add to Plex Watchlist',
+        removeButton: 'Remove from Plex Watchlist',
+        toast: 'Added to Plex Watchlist',
+      },
+      fr: {
+        add: 'Ajouter The Rings of Power à liste de suivi sur Plex',
+        remove: 'Retirer The Rings of Power de liste de suivi sur Plex',
+        addButton: 'Ajouter à liste de suivi sur Plex',
+        removeButton: 'Retirer de liste de suivi sur Plex',
+        toast: 'Ajouté à liste de suivi sur Plex.',
+      },
+      ar: {
+        add: 'إضافة The Rings of Power إلى قائمة المتابعة في Plex',
+        remove: 'إزالة The Rings of Power من قائمة المتابعة في Plex',
+        addButton: 'إضافة إلى قائمة المتابعة في Plex',
+        removeButton: 'إزالة من قائمة المتابعة في Plex',
+        toast: 'أُضيف إلى قائمة المتابعة في Plex.',
+      },
+    }[locale];
+    await page
+      .getByTestId('tv-media-server')
+      .locator('summary')
+      .first()
+      .click();
+    const action = page.getByRole('button', { name: strings.add });
+    await expect(action).toBeEnabled();
+    await expect(action).toContainText(strings.addButton);
+    const captureDir = process.env.LUMEN_MEDIA_SERVER_SAVED_CAPTURE_DIR;
+    if (
+      captureDir &&
+      locale === 'fr' &&
+      ['desktop', 'iphone'].includes(testInfo.project.name)
+    ) {
+      await action.evaluate((element) => {
+        element.innerHTML = element.innerHTML.replace(
+          'Ajouter à liste de suivi sur Plex',
+          'Add to Plex Watchlist'
+        );
+      });
+      await page.screenshot({
+        path: `${captureDir}/baseline-${testInfo.project.name}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      });
+      await page.reload();
+      await page
+        .getByTestId('tv-media-server')
+        .locator('summary')
+        .first()
+        .click();
+      await expect(action).toContainText(strings.addButton);
+      await page.screenshot({
+        path: `${captureDir}/candidate-${testInfo.project.name}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      });
+    }
+    await action.click();
+    const saved = page.getByRole('button', { name: strings.remove });
+    await expect(saved).toBeEnabled();
+    await expect(saved).toContainText(strings.removeButton);
+    await expect(saved).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText(strings.toast, { exact: true })).toBeVisible();
+  });
 }
 
 for (const locale of ['en', 'fr', 'ar'] as const) {
@@ -431,19 +626,57 @@ test('a 4K request does not lock standard seasons', async ({ page }) => {
   await expect(page.locator('.srow').first()).not.toHaveClass(/locked/);
 });
 
-test('a redacted foreign request uses a non-identifying requester label', async ({
-  page,
-}) => {
-  const foreign = req([1]);
-  delete (foreign as { requestedBy?: unknown }).requestedBy;
-  await show(
+for (const locale of ['en', 'fr', 'ar'] as const) {
+  test(`a redacted foreign request uses a non-identifying ${locale} requester label`, async ({
     page,
-    { id: 2074, status: 3, requests: [foreign], seasons: [] },
-    [],
-    32
-  );
-  await expect(page.locator('.rinfo')).toContainText('requested by someone');
-});
+  }, testInfo) => {
+    const foreign = req([1]);
+    delete (foreign as { requestedBy?: unknown }).requestedBy;
+    await show(
+      page,
+      { id: 2074, status: 3, requests: [foreign], seasons: [] },
+      [],
+      32,
+      undefined,
+      {},
+      seasons,
+      locale
+    );
+    const expected = {
+      en: 'requested by Unknown user',
+      fr: 'demandé par Utilisateur inconnu',
+      ar: 'طُلب بواسطة مستخدم غير معروف',
+    }[locale];
+    const row = page.locator('.rinfo li');
+    await expect(row).toContainText(expected);
+    const captureDir = process.env.LUMEN_TV_REDACTED_CAPTURE_DIR;
+    if (
+      captureDir &&
+      locale === 'fr' &&
+      ['desktop', 'iphone'].includes(testInfo.project.name)
+    ) {
+      const previous = 'demandé par someone';
+      await row.evaluate((element, replacement) => {
+        element.innerHTML = element.innerHTML.replace(
+          'demandé par Utilisateur inconnu',
+          replacement
+        );
+      }, previous);
+      await page.screenshot({
+        path: `${captureDir}/baseline-${testInfo.project.name}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      });
+      await page.reload();
+      await expect(page.locator('.rinfo li')).toContainText(expected);
+      await page.screenshot({
+        path: `${captureDir}/candidate-${testInfo.project.name}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      });
+    }
+  });
+}
 
 test('a fully available series says so and offers no request', async ({
   page,
@@ -904,6 +1137,7 @@ test('requests a full season when every episode metadata batch fails', async ({
   await expect(
     sheet.getByText('Request full seasons without episode details')
   ).toBeVisible();
+  await expect(sheet.locator('.setlist details')).toHaveCount(0);
   expect(batchQueries).toEqual([
     '1,2,3,4,5',
     '1,2,3,4,5',
@@ -917,9 +1151,24 @@ test('requests a full season when every episode metadata batch fails', async ({
     exact: true,
   });
   await seasonChoice.check();
-  await expect(
-    sheet.getByRole('button', { name: 'Request Selected Items' })
-  ).toBeEnabled();
+  const finalSeasonChoice = sheet.getByRole('checkbox', {
+    name: 'Season 12 20 episodes',
+    exact: true,
+  });
+  await finalSeasonChoice.check();
+  await expect(sheet.getByText('Selected: 2')).toBeVisible();
+  await finalSeasonChoice.scrollIntoViewIfNeeded();
+  const finalSeasonBounds = await finalSeasonChoice.boundingBox();
+  const submitButton = sheet.getByRole('button', {
+    name: 'Request Selected Items',
+  });
+  const submitBounds = await submitButton.boundingBox();
+  expect(finalSeasonBounds).not.toBeNull();
+  expect(submitBounds).not.toBeNull();
+  expect(finalSeasonBounds!.y + finalSeasonBounds!.height).toBeLessThanOrEqual(
+    submitBounds!.y
+  );
+  await expect(submitButton).toBeEnabled();
   if (['desktop', 'iphone'].includes(info.project.name))
     await page.screenshot({
       path: info.outputPath(
@@ -927,7 +1176,7 @@ test('requests a full season when every episode metadata batch fails', async ({
       ),
       fullPage: false,
     });
-  await sheet.getByRole('button', { name: 'Request Selected Items' }).click();
+  await submitButton.click();
   await expect(
     page.getByText('Episodes requested for The Rings of Power')
   ).toBeVisible();
@@ -939,8 +1188,8 @@ test('requests a full season when every episode metadata batch fails', async ({
         mediaId: 84773,
         is4k: false,
         monitorFutureSeasons: true,
-        seasons: [1],
-        seasonRequests: [{ seasonNumber: 1 }],
+        seasons: [1, 12],
+        seasonRequests: [{ seasonNumber: 1 }, { seasonNumber: 12 }],
       },
     },
   ]);

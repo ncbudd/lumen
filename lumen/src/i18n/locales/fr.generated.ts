@@ -2299,6 +2299,8 @@ export const messages = {
   'lumen.adminDiscovery.provider.simkl': 'Simkl',
   'lumen.adminDiscovery.provider.trakt': 'Trakt',
   'lumen.adminDiscovery.save': 'Enregistrer les identifiants de découverte',
+  'lumen.adminDiscovery.confirmFailure':
+    'Impossible de confirmer l’enregistrement des identifiants de découverte. Réessayez.',
   'lumen.adminDiscovery.saveFailure':
     'Impossible d’enregistrer les identifiants de découverte. Réessayez.',
   'lumen.adminDiscovery.saved':
@@ -4775,6 +4777,8 @@ export const messages = {
   'lumen.managedMaturity.what': 'limites de classification',
   'lumen.managedMediaCategories.accountOverrides':
     'Utilisation des paramètres personnalisés du compte.',
+  'lumen.managedMediaCategories.confirmFailure':
+    'Impossible de confirmer l’enregistrement. Vérifiez les valeurs actuelles et réessayez.',
   'lumen.managedMediaCategories.hide': 'Masquer',
   'lumen.managedMediaCategories.indexerDetails': 'Détails des indexeurs',
   'lumen.managedMediaCategories.indexerDisabled':
@@ -4787,6 +4791,7 @@ export const messages = {
     'Chargement des catégories de médias…',
   'lumen.managedMediaCategories.restore':
     'Restaurer les valeurs par défaut du serveur',
+  'lumen.managedMediaCategories.retry': 'Réessayer',
   'lumen.managedMediaCategories.save': 'Enregistrer les catégories',
   'lumen.managedMediaCategories.saveFailure':
     'Impossible d’enregistrer les catégories de médias.',
@@ -4818,6 +4823,8 @@ export const messages = {
   'lumen.managedQuotas.category.music': 'Musique',
   'lumen.managedQuotas.category.software': 'Logiciels',
   'lumen.managedQuotas.category.tv': 'Séries',
+  'lumen.managedQuotas.confirmFailure':
+    'Impossible de confirmer l’enregistrement du quota de demandes. Vérifiez les valeurs actuelles et réessayez.',
   'lumen.managedQuotas.days': 'Durée du quota en jours',
   'lumen.managedQuotas.description':
     'Laissez les deux champs vides pour utiliser la valeur par défaut du serveur.',
@@ -8714,4 +8721,51 @@ export const messages = {
   'lumen.bookRecommendations.seriesPart': '{series} nº {position}',
   'lumen.setup.step.defaults': 'Valeurs par défaut des nouveaux utilisateurs',
   'lumen.setup.libraryCount': '{count} bibliothèques',
+  'lumen.mediaServerSavedItem.addButton': 'Ajouter à {list} sur {server}',
+  'lumen.mediaServerSavedItem.addLabel':
+    'Ajouter {title} à {list} sur {server}',
+  'lumen.mediaServerSavedItem.added': 'Ajouté à {list} sur {server}.',
+  'lumen.mediaServerSavedItem.changeNotConfirmed':
+    'La modification n’a pas pu être confirmée.',
+  'lumen.mediaServerSavedItem.favorites': 'favoris',
+  'lumen.mediaServerSavedItem.linkAccount': 'Lier le compte {server}',
+  'lumen.mediaServerSavedItem.linkHelp':
+    'Liez votre compte {server} avant d’enregistrer cette série.',
+  'lumen.mediaServerSavedItem.loadFailed':
+    'Impossible de charger l’état enregistré de {server}.',
+  'lumen.mediaServerSavedItem.loadingButton': 'Chargement de {list}…',
+  'lumen.mediaServerSavedItem.loadingLabel':
+    'Chargement de {list} sur {server}',
+  'lumen.mediaServerSavedItem.missingHelp':
+    'Cette série ne figure pas dans le catalogue {server} auquel vous avez accès.',
+  'lumen.mediaServerSavedItem.notInCatalog':
+    'Cette série ne figure pas dans le catalogue {server} auquel vous avez accès.',
+  'lumen.mediaServerSavedItem.removeButton': 'Retirer de {list} sur {server}',
+  'lumen.mediaServerSavedItem.removeLabel':
+    'Retirer {title} de {list} sur {server}',
+  'lumen.mediaServerSavedItem.removed': 'Retiré de {list} sur {server}.',
+  'lumen.mediaServerSavedItem.retryBeforeChange':
+    'Impossible de confirmer l’état enregistré de {server}. Réessayez avant de le modifier.',
+  'lumen.mediaServerSavedItem.retryButton': 'Réessayer',
+  'lumen.mediaServerSavedItem.retryHelp':
+    'La nouvelle tentative relit l’état actuel. Elle ne répète pas l’ajout ni le retrait.',
+  'lumen.mediaServerSavedItem.retryLabel':
+    'Réessayer l’état de {list} sur {server}',
+  'lumen.mediaServerSavedItem.saveHelp':
+    'Enregistrez toute cette série dans {list} sur {server}. Cela ne modifie ni votre liste de suivi SeerrNG ni vos demandes.',
+  'lumen.mediaServerSavedItem.unavailableButton': '{list} indisponible',
+  'lumen.mediaServerSavedItem.unavailableLabel':
+    '{list} indisponible sur {server}',
+  'lumen.mediaServerSavedItem.updateFailed':
+    'Impossible de mettre à jour l’état enregistré de {server}.',
+  'lumen.mediaServerSavedItem.verifyFailed':
+    'Impossible de vérifier l’état enregistré.',
+  'lumen.mediaServerSavedItem.watchlist': 'liste de suivi',
+  'lumen.readerDelivery.browseIn': 'Parcourir {library} sur {service}',
+  'lumen.readerDelivery.ebooks': 'Livres numériques',
+  'lumen.readerDelivery.audiobooks': 'Livres audio',
+  'lumen.readerDelivery.comics': 'Bandes dessinées',
+  'lumen.readerDelivery.magazinePdfs': 'PDF de magazines',
+  'lumen.category.disabledForServer':
+    'La catégorie {category} est désactivée sur ce serveur.',
 } as const;

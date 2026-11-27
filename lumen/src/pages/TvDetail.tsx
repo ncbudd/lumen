@@ -854,7 +854,12 @@ export default function TvDetail() {
                   )}
                   {' · '}
                   {translate('lumen.tv.requestedBy', 'requested by {name}', {
-                    name: r.requestedBy?.displayName || 'someone',
+                    name:
+                      r.requestedBy?.displayName ||
+                      translate(
+                        'lumen.manageVideo.unknownUser',
+                        'Unknown user'
+                      ),
                   })}
                   {r.createdAt
                     ? ' · ' +
@@ -963,7 +968,10 @@ export default function TvDetail() {
                       className="btn btn-tonal btn-sm"
                       to="/me/account/linked-accounts"
                     >
-                      Link Playback Account
+                      {translate(
+                        'lumen.account.linked.linkAccount',
+                        'Link Account'
+                      )}
                     </Link>
                   )}
                 </div>
@@ -1017,10 +1025,13 @@ export default function TvDetail() {
                     className="chip"
                     onClick={() => setSel(new Set([Math.max(...missing)]))}
                   >
-                    Latest season only
+                    {translate(
+                      'lumen.tv.latestSeasonOnly',
+                      'Latest season only'
+                    )}
                   </button>
                   <button className="chip" onClick={() => setSel(new Set())}>
-                    Clear
+                    {translate('lumen.tv.clear', 'Clear')}
                   </button>
                 </div>
               )}

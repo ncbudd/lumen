@@ -2719,6 +2719,9 @@ test('music album Details and Artists remember scoped pins', async ({
   await page.route('**/api/v1/user/1/settings/main', (route) =>
     route.fulfill({ json: { enabledMediaCategories: { music: true } } })
   );
+  await page.route('**/api/v1/service/lidarr**', (route) =>
+    route.fulfill({ json: [] })
+  );
   await page.route(`**/api/v1/music/${album}`, (route) =>
     route.fulfill({
       json: {
@@ -2739,7 +2742,21 @@ test('music album Details and Artists remember scoped pins', async ({
           ],
         },
         'artist-credit': [{ name: 'Fixture Artist', artist: { id: artist } }],
-        tracks: [],
+        tracks: [
+          {
+            position: 1,
+            name: 'Fixture Track',
+            length: 180000,
+            recordingMbid: 'fixture-recording-1',
+            artists: [
+              { mbid: artist, name: 'Fixture Artist' },
+              {
+                mbid: 'fixture-featured-artist',
+                name: 'Featured Artist',
+              },
+            ],
+          },
+        ],
       },
     })
   );
@@ -2780,6 +2797,16 @@ test('music album Details and Artists remember scoped pins', async ({
   await expect(
     artists.getByRole('link', { name: 'Fixture Artist · Album Artist' })
   ).toHaveAttribute('href', testAppPath(`/artist/${artist}`));
+  await expect(
+    artists.getByRole('link', { name: 'Featured Artist · Track Artist' })
+  ).toHaveAttribute('href', testAppPath('/artist/fixture-featured-artist'));
+  const artistCapture = process.env.LUMEN_MUSIC_ARTISTS_PARITY_CAPTURE;
+  if (artistCapture) {
+    await page.screenshot({
+      path: `${artistCapture}-open-${test.info().project.name}.png`,
+      fullPage: true,
+    });
+  }
   const artistsPin = artists.getByRole('button', {
     name: 'Keep View Artists Open',
   });
@@ -10756,7 +10783,9 @@ test('Users sets an Episode Queue default for the selected account', async ({
   ).toBeDisabled();
 });
 
-test('Users saves and resets a selected media quota', async ({ page }) => {
+test('Users saves and resets a selected media quota', async ({
+  page,
+}, testInfo) => {
   await fixtures(page);
   await page.route(/\/api\/v1\/user\?/, (route) =>
     route.fulfill({
@@ -10767,6 +10796,7 @@ test('Users saves and resets a selected media quota', async ({ page }) => {
     })
   );
   const writes: unknown[] = [];
+  let persistQuota = false;
   let quotas: Record<string, number | null> = {
     globalMusicQuotaLimit: 4,
     globalMusicQuotaDays: 7,
@@ -10777,7 +10807,7 @@ test('Users saves and resets a selected media quota', async ({ page }) => {
     if (route.request().method() === 'POST') {
       const body = route.request().postDataJSON();
       writes.push(body);
-      quotas = { ...quotas, ...body };
+      if (persistQuota) quotas = { ...quotas, ...body };
     }
     return route.fulfill({ json: quotas });
   });
@@ -10798,13 +10828,39 @@ test('Users saves and resets a selected media quota', async ({ page }) => {
   await page.getByLabel('Request Limit').fill('2');
   await page.getByLabel('Quota Days').fill('14');
   await page.getByRole('button', { name: 'Save Quota' }).click();
+  await expect(
+    page
+      .getByRole('alert')
+      .filter({ hasText: 'Could not confirm the saved request quota.' })
+  ).toBeVisible();
+  await expect(page.getByLabel('Request Limit')).toHaveValue('2');
+  await expect(page.getByLabel('Quota Days')).toHaveValue('14');
+  if (
+    process.env.LUMEN_QUOTA_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(testInfo.project.name)
+  ) {
+    const { mkdir } = await import('node:fs/promises');
+    const { join } = await import('node:path');
+    await mkdir(process.env.LUMEN_QUOTA_CAPTURE_DIR, { recursive: true });
+    await page.screenshot({
+      path: join(
+        process.env.LUMEN_QUOTA_CAPTURE_DIR,
+        `candidate-${testInfo.project.name}-readback-error.png`
+      ),
+    });
+  }
+  persistQuota = true;
+  await page.getByRole('button', { name: 'Save Quota' }).click();
   await expect(page.getByText('Request quota saved.')).toBeVisible();
   await expect(page.getByLabel('Request Limit')).toHaveValue('2');
   await page.getByLabel('Request Limit').fill('');
   await page.getByLabel('Quota Days').fill('');
   await page.getByRole('button', { name: 'Save Quota' }).click();
   await expect(page.getByText('Request quota saved.')).toBeVisible();
+  await expect(page.getByLabel('Request Limit')).toHaveValue('');
+  await expect(page.getByLabel('Quota Days')).toHaveValue('');
   expect(writes).toEqual([
+    { musicQuotaLimit: 2, musicQuotaDays: 14 },
     { musicQuotaLimit: 2, musicQuotaDays: 14 },
     { musicQuotaLimit: null, musicQuotaDays: null },
   ]);
@@ -10812,7 +10868,7 @@ test('Users saves and resets a selected media quota', async ({ page }) => {
 
 test('Users changes media categories and indexer visibility independently', async ({
   page,
-}) => {
+}, testInfo) => {
   await fixtures(page);
   await page.route(/\/api\/v1\/user\?/, (route) =>
     route.fulfill({
@@ -10825,13 +10881,16 @@ test('Users changes media categories and indexer visibility independently', asyn
   const writes: unknown[] = [];
   let indexer: boolean | null = null;
   let override: Record<string, boolean> | null = null;
+  let persistCategories = false;
+  let persistIndexer = false;
   await page.route('**/api/v1/user/19/settings/main', (route) => {
     if (route.request().method() === 'POST') {
       const body = route.request().postDataJSON();
       writes.push(body);
-      if ('enabledMediaCategories' in body)
+      if ('enabledMediaCategories' in body && persistCategories)
         override = body.enabledMediaCategories;
-      if ('showIndexerDetails' in body) indexer = body.showIndexerDetails;
+      if ('showIndexerDetails' in body && persistIndexer)
+        indexer = body.showIndexerDetails;
     }
     return route.fulfill({
       json: {
@@ -10852,15 +10911,67 @@ test('Users changes media categories and indexer visibility independently', asyn
   const movies = page.getByRole('checkbox', { name: 'Movies', exact: true });
   await movies.uncheck();
   await page.getByRole('button', { name: 'Save Categories' }).click();
+  await expect(
+    page
+      .getByRole('alert')
+      .filter({ hasText: 'Could not confirm the saved settings.' })
+  ).toBeVisible();
+  await expect(movies).not.toBeChecked();
+  if (
+    process.env.LUMEN_QUOTA_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(testInfo.project.name)
+  ) {
+    const { mkdir } = await import('node:fs/promises');
+    const { join } = await import('node:path');
+    await mkdir(process.env.LUMEN_QUOTA_CAPTURE_DIR, { recursive: true });
+    await page.screenshot({
+      path: join(
+        process.env.LUMEN_QUOTA_CAPTURE_DIR,
+        `candidate-${testInfo.project.name}-category-readback-error.png`
+      ),
+    });
+  }
+  persistCategories = true;
+  await page.getByRole('button', { name: 'Save Categories' }).click();
   await expect(page.getByText('Using account overrides.')).toBeVisible();
   await expect(movies).not.toBeChecked();
   await page.getByRole('button', { name: 'Restore Server Defaults' }).click();
   await expect(page.getByText('Using server defaults.')).toBeVisible();
   await expect(movies).toBeChecked();
   const indexerDetails = page.getByLabel('Indexer Details');
+  const indexerField = page.locator('label.sel[data-layout="stacked-mobile"]');
+  await expect(indexerField.getByText('Indexer Details')).toBeVisible();
+  expect(
+    await indexerField.evaluate((element) => getComputedStyle(element).display)
+  ).toBe(
+    ['iphone', 'android'].includes(testInfo.project.name) ? 'grid' : 'flex'
+  );
   await expect(indexerDetails).toHaveValue('default');
   await movies.uncheck();
   await indexerDetails.selectOption('hide');
+  await expect(
+    page
+      .getByRole('alert')
+      .filter({ hasText: 'Could not confirm the saved settings.' })
+  ).toBeVisible();
+  await expect(indexerDetails).toHaveValue('hide');
+  if (
+    process.env.LUMEN_QUOTA_CAPTURE_DIR &&
+    ['desktop', 'iphone'].includes(testInfo.project.name)
+  ) {
+    const { mkdir } = await import('node:fs/promises');
+    const { join } = await import('node:path');
+    await indexerDetails.scrollIntoViewIfNeeded();
+    await mkdir(process.env.LUMEN_QUOTA_CAPTURE_DIR, { recursive: true });
+    await page.screenshot({
+      path: join(
+        process.env.LUMEN_QUOTA_CAPTURE_DIR,
+        `candidate-${testInfo.project.name}-indexer-readback-error.png`
+      ),
+    });
+  }
+  persistIndexer = true;
+  await page.getByRole('button', { name: 'Retry', exact: true }).click();
   await expect(page.getByText('Indexer visibility saved.')).toBeVisible();
   await expect(indexerDetails).toHaveValue('hide');
   await expect(movies).not.toBeChecked();
@@ -10868,7 +10979,9 @@ test('Users changes media categories and indexer visibility independently', asyn
   await expect(indexerDetails).toHaveValue('default');
   expect(writes).toEqual([
     { enabledMediaCategories: { movie: false } },
+    { enabledMediaCategories: { movie: false } },
     { enabledMediaCategories: null },
+    { showIndexerDetails: false },
     { showIndexerDetails: false },
     { showIndexerDetails: null },
   ]);

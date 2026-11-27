@@ -471,6 +471,33 @@ test('music home shows Play, preview and Get by what is in the library', async (
   await mockMusic(page, seen);
   await page.goto(testAppPath('/music'));
 
+  const share = page
+    .locator('#view')
+    .getByRole('link', { name: 'Share & Identify' });
+  const following = page
+    .locator('#view')
+    .getByRole('link', { name: 'Following' });
+  await expect(share).toHaveAttribute('href', testAppPath('/share'));
+  await expect(following).toHaveAttribute('href', testAppPath('/following'));
+  await expect(share).toBeInViewport();
+  await expect(following).toBeInViewport();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth
+      )
+    )
+    .toBe(true);
+  const captureDirectory = process.env.LUMEN_MUSIC_TOOLS_CAPTURE_DIR;
+  if (
+    captureDirectory &&
+    ['desktop', 'iphone'].includes(test.info().project.name)
+  )
+    await page.screenshot({
+      path: `${captureDirectory}/${test.info().project.name}.png`,
+      fullPage: true,
+    });
+
   const owned = page.locator('li', { hasText: 'Owned Song' });
   const play = owned.getByRole('link', { name: /Play Owned Song in Aurral/ });
   await expect(play).toBeVisible();
@@ -2701,6 +2728,51 @@ async function mockPodcasts(
     return route.fulfill({ status: 404, json: { message: 'Not found' } });
   });
 }
+
+test('podcast service status can recover after a temporary error', async ({
+  page,
+}, info) => {
+  const baseline = process.env.LUMEN_PODCAST_STATUS_BASELINE === '1';
+  let statusReads = 0;
+  await mockMusic(page, { previews: [], saved: [] });
+  await mockPodcasts(page, { subscribed: [], downloads: [], auto: [] });
+  await page.route('**/api/v1/podcast/status', (route) => {
+    statusReads += 1;
+    if (statusReads === 1) {
+      return route.fulfill({
+        status: 503,
+        json: { message: 'Temporary service outage' },
+      });
+    }
+    return route.fulfill({
+      json: {
+        configured: true,
+        libraryName: 'Podcasts',
+        canManage: true,
+      },
+    });
+  });
+  await page.goto(testAppPath('/podcasts'));
+  await expect(page.getByText('Podcasts could not load')).toBeVisible();
+  const retry = page.getByRole('button', { name: 'Try again' });
+  if (baseline) {
+    await expect(retry).toHaveCount(0);
+  } else {
+    await expect(retry).toBeVisible();
+  }
+  if (['desktop', 'iphone'].includes(info.project.name)) {
+    await page.screenshot({
+      path: info.outputPath(
+        `podcast-status-error-${baseline ? 'baseline' : 'candidate'}.png`
+      ),
+      fullPage: true,
+    });
+  }
+  if (baseline) return;
+  await retry.click();
+  await expect(page.getByRole('tab', { name: 'Discover' })).toBeVisible();
+  expect(statusReads).toBeGreaterThan(1);
+});
 
 test('Podcasts is its own section with Discover, search, your shows and activity', async ({
   page,

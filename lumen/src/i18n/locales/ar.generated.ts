@@ -2139,6 +2139,8 @@ export const messages = {
   'lumen.adminDiscovery.provider.simkl': 'Simkl',
   'lumen.adminDiscovery.provider.trakt': 'Trakt',
   'lumen.adminDiscovery.save': 'حفظ بيانات اعتماد الاستكشاف',
+  'lumen.adminDiscovery.confirmFailure':
+    'تعذر تأكيد حفظ بيانات اعتماد الاستكشاف. حاول مرة أخرى.',
   'lumen.adminDiscovery.saveFailure':
     'تعذر حفظ بيانات اعتماد الاستكشاف. حاول مرة أخرى.',
   'lumen.adminDiscovery.saved': 'تم حفظ بيانات اعتماد الاستكشاف.',
@@ -4385,6 +4387,8 @@ export const messages = {
   'lumen.managedMaturity.what': 'حدود التصنيف العمري',
   'lumen.managedMediaCategories.accountOverrides':
     'يستخدم إعدادات الحساب المخصصة.',
+  'lumen.managedMediaCategories.confirmFailure':
+    'تعذر تأكيد حفظ الإعدادات. راجع القيم الحالية ثم أعد المحاولة.',
   'lumen.managedMediaCategories.hide': 'إخفاء',
   'lumen.managedMediaCategories.indexerDetails': 'تفاصيل أدوات الفهرسة',
   'lumen.managedMediaCategories.indexerDisabled':
@@ -4395,6 +4399,7 @@ export const messages = {
     'تم حفظ إعدادات ظهور أدوات الفهرسة.',
   'lumen.managedMediaCategories.loading': 'جارٍ تحميل فئات الوسائط…',
   'lumen.managedMediaCategories.restore': 'استعادة الإعدادات الافتراضية للخادم',
+  'lumen.managedMediaCategories.retry': 'إعادة المحاولة',
   'lumen.managedMediaCategories.save': 'حفظ الفئات',
   'lumen.managedMediaCategories.saveFailure': 'تعذر حفظ فئات الوسائط.',
   'lumen.managedMediaCategories.saved': 'تم حفظ فئات الوسائط.',
@@ -4422,6 +4427,8 @@ export const messages = {
   'lumen.managedQuotas.category.music': 'موسيقى',
   'lumen.managedQuotas.category.software': 'برامج',
   'lumen.managedQuotas.category.tv': 'مسلسلات',
+  'lumen.managedQuotas.confirmFailure':
+    'تعذر تأكيد حفظ حصة الطلبات. راجع القيم الحالية ثم أعد المحاولة.',
   'lumen.managedQuotas.days': 'أيام الحصة',
   'lumen.managedQuotas.description':
     'اترك الحقلين فارغين لاستخدام الإعداد الافتراضي للخادم.',
@@ -8018,4 +8025,44 @@ export const messages = {
   'lumen.bookRecommendations.seriesPart': '{series}، رقم {position}',
   'lumen.setup.step.defaults': 'الإعدادات الافتراضية للمستخدمين الجدد',
   'lumen.setup.libraryCount': '{count} مكتبات',
+  'lumen.mediaServerSavedItem.addButton': 'إضافة إلى {list} في {server}',
+  'lumen.mediaServerSavedItem.addLabel': 'إضافة {title} إلى {list} في {server}',
+  'lumen.mediaServerSavedItem.added': 'أُضيف إلى {list} في {server}.',
+  'lumen.mediaServerSavedItem.changeNotConfirmed': 'تعذّر تأكيد التغيير.',
+  'lumen.mediaServerSavedItem.favorites': 'المفضلة',
+  'lumen.mediaServerSavedItem.linkAccount': 'ربط حساب {server}',
+  'lumen.mediaServerSavedItem.linkHelp':
+    'اربط حسابك في {server} قبل حفظ هذا المسلسل.',
+  'lumen.mediaServerSavedItem.loadFailed':
+    'تعذّر تحميل الحالة المحفوظة في {server}.',
+  'lumen.mediaServerSavedItem.loadingButton': 'جارٍ تحميل {list}…',
+  'lumen.mediaServerSavedItem.loadingLabel': 'جارٍ تحميل {list} في {server}',
+  'lumen.mediaServerSavedItem.missingHelp':
+    'هذا المسلسل غير موجود في فهرس {server} المتاح لك.',
+  'lumen.mediaServerSavedItem.notInCatalog':
+    'هذا المسلسل غير موجود في فهرس {server} المتاح لك.',
+  'lumen.mediaServerSavedItem.removeButton': 'إزالة من {list} في {server}',
+  'lumen.mediaServerSavedItem.removeLabel':
+    'إزالة {title} من {list} في {server}',
+  'lumen.mediaServerSavedItem.removed': 'أُزيل من {list} في {server}.',
+  'lumen.mediaServerSavedItem.retryBeforeChange':
+    'تعذّر تأكيد الحالة المحفوظة في {server}. أعد المحاولة قبل تغييرها.',
+  'lumen.mediaServerSavedItem.retryButton': 'إعادة المحاولة',
+  'lumen.mediaServerSavedItem.retryHelp':
+    'تعيد المحاولة قراءة الحالة الحالية ولا تكرر الإضافة أو الإزالة.',
+  'lumen.mediaServerSavedItem.retryLabel': 'إعادة التحقق من {list} في {server}',
+  'lumen.mediaServerSavedItem.saveHelp':
+    'احفظ المسلسل بالكامل في {list} في {server}. لن يغيّر ذلك قائمة متابعة SeerrNG أو حالة الطلب.',
+  'lumen.mediaServerSavedItem.unavailableButton': '{list} غير متاحة',
+  'lumen.mediaServerSavedItem.unavailableLabel': '{list} غير متاحة في {server}',
+  'lumen.mediaServerSavedItem.updateFailed':
+    'تعذّر تحديث الحالة المحفوظة في {server}.',
+  'lumen.mediaServerSavedItem.verifyFailed': 'تعذّر التحقق من الحالة المحفوظة.',
+  'lumen.mediaServerSavedItem.watchlist': 'قائمة المتابعة',
+  'lumen.readerDelivery.browseIn': 'تصفح {library} في {service}',
+  'lumen.readerDelivery.ebooks': 'الكتب الإلكترونية',
+  'lumen.readerDelivery.audiobooks': 'الكتب الصوتية',
+  'lumen.readerDelivery.comics': 'القصص المصورة',
+  'lumen.readerDelivery.magazinePdfs': 'ملفات المجلات PDF',
+  'lumen.category.disabledForServer': 'تم إيقاف فئة {category} على هذا الخادم.',
 } as const;
