@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
   api,
@@ -17,9 +17,12 @@ import {
   type BookResult,
   type Edition,
   type EditionList,
+  type RequestOptions,
 } from '../api';
 import { isAdministrator, useAuth } from '../auth';
 import BlocklistButton from '../components/BlocklistButton';
+import BookRequestOptions from '../components/BookRequestOptions';
+import BulkBookRequest from '../components/BulkBookRequest';
 import { StatLabel, statusOf } from '../components/cards';
 import {
   ActionBar,
@@ -34,6 +37,7 @@ import {
 import { ServiceNote } from '../components/extra';
 import FollowButton from '../components/FollowButton';
 import IndexerSearchLink from '../components/IndexerSearchLink';
+import { ManageMediaAction } from '../components/ManageMediaSheet';
 import OpenIssueReports from '../components/OpenIssueReports';
 import ReaderDeliveryLink from '../components/ReaderDeliveryLink';
 import ReportIssueButton from '../components/ReportIssueButton';
@@ -322,6 +326,37 @@ export default function BookDetail() {
   }
   const [pick, setPick] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [requestOptions, setRequestOptions] = useState<{
+    format: 'ebook' | 'audiobook';
+    options: RequestOptions;
+  }>({ format: f, options: {} });
+  const [requestOptionsReady, setRequestOptionsReady] = useState(true);
+  const onBookOptionsChange = useCallback(
+    (options: RequestOptions) => setRequestOptions({ format: f, options }),
+    [f]
+  );
+  const effectiveRequestOptions =
+    requestOptions.format === f ? requestOptions.options : {};
+  const quotaUserId = effectiveRequestOptions.userId ?? user?.id;
+  const quota = useApi<{
+    book?: {
+      limit?: number;
+      remaining?: number;
+      days?: number;
+      restricted?: boolean;
+    };
+  }>(quotaUserId ? `/user/${quotaUserId}/quota` : null, {
+    currentPathOnly: true,
+  });
+  const bookQuota = quota.data?.book;
+  const quotaReady = !!quota.data || !!quota.error;
+  const quotaBlocked = bookQuota?.restricted === true;
+  const requestDisabled =
+    busy ||
+    !requestOptionsReady ||
+    !quotaReady ||
+    !!quota.error ||
+    quotaBlocked;
   // set at once, unlike busy: a double tap can't send a request twice before the re-render
   const sending = useRef(false);
   const [justAsked, setJustAsked] = useState<Set<string>>(new Set());
@@ -419,6 +454,30 @@ export default function BookDetail() {
             request.bookFormat === 'both')
       )
     : undefined;
+  const visibleRequest = (() => {
+    const active = (b?.mediaInfo?.requests ?? []).filter((request) => {
+      const matchesFormat =
+        (request.bookFormat ?? 'ebook') === f || request.bookFormat === 'both';
+      if (!matchesFormat) return false;
+      if (request.status === 1 || request.status === 2) return true;
+      return (
+        request.status === 5 &&
+        (request.serviceTargets ?? []).some(
+          (target) =>
+            target.serviceType === 'readarr' &&
+            (target.format === f || target.format === 'both') &&
+            (target.status === MediaStatus.PENDING ||
+              target.status === MediaStatus.PROCESSING)
+        )
+      );
+    });
+    return (
+      active.find((request) => request.requestedBy?.id === user?.id) ??
+      (canManageRequests(user?.permissions) && active.length === 1
+        ? active[0]
+        : undefined)
+    );
+  })();
   const mayRequest = canRequestBook(user?.permissions);
   const approve = async () => {
     if (!pendingRequest || busy) return;
@@ -449,7 +508,13 @@ export default function BookDetail() {
     setBusy(true);
     try {
       // an ordinary request, so it goes through approval like any other
-      await requestBook(bookId, 'audiobook', row.id, 'alongside');
+      await requestBook(
+        bookId,
+        'audiobook',
+        row.id,
+        'alongside',
+        effectiveRequestOptions
+      );
       setJustAsked((x) => new Set(x).add(narratorKey(row.narrators)));
       setPick(null);
       toast(
@@ -490,7 +555,8 @@ export default function BookDetail() {
         bookId,
         f,
         exact || fallback,
-        exact ? 'only' : 'either'
+        exact ? 'only' : 'either',
+        effectiveRequestOptions
       );
       if (audio && showNarr && chosenRow)
         setJustAsked((x) => new Set(x).add(narratorKey(chosenRow.narrators)));
@@ -527,6 +593,13 @@ export default function BookDetail() {
           narrator: who(chosenRow, t),
         })
       : t('lumen.bookDetail.requestAudiobook', 'Request audiobook');
+  const canCustomizeRequest =
+    mayRequest &&
+    b.mediaInfo?.status !== MediaStatus.BLOCKLISTED &&
+    !pendingRequest &&
+    (audio && showNarr && anotherMode
+      ? !!chosenRow
+      : !available && !(s && s.k !== 'ok'));
   // with the admin's Audiobookshelf address this opens the book there; without one it's a plain
   // "in your library" status rather than a button that does nothing
   const inAbs = (listening: boolean) => {
@@ -576,7 +649,7 @@ export default function BookDetail() {
       chosenRow ? (
         <button
           className="btn btn-primary"
-          disabled={busy}
+          disabled={requestDisabled}
           onClick={requestAnother}
         >
           <Icon name="plus" />
@@ -603,7 +676,11 @@ export default function BookDetail() {
         <StatLabel s={s} />
       </button>
     ) : (
-      <button className="btn btn-primary" disabled={busy} onClick={request}>
+      <button
+        className="btn btn-primary"
+        disabled={requestDisabled}
+        onClick={request}
+      >
         <Icon name="plus" />
         {label}
       </button>
@@ -693,6 +770,32 @@ export default function BookDetail() {
               <StatLabel s={s} />
             </Pill>
           )}
+          {visibleRequest && (
+            <Link
+              className="chip"
+              to={`/requests?requestId=${visibleRequest.id}`}
+            >
+              {t(
+                'lumen.bookDetail.viewRequestFormat',
+                'View {format} request',
+                {
+                  format:
+                    visibleRequest.bookFormat === 'audiobook'
+                      ? t('lumen.bookDetail.audiobook', 'Audiobook')
+                      : t('lumen.bookDetail.ebook', 'Ebook'),
+                }
+              )}
+            </Link>
+          )}
+          <ManageMediaAction
+            mediaType="book"
+            title={b.title}
+            media={b.mediaInfo}
+            onUpdated={() => {
+              dropBookStates();
+              first.refresh();
+            }}
+          />
           <IndexerSearchLink
             category={audio ? 'audiobook' : 'ebook'}
             title={b.title}
@@ -707,6 +810,16 @@ export default function BookDetail() {
           />
           <ReaderDeliveryLink target={f} />
           <ReaderDownloads mediaId={b.mediaInfo?.id} type="book" format={f} />
+          {b.authorId && (
+            <BulkBookRequest
+              source={{ id: b.authorId, books: [b], nextOffset: 1 }}
+              onComplete={first.refresh}
+              buttonLabel={t(
+                'lumen.bulkBooks.requestBibliography',
+                'Request Bibliography'
+              )}
+            />
+          )}
           <ReportIssueButton type="book" title={b.title} media={b.mediaInfo} />
           {canViewFollowing(user?.permissions) && b.authorId && b.author && (
             <FollowButton
@@ -768,6 +881,50 @@ export default function BookDetail() {
             </p>
           )}
         </VideoDisclosure>
+        {canCustomizeRequest && (
+          <BookRequestOptions
+            key={f}
+            format={f}
+            onChange={onBookOptionsChange}
+            onReady={setRequestOptionsReady}
+            disabled={busy}
+          />
+        )}
+        {(bookQuota?.limit ?? 0) > 0 && (
+          <p className="note" role={quotaBlocked ? 'status' : undefined}>
+            {quotaBlocked
+              ? t(
+                  'lumen.bookDetail.quotaReached',
+                  'Your book request limit has been reached.'
+                )
+              : t(
+                  'lumen.bookDetail.quotaRemaining',
+                  '{remaining} of {limit} book requests remaining.',
+                  {
+                    remaining: bookQuota?.remaining ?? 0,
+                    limit: bookQuota?.limit ?? 0,
+                  }
+                )}
+            {!!bookQuota?.days &&
+              ` ${t('lumen.bookDetail.quotaPeriod', 'Quota period: {days} days.', { days: bookQuota.days })}`}
+          </p>
+        )}
+        {quota.error && (
+          <p className="note" role="alert">
+            {t(
+              'lumen.bookDetail.quotaLoadFailure',
+              'Could not check the book request limit. Retry before requesting.'
+            )}{' '}
+            <button className="chip" type="button" onClick={quota.reload}>
+              {t('lumen.bookDetail.recheckQuota', 'Recheck quota')}
+            </button>
+          </p>
+        )}
+        {!quotaReady && (
+          <p className="note" aria-busy="true">
+            {t('lumen.bookDetail.quotaLoading', 'Checking book request limit…')}
+          </p>
+        )}
         <div className="dcols">
           <div style={{ display: 'grid', gap: 22 }}>
             {b.description && <p className="ov long">{b.description.trim()}</p>}

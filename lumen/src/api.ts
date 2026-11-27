@@ -150,6 +150,7 @@ export interface MediaInfo {
     requestedBy?: { id?: number; displayName?: string };
     serviceTargets?: {
       serviceType?: string;
+      format?: string;
       serverId?: number;
       status?: number;
     }[];
@@ -188,6 +189,7 @@ export interface MediaInfo {
   status?: number;
   status4k?: number;
   serviceUrl?: string | null;
+  audiobookServiceUrl?: string | null;
   serviceUrl4k?: string | null;
   tautulliUrl?: string | null;
   tautulliUrl4k?: string | null;
@@ -530,6 +532,7 @@ export interface SeasonRequestSelection {
 }
 
 export interface RequestOptions {
+  monitorFutureSeasons?: boolean;
   is4k?: boolean;
   serverId?: number;
   profileId?: number;
@@ -549,7 +552,7 @@ export interface RequestOptions {
   ignoreQuota?: boolean;
   requestQuotaApproval?: boolean;
   bypassStreamingRequestPolicy?: boolean;
-  userId?: number; // request on someone else's behalf (admins)
+  userId?: number; // request on someone else's behalf (authorized managers)
 }
 const post = <T = { id: number }>(body: object) =>
   api<T>('/request', {
@@ -604,12 +607,14 @@ export const requestBook = (
   id: string,
   format: 'ebook' | 'audiobook',
   editionId?: string,
-  policy: 'only' | 'either' | 'alongside' = 'only'
+  policy: 'only' | 'either' | 'alongside' = 'only',
+  options: RequestOptions = {}
 ) =>
   post({
     mediaType: 'book',
     mediaId: bookIdFor(id, format),
     format,
+    ...options,
     ...(editionId
       ? { preferredEditionId: editionId, editionPolicy: policy }
       : {}),
