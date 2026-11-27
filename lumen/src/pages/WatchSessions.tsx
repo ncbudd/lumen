@@ -17,6 +17,7 @@ interface Summary {
   status: 'draft' | 'active';
   ownerId: number;
   memberCount: number;
+  expiresAt: string;
 }
 interface Filters {
   genreIds?: number[];
@@ -257,7 +258,8 @@ function SessionForm({
 }
 
 function SessionList() {
-  const { t } = useLumenLocale();
+  const { locale, t } = useLumenLocale();
+  const { user } = useAuth();
   const list = useApi<{ sessions: Summary[] }>(path);
   const navigate = useNavigate();
   return (
@@ -304,6 +306,19 @@ function SessionList() {
                       {t('lumen.watchSessions.memberCount', '{count} members', {
                         count: session.memberCount,
                       })}
+                      {session.ownerId === user?.id && (
+                        <>
+                          {' · '}
+                          {t('lumen.watchSessions.owner', 'Owner')}
+                        </>
+                      )}
+                    </small>
+                    <small>
+                      {t('lumen.watchSessions.expires', 'Expires {date}', {
+                        date: new Intl.DateTimeFormat(locale, {
+                          dateStyle: 'medium',
+                        }).format(new Date(session.expiresAt)),
+                      })}
                     </small>
                   </span>
                   <Link
@@ -335,7 +350,7 @@ function SessionList() {
 }
 
 function SessionRoom({ id }: { id: string }) {
-  const { t } = useLumenLocale();
+  const { locale, t } = useLumenLocale();
   const { user } = useAuth();
   const navigate = useNavigate();
   const endpoint = `${path}/${id}`;
@@ -435,6 +450,21 @@ function SessionRoom({ id }: { id: string }) {
               : t('lumen.watchSessions.waitingToStart', 'Waiting to Start')
           }
         >
+          <p className="note">
+            {session.status === 'active'
+              ? t('lumen.watchSessions.active', 'Active')
+              : t('lumen.watchSessions.draft', 'Draft')}{' '}
+            ·{' '}
+            {t('lumen.watchSessions.memberCount', '{count} members', {
+              count: session.memberCount,
+            })}{' '}
+            ·{' '}
+            {t('lumen.watchSessions.expires', 'Expires {date}', {
+              date: new Intl.DateTimeFormat(locale, {
+                dateStyle: 'medium',
+              }).format(new Date(session.expiresAt)),
+            })}
+          </p>
           <div className="setlist">
             {session.members.map((member) => (
               <div className="set cfg-row" key={member.id}>

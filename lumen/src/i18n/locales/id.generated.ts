@@ -1675,6 +1675,35 @@ export const messages = {
   'components.Discover.DiscoverAdult.unavailable':
     'Pencarian scene dewasa saat ini tidak tersedia.',
   'components.Discover.FilterPanel.filters': 'Filter',
+  'components.GameContent.addsNothing':
+    'Edisi ini tidak menambahkan apa pun yang belum Anda miliki.',
+  'components.GameContent.contentNotListed': 'Konten tidak terdaftar',
+  'components.GameContent.cosmetic': 'Kosmetik',
+  'components.GameContent.includes': 'Termasuk',
+  'components.GameContent.owned': 'Di Perpustakaan Anda',
+  'components.GameContent.story': 'Cerita',
+  'components.GameContent.typeBonus': 'Konten bonus',
+  'components.GameContent.typeCosmetic': 'Kosmetik',
+  'components.GameContent.typeDlc': 'Konten tambahan',
+  'components.GameContent.typeExpansion': 'Ekspansi',
+  'components.GameContent.typeSeasonPass': 'Tiket Musim',
+  'components.GameContent.typeSoundtrack': 'Soundtrack',
+  'components.GameContent.typeUnknown': 'Lainnya',
+  'components.GameLibrary.openCatalog': 'Buka dalam katalog',
+  'components.GameLibrary.requestApproved': 'Disetujui',
+  'components.GameLibrary.requestAvailable': 'Tersedia',
+  'components.GameLibrary.requestCancelled': 'Dibatalkan',
+  'components.GameLibrary.requestDeclined': 'Ditolak',
+  'components.GameLibrary.requestDownloading': 'Mengunduh',
+  'components.GameLibrary.requestFailed': 'Gagal',
+  'components.GameLibrary.requestGame': 'Minta game ini',
+  'components.GameLibrary.requestImporting': 'Mengimpor',
+  'components.GameLibrary.requestPending': 'Persetujuan tertunda',
+  'components.GameLibrary.requestSearching': 'Mencari',
+  'components.GameLibrary.requestStatus': 'Permintaan: {status}',
+  'components.GameLibrary.requestUnknown': 'Dalam proses',
+  'components.GameLibrary.requestWithdrawn': 'Ditarik',
+  'components.GameLibrary.sharedBy': 'Dibagikan oleh {owners}',
   'components.SoftwareCatalog.allPcPlatforms': 'Semua platform PC',
   'components.SoftwareCatalog.allSystems': 'Semua sistem',
   'components.SoftwareCatalog.genreFilter': 'Genre',
@@ -1683,6 +1712,8 @@ export const messages = {
   'components.SoftwareCatalog.linux': 'Linux',
   'components.SoftwareCatalog.macos': 'MaOS',
   'components.SoftwareCatalog.releaseYearFilter': 'Rilis tahun',
+  'components.SoftwareCatalog.steamOwnedDescription':
+    'QuestarrNG menemukan game ini di perpustakaan umum Steam yang tertaut. Ini mungkin tidak diinstal atau tersedia sebagai file QuestarrNG lokal.',
   'components.SoftwareCatalog.windows': 'Jendela',
   'components.RequestModal.Music.requestmusic': 'Permintaan Musik',
   'components.RequestModal.Music.backendRequestFailed':
@@ -1726,4 +1757,65 @@ export const messages = {
   'components.MusicDetails.Layout.artistType': 'Tipe Artis',
   'components.MusicDetails.Layout.musicBrainz': 'MusicBrainz',
   'components.MusicDetails.Layout.origin': 'Asal',
+  'components.MediaDetails.MetadataAttribution.label': 'Sumber metadata',
+  'components.MediaDetails.MetadataAttribution.licenseInformation':
+    '{license} informasi lisensi',
+  'components.MediaDetails.MetadataAttribution.tmdb': 'TMDB',
+  'components.MediaDetails.MetadataAttribution.tmdbTitle':
+    'Lihat sumber metadata di TMDB.',
+  'components.MediaDetails.MetadataAttribution.tvdb': 'TheTVDB.com',
+  'components.MediaDetails.MetadataAttribution.tvdbTitle':
+    'Metadata disediakan oleh TheTVDB. Atribusi sumber wajib dicantumkan.',
+  'components.MediaDetails.MetadataAttribution.tvmaze': 'TVmaze (diadaptasi)',
+  'components.MediaDetails.MetadataAttribution.tvmazeTitle':
+    'Metadata TVmaze diadaptasi dan dibagikan berdasarkan lisensi CC BY-SA 4.0.',
+  'components.MediaDetails.MetadataAttribution.wikidata': 'Wikidata',
+  'components.MediaDetails.MetadataAttribution.wikidataTitle':
+    'Data Wikidata terstruktur dibagi di bawah CC0.',
+  'components.TvDetails.Layout.director': 'Sutradara',
+  'components.TvDetails.Layout.writers': 'Penulis',
+  'components.MovieSummaryCard.screenplay': 'Skenario',
+  'components.Setup.defaultsTitle': 'Atur default untuk pengguna baru',
+  'components.Setup.defaultsDescription':
+    'Pilih apa yang dapat diminta pengguna saat bergabung. Permintaan tetap mengikuti aturan persetujuan dan kuota Anda.',
+  'components.Setup.defaultsTip':
+    'Anda dapat mengubah default ini atau menyesuaikan pengguna individu nanti di Pengaturan.',
+  'components.Setup.requestAccess': 'Izinkan pengguna baru untuk meminta media',
+  'components.Setup.requestAccessDescription':
+    'Beri pengguna baru akses untuk meminta item dalam kategori yang Anda aktifkan.',
+  'components.Setup.enable4k': 'Aktifkan opsi permintaan 4K',
+  'components.Setup.enable4kDescription':
+    'Buat permintaan 4K tersedia di seluruh SeerrNG. Tambahkan tujuan 4K Radarr atau Sonarr terpisah di bawah Film & TV.',
+  'components.Setup.request4k': 'Izinkan pengguna baru untuk meminta dalam 4K',
+  'components.Setup.request4kDescription':
+    'Ini adalah izin bawaan untuk pengguna baru. Memerlukan akses permintaan dan opsi 4K diaktifkan.',
+  'components.Setup.partialRequests': 'Izinkan permintaan musim TV parsial',
+  'components.Setup.partialRequestsDescription':
+    'Izinkan pengguna untuk meminta episode tertentu alih-alih musim penuh. Ini berlaku untuk semua orang.',
+  'components.Setup.defaultsLoadError': 'Default pengguna tidak dapat dimuat.',
+  'components.Setup.defaultsSaveError':
+    'Default pengguna tidak dapat disimpan. Coba lagi.',
+  'components.Setup.skipDefaults': 'Lewati untuk sekarang',
+  'components.Setup.saveDefaults': 'Simpan bawaan dan lanjutkan',
+  'components.Setup.savingDefaults': 'Menyimpan…',
+  'components.Setup.enabledRequestTypes': 'Jenis permintaan yang diaktifkan',
+  'components.Setup.enabledMediaLibraries':
+    'Perpustakaan media yang diaktifkan',
+  'components.Setup.noneEnabled': 'Tidak ada yang diaktifkan',
+  'components.Setup.requiredSetupComplete':
+    'Pengaturan wajib telah selesai. Koneksi layanan bersifat opsional dan dapat diuji di formulir di bawah.',
+  'components.Setup.serviceTestNote':
+    'Hasil uji koneksi ditampilkan di setiap formulir layanan dan tidak disimpan sebagai status pengaturan.',
+  'components.Setup.categoryMovie': 'Film',
+  'components.Setup.categoryTv': 'TV',
+  'components.Setup.categoryMusic': 'Musik',
+  'components.Setup.categoryEbook': 'Buku',
+  'components.Setup.categoryAudiobook': 'Buku audio',
+  'components.Setup.categoryComic': 'Komik',
+  'components.Setup.categoryMagazine': 'Majalah',
+  'components.Setup.categoryAdult': 'Dewasa',
+  'components.Setup.categorySports': 'Olahraga',
+  'components.Setup.categoryRetro': 'Game retro',
+  'components.Setup.categoryModern': 'Game modern',
+  'components.Setup.categoryGame': 'Game PC',
 } as const;

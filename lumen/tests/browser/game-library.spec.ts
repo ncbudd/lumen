@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 
 const appPath = (path: string) =>
   `${process.env.LUMEN_TEST_MOUNT ? '/lumen' : ''}${path}`;
+const apiPath = (pathname: string) =>
+  pathname.replace(/^\/lumen(?=\/)/, '').slice('/api/v1'.length);
 
 test('My Games keeps private edits separate from household results', async ({
   page,
@@ -27,7 +29,7 @@ test('My Games keeps private edits separate from household results', async ({
   await page.route('**/api/v1/**', (route) => {
     const request = route.request();
     const url = new URL(request.url());
-    const path = url.pathname.slice('/api/v1'.length);
+    const path = apiPath(url.pathname);
     if (path === '/game-library/4' && request.method() === 'PATCH') {
       const body = request.postDataJSON();
       expect(body).toMatchObject({
@@ -75,9 +77,24 @@ test('My Games keeps private edits separate from household results', async ({
               category: 'game',
               catalogId: 22,
               playtimeMinutes: 60,
+              ownerCount: 2,
               owners: [
-                { id: 2, displayName: 'Friend' },
-                { id: 3, displayName: 'Neighbour' },
+                {
+                  id: 2,
+                  displayName: 'Friend',
+                  status: 'playing',
+                  storeName: 'Steam',
+                  platformName: 'Windows',
+                  playtimeMinutes: 45,
+                },
+                {
+                  id: 3,
+                  displayName: 'Neighbour',
+                  status: 'completed',
+                  storeName: 'GOG',
+                  platformName: 'Linux',
+                  playtimeMinutes: 15,
+                },
               ],
             },
           ],
@@ -130,7 +147,9 @@ test('My Games keeps private edits separate from household results', async ({
   ).toHaveCount(0);
   expect(removed).toBe(true);
 
-  await page.getByRole('link', { name: 'Household Games' }).click();
+  await page
+    .locator(`a[href="${appPath('/game-library?view=shared')}"]`)
+    .click();
   await expect(
     page.getByRole('link', { name: 'Shared Fixture' })
   ).toHaveAttribute('href', appPath('/game/game/22'));
@@ -140,6 +159,310 @@ test('My Games keeps private edits separate from household results', async ({
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth)
   ).toBeLessThanOrEqual(page.viewportSize()!.width);
+});
+
+test('My Games exposes request and catalog actions from private and shared games', async ({
+  page,
+}, testInfo) => {
+  const locale = process.env.LUMEN_GAME_LIBRARY_REQUEST_LOCALE ?? 'en';
+  const labels = {
+    en: {
+      request: 'Request this game',
+      catalog: 'Open in catalog',
+      ownerCount: 'Owner Count: 2',
+      sharedBy: 'Shared by Friend, Neighbour',
+      requestStatus: 'Request: Downloading',
+      requestHistory: 'Request History',
+      friend: 'Friend: Playing · Steam · Windows · 80 minutes played',
+      neighbour: 'Neighbour: Completed · GOG · Linux · 125 minutes played',
+    },
+    fr: {
+      request: 'Demander ce jeu',
+      catalog: 'Ouvrir dans le catalogue',
+      ownerCount: 'Nombre de propriétaires: 2',
+      sharedBy: 'Partagé par Friend, Neighbour',
+      requestStatus: 'Demande: Téléchargement en cours',
+      requestHistory: 'Historique des demandes',
+      friend: 'Friend: En cours · Steam · Windows · 80 minutes jouées',
+      neighbour: 'Neighbour: Terminé · GOG · Linux · 125 minutes jouées',
+    },
+    ar: {
+      request: 'اطلب هذه اللعبة',
+      catalog: 'افتح في الكتالوج',
+      ownerCount: 'عدد المالكين: ٢',
+      sharedBy: 'تمت المشاركة بواسطة Friend, Neighbour',
+      requestStatus: 'الطلب: جارٍ التنزيل',
+      requestHistory: 'سجل الطلبات',
+      friend: 'Friend: قيد اللعب · Steam · Windows · ٨٠ دقيقة لعب',
+      neighbour: 'Neighbour: مكتملة · GOG · Linux · ١٢٥ دقيقة لعب',
+    },
+  } as const;
+  const copy = labels[locale as keyof typeof labels] ?? labels.en;
+  const entries = [
+    {
+      id: 41,
+      title: 'Catalog Game',
+      category: 'retro',
+      catalogId: 41,
+      status: 'backlog',
+      isOwned: true,
+      steamOwned: false,
+      shareWithHousehold: true,
+      storeName: '',
+      platformName: '',
+      playtimeMinutes: 0,
+      request: { id: 41, status: 'downloading' },
+    },
+    {
+      id: 42,
+      title: 'Manual Game',
+      category: 'modern',
+      catalogId: null,
+      status: 'backlog',
+      isOwned: false,
+      steamOwned: false,
+      shareWithHousehold: false,
+      storeName: '',
+      platformName: '',
+      playtimeMinutes: 0,
+      request: null,
+    },
+  ];
+  const shared = [
+    {
+      key: 'catalog',
+      title: 'Shared Catalog Game',
+      category: 'game',
+      catalogId: 22,
+      playtimeMinutes: 0,
+      ownerCount: 2,
+      owners: [
+        {
+          id: 2,
+          displayName: 'Friend',
+          status: 'playing',
+          storeName: 'Steam',
+          platformName: 'Windows',
+          playtimeMinutes: 80,
+        },
+        {
+          id: 3,
+          displayName: 'Neighbour',
+          status: 'completed',
+          storeName: 'GOG',
+          platformName: 'Linux',
+          playtimeMinutes: 125,
+        },
+      ],
+    },
+    {
+      key: 'manual',
+      title: 'Shared Manual Game',
+      category: 'game',
+      catalogId: null,
+      playtimeMinutes: 0,
+      ownerCount: 1,
+      owners: [
+        {
+          id: 2,
+          displayName: 'Friend',
+          status: 'playing',
+          storeName: '',
+          platformName: '',
+          playtimeMinutes: 0,
+        },
+      ],
+    },
+  ];
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const path = apiPath(new URL(route.request().url()).pathname);
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: { id: 1, displayName: 'Player', permissions: 32 },
+      });
+    if (path === '/settings/public')
+      return route.fulfill({
+        json: { softwareEnabled: true, enabledMediaCategories: { game: true } },
+      });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({
+        json: { locale, enabledMediaCategories: { game: true } },
+      });
+    if (path === '/game-library/steam/status')
+      return route.fulfill({
+        json: {
+          connected: false,
+          lastSyncedAt: null,
+          lastSyncCount: 0,
+          apiKeyConfigured: false,
+        },
+      });
+    if (path === '/game-library/shared')
+      return route.fulfill({
+        json: { results: shared, total: shared.length, nextOffset: null },
+      });
+    if (path === '/game-library')
+      return route.fulfill({
+        json: { results: entries, total: entries.length, nextOffset: null },
+      });
+    return route.fulfill({ json: {} });
+  });
+
+  await page.goto(appPath('/game-library'));
+  await expect(page.getByText('Catalog Game')).toBeVisible();
+  await expect(page.getByText('Manual Game')).toBeVisible();
+  await expect(page.getByText(copy.requestStatus)).toBeVisible();
+  const captureDirectory = process.env.LUMEN_GAME_LIBRARY_REQUEST_CAPTURE_DIR;
+  const capture = async (state: string, gameTitle: string) => {
+    await page
+      .locator('.set')
+      .filter({ hasText: gameTitle })
+      .scrollIntoViewIfNeeded();
+    if (
+      captureDirectory &&
+      ['desktop', 'iphone'].includes(testInfo.project.name)
+    ) {
+      const { mkdirSync } = await import('node:fs');
+      mkdirSync(captureDirectory, { recursive: true });
+      await page.screenshot({
+        path: `${captureDirectory}/${process.env.LUMEN_GAME_LIBRARY_REQUEST_CAPTURE_PHASE}-${state}-${testInfo.project.name}.png`,
+        fullPage: true,
+      });
+      await page.screenshot({
+        path: `${captureDirectory}/${process.env.LUMEN_GAME_LIBRARY_REQUEST_CAPTURE_PHASE}-${state}-${testInfo.project.name}-viewport.png`,
+      });
+    }
+  };
+  await capture('private', 'Manual Game');
+  const requestActions = page.getByRole('link', { name: copy.request });
+  await expect.soft(requestActions).toHaveCount(2);
+  await expect
+    .soft(requestActions.nth(0))
+    .toHaveAttribute('href', appPath('/game/retro/41'));
+  await expect
+    .soft(requestActions.nth(1))
+    .toHaveAttribute('href', appPath('/games?c=game&q=Manual+Game'));
+  const historyAction = page.getByRole('link', { name: copy.requestHistory });
+  await expect(historyAction).toBeVisible();
+  const historyBox = await historyAction.boundingBox();
+  const requestBox = await requestActions.first().boundingBox();
+  expect(historyBox).not.toBeNull();
+  expect(requestBox).not.toBeNull();
+  expect(
+    historyBox!.x + historyBox!.width <= requestBox!.x ||
+      requestBox!.x + requestBox!.width <= historyBox!.x ||
+      historyBox!.y + historyBox!.height <= requestBox!.y ||
+      requestBox!.y + requestBox!.height <= historyBox!.y
+  ).toBe(true);
+
+  await page
+    .locator(`a[href="${appPath('/game-library?view=shared')}"]`)
+    .click();
+  await expect(page.getByText('Shared Catalog Game')).toBeVisible();
+  await expect(page.getByText('Shared Manual Game')).toBeVisible();
+  await expect(page.getByText(copy.ownerCount)).toBeVisible();
+  await expect(page.getByText(copy.sharedBy)).toBeVisible();
+  await expect(page.getByText(copy.friend)).toBeVisible();
+  await expect(page.getByText(copy.neighbour)).toBeVisible();
+  await capture('shared', 'Shared Manual Game');
+  const catalogActions = page.getByRole('link', { name: copy.catalog });
+  await expect.soft(catalogActions).toHaveCount(1);
+  await expect
+    .soft(catalogActions)
+    .toHaveAttribute('href', appPath('/game/game/22'));
+  const manualRequest = page.getByRole('link', { name: copy.request });
+  await expect.soft(manualRequest).toHaveCount(1);
+  await expect
+    .soft(manualRequest)
+    .toHaveAttribute('href', appPath('/games?c=game&q=Shared+Manual+Game'));
+  await catalogActions.click();
+  await expect(page).toHaveURL(new RegExp(`${appPath('/game/game/22')}$`));
+  await page.goBack();
+  await manualRequest.click();
+  await expect(page).toHaveURL(
+    new URL(`${appPath('/games')}?c=game&q=Shared+Manual+Game`, page.url()).href
+  );
+});
+
+test('My Games keeps request actions behind request permission', async ({
+  page,
+}) => {
+  await page.route('https://**/*', (route) => route.abort());
+  await page.route('**/api/v1/**', (route) => {
+    const path = apiPath(new URL(route.request().url()).pathname);
+    if (path === '/auth/me')
+      return route.fulfill({ json: { id: 1, permissions: 16384 } });
+    if (path === '/settings/public')
+      return route.fulfill({
+        json: { softwareEnabled: true, enabledMediaCategories: { game: true } },
+      });
+    if (path === '/user/1/settings/main')
+      return route.fulfill({
+        json: { locale: 'en', enabledMediaCategories: { game: true } },
+      });
+    if (path === '/game-library')
+      return route.fulfill({
+        json: {
+          results: [
+            {
+              id: 41,
+              title: 'Catalog Game',
+              category: 'retro',
+              catalogId: 41,
+              status: 'backlog',
+              isOwned: false,
+              steamOwned: false,
+              shareWithHousehold: false,
+              storeName: '',
+              platformName: '',
+              playtimeMinutes: 0,
+              request: null,
+            },
+          ],
+          total: 1,
+          nextOffset: null,
+        },
+      });
+    if (path === '/game-library/shared')
+      return route.fulfill({
+        json: {
+          results: [
+            {
+              key: 'manual',
+              title: 'Shared Manual Game',
+              category: 'game',
+              catalogId: null,
+              playtimeMinutes: 0,
+              ownerCount: 1,
+              owners: [
+                {
+                  id: 2,
+                  displayName: 'Friend',
+                  status: 'playing',
+                  storeName: '',
+                  platformName: '',
+                  playtimeMinutes: 0,
+                },
+              ],
+            },
+          ],
+          total: 1,
+          nextOffset: null,
+        },
+      });
+    return route.fulfill({ json: {} });
+  });
+  await page.goto(appPath('/game-library'));
+  await expect(page.getByText('Catalog Game')).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Request this game' })
+  ).toHaveCount(0);
+  await page.getByRole('link', { name: 'Household Games' }).click();
+  await expect(page.getByText('Shared Manual Game')).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Open in catalog' })
+  ).toBeVisible();
 });
 
 test('catalogue matching saves the chosen identity with the current game edits', async ({
@@ -164,7 +487,7 @@ test('catalogue matching saves the chosen identity with the current game edits',
   await page.route('**/api/v1/**', (route) => {
     const request = route.request();
     const url = new URL(request.url());
-    const path = url.pathname.slice('/api/v1'.length);
+    const path = apiPath(url.pathname);
     if (path === '/request/software/catalog/search') {
       expect(Object.fromEntries(url.searchParams)).toEqual({
         category: 'game',
@@ -239,7 +562,7 @@ test('Steam import returns to My Games and refreshes ownership after sync and un
   await page.route('**/api/v1/**', (route) => {
     const request = route.request();
     const url = new URL(request.url());
-    switch (url.pathname.slice('/api/v1'.length)) {
+    switch (apiPath(url.pathname)) {
       case '/auth/me':
         return route.fulfill({
           json: { id: 1, displayName: 'Player', permissions: 32 },

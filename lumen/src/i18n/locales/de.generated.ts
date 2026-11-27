@@ -1711,6 +1711,35 @@ export const messages = {
   'components.Discover.DiscoverAdult.unavailable':
     'Die Suche nach erwachsenen Szenen ist derzeit nicht verfügbar.',
   'components.Discover.FilterPanel.filters': 'Filter',
+  'components.GameContent.addsNothing':
+    'Diese Edition fügt nichts hinzu, das du nicht bereits besitzt.',
+  'components.GameContent.contentNotListed': 'Inhalt nicht aufgeführt',
+  'components.GameContent.cosmetic': 'Kosmetik',
+  'components.GameContent.includes': 'Enthält',
+  'components.GameContent.owned': 'In deiner Bibliothek',
+  'components.GameContent.story': 'Geschichte',
+  'components.GameContent.typeBonus': 'Bonusinhalt',
+  'components.GameContent.typeCosmetic': 'Kosmetik',
+  'components.GameContent.typeDlc': 'Zusatzinhalt',
+  'components.GameContent.typeExpansion': 'Erweiterung',
+  'components.GameContent.typeSeasonPass': 'Saisonpass',
+  'components.GameContent.typeSoundtrack': 'Soundtrack',
+  'components.GameContent.typeUnknown': 'Sonstiges',
+  'components.GameLibrary.openCatalog': 'Im Katalog öffnen',
+  'components.GameLibrary.requestApproved': 'Genehmigt',
+  'components.GameLibrary.requestAvailable': 'Verfügbar',
+  'components.GameLibrary.requestCancelled': 'Storniert',
+  'components.GameLibrary.requestDeclined': 'Abgelehnt',
+  'components.GameLibrary.requestDownloading': 'Wird heruntergeladen',
+  'components.GameLibrary.requestFailed': 'Fehlgeschlagen',
+  'components.GameLibrary.requestGame': 'Fordern Sie dieses Spiel an',
+  'components.GameLibrary.requestImporting': 'Import läuft …',
+  'components.GameLibrary.requestPending': 'Ausstehende Genehmigung',
+  'components.GameLibrary.requestSearching': 'Suche läuft',
+  'components.GameLibrary.requestStatus': 'Antrag: {status}',
+  'components.GameLibrary.requestUnknown': 'Im Gange',
+  'components.GameLibrary.requestWithdrawn': 'Zurückgenommen',
+  'components.GameLibrary.sharedBy': 'Geteilt von {owners}',
   'components.SoftwareCatalog.allPcPlatforms': 'Alle PC Plattformen',
   'components.SoftwareCatalog.allSystems': 'Alle Systeme',
   'components.SoftwareCatalog.genreFilter': 'Genre',
@@ -1719,6 +1748,8 @@ export const messages = {
   'components.SoftwareCatalog.linux': 'Linux',
   'components.SoftwareCatalog.macos': 'macOS',
   'components.SoftwareCatalog.releaseYearFilter': 'Erscheinungsjahr',
+  'components.SoftwareCatalog.steamOwnedDescription':
+    'QuestarrNG fand dieses Spiel in seiner verknüpften öffentlichen Steam-Bibliothek. Sie ist möglicherweise nicht als lokale QuestarrNG-Datei installiert oder verfügbar.',
   'components.SoftwareCatalog.windows': 'Windows',
   'components.RequestModal.Music.requestmusic': 'Musik anfordern',
   'components.RequestModal.Music.backendRequestFailed':
@@ -1763,4 +1794,65 @@ export const messages = {
   'components.MusicDetails.Layout.artistType': 'Künstlertyp',
   'components.MusicDetails.Layout.musicBrainz': 'MusicBrainz',
   'components.MusicDetails.Layout.origin': 'Ursprung',
+  'components.MediaDetails.MetadataAttribution.label': 'Metadatenquellen',
+  'components.MediaDetails.MetadataAttribution.licenseInformation':
+    '{license} Lizenzinformationen',
+  'components.MediaDetails.MetadataAttribution.tmdb': 'TMDB',
+  'components.MediaDetails.MetadataAttribution.tmdbTitle':
+    'Metadatenquelle auf TMDB anzeigen.',
+  'components.MediaDetails.MetadataAttribution.tvdb': 'TheTVDB.com',
+  'components.MediaDetails.MetadataAttribution.tvdbTitle':
+    'Metadaten werden von TheTVDB bereitgestellt. Quellenangabe erforderlich.',
+  'components.MediaDetails.MetadataAttribution.tvmaze': 'TVmaze (angepasst)',
+  'components.MediaDetails.MetadataAttribution.tvmazeTitle':
+    'TVmaze Metadaten werden unter der CC BY-SA 4.0 Lizenz angepasst und geteilt.',
+  'components.MediaDetails.MetadataAttribution.wikidata': 'Wikidata',
+  'components.MediaDetails.MetadataAttribution.wikidataTitle':
+    'Strukturierte Wikidata-Daten werden unter CC0 geteilt.',
+  'components.TvDetails.Layout.director': 'Regisseur',
+  'components.TvDetails.Layout.writers': 'Autoren',
+  'components.MovieSummaryCard.screenplay': 'Drehbuch',
+  'components.Setup.defaultsTitle': 'Standardwerte für neue Benutzer festlegen',
+  'components.Setup.defaultsDescription':
+    'Wählen Sie aus, was Benutzer anfordern können, wenn sie beitreten. Anfragen unterliegen weiterhin Ihren Genehmigungs- und Kontingentregeln.',
+  'components.Setup.defaultsTip':
+    'Sie können diese Standardwerte oder einzelne Benutzer später in den Einstellungen ändern.',
+  'components.Setup.requestAccess': 'Neuen Benutzern Medienanfragen erlauben',
+  'components.Setup.requestAccessDescription':
+    'Gewähre neuen Benutzern Zugriff auf die Anfrage von Elementen in den von dir aktivierten Kategorien.',
+  'components.Setup.enable4k': '4K-Anforderungsoptionen aktivieren',
+  'components.Setup.enable4kDescription':
+    'Machen Sie 4K-Anforderungen in SeerrNG verfügbar. Fügen Sie separate 4K-Ziele für Radarr oder Sonarr unter Filme & TV hinzu.',
+  'components.Setup.request4k': 'Neuen Benutzern 4K-Anfragen erlauben',
+  'components.Setup.request4kDescription':
+    'Dies ist eine Standardberechtigung für neue Benutzer. Es müssen die Optionen für Zugriffsanfragen und 4K aktiviert sein.',
+  'components.Setup.partialRequests': 'Teilweise TV-Serienanfragen erlauben',
+  'components.Setup.partialRequestsDescription':
+    'Erlaube Benutzern, ausgewählte Episoden anstelle einer ganzen Staffel anzufordern. Dies gilt für alle.',
+  'components.Setup.defaultsLoadError':
+    'Benutzerstandardwerte konnten nicht geladen werden.',
+  'components.Setup.defaultsSaveError':
+    'Benutzerstandardwerte konnten nicht gespeichert werden. Versuchen Sie es erneut.',
+  'components.Setup.skipDefaults': 'Jetzt überspringen',
+  'components.Setup.saveDefaults': 'Standards speichern und fortfahren',
+  'components.Setup.savingDefaults': 'Wird gespeichert…',
+  'components.Setup.enabledRequestTypes': 'Aktivierte Anforderungstypen',
+  'components.Setup.enabledMediaLibraries': 'Aktivierte Mediatheken',
+  'components.Setup.noneEnabled': 'Keine aktiviert',
+  'components.Setup.requiredSetupComplete':
+    'Das erforderliche Setup ist abgeschlossen. Dienstverbindungen sind optional und können in den untenstehenden Formularen getestet werden.',
+  'components.Setup.serviceTestNote':
+    'Die Ergebnisse der Verbindungstests werden in jedem Dienstformular angezeigt und nicht als Setup-Status gespeichert.',
+  'components.Setup.categoryMovie': 'Filme',
+  'components.Setup.categoryTv': 'TV',
+  'components.Setup.categoryMusic': 'Musik',
+  'components.Setup.categoryEbook': 'Bücher',
+  'components.Setup.categoryAudiobook': 'Hörbücher',
+  'components.Setup.categoryComic': 'Comics',
+  'components.Setup.categoryMagazine': 'Zeitschriften',
+  'components.Setup.categoryAdult': 'Erwachsenenmedien',
+  'components.Setup.categorySports': 'Sport',
+  'components.Setup.categoryRetro': 'Retro-Spiele',
+  'components.Setup.categoryModern': 'Moderne Spiele',
+  'components.Setup.categoryGame': 'PC-Spiele',
 } as const;

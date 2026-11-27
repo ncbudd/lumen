@@ -6,12 +6,17 @@ const labels = {
     steps: 'Setup steps',
     categories: 'Configure Media Categories',
     services: 'Request Services',
+    defaultsStep: 'Defaults for New Users',
+    defaultsTitle: 'Set defaults for new users',
+    saveDefaults: 'Save defaults and continue',
     review: 'Review Setup',
     serviceGroup: 'Service Group',
     allServices: 'All Request Services',
     next: 'Next Step',
     previous: 'Previous Step',
-    enabledLibraries: 'Enabled Media Libraries',
+    enabledLibraries: 'Enabled media libraries',
+    enabledRequestTypes: 'Enabled request types',
+    bookCategory: 'Books',
     libraryRequired:
       'Enable at least one media library before finishing setup.',
     downloadClients: 'Download Clients',
@@ -31,12 +36,18 @@ const labels = {
     steps: 'Étapes de configuration',
     categories: 'Configurer les catégories de médias',
     services: 'Services de demande',
+    defaultsStep: 'Valeurs par défaut des nouveaux utilisateurs',
+    defaultsTitle:
+      'Définir les valeurs par défaut pour les nouveaux utilisateurs',
+    saveDefaults: 'Enregistrer les valeurs par défaut et continuer',
     review: 'Vérifier la configuration',
     serviceGroup: 'Groupe de services',
     allServices: 'Tous les services de demande',
     next: 'Étape suivante',
     previous: 'Étape précédente',
-    enabledLibraries: 'Bibliothèques multimédias activées',
+    enabledLibraries: 'Bibliothèques de médias activées',
+    enabledRequestTypes: 'Types de demandes activés',
+    bookCategory: 'Livres',
     libraryRequired:
       'Activez au moins une bibliothèque multimédia avant de terminer la configuration.',
     downloadClients: 'Clients de téléchargement',
@@ -56,12 +67,17 @@ const labels = {
     steps: 'خطوات الإعداد',
     categories: 'تكوين فئات الوسائط',
     services: 'خدمات الطلب',
+    defaultsStep: 'الإعدادات الافتراضية للمستخدمين الجدد',
+    defaultsTitle: 'تعيين القيم الافتراضية للمستخدمين الجدد',
+    saveDefaults: 'حفظ الإعدادات الافتراضية والمتابعة',
     review: 'مراجعة الإعداد',
     serviceGroup: 'مجموعة الخدمات',
     allServices: 'جميع خدمات الطلب',
     next: 'الخطوة التالية',
     previous: 'الخطوة السابقة',
     enabledLibraries: 'مكتبات الوسائط المفعّلة',
+    enabledRequestTypes: 'أنواع الطلبات المفعّلة',
+    bookCategory: 'الكتب',
     libraryRequired: 'فعّل مكتبة وسائط واحدة على الأقل قبل إنهاء الإعداد.',
     downloadClients: 'عملاء التنزيل',
     prowlarr: 'Prowlarr',
@@ -102,6 +118,14 @@ for (const locale of ['en', 'fr', 'ar'] as const) {
             enabledMediaCategories: { ebook: true, music: false },
           },
         });
+      if (path === '/settings/main')
+        return route.fulfill({
+          json: {
+            defaultPermissions: 0,
+            enable4k: false,
+            partialRequestsEnabled: false,
+          },
+        });
       if (path === '/settings/jellyfin')
         return route.fulfill({
           json: {
@@ -131,6 +155,12 @@ for (const locale of ['en', 'fr', 'ar'] as const) {
     ).toBeVisible();
     await expect(page.getByText(copy.enabledLibraries)).toBeVisible();
     await expect(
+      page.locator('dt').filter({ hasText: copy.enabledRequestTypes })
+    ).toBeVisible();
+    await expect(
+      page.locator('dd').filter({ hasText: copy.bookCategory })
+    ).toBeVisible();
+    await expect(
       page.locator('dt').filter({ hasText: copy.downloadClients })
     ).toBeVisible();
     await expect(
@@ -151,6 +181,20 @@ for (const locale of ['en', 'fr', 'ar'] as const) {
     await expect(
       page.getByRole('navigation').getByRole('link', { name: copy.services })
     ).toBeVisible();
+    await page.goto(`${mount}/setup?guide=1&step=defaults`);
+    await expect(
+      page
+        .getByRole('navigation')
+        .getByRole('link', { name: copy.defaultsStep })
+    ).toBeVisible();
+    await expect(
+      page.getByText(copy.defaultsTitle, { exact: true })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: copy.saveDefaults })
+    ).toBeVisible();
+
+    await page.goto(`${mount}/setup?guide=1&step=services`);
     const serviceGroup = page.getByLabel(copy.serviceGroup);
     const serviceGroupLabel = page
       .locator('label.sel')

@@ -1681,6 +1681,35 @@ export const messages = {
   'components.Discover.DiscoverAdult.unavailable':
     'アダルトシーン検索は現在利用できません。',
   'components.Discover.FilterPanel.filters': 'フィルター',
+  'components.GameContent.addsNothing':
+    'このエディションは、すでに所有しているものを除いて何も追加しません。',
+  'components.GameContent.contentNotListed': '未記載のコンテンツ',
+  'components.GameContent.cosmetic': '外観',
+  'components.GameContent.includes': '含まれるもの',
+  'components.GameContent.owned': 'ライブラリにあり',
+  'components.GameContent.story': 'ストーリー',
+  'components.GameContent.typeBonus': 'ボーナス',
+  'components.GameContent.typeCosmetic': '外観',
+  'components.GameContent.typeDlc': 'アドオン',
+  'components.GameContent.typeExpansion': '拡張パック',
+  'components.GameContent.typeSeasonPass': 'シーズンパス',
+  'components.GameContent.typeSoundtrack': 'サウンドトラック',
+  'components.GameContent.typeUnknown': 'その他',
+  'components.GameLibrary.openCatalog': 'カタログで開く',
+  'components.GameLibrary.requestApproved': '承認済み',
+  'components.GameLibrary.requestAvailable': '利用可能',
+  'components.GameLibrary.requestCancelled': '取り消し済み',
+  'components.GameLibrary.requestDeclined': '拒否済み',
+  'components.GameLibrary.requestDownloading': 'ダウンロード中',
+  'components.GameLibrary.requestFailed': '失敗',
+  'components.GameLibrary.requestGame': 'このゲームをリクエストする',
+  'components.GameLibrary.requestImporting': 'インポート中',
+  'components.GameLibrary.requestPending': '承認待ち',
+  'components.GameLibrary.requestSearching': '検索中',
+  'components.GameLibrary.requestStatus': 'リクエスト: {status}',
+  'components.GameLibrary.requestUnknown': '進行中',
+  'components.GameLibrary.requestWithdrawn': '取り下げ済み',
+  'components.GameLibrary.sharedBy': '共有者: {owners}',
   'components.SoftwareCatalog.allPcPlatforms': 'すべてのPCプラットフォーム',
   'components.SoftwareCatalog.allSystems': 'すべてのシステム',
   'components.SoftwareCatalog.genreFilter': 'ジャンル',
@@ -1689,6 +1718,8 @@ export const messages = {
   'components.SoftwareCatalog.linux': 'Linux',
   'components.SoftwareCatalog.macos': 'マックオース',
   'components.SoftwareCatalog.releaseYearFilter': 'リリース年',
+  'components.SoftwareCatalog.steamOwnedDescription':
+    'QuestarrNG は、リンクされたパブリック Steam ライブラリでこのゲームを見つけました。インストールされていないか、ローカルの QuestarrNG ファイルとして利用できない可能性があります。',
   'components.SoftwareCatalog.windows': 'ウィンドウズ',
   'components.RequestModal.Music.requestmusic': '音楽のリクエスト',
   'components.RequestModal.Music.backendRequestFailed':
@@ -1732,4 +1763,65 @@ export const messages = {
   'components.MusicDetails.Layout.artistType': 'アーティストタイプ',
   'components.MusicDetails.Layout.musicBrainz': 'MusicBrainz',
   'components.MusicDetails.Layout.origin': '出身地',
+  'components.MediaDetails.MetadataAttribution.label': 'メタデータソース',
+  'components.MediaDetails.MetadataAttribution.licenseInformation':
+    '{license}ライセンス情報',
+  'components.MediaDetails.MetadataAttribution.tmdb': 'TMDB',
+  'components.MediaDetails.MetadataAttribution.tmdbTitle':
+    'TMDB のメタデータソースを表示します。',
+  'components.MediaDetails.MetadataAttribution.tvdb': 'TheTVDB.com',
+  'components.MediaDetails.MetadataAttribution.tvdbTitle':
+    'メタデータの提供元はTheTVDBです。出典の明記が必要です。',
+  'components.MediaDetails.MetadataAttribution.tvmaze': 'TVmaze（改変）',
+  'components.MediaDetails.MetadataAttribution.tvmazeTitle':
+    'TVmaze メタデータは CC BY-SA 4.0 ライセンスの下で適応および共有されます。',
+  'components.MediaDetails.MetadataAttribution.wikidata': 'Wikidata',
+  'components.MediaDetails.MetadataAttribution.wikidataTitle':
+    'Wikidata の構造化データは CC0 の下で共有されています。',
+  'components.TvDetails.Layout.director': '監督',
+  'components.TvDetails.Layout.writers': 'ライター',
+  'components.MovieSummaryCard.screenplay': '脚本',
+  'components.Setup.defaultsTitle': '新規ユーザーのデフォルトを設定',
+  'components.Setup.defaultsDescription':
+    'ユーザーが参加した際にリクエストできる内容を選択してください。リクエストは引き続き承認とクォータのルールに従います。',
+  'components.Setup.defaultsTip':
+    'これらのデフォルトは後で設定で変更したり、個別のユーザーを調整したりできます。',
+  'components.Setup.requestAccess': '新規ユーザーのメディアリクエストを許可',
+  'components.Setup.requestAccessDescription':
+    '有効化したカテゴリ内のアイテムをリクエストするアクセス権を新規ユーザーに付与します。',
+  'components.Setup.enable4k': '4Kリクエストオプションを有効化',
+  'components.Setup.enable4kDescription':
+    'SeerrNG全体で4Kリクエストを利用可能にします。映画・テレビの下に、個別の4K Radarr または Sonarr 宛先を追加してください。',
+  'components.Setup.request4k': '新規ユーザーの4Kリクエストを許可',
+  'components.Setup.request4kDescription':
+    'これは新規ユーザーのデフォルト権限です。リクエストアクセスと4Kオプションの有効化が必要です。',
+  'components.Setup.partialRequests': 'テレビシーズン部分リクエストを許可',
+  'components.Setup.partialRequestsDescription':
+    'ユーザーが全シーズンではなく選択したエピソードのみをリクエストできるようにします。これは全員に適用されます。',
+  'components.Setup.defaultsLoadError':
+    'ユーザーのデフォルトを読み込めませんでした。',
+  'components.Setup.defaultsSaveError':
+    'ユーザーのデフォルトを保存できませんでした。もう一度お試しください。',
+  'components.Setup.skipDefaults': '今はスキップ',
+  'components.Setup.saveDefaults': 'デフォルトを保存して続行',
+  'components.Setup.savingDefaults': '保存中…',
+  'components.Setup.enabledRequestTypes': '有効化されたリクエストタイプ',
+  'components.Setup.enabledMediaLibraries': '有効化されたメディアライブラリ',
+  'components.Setup.noneEnabled': '有効化されていません',
+  'components.Setup.requiredSetupComplete':
+    '必須のセットアップが完了しました。サービスの接続は任意であり、以下のフォームでテストできます。',
+  'components.Setup.serviceTestNote':
+    '接続テストの結果は各サービスのフォームに表示され、セットアップ状態として保存されません。',
+  'components.Setup.categoryMovie': '映画',
+  'components.Setup.categoryTv': 'テレビ',
+  'components.Setup.categoryMusic': '音楽',
+  'components.Setup.categoryEbook': '書籍',
+  'components.Setup.categoryAudiobook': 'オーディオブック',
+  'components.Setup.categoryComic': 'コミック',
+  'components.Setup.categoryMagazine': '雑誌',
+  'components.Setup.categoryAdult': 'アダルト',
+  'components.Setup.categorySports': 'スポーツ',
+  'components.Setup.categoryRetro': 'レトロゲーム',
+  'components.Setup.categoryModern': 'モダンゲーム',
+  'components.Setup.categoryGame': 'PC ゲーム',
 } as const;

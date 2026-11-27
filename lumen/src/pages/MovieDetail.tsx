@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
   ApiError,
@@ -51,6 +51,7 @@ import { ManageVideoSheet } from '../components/ManageVideoSheet';
 import ReportIssueButton from '../components/ReportIssueButton';
 import { useVideoRequestQuota } from '../components/requestSheet';
 import { useToast } from '../components/toast';
+import { videoMetadataRows } from '../components/VideoMetadataFacts';
 import VideoPlaybackButton from '../components/VideoPlaybackButton';
 import VideoRatings from '../components/VideoRatings';
 import WatchlistButton from '../components/WatchlistButton';
@@ -234,6 +235,9 @@ export default function MovieDetail() {
     .filter((c) => c.job === 'Director')
     .map((c) => c.name)
     .join(', ');
+  const screenplay = (m.credits?.crew ?? []).find((credit) =>
+    ['Screenplay', 'Writer', 'Story'].includes(credit.job ?? '')
+  );
   const trailer = youtubeTrailerUrl(m.relatedVideos, pub?.youtubeUrl);
   // a 4K copy is in hand or on its way (requested, downloading, partly or fully there)
   const has4k =
@@ -379,10 +383,16 @@ export default function MovieDetail() {
           certification && <span className="cert">{certification}</span>,
           fmtRun(m.runtime),
           m.genres
-            .filter((g) => g.id)
+            .filter(
+              (g) => Number.isInteger(g.id) && g.id > 0 && g.id <= 1_000_000_000
+            )
             .slice(0, 3)
-            .map((g) => g.name)
-            .join(', '),
+            .map((g, index) => (
+              <Fragment key={g.id}>
+                {index > 0 ? ', ' : null}
+                <Link to={`/movies?genre=${g.id}`}>{g.name}</Link>
+              </Fragment>
+            )),
         ]}
       />
       <div className="dbody">
@@ -630,6 +640,14 @@ export default function MovieDetail() {
                         : '',
                   ],
                   [t('lumen.movie.fact.director', 'Director'), director],
+                  [
+                    t('components.MovieSummaryCard.screenplay', 'Screenplay'),
+                    screenplay && (
+                      <Link to={`/person/${screenplay.id}`}>
+                        {screenplay.name}
+                      </Link>
+                    ),
+                  ],
                   [t('lumen.movie.fact.rated', 'Rated'), certification],
                   [
                     t('lumen.movie.fact.collection', 'Collection'),
@@ -639,6 +657,13 @@ export default function MovieDetail() {
                       </Link>
                     ),
                   ],
+                  ...videoMetadataRows(
+                    m.metadataSources,
+                    m.supplementalMetadata,
+                    (m.credits?.crew ?? []).map(({ name }) => name),
+                    locale,
+                    t
+                  ),
                   [
                     '4K',
                     pub?.movie4kEnabled

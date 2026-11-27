@@ -30,6 +30,15 @@ const copy = {
     genre: 'Genre',
     releaseYear: 'Release year',
     linux: 'Linux',
+    mainStory: 'Main Story: 30.5 h',
+    pcSystems: 'Windows · Linux',
+    steamLibrary: 'Steam Library',
+    steamLibraryDescription:
+      'QuestarrNG found this game in its linked public Steam library. It may not be installed or available as a local QuestarrNG file.',
+    availabilityUnknown: 'Availability unknown',
+    ownedInQuestarr: 'Owned in QuestarrNG',
+    tracked: 'Tracked',
+    consoleSystems: 'Nintendo Entertainment System',
   },
   fr: {
     title: 'Jeux',
@@ -50,6 +59,15 @@ const copy = {
     genre: 'Genre',
     releaseYear: 'Année de sortie',
     linux: 'Linux',
+    mainStory: 'Histoire principale : 30,5 h',
+    pcSystems: 'Windows · Linux',
+    steamLibrary: 'Bibliothèque Steam',
+    steamLibraryDescription:
+      'QuestarrNG a trouvé ce jeu dans sa bibliothèque publique liée Steam. Il ne peut pas être installé ou disponible comme fichier QuestarrNG local.',
+    availabilityUnknown: 'Disponibilité inconnue',
+    ownedInQuestarr: 'Possédé dans QuestarrNG',
+    tracked: 'Suivi',
+    consoleSystems: 'Nintendo Entertainment System',
   },
   ar: {
     title: 'الألعاب',
@@ -70,6 +88,15 @@ const copy = {
     genre: 'النوع',
     releaseYear: 'سنة الإصدار',
     linux: 'Linux',
+    mainStory: 'القصة الرئيسية: 30.5 ساعة',
+    pcSystems: 'Windows · Linux',
+    steamLibrary: 'مكتبة Steam',
+    steamLibraryDescription:
+      'وجدت QuestarrNG هذه اللعبة في مكتبة Steam العامة المرتبطة بها. قد لا يكون مثبتًا أو متاحًا كملف QuestarrNG محلي.',
+    availabilityUnknown: 'التوفر غير معروف',
+    ownedInQuestarr: 'مملوكة في QuestarrNG',
+    tracked: 'متتبعة',
+    consoleSystems: 'Nintendo Entertainment System',
   },
 }[locale];
 
@@ -135,6 +162,60 @@ test('Games catalog controls and empty state follow the saved locale', async ({
               coverUrl: null,
               releaseDate: '2025-01-01',
               genres: ['Adventure'],
+              platforms: ['Windows', 'Linux', 'Nintendo Switch'],
+              emulationSystems: [
+                {
+                  slug: 'nes',
+                  name: 'Nintendo Entertainment System',
+                  group: 'retro',
+                },
+              ],
+              steamOwned: true,
+              timeToBeat: { normally: 30.5 },
+            },
+            {
+              id: 'fixture-game-missing-date',
+              title: 'Fixture Game Without Release Date',
+              catalogId: '43',
+              catalogProvider: 'igdb',
+              igdbId: 43,
+              coverUrl: null,
+              releaseDate: null,
+              genres: ['Strategy', 'Simulation', 'Adventure'],
+              platforms: ['Windows'],
+            },
+            {
+              id: 'fixture-game-unknown',
+              title: 'Fixture Game Unknown Availability',
+              catalogId: '44',
+              catalogProvider: 'igdb',
+              igdbId: 44,
+              coverUrl: null,
+              releaseDate: null,
+              platforms: ['Windows'],
+              availability: 'unknown',
+            },
+            {
+              id: 'fixture-game-owned',
+              title: 'Fixture Game Owned',
+              catalogId: '45',
+              catalogProvider: 'igdb',
+              igdbId: 45,
+              coverUrl: null,
+              releaseDate: null,
+              platforms: ['Windows'],
+              availability: 'owned',
+            },
+            {
+              id: 'fixture-game-tracked',
+              title: 'Fixture Game Tracked',
+              catalogId: '46',
+              catalogProvider: 'igdb',
+              igdbId: 46,
+              coverUrl: null,
+              releaseDate: null,
+              platforms: ['Windows'],
+              availability: 'tracked',
             },
           ],
           nextOffset: null,
@@ -167,7 +248,52 @@ test('Games catalog controls and empty state follow the saved locale', async ({
     'placeholder',
     copy.searchPc
   );
-  await expect(page.getByText('Fixture Game')).toBeVisible();
+  await expect(page.getByText('Fixture Game', { exact: true })).toBeVisible();
+  const captureDirectory = process.env.LUMEN_GAME_CATALOG_CAPTURE_DIR;
+  if (captureDirectory)
+    await page.screenshot({
+      path: `${captureDirectory}/${locale}-${info.project.name}-availability-baseline.png`,
+      fullPage: true,
+    });
+  const unknownGame = page
+    .locator('.grid .poster')
+    .filter({ hasText: 'Fixture Game Unknown Availability' });
+  await expect(unknownGame.locator('.glyph.neutral')).toHaveAttribute(
+    'title',
+    copy.availabilityUnknown
+  );
+  const ownedGame = page
+    .locator('.grid .poster')
+    .filter({ hasText: 'Fixture Game Owned' });
+  await expect(ownedGame.locator('.glyph.ok')).toHaveAttribute(
+    'title',
+    copy.ownedInQuestarr
+  );
+  const trackedGame = page
+    .locator('.grid .poster')
+    .filter({ hasText: 'Fixture Game Tracked' });
+  await expect(trackedGame.locator('.glyph.wait')).toHaveAttribute(
+    'title',
+    copy.tracked
+  );
+  const datedGame = page
+    .locator('.grid .poster')
+    .filter({ hasText: 'Fixture Game' })
+    .first();
+  await expect(datedGame.locator('.m')).toHaveText('2025-01-01');
+  await expect(datedGame.locator('.m2')).toHaveText([
+    copy.mainStory,
+    copy.pcSystems,
+    copy.steamLibrary,
+  ]);
+  await expect(datedGame.getByText(copy.steamLibrary)).toHaveAttribute(
+    'title',
+    copy.steamLibraryDescription
+  );
+  const undatedGame = page
+    .locator('.grid .poster')
+    .filter({ hasText: 'Fixture Game Without Release Date' });
+  await expect(undatedGame.locator('.m')).toHaveText('Strategy · Simulation');
   await expect(page.getByLabel(copy.allPcPlatforms)).toBeVisible();
   await expect(page.getByLabel(copy.genre)).toBeVisible();
   await expect(page.getByLabel(copy.releaseYear)).toBeVisible();
@@ -180,7 +306,6 @@ test('Games catalog controls and empty state follow the saved locale', async ({
     )
   ).toBe(true);
 
-  const captureDirectory = process.env.LUMEN_GAME_CATALOG_CAPTURE_DIR;
   if (captureDirectory)
     await page.screenshot({
       path: `${captureDirectory}/${locale}-${info.project.name}.png`,
@@ -223,6 +348,14 @@ test('Games catalog controls and empty state follow the saved locale', async ({
       )
     )
     .toBe(true);
+  await expect(page.locator('.grid .poster .m2')).toHaveText([
+    copy.consoleSystems,
+  ]);
+  if (captureDirectory && ['desktop', 'iphone'].includes(info.project.name))
+    await page.screenshot({
+      path: `${captureDirectory}/${locale}-${info.project.name}-retro.png`,
+      fullPage: true,
+    });
   await expect(page.getByPlaceholder(copy.searchRetro)).toBeVisible();
   await expect(page.getByPlaceholder(copy.searchRetro)).toHaveAttribute(
     'placeholder',
@@ -429,13 +562,15 @@ async function openConsoleGame(
   page: Page,
   category: 'retro' | 'modern',
   systems: { slug: string; name: string; group: 'retro' | 'modern' }[]
-) {
+): Promise<Record<string, unknown>[]> {
+  const requests: Record<string, unknown>[] = [];
   await page.route('https://**/*', (route) => route.abort());
   await page.route('**/lumen-config.json', (route) =>
     route.fulfill({ json: {} })
   );
-  await page.route('**/api/v1/**', (route) => {
-    const path = new URL(route.request().url()).pathname
+  await page.route('**/api/v1/**', async (route) => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname
       .replace(/^\/lumen(?=\/)/, '')
       .slice('/api/v1'.length);
     if (path === '/auth/me')
@@ -467,18 +602,54 @@ async function openConsoleGame(
           },
         },
       });
+    if (path === '/patches/search')
+      return route.fulfill({
+        json: {
+          available: true,
+          results: [
+            {
+              id: 'fixture-translation',
+              name: 'Fixture Translation',
+              kind: 'translation',
+              language: 'fr',
+              status: 'complete',
+              latestVersionId: 'v2',
+              versions: [
+                {
+                  id: 'v1',
+                  version: '1.0',
+                  base: { available: false, region: 'US', revision: '1' },
+                },
+                {
+                  id: 'v2',
+                  version: '2.0',
+                  releasedAt: '2026-01-02',
+                  base: { available: true, region: 'US', revision: '1' },
+                },
+              ],
+            },
+          ],
+        },
+      });
+    if (path === '/request/software' && request.method() === 'POST') {
+      requests.push(request.postDataJSON() as Record<string, unknown>);
+      return route.fulfill({
+        json: { request: { id: 44, status: 'requested' } },
+      });
+    }
     return route.fulfill({ json: { results: [] } });
   });
   await page.goto(mountedTestAppPath(`/game/${category}/42`));
   await expect(
     page.getByRole('heading', { name: 'Fixture Console Game' })
   ).toBeVisible();
+  return requests;
 }
 
 test('Console game request controls follow the saved locale', async ({
   page,
 }) => {
-  await openConsoleGame(page, 'retro', [
+  const requests = await openConsoleGame(page, 'retro', [
     { slug: 'snes', name: 'Super Nintendo', group: 'retro' },
   ]);
   await expect(page.getByLabel(consoleCopy.label)).toBeVisible();
@@ -488,6 +659,44 @@ test('Console game request controls follow the saved locale', async ({
   await expect(
     page.getByRole('button', { name: detailCopy.request })
   ).toBeVisible();
+  const capture = async () => {
+    const directory = process.env.LUMEN_PATCH_REQUEST_CAPTURE_DIR;
+    if (directory && ['desktop', 'iphone'].includes(test.info().project.name))
+      await page.screenshot({
+        path: `${directory}/${test.info().project.name}.png`,
+        fullPage: true,
+      });
+  };
+  if (process.env.LUMEN_PATCH_REQUEST_BASELINE === '1') {
+    await capture();
+    return;
+  }
+  const patchChoice = page.getByRole('radio', { name: /Fixture Translation/ });
+  await expect(patchChoice).toBeVisible();
+  await capture();
+  await patchChoice.check();
+  await expect(page.getByText(/Fixture Translation 2\.0/)).toBeVisible();
+  const patchVersion = page.getByRole('radiogroup').getByRole('combobox');
+  await patchVersion.selectOption('v1');
+  await expect(
+    page.getByRole('button', { name: detailCopy.request })
+  ).toBeDisabled();
+  await patchVersion.selectOption('v2');
+  await expect(
+    page.getByRole('button', { name: detailCopy.request })
+  ).toBeEnabled();
+  await page.getByRole('button', { name: detailCopy.request }).click();
+  await expect.poll(() => requests.length).toBe(1);
+  expect(requests[0]).toMatchObject({
+    category: 'retro',
+    platformSlug: 'snes',
+    selection: {
+      kind: 'patch',
+      projectId: 'fixture-translation',
+      versionId: 'v2',
+      keepOriginal: true,
+    },
+  });
 });
 
 test('Unsupported console state follows the saved locale', async ({ page }) => {

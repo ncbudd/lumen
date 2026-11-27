@@ -118,6 +118,21 @@ for (const locale of ['en', 'fr', 'ar'] as const) {
         return route.fulfill({
           json: { applicationTitle: 'SeerrNG', mediaServerType: 1 },
         });
+      if (path === '/watch-sessions')
+        return route.fulfill({
+          json: {
+            sessions: [
+              {
+                id: 9,
+                title: 'Friday Movie Night',
+                status: 'draft',
+                ownerId: 1,
+                memberCount: 1,
+                expiresAt: '2030-01-15T12:00:00.000Z',
+              },
+            ],
+          },
+        });
       if (path === '/watch-sessions/9')
         return route.fulfill({
           json: {
@@ -127,6 +142,7 @@ for (const locale of ['en', 'fr', 'ar'] as const) {
               status: 'draft',
               ownerId: 1,
               memberCount: 1,
+              expiresAt: '2030-01-15T12:00:00.000Z',
               members: [{ id: 1, displayName: 'Admin Fixture', isOwner: true }],
               filters: { genreIds: [99] },
               ownPreferences: { includeWatchlistContributions: false },
@@ -139,7 +155,20 @@ for (const locale of ['en', 'fr', 'ar'] as const) {
       return route.fulfill({ json: {} });
     });
 
+    await page.goto(testAppPath('/watch-sessions'));
+    const ownerLabel = { en: 'Owner', fr: 'Propriétaire', ar: 'المالك' }[
+      locale
+    ];
+    await expect(
+      page.locator('.set.cfg-row').filter({ hasText: 'Friday Movie Night' })
+    ).toContainText(ownerLabel);
     await page.goto(testAppPath('/watch-sessions/9'));
+    const expiryDate = new Intl.DateTimeFormat(locale, {
+      dateStyle: 'medium',
+    }).format(new Date('2030-01-15T12:00:00.000Z'));
+    await expect(
+      page.locator('.note').filter({ hasText: expiryDate })
+    ).toBeVisible();
     const fallback = {
       en: 'Genre 99',
       fr: 'Genre 99',

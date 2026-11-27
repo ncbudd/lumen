@@ -1,6 +1,8 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
+import { useAuth } from '../auth';
+import { canUseRequestAccess } from '../components/detail';
 import { ExtraHeader, ServiceNote } from '../components/extra';
 import { useToast } from '../components/toast';
 import { friendlyError } from '../errors';
@@ -17,6 +19,27 @@ const PROGRESS = {
   dropped: 'Dropped',
 };
 const PAGE_SIZE = 48;
+const REQUEST_STATUS: Record<string, [string, string]> = {
+  pending: ['components.GameLibrary.requestPending', 'Pending approval'],
+  approved: ['components.GameLibrary.requestApproved', 'Approved'],
+  searching: ['components.GameLibrary.requestSearching', 'Searching'],
+  downloading: ['components.GameLibrary.requestDownloading', 'Downloading'],
+  importing: ['components.GameLibrary.requestImporting', 'Importing'],
+  available: ['components.GameLibrary.requestAvailable', 'Available'],
+  failed: ['components.GameLibrary.requestFailed', 'Failed'],
+  cancelled: ['components.GameLibrary.requestCancelled', 'Cancelled'],
+  declined: ['components.GameLibrary.requestDeclined', 'Declined'],
+  withdrawn: ['components.GameLibrary.requestWithdrawn', 'Withdrawn'],
+};
+
+const gameCatalogPath = (game: {
+  category: GameCategory;
+  catalogId: number | null;
+  title: string;
+}) =>
+  game.catalogId !== null
+    ? `/game/${game.category}/${game.catalogId}`
+    : `/games?${new URLSearchParams({ c: 'game', q: game.title })}`;
 
 const messageKey = (value: string) =>
   `lumen.gameLibrary.${value
@@ -49,7 +72,15 @@ interface SharedGame {
   category: GameCategory;
   catalogId: number | null;
   playtimeMinutes: number;
-  owners: { id: number; displayName: string }[];
+  ownerCount: number;
+  owners: {
+    id: number;
+    displayName: string;
+    status: keyof typeof PROGRESS;
+    storeName: string;
+    platformName: string;
+    playtimeMinutes: number;
+  }[];
 }
 
 interface ResultPage<T> {
@@ -551,8 +582,29 @@ function SteamLibrary({
 }
 
 export default function GameLibrary() {
-  const { t } = useLumenLocale();
+  const { user } = useAuth();
+  const { locale, t } = useLumenLocale();
   const tr = (value: string) => t(messageKey(value), value);
+  const formatNumber = (value: number) =>
+    new Intl.NumberFormat(locale === 'ar' ? 'ar-u-nu-arab' : locale).format(
+      value
+    );
+  const formatMinutes = (key: string, fallback: string, minutes: number) => {
+    const number = formatNumber(minutes);
+    const marker = '__minutes__';
+    const message = t(key, fallback, { minutes: marker });
+    return message.includes(marker)
+      ? message.replace(marker, number)
+      : `${number} ${message}`;
+  };
+  const formatRequestStatus = (status: string) => {
+    const [key, fallback] = REQUEST_STATUS[status] ?? [
+      'components.GameLibrary.requestUnknown',
+      'In progress',
+    ];
+    return t(key, fallback);
+  };
+  const mayRequest = canUseRequestAccess(user?.permissions);
   const [params, setParams] = useSearchParams();
   const [editor, setEditor] = useState<GameEntry | null | undefined>();
   const shared = params.get('view') === 'shared';
@@ -714,21 +766,63 @@ export default function GameLibrary() {
               <li className="set" key={game.key}>
                 <div>
                   <GameName game={game} />
+                  <small>{[tr(GAME_LABEL[game.category])].join(' · ')}</small>
                   <small>
-                    {[
-                      tr(GAME_LABEL[game.category]),
-                      ...game.owners.map((owner) => owner.displayName),
-                    ].join(' · ')}
+                    {`${tr('Owner Count')}: ${formatNumber(game.ownerCount)}`}
+                  </small>
+                  <small>
+                    {t(
+                      'components.GameLibrary.sharedBy',
+                      'Shared by {owners}',
+                      {
+                        owners: game.owners
+                          .map((owner) => owner.displayName)
+                          .join(', '),
+                      }
+                    )}
+                  </small>
+                  <small>
+                    {game.owners
+                      .map((owner) =>
+                        [
+                          `${owner.displayName}: ${tr(PROGRESS[owner.status])}`,
+                          owner.storeName,
+                          owner.platformName,
+                          owner.playtimeMinutes > 0 &&
+                            formatMinutes(
+                              'lumen.gameLibrary.minutesPlayed',
+                              '{minutes} minutes played',
+                              owner.playtimeMinutes
+                            ),
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')
+                      )
+                      .join(' · ')}
                   </small>
                   {game.playtimeMinutes > 0 && (
                     <small>
-                      {t(
+                      {formatMinutes(
                         'lumen.gameLibrary.minutesPlayedTogether',
                         '{minutes} minutes played together',
-                        { minutes: game.playtimeMinutes }
+                        game.playtimeMinutes
                       )}
                     </small>
                   )}
+                  <Link
+                    className="btn btn-tonal btn-sm"
+                    to={gameCatalogPath(game)}
+                  >
+                    {game.catalogId === null && mayRequest
+                      ? t(
+                          'components.GameLibrary.requestGame',
+                          'Request this game'
+                        )
+                      : t(
+                          'components.GameLibrary.openCatalog',
+                          'Open in catalog'
+                        )}
+                  </Link>
                 </div>
               </li>
             ))
@@ -760,12 +854,36 @@ export default function GameLibrary() {
                       ` · ${t('lumen.gameLibrary.minutesPlayed', '{minutes} minutes played', { minutes: game.playtimeMinutes })}`}
                   </small>
                   {game.request && (
-                    <Link
-                      className="go"
-                      to={`/requests?softwareRequestId=${game.request.id}`}
-                    >
-                      {tr('Request History')}
-                    </Link>
+                    <small>
+                      {t(
+                        'components.GameLibrary.requestStatus',
+                        'Request: {status}',
+                        { status: formatRequestStatus(game.request.status) }
+                      )}
+                    </small>
+                  )}
+                  {(game.request || mayRequest) && (
+                    <div className="toolbar">
+                      {game.request && (
+                        <Link
+                          className="go"
+                          to={`/requests?softwareRequestId=${game.request.id}`}
+                        >
+                          {tr('Request History')}
+                        </Link>
+                      )}
+                      {mayRequest && (
+                        <Link
+                          className="btn btn-tonal btn-sm"
+                          to={gameCatalogPath(game)}
+                        >
+                          {t(
+                            'components.GameLibrary.requestGame',
+                            'Request this game'
+                          )}
+                        </Link>
+                      )}
+                    </div>
                   )}
                 </div>
                 <button

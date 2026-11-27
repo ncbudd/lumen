@@ -32,6 +32,7 @@ import {
 import FollowButton from '../components/FollowButton';
 import GameContentPicker from '../components/GameContentPicker';
 import IndexerSearchLink from '../components/IndexerSearchLink';
+import PatchRequestPicker from '../components/PatchRequestPicker';
 import { useToast } from '../components/toast';
 import { friendlyError } from '../errors';
 import {
@@ -46,6 +47,7 @@ import {
   type GameCategory,
   type GameContentSelection,
   type GamePage,
+  type PatchSelection,
 } from '../extras';
 import { canViewFollowing } from '../followPermissions';
 import { useApi } from '../hooks';
@@ -69,9 +71,17 @@ const statOf = (g: Game, t: Translate): Stat => {
     ? null
     : w === 'In library'
       ? { k: 'ok', word: t('lumen.status.inLibrary', w), ico: 'check' }
-      : w === 'Downloading'
-        ? { k: 'dl', word: t('lumen.status.downloading', w), ico: 'down' }
-        : { k: 'wait', word: t('lumen.status.requested', w), ico: 'clock' };
+      : w === 'Owned in QuestarrNG'
+        ? { k: 'ok', word: t('lumen.games.ownedInQuestarr', w), ico: 'check' }
+        : w === 'Downloading'
+          ? { k: 'dl', word: t('lumen.status.downloading', w), ico: 'down' }
+          : w === 'Tracked'
+            ? { k: 'wait', word: t('lumen.games.tracked', w), ico: 'clock' }
+            : {
+                k: 'neutral',
+                word: t('lumen.games.availabilityUnknown', w),
+                ico: 'info',
+              };
 };
 
 type CatalogFilters = {
@@ -211,7 +221,7 @@ export function SoftwareBookmark() {
 
 export function Games() {
   const { user } = useAuth();
-  const { t } = useLumenLocale();
+  const { locale, t } = useLumenLocale();
   const x = useExtras();
   const [p, setP] = useSearchParams();
   const { key: locationKey } = useLocation();
@@ -516,9 +526,38 @@ export function Games() {
             title={g.title}
             icon="game"
             stat={statOf(g, t)}
-            meta={[(g.releaseDate || '').slice(0, 4), g.genres?.[0]]
-              .filter(Boolean)
-              .join(' · ')}
+            meta={g.releaseDate || g.genres?.slice(0, 2).join(' · ')}
+            details={[
+              cat === 'game' && g.timeToBeat?.normally != null
+                ? t('lumen.games.mainStoryEstimate', 'Main Story: {hours} h', {
+                    hours: new Intl.NumberFormat(locale, {
+                      maximumFractionDigits: 1,
+                    }).format(g.timeToBeat.normally),
+                  })
+                : undefined,
+              cat === 'game'
+                ? g.platforms
+                    ?.filter((platform) => /windows|linux|mac/i.test(platform))
+                    .slice(0, 2)
+                    .join(' · ')
+                : g.emulationSystems
+                    ?.map((system) => system.name)
+                    .slice(0, 2)
+                    .join(' · '),
+              cat === 'game' && g.steamOwned
+                ? t('lumen.games.steamLibrary', 'Steam Library')
+                : undefined,
+            ].filter((detail): detail is string => Boolean(detail))}
+            detailsDescriptions={
+              cat === 'game' && g.steamOwned
+                ? {
+                    [t('lumen.games.steamLibrary', 'Steam Library')]: t(
+                      'components.SoftwareCatalog.steamOwnedDescription',
+                      'QuestarrNG found this game in its linked public Steam library. It may not be installed or available as a local QuestarrNG file.'
+                    ),
+                  }
+                : undefined
+            }
           />
         ))}
       </div>
@@ -596,8 +635,8 @@ function GameDetailView({
   const [libraryError, setLibraryError] = useState('');
   const libraryPending = useRef(false);
   const [selection, setSelection] = useState<
-    GameContentSelection | null | undefined
-  >(null);
+    GameContentSelection | PatchSelection | null | undefined
+  >(() => (cat === 'game' ? null : undefined));
   const libraryCatalogId =
     g?.catalogProvider === 'igdb' &&
     typeof g.igdbId === 'number' &&
@@ -703,11 +742,28 @@ function GameDetailView({
     g.igdbId > 0
       ? g.igdbId
       : undefined;
-  const baseBlocked = !!s && selection === null;
+  const selectedSystemAvailable =
+    cat !== 'game' && g.availableSystems?.includes(sys) === true;
+  const selectedSystemTracked =
+    cat !== 'game' && g.trackedSystems?.includes(sys) === true;
+  const selectedSystemStatus = selectedSystemAvailable
+    ? t('lumen.games.systemAvailable', 'Available')
+    : selectedSystemTracked
+      ? t('lumen.games.systemTracked', 'Tracked')
+      : '';
+  const systemBlocked = selectedSystemAvailable || selectedSystemTracked;
+  const mainStatusIcon = selectedSystemAvailable
+    ? 'check'
+    : selectedSystemTracked
+      ? 'clock'
+      : s?.ico || 'clock';
+  const baseBlocked = cat === 'game' && !!s && selection === null;
   const ready =
-    cat === 'game' ? !!os && !!arch && selection !== undefined : !!sys;
+    cat === 'game'
+      ? !!os && !!arch && selection !== undefined
+      : !!sys && selection !== undefined;
   const go = async () => {
-    if (!ready || baseBlocked || pending.current) return;
+    if (!ready || baseBlocked || systemBlocked || pending.current) return;
     pending.current = true;
     setBusy(true);
     try {
@@ -745,10 +801,10 @@ function GameDetailView({
     }
   };
   const main = canRequest ? (
-    baseBlocked || done ? (
+    baseBlocked || systemBlocked || done ? (
       <button className="btn btn-tonal" disabled>
-        <Icon name={s?.ico || 'clock'} />
-        {done || <StatLabel s={s} />}
+        <Icon name={mainStatusIcon} />
+        {done || selectedSystemStatus || <StatLabel s={s} />}
       </button>
     ) : (
       <button
@@ -894,7 +950,10 @@ function GameDetailView({
                   </span>
                   <select
                     value={sys}
-                    onChange={(e) => setSystem(e.target.value)}
+                    onChange={(e) => {
+                      setSelection(undefined);
+                      setSystem(e.target.value);
+                    }}
                   >
                     {!sys && (
                       <option value="">
@@ -904,6 +963,9 @@ function GameDetailView({
                     {systems.map((x) => (
                       <option key={x.slug} value={x.slug}>
                         {x.name}
+                        {selectedSystemAvailable && sys === x.slug
+                          ? ` · ${selectedSystemStatus}`
+                          : ''}
                       </option>
                     ))}
                   </select>
@@ -922,6 +984,15 @@ function GameDetailView({
                 </p>
               )}
             </div>
+          )}
+          {patchSearch && sys && canUseRequestAccess(user?.permissions) && (
+            <PatchRequestPicker
+              key={sys}
+              catalogKey={g.catalogId || id}
+              platform={sys}
+              disabled={busy || !!done}
+              onChange={setSelection}
+            />
           )}
           {!!quotaStatus?.limit && (
             <p className="note" role={quotaRestricted ? 'status' : undefined}>

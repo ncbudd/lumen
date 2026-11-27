@@ -199,8 +199,7 @@ export function useExtras() {
   const mine = useApi<{ enabledMediaCategories?: Record<string, boolean> }>(
     user ? `/user/${user.id}/settings/main` : null
   );
-  const userSettled =
-    user !== undefined && (!user || !!mine.data || !!mine.error);
+  const userSettled = user !== undefined && (!user || !!mine.data);
   const own = mine.data?.enabledMediaCategories;
   const global = pub?.enabledMediaCategories || {};
   // a category must be on for the whole server *and* for this account
@@ -278,8 +277,11 @@ export function useExtras() {
     ready: !!pub && userSettled,
     accountReady: userSettled,
     // SeerrNG's settings couldn't be read: the pages that wait for them offer Retry
-    error: pub ? null : settings.error,
-    retry: settings.reload,
+    error: !pub ? settings.error : user && !mine.data ? mine.error : null,
+    retry: () => {
+      if (!pub) settings.reload();
+      if (user && !mine.data) mine.reload();
+    },
     enabled,
     // raw server/account category visibility, independent of connected services
     categoryEnabled: (category: string) => on[category] !== false,
@@ -709,6 +711,8 @@ export interface Game {
   }[];
   availability?:
     'available' | 'owned' | 'tracked' | 'downloading' | 'missing' | 'unknown';
+  availableSystems?: string[];
+  trackedSystems?: string[];
   steamOwned?: boolean;
   rating?: number | null;
   publishers?: string[];
@@ -772,10 +776,21 @@ type Content = {
   title: string;
   owned: boolean;
   storyContent: boolean | null;
+  type?:
+    | 'expansion'
+    | 'dlc'
+    | 'cosmetic'
+    | 'season-pass'
+    | 'bonus'
+    | 'soundtrack'
+    | 'unknown';
+  releaseDate?: string;
 };
 type Edition = {
   igdbId: number;
   title: string;
+  summary?: string;
+  releaseDate?: string;
   owned: boolean;
   contentKnown: boolean;
   includes: Content[];
@@ -824,13 +839,17 @@ export const requestGame = (
   });
 // a game's state in plain words, from the catalogue's availability field
 export const gameState = (g: Game) =>
-  g.availability === 'available' || g.availability === 'owned'
+  g.availability === 'available'
     ? 'In library'
-    : g.availability === 'downloading'
-      ? 'Downloading'
-      : g.availability === 'tracked'
-        ? 'Requested'
-        : '';
+    : g.availability === 'owned'
+      ? 'Owned in QuestarrNG'
+      : g.availability === 'downloading'
+        ? 'Downloading'
+        : g.availability === 'tracked'
+          ? 'Tracked'
+          : g.availability === 'unknown'
+            ? 'Availability unknown'
+            : '';
 
 export interface SoftwareRequest {
   request: {

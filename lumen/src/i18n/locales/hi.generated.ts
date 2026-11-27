@@ -1662,6 +1662,35 @@ export const messages = {
   'components.Discover.DiscoverAdult.unavailable':
     'अडल्ट सीन खोज अभी उपलब्ध नहीं है।',
   'components.Discover.FilterPanel.filters': 'फ़िल्टर',
+  'components.GameContent.addsNothing':
+    'यह संस्करण कुछ भी नहीं जोड़ता जो आपके पास पहले से नहीं है।',
+  'components.GameContent.contentNotListed': 'सामग्री सूचीबद्ध नहीं है',
+  'components.GameContent.cosmetic': 'सजावटी',
+  'components.GameContent.includes': 'शामिल है',
+  'components.GameContent.owned': 'आपकी लाइब्रेरी में',
+  'components.GameContent.story': 'कहानी',
+  'components.GameContent.typeBonus': 'बोनस',
+  'components.GameContent.typeCosmetic': 'सजावटी',
+  'components.GameContent.typeDlc': 'ऐड-ऑन',
+  'components.GameContent.typeExpansion': 'विस्तार',
+  'components.GameContent.typeSeasonPass': 'सीज़न पास',
+  'components.GameContent.typeSoundtrack': 'साउंडट्रैक',
+  'components.GameContent.typeUnknown': 'अन्य',
+  'components.GameLibrary.openCatalog': 'कैटलॉग में खोलें',
+  'components.GameLibrary.requestApproved': 'मंज़ूर',
+  'components.GameLibrary.requestAvailable': 'उपलब्ध',
+  'components.GameLibrary.requestCancelled': 'रद्द किया गया',
+  'components.GameLibrary.requestDeclined': 'अस्वीकृत',
+  'components.GameLibrary.requestDownloading': 'डाउनलोड हो रहा है',
+  'components.GameLibrary.requestFailed': 'विफल',
+  'components.GameLibrary.requestGame': 'इस खेल का अनुरोध करें',
+  'components.GameLibrary.requestImporting': 'आयात हो रहा है',
+  'components.GameLibrary.requestPending': 'मंज़ूरी लंबित',
+  'components.GameLibrary.requestSearching': 'खोज जारी है',
+  'components.GameLibrary.requestStatus': 'अनुरोध: {status}',
+  'components.GameLibrary.requestUnknown': 'प्रगति में',
+  'components.GameLibrary.requestWithdrawn': 'वापस लिया गया',
+  'components.GameLibrary.sharedBy': 'इन लोगों ने साझा किया: {owners}',
   'components.SoftwareCatalog.allPcPlatforms': 'सभी पीसी प्लेटफॉर्म',
   'components.SoftwareCatalog.allSystems': 'सभी प्रणालियों',
   'components.SoftwareCatalog.genreFilter': 'शैली',
@@ -1670,6 +1699,8 @@ export const messages = {
   'components.SoftwareCatalog.linux': 'Linux',
   'components.SoftwareCatalog.macos': 'MacOS',
   'components.SoftwareCatalog.releaseYearFilter': 'रिलीज वर्ष',
+  'components.SoftwareCatalog.steamOwnedDescription':
+    'QuestarrNG ने इस गेम को अपने लिंक्ड पब्लिक में पाया Steam पुस्तकालय इसे स्थानीय QuestarrNG फ़ाइल के रूप में स्थापित या उपलब्ध नहीं किया जा सकता है।',
   'components.SoftwareCatalog.windows': 'विंडोज',
   'components.RequestModal.Music.requestmusic': 'संगीत अनुरोध',
   'components.RequestModal.Music.backendRequestFailed':
@@ -1712,4 +1743,67 @@ export const messages = {
   'components.MusicDetails.Layout.artistType': 'कलाकार प्रकार',
   'components.MusicDetails.Layout.musicBrainz': 'MusicBrainz',
   'components.MusicDetails.Layout.origin': 'उत्पत्ति',
+  'components.MediaDetails.MetadataAttribution.label': 'मेटाडाटा स्रोत',
+  'components.MediaDetails.MetadataAttribution.licenseInformation':
+    '{license} लाइसेंस जानकारी',
+  'components.MediaDetails.MetadataAttribution.tmdb': 'TMDB',
+  'components.MediaDetails.MetadataAttribution.tmdbTitle':
+    'TMDB पर मेटाडाटा स्रोत देखें।',
+  'components.MediaDetails.MetadataAttribution.tvdb': 'TheTVDB.com',
+  'components.MediaDetails.MetadataAttribution.tvdbTitle':
+    'TheTVDB द्वारा दिया गया मेटाडेटा। स्रोत का श्रेय देना आवश्यक है।',
+  'components.MediaDetails.MetadataAttribution.tvmaze': 'TVmaze (अनुकूलित)',
+  'components.MediaDetails.MetadataAttribution.tvmazeTitle':
+    'TVmaze मेटाडाटा को CC BY-SA 4.0 लाइसेंस के तहत अनुकूलित और साझा किया गया है।',
+  'components.MediaDetails.MetadataAttribution.wikidata': 'Wikidata',
+  'components.MediaDetails.MetadataAttribution.wikidataTitle':
+    'Wikidata संरचित डेटा CC0 के तहत साझा किया गया है।',
+  'components.TvDetails.Layout.director': 'निर्देशक',
+  'components.TvDetails.Layout.writers': 'लेखक',
+  'components.MovieSummaryCard.screenplay': 'पटकथा',
+  'components.Setup.defaultsTitle': 'नए उपयोगकर्ताओं के लिए डिफ़ॉल्ट सेट करें',
+  'components.Setup.defaultsDescription':
+    'चुनें कि उपयोगकर्ता जुड़ने पर क्या अनुरोध कर सकते हैं। अनुरोध अभी भी आपकी स्वीकृति और कोटा नियमों का पालन करते हैं।',
+  'components.Setup.defaultsTip':
+    'आप इन डिफ़ॉल्ट को बदल सकते हैं या बाद में सेटिंग्स में व्यक्तिगत उपयोगकर्ताओं को समायोजित कर सकते हैं।',
+  'components.Setup.requestAccess':
+    'नए उपयोगकर्ताओं को मीडिया अनुरोध करने की अनुमति दें',
+  'components.Setup.requestAccessDescription':
+    'नए उपयोगकर्ताओं को उन श्रेणियों में आइटम अनुरोध करने की पहुंच दें जिन्हें आप सक्षम करते हैं।',
+  'components.Setup.enable4k': '4K अनुरोध विकल्प सक्षम करें',
+  'components.Setup.enable4kDescription':
+    'SeerrNG में 4K अनुरोध उपलब्ध कराएं। फ़िल्में और टीवी के तहत अलग 4K Radarr या Sonarr गंतव्य जोड़ें।',
+  'components.Setup.request4k':
+    'नए उपयोगकर्ताओं को 4K में अनुरोध करने की अनुमति दें',
+  'components.Setup.request4kDescription':
+    'यह नए उपयोगकर्ताओं के लिए एक डिफ़ॉल्ट अनुमतियां है। इसके लिए अनुरोध पहुंच और 4K विकल्पों को सक्षम होना आवश्यक है।',
+  'components.Setup.partialRequests': 'आंशिक टीवी सीज़न अनुरोधों की अनुमति दें',
+  'components.Setup.partialRequestsDescription':
+    'उपयोगकर्ताओं को पूरे सीज़न के बजाय चयनित एपिसोड अनुरोध करने दें। यह सभी पर लागू होता है।',
+  'components.Setup.defaultsLoadError':
+    'उपयोगकर्ता डिफ़ॉल्ट लोड नहीं किए जा सके।',
+  'components.Setup.defaultsSaveError':
+    'उपयोगकर्ता डिफ़ॉल्ट सहेजे नहीं जा सके। पुनः प्रयास करें।',
+  'components.Setup.skipDefaults': 'अभी के लिए छोड़ें',
+  'components.Setup.saveDefaults': 'डिफ़ॉल्ट सेव करें और आगे बढ़ें',
+  'components.Setup.savingDefaults': 'सेव हो रहा है…',
+  'components.Setup.enabledRequestTypes': 'सक्षम अनुरोध प्रकार',
+  'components.Setup.enabledMediaLibraries': 'सक्षम मीडिया लाइब्रेरी',
+  'components.Setup.noneEnabled': 'कोई भी सक्षम नहीं है',
+  'components.Setup.requiredSetupComplete':
+    'आवश्यक सेटअप पूरा हो गया है। सेवा कनेक्शन वैकल्पिक हैं और उन्हें नीचे दी गई फॉर्म में परीक्षण किया जा सकता है।',
+  'components.Setup.serviceTestNote':
+    'कनेक्शन परीक्षण परिणाम प्रत्येक सेवा फॉर्म में दिखाए जाते हैं और सेटअप स्थिति के रूप में सेव नहीं किए जाते हैं।',
+  'components.Setup.categoryMovie': 'फ़िल्में',
+  'components.Setup.categoryTv': 'टीवी',
+  'components.Setup.categoryMusic': 'संगीत',
+  'components.Setup.categoryEbook': 'पुस्तकें',
+  'components.Setup.categoryAudiobook': 'ऑडियोबुक्स',
+  'components.Setup.categoryComic': 'कॉमिक्स',
+  'components.Setup.categoryMagazine': 'पत्रिकाएँ',
+  'components.Setup.categoryAdult': 'अल्ड',
+  'components.Setup.categorySports': 'खेल',
+  'components.Setup.categoryRetro': 'रिट्रो गेम',
+  'components.Setup.categoryModern': 'आधुनिक गेम',
+  'components.Setup.categoryGame': 'PC गेम',
 } as const;

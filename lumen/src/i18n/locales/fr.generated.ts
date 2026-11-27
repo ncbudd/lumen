@@ -1737,6 +1737,35 @@ export const messages = {
   'components.Discover.DiscoverAdult.unavailable':
     "La recherche de scènes pour adultes n'est pas disponible pour le moment.",
   'components.Discover.FilterPanel.filters': 'Filtres',
+  'components.GameContent.addsNothing':
+    "Cette édition n'ajoute rien que vous n'ayez déjà.",
+  'components.GameContent.contentNotListed': 'Contenu non répertorié',
+  'components.GameContent.cosmetic': 'Cosmétique',
+  'components.GameContent.includes': 'Inclut',
+  'components.GameContent.owned': 'Dans votre bibliothèque',
+  'components.GameContent.story': 'Histoire',
+  'components.GameContent.typeBonus': 'Bonus',
+  'components.GameContent.typeCosmetic': 'Cosmétique',
+  'components.GameContent.typeDlc': 'Ajout',
+  'components.GameContent.typeExpansion': 'Extension',
+  'components.GameContent.typeSeasonPass': 'Passe de saison',
+  'components.GameContent.typeSoundtrack': 'Bande-son',
+  'components.GameContent.typeUnknown': 'Autre',
+  'components.GameLibrary.openCatalog': 'Ouvrir dans le catalogue',
+  'components.GameLibrary.requestApproved': 'Validée',
+  'components.GameLibrary.requestAvailable': 'Disponible',
+  'components.GameLibrary.requestCancelled': 'Annulée',
+  'components.GameLibrary.requestDeclined': 'Refusée',
+  'components.GameLibrary.requestDownloading': 'Téléchargement en cours',
+  'components.GameLibrary.requestFailed': 'Échec',
+  'components.GameLibrary.requestGame': 'Demander ce jeu',
+  'components.GameLibrary.requestImporting': 'Importation en cours',
+  'components.GameLibrary.requestPending': "En attente d'approbation",
+  'components.GameLibrary.requestSearching': 'Recherche en cours',
+  'components.GameLibrary.requestStatus': 'Demande: {status}',
+  'components.GameLibrary.requestUnknown': 'En cours',
+  'components.GameLibrary.requestWithdrawn': 'Retirée',
+  'components.GameLibrary.sharedBy': 'Partagé par {owners}',
   'components.SoftwareCatalog.allPcPlatforms': 'Toutes les plateformes PC',
   'components.SoftwareCatalog.allSystems': 'Tous les systèmes',
   'components.SoftwareCatalog.genreFilter': 'Genre',
@@ -1745,6 +1774,8 @@ export const messages = {
   'components.SoftwareCatalog.linux': 'Linux',
   'components.SoftwareCatalog.macos': 'MACOS',
   'components.SoftwareCatalog.releaseYearFilter': 'Année de sortie',
+  'components.SoftwareCatalog.steamOwnedDescription':
+    'QuestarrNG a trouvé ce jeu dans sa bibliothèque publique liée Steam. Il ne peut pas être installé ou disponible comme fichier QuestarrNG local.',
   'components.SoftwareCatalog.windows': 'Fenêtres',
   'components.RequestModal.Music.requestmusic': 'Demander de la musique',
   'components.RequestModal.Music.backendRequestFailed':
@@ -1790,6 +1821,73 @@ export const messages = {
   'components.MusicDetails.Layout.artistType': "Type d'artiste",
   'components.MusicDetails.Layout.musicBrainz': 'MusicBrainz',
   'components.MusicDetails.Layout.origin': 'Origine',
+  'components.MediaDetails.MetadataAttribution.label':
+    'Sources des métadonnées',
+  'components.MediaDetails.MetadataAttribution.licenseInformation':
+    'Informations sur la licence {license}',
+  'components.MediaDetails.MetadataAttribution.tmdb': 'TMDB',
+  'components.MediaDetails.MetadataAttribution.tmdbTitle':
+    'Afficher la source des métadonnées sur TMDB.',
+  'components.MediaDetails.MetadataAttribution.tvdb': 'TheTVDB.com',
+  'components.MediaDetails.MetadataAttribution.tvdbTitle':
+    'Métadonnées fournies par TheTVDB. Attribution requise.',
+  'components.MediaDetails.MetadataAttribution.tvmaze': 'TVmaze (adapté)',
+  'components.MediaDetails.MetadataAttribution.tvmazeTitle':
+    'Les métadonnées de TVmaze sont adaptées et partagées sous la licence CC BY-SA 4.0.',
+  'components.MediaDetails.MetadataAttribution.wikidata': 'Wikidata',
+  'components.MediaDetails.MetadataAttribution.wikidataTitle':
+    'Les données structurées de Wikidata sont partagées sous CC0.',
+  'components.TvDetails.Layout.director': 'Réalisateur',
+  'components.TvDetails.Layout.writers': 'Auteurs',
+  'components.MovieSummaryCard.screenplay': 'Scénario',
+  'components.Setup.defaultsTitle':
+    'Définir les valeurs par défaut pour les nouveaux utilisateurs',
+  'components.Setup.defaultsDescription':
+    "Choisissez ce que les utilisateurs peuvent demander lors de leur inscription. Les demandes restent soumises à vos règles d'approbation et de quota.",
+  'components.Setup.defaultsTip':
+    'Vous pouvez modifier ces valeurs par défaut ou ajuster les utilisateurs individuels plus tard dans les Paramètres.',
+  'components.Setup.requestAccess':
+    'Autoriser les nouveaux utilisateurs à demander des médias',
+  'components.Setup.requestAccessDescription':
+    "Donnez aux nouveaux utilisateurs l'accès pour demander des éléments dans les catégories que vous activez.",
+  'components.Setup.enable4k': 'Activer les options de demande 4K',
+  'components.Setup.enable4kDescription':
+    'Rendre les demandes 4K disponibles dans tout SeerrNG. Ajoutez des destinations 4K séparées pour Radarr ou Sonarr sous Films & TV.',
+  'components.Setup.request4k':
+    'Autoriser les nouveaux utilisateurs à demander en 4K',
+  'components.Setup.request4kDescription':
+    "C'est une autorisation par défaut pour les nouveaux utilisateurs. Elle nécessite l'accès aux demandes et les options 4K activées.",
+  'components.Setup.partialRequests':
+    'Autoriser les demandes partielles de saisons TV',
+  'components.Setup.partialRequestsDescription':
+    "Permet aux utilisateurs de demander des épisodes sélectionnés au lieu d'une saison complète. Cela s'applique à tout le monde.",
+  'components.Setup.defaultsLoadError':
+    'Impossible de charger les valeurs par défaut des utilisateurs.',
+  'components.Setup.defaultsSaveError':
+    "Impossible d'enregistrer les valeurs par défaut des utilisateurs. Réessayez.",
+  'components.Setup.skipDefaults': "Passer pour l'instant",
+  'components.Setup.saveDefaults':
+    'Enregistrer les valeurs par défaut et continuer',
+  'components.Setup.savingDefaults': 'Enregistrement…',
+  'components.Setup.enabledRequestTypes': 'Types de demandes activés',
+  'components.Setup.enabledMediaLibraries': 'Bibliothèques de médias activées',
+  'components.Setup.noneEnabled': 'Aucun activé',
+  'components.Setup.requiredSetupComplete':
+    'La configuration requise est terminée. Les connexions de services sont facultatives et peuvent être testées dans leurs formulaires ci-dessous.',
+  'components.Setup.serviceTestNote':
+    'Les résultats des tests de connexion sont affichés dans chaque formulaire de service et ne sont pas enregistrés comme statut de configuration.',
+  'components.Setup.categoryMovie': 'Films',
+  'components.Setup.categoryTv': 'TV',
+  'components.Setup.categoryMusic': 'Musique',
+  'components.Setup.categoryEbook': 'Livres',
+  'components.Setup.categoryAudiobook': 'Livres audio',
+  'components.Setup.categoryComic': 'Bandes dessinées',
+  'components.Setup.categoryMagazine': 'Revues',
+  'components.Setup.categoryAdult': 'Adulte',
+  'components.Setup.categorySports': 'Sports',
+  'components.Setup.categoryRetro': 'Jeux rétro',
+  'components.Setup.categoryModern': 'Jeux modernes',
+  'components.Setup.categoryGame': 'Jeux PC',
   'components.IssueDetails.allepisodes': 'Tous les épisodes',
   'components.Layout.Sidebar.comingSoon': 'À venir',
   'components.Layout.Sidebar.watchSessions': 'Séances de visionnage',
@@ -4221,12 +4319,15 @@ export const messages = {
   'lumen.games.gameVideo': 'Vidéo du jeu',
   'lumen.games.hoursValue': '{hours} h',
   'lumen.games.mainStory': 'Histoire principale',
+  'lumen.games.mainStoryEstimate': 'Histoire principale : {hours} h',
   'lumen.games.platforms': 'Plateformes',
   'lumen.games.publisher': 'Éditeur',
   'lumen.games.quickFinish': 'Fin rapide',
   'lumen.games.released': 'Sortie',
   'lumen.games.screenshots': 'Captures d’écran',
   'lumen.games.steamLibrary': 'Bibliothèque Steam',
+  'lumen.games.systemAvailable': 'Disponible',
+  'lumen.games.systemTracked': 'Suivi',
   'lumen.games.videos': 'Vidéos',
   'lumen.games.watchVideo': 'Regarder {name}',
   'lumen.genrePicker.all': 'Tous les genres',
@@ -6286,6 +6387,7 @@ export const messages = {
     'Toutes les saisons manquantes sont cochées.',
   'lumen.tv.fact.createdBy': 'Créé par',
   'lumen.tv.fact.episodeLength': 'Durée d’un épisode',
+  'lumen.tv.fact.episodes': 'Épisodes',
   'lumen.tv.fact.firstAirDate': 'Date de première diffusion',
   'lumen.tv.fact.genres': 'Genres',
   'lumen.tv.fact.lastAired': 'Dernière diffusion',
@@ -6420,6 +6522,7 @@ export const messages = {
   'lumen.watchSessions.endPrompt':
     'Terminer cette session pour tout le monde ?',
   'lumen.watchSessions.endSession': 'Terminer la session',
+  'lumen.watchSessions.expires': 'Expire le {date}',
   'lumen.watchSessions.fromYear': 'À partir de l’année',
   'lumen.watchSessions.genresCount': 'Genres ({count} sur 5)',
   'lumen.watchSessions.genresLoadFailed':
@@ -6482,6 +6585,7 @@ export const messages = {
   'lumen.watchSessions.openMovie': 'Ouvrir le film',
   'lumen.watchSessions.openMovieTitle': 'Ouvrir {title}',
   'lumen.watchSessions.openSession': 'Ouvrir {title}',
+  'lumen.watchSessions.owner': 'Propriétaire',
   'lumen.watchSessions.pass': 'Passer',
   'lumen.watchSessions.passTitle': 'Passer {title}',
   'lumen.watchSessions.passed': 'Passé',
@@ -6843,6 +6947,9 @@ export const messages = {
   'lumen.games.searchConsole': 'Rechercher des jeux sur console…',
   'lumen.games.catalogueUnavailable': 'Aucun catalogue de jeux n’a répondu.',
   'lumen.games.catalogueWhat': 'jeux',
+  'lumen.games.availabilityUnknown': 'Disponibilité inconnue',
+  'lumen.games.ownedInQuestarr': 'Possédé dans QuestarrNG',
+  'lumen.games.tracked': 'Suivi',
   'lumen.games.noGamesFound': 'Aucun jeu trouvé',
   'lumen.games.tryFullTitle': 'Essayez le titre complet du jeu.',
   'lumen.games.systemLabel': 'Système',
@@ -7816,6 +7923,9 @@ export const messages = {
   'lumen.gameContent.contentTypeUnknown': 'Type de contenu inconnu',
   'lumen.gameContent.itemsMissing':
     '{count} éléments manquent dans votre bibliothèque',
+  'lumen.gameContent.itemMissing':
+    'Il manque 1 élément dans votre bibliothèque.',
+  'lumen.gameContent.loading': 'Vérification des éditions…',
   'lumen.gameContent.editionContentsUnknown':
     'Le contenu de cette édition est inconnu.',
   'lumen.gameContent.baseOwned': 'Vous avez déjà le jeu de base.',
@@ -8601,4 +8711,7 @@ export const messages = {
   'lumen.manageMedia.requestDeleted': 'La demande a été supprimée.',
   'lumen.manageMedia.requestDeleteFailed':
     'Impossible de supprimer cette demande.',
+  'lumen.bookRecommendations.seriesPart': '{series} nº {position}',
+  'lumen.setup.step.defaults': 'Valeurs par défaut des nouveaux utilisateurs',
+  'lumen.setup.libraryCount': '{count} bibliothèques',
 } as const;

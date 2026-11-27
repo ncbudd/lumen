@@ -190,9 +190,11 @@ function UserSettingsBookmark() {
   const page = parts[0] ?? 'main';
   const targetIsSelf = user?.id === Number(userId);
   const ownDestination: Record<string, string> = {
+    password: '/me/account#password',
+    permissions: '/me/account#account-permissions',
     'linked-accounts': '/me/account/linked-accounts',
     'tv-request-access': '/me/account/tv-requests',
-    'episode-queue': '/me/account/tv-requests',
+    'episode-queue': '/me/account/tv-requests#episode-queue',
     maturity: '/me/account#maturity-controls',
     notifications: '/me/account/notifications',
     'client-tokens': '/me/account/client-tokens',
@@ -248,7 +250,7 @@ function ProfileWatchlistBookmark() {
 
 function ProfileBookmark() {
   const { search } = useLocation();
-  return <Navigate to={`/me${search}`} replace />;
+  return <Navigate to={`/household/me${search}`} replace />;
 }
 
 function NativeDiscoverBookmark() {
@@ -347,7 +349,7 @@ function ProfileSettingsBookmark() {
     permissions: '/me/account#account-permissions',
     'linked-accounts': '/me/account/linked-accounts',
     'client-tokens': '/me/account/client-tokens',
-    'episode-queue': '/me/account/tv-requests',
+    'episode-queue': '/me/account/tv-requests#episode-queue',
     'tv-request-access': '/me/account/tv-requests',
     maturity: '/me/account#maturity-controls',
   };

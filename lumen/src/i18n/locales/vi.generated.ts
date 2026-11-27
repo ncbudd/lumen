@@ -1671,6 +1671,35 @@ export const messages = {
   'components.Discover.DiscoverAdult.unavailable':
     'Tìm kiếm cảnh người lớn hiện không khả dụng.',
   'components.Discover.FilterPanel.filters': 'Bộ lọc',
+  'components.GameContent.addsNothing':
+    'Phiên bản này không thêm gì mà bạn chưa có.',
+  'components.GameContent.contentNotListed': 'Nội dung không được liệt kê',
+  'components.GameContent.cosmetic': 'Vật phẩm ngoại trang',
+  'components.GameContent.includes': 'Bao gồm',
+  'components.GameContent.owned': 'Trong Thư viện của bạn',
+  'components.GameContent.story': 'Cốt truyện',
+  'components.GameContent.typeBonus': 'Phần thưởng',
+  'components.GameContent.typeCosmetic': 'Vật phẩm ngoại trang',
+  'components.GameContent.typeDlc': 'Phần bổ sung',
+  'components.GameContent.typeExpansion': 'Bản mở rộng',
+  'components.GameContent.typeSeasonPass': 'Season Pass',
+  'components.GameContent.typeSoundtrack': 'Nhạc nền',
+  'components.GameContent.typeUnknown': 'Khác',
+  'components.GameLibrary.openCatalog': 'Mở trong danh mục',
+  'components.GameLibrary.requestApproved': 'Đã phê duyệt',
+  'components.GameLibrary.requestAvailable': 'Có sẵn',
+  'components.GameLibrary.requestCancelled': 'Đã hủy',
+  'components.GameLibrary.requestDeclined': 'Đã từ chối',
+  'components.GameLibrary.requestDownloading': 'Đang tải về',
+  'components.GameLibrary.requestFailed': 'Thất bại',
+  'components.GameLibrary.requestGame': 'Yêu cầu trò chơi này',
+  'components.GameLibrary.requestImporting': 'Đang nhập',
+  'components.GameLibrary.requestPending': 'Đang chờ phê duyệt',
+  'components.GameLibrary.requestSearching': 'Đang tìm kiếm',
+  'components.GameLibrary.requestStatus': 'Yêu cầu: {status}',
+  'components.GameLibrary.requestUnknown': 'Đang xử lý',
+  'components.GameLibrary.requestWithdrawn': 'Đã rút yêu cầu',
+  'components.GameLibrary.sharedBy': 'Được chia sẻ bởi {owners}',
   'components.SoftwareCatalog.allPcPlatforms': 'Mọi nền tảng PC',
   'components.SoftwareCatalog.allSystems': 'Mọi hệ thống',
   'components.SoftwareCatalog.genreFilter': 'Thể loại',
@@ -1679,6 +1708,8 @@ export const messages = {
   'components.SoftwareCatalog.linux': 'Linux',
   'components.SoftwareCatalog.macos': 'MacOS',
   'components.SoftwareCatalog.releaseYearFilter': 'Phát hành năm',
+  'components.SoftwareCatalog.steamOwnedDescription':
+    'Tìm thấy trò chơi này trong thư viện Steam công cộng. Có thể nó không được cài đặt hoặc có sẵn như một tập tin searcharNG cục bộ.',
   'components.SoftwareCatalog.windows': 'Cửa sổ',
   'components.RequestModal.Music.requestmusic': 'Yêu cầu âm nhạc',
   'components.RequestModal.Music.backendRequestFailed':
@@ -1723,4 +1754,68 @@ export const messages = {
   'components.MusicDetails.Layout.artistType': 'Loại nghệ sĩ',
   'components.MusicDetails.Layout.musicBrainz': 'MusicBrainz',
   'components.MusicDetails.Layout.origin': 'Nguồn gốc',
+  'components.MediaDetails.MetadataAttribution.label': 'Nguồn siêu dữ liệu',
+  'components.MediaDetails.MetadataAttribution.licenseInformation':
+    '{license} thông tin giấy phép',
+  'components.MediaDetails.MetadataAttribution.tmdb': 'TMDB',
+  'components.MediaDetails.MetadataAttribution.tmdbTitle':
+    'Xem nguồn siêu dữ liệu trên TMDB.',
+  'components.MediaDetails.MetadataAttribution.tvdb': 'TheTVDB.com',
+  'components.MediaDetails.MetadataAttribution.tvdbTitle':
+    'Siêu dữ liệu do TheTVDB cung cấp. Bắt buộc ghi công nguồn.',
+  'components.MediaDetails.MetadataAttribution.tvmaze': 'TVmaze (đã biên tập)',
+  'components.MediaDetails.MetadataAttribution.tvmazeTitle':
+    'Siêu dữ liệu TVmaze được điều chỉnh và chia sẻ theo giấy phép CC BY-SA 4.0.',
+  'components.MediaDetails.MetadataAttribution.wikidata': 'Wikidata',
+  'components.MediaDetails.MetadataAttribution.wikidataTitle':
+    'Dữ liệu cấu trúc Wikidata được chia sẻ dưới CC0.',
+  'components.TvDetails.Layout.director': 'Đạo diễn',
+  'components.TvDetails.Layout.writers': 'Tác giả',
+  'components.MovieSummaryCard.screenplay': 'Kịch bản',
+  'components.Setup.defaultsTitle': 'Đặt mặc định cho người dùng mới',
+  'components.Setup.defaultsDescription':
+    'Chọn những gì người dùng có thể yêu cầu khi tham gia. Các yêu cầu vẫn tuân theo quy tắc phê duyệt và hạn mức của bạn.',
+  'components.Setup.defaultsTip':
+    'Bạn có thể thay đổi các cài đặt mặc định này hoặc điều chỉnh cho từng người dùng sau trong Cài đặt.',
+  'components.Setup.requestAccess':
+    'Cho phép người dùng mới yêu cầu phương tiện',
+  'components.Setup.requestAccessDescription':
+    'Cấp cho người dùng mới quyền truy cập để yêu cầu các mục trong các danh mục bạn đã bật.',
+  'components.Setup.enable4k': 'Bật tùy chọn yêu cầu 4K',
+  'components.Setup.enable4kDescription':
+    'Cho phép yêu cầu 4K trên toàn bộ SeerrNG. Thêm các đích 4K riêng biệt cho Radarr hoặc Sonarr dưới mục Phim & Truyền hình.',
+  'components.Setup.request4k':
+    'Cho phép người dùng mới yêu cầu ở độ phân giải 4K',
+  'components.Setup.request4kDescription':
+    'Đây là quyền mặc định cho người dùng mới. Cần có quyền truy cập yêu cầu và tùy chọn 4K được bật.',
+  'components.Setup.partialRequests':
+    'Cho phép yêu cầu một phần mùa phim truyền hình',
+  'components.Setup.partialRequestsDescription':
+    'Cho phép người dùng yêu cầu các tập được chọn thay vì cả mùa. Điều này áp dụng cho tất cả mọi người.',
+  'components.Setup.defaultsLoadError':
+    'Không thể tải cài đặt mặc định của người dùng.',
+  'components.Setup.defaultsSaveError':
+    'Không thể lưu cài đặt mặc định của người dùng. Hãy thử lại.',
+  'components.Setup.skipDefaults': 'Bỏ qua cho bây giờ',
+  'components.Setup.saveDefaults': 'Lưu mặc định và tiếp tục',
+  'components.Setup.savingDefaults': 'Đang lưu…',
+  'components.Setup.enabledRequestTypes': 'Loại yêu cầu đã bật',
+  'components.Setup.enabledMediaLibraries': 'Thư viện phương tiện đã bật',
+  'components.Setup.noneEnabled': 'Chưa bật dịch vụ nào',
+  'components.Setup.requiredSetupComplete':
+    'Cài đặt bắt buộc đã hoàn tất. Kết nối dịch vụ là tùy chọn và có thể được kiểm tra trong các biểu mẫu bên dưới.',
+  'components.Setup.serviceTestNote':
+    'Kết quả kiểm tra kết nối được hiển thị trong mỗi biểu mẫu dịch vụ và không được lưu như trạng thái cài đặt.',
+  'components.Setup.categoryMovie': 'Phim',
+  'components.Setup.categoryTv': 'Truyền hình',
+  'components.Setup.categoryMusic': 'Nhạc',
+  'components.Setup.categoryEbook': 'Sách',
+  'components.Setup.categoryAudiobook': 'Sách nói',
+  'components.Setup.categoryComic': 'Truyện tranh',
+  'components.Setup.categoryMagazine': 'Tạp chí',
+  'components.Setup.categoryAdult': 'Người lớn',
+  'components.Setup.categorySports': 'Thể thao',
+  'components.Setup.categoryRetro': 'Trò chơi cổ điển',
+  'components.Setup.categoryModern': 'Trò chơi hiện đại',
+  'components.Setup.categoryGame': 'Trò chơi PC',
 } as const;

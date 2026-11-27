@@ -1630,6 +1630,35 @@ export const messages = {
   'components.Discover.DiscoverAdult.unavailable':
     '현재 성인 장면 검색을 사용할 수 없습니다.',
   'components.Discover.FilterPanel.filters': '필터',
+  'components.GameContent.addsNothing':
+    '이 에디션은 이미 소유한 것 외에는 추가하지 않습니다.',
+  'components.GameContent.contentNotListed': '목록에 없는 콘텐츠',
+  'components.GameContent.cosmetic': '코스메틱',
+  'components.GameContent.includes': '포함 내용',
+  'components.GameContent.owned': '내 라이브러리',
+  'components.GameContent.story': '스토리',
+  'components.GameContent.typeBonus': '보너스',
+  'components.GameContent.typeCosmetic': '코스메틱',
+  'components.GameContent.typeDlc': '추가 콘텐츠',
+  'components.GameContent.typeExpansion': '확장팩',
+  'components.GameContent.typeSeasonPass': '시즌 패스',
+  'components.GameContent.typeSoundtrack': '사운드트랙',
+  'components.GameContent.typeUnknown': '기타',
+  'components.GameLibrary.openCatalog': '카탈로그에서 열기',
+  'components.GameLibrary.requestApproved': '승인됨',
+  'components.GameLibrary.requestAvailable': '사용 가능',
+  'components.GameLibrary.requestCancelled': '취소됨',
+  'components.GameLibrary.requestDeclined': '거부됨',
+  'components.GameLibrary.requestDownloading': '다운로드 중',
+  'components.GameLibrary.requestFailed': '실패',
+  'components.GameLibrary.requestGame': '이 게임 요청하기',
+  'components.GameLibrary.requestImporting': '가져오는 중',
+  'components.GameLibrary.requestPending': '승인 대기 중',
+  'components.GameLibrary.requestSearching': '검색 중',
+  'components.GameLibrary.requestStatus': '요청: {status}',
+  'components.GameLibrary.requestUnknown': '진행 중',
+  'components.GameLibrary.requestWithdrawn': '철회됨',
+  'components.GameLibrary.sharedBy': '공유한 사람: {owners}',
   'components.SoftwareCatalog.allPcPlatforms': '모든 PC 플랫폼',
   'components.SoftwareCatalog.allSystems': '모든 시스템',
   'components.SoftwareCatalog.genreFilter': '장르',
@@ -1638,6 +1667,8 @@ export const messages = {
   'components.SoftwareCatalog.linux': 'Linux',
   'components.SoftwareCatalog.macos': '맥 OS',
   'components.SoftwareCatalog.releaseYearFilter': '출시 년',
+  'components.SoftwareCatalog.steamOwnedDescription':
+    'QuestarrNG는 링크된 공개 Steam 라이브러리에서 이 게임을 발견했습니다. 로컬 QuestarrNG 파일로 설치되지 않거나 사용 가능하지 않을 수 있습니다.',
   'components.SoftwareCatalog.windows': '윈도우',
   'components.RequestModal.Music.requestmusic': '음악 요청',
   'components.RequestModal.Music.backendRequestFailed':
@@ -1681,4 +1712,64 @@ export const messages = {
   'components.MusicDetails.Layout.artistType': '아티스트 유형',
   'components.MusicDetails.Layout.musicBrainz': 'MusicBrainz',
   'components.MusicDetails.Layout.origin': '출신',
+  'components.MediaDetails.MetadataAttribution.label': 'Metadata 소스',
+  'components.MediaDetails.MetadataAttribution.licenseInformation':
+    '{license} 라이센스 정보',
+  'components.MediaDetails.MetadataAttribution.tmdb': 'TMDB',
+  'components.MediaDetails.MetadataAttribution.tmdbTitle':
+    'TMDB의 메타데이터 소스 보기.',
+  'components.MediaDetails.MetadataAttribution.tvdb': 'TheTVDB.com',
+  'components.MediaDetails.MetadataAttribution.tvdbTitle':
+    'TheTVDB에서 제공하는 메타데이터입니다. 저작자 표시가 필요합니다.',
+  'components.MediaDetails.MetadataAttribution.tvmaze': 'TVmaze (각색됨)',
+  'components.MediaDetails.MetadataAttribution.tvmazeTitle':
+    'TVmaze metadata는 CC BY-SA 4.0 라이센스에 따라 조정 및 공유됩니다.',
+  'components.MediaDetails.MetadataAttribution.wikidata': 'Wikidata',
+  'components.MediaDetails.MetadataAttribution.wikidataTitle':
+    'Wikidata 구조 데이터는 CC0에서 공유됩니다.',
+  'components.TvDetails.Layout.director': '감독',
+  'components.TvDetails.Layout.writers': '작가',
+  'components.MovieSummaryCard.screenplay': '각본',
+  'components.Setup.defaultsTitle': '새 사용자를 위한 기본값 설정',
+  'components.Setup.defaultsDescription':
+    '사용자가 가입할 때 요청할 수 있는 항목을 선택하세요. 요청은 여전히 승인 및 할당량 규칙을 따릅니다.',
+  'components.Setup.defaultsTip':
+    '이 기본값은 나중에 설정에서 변경하거나 개별 사용자를 조정할 수 있습니다.',
+  'components.Setup.requestAccess': '새 사용자의 미디어 요청 허용',
+  'components.Setup.requestAccessDescription':
+    '활성화한 카테고리에서 새 사용자가 항목을 요청할 수 있는 액세스 권한을 부여합니다.',
+  'components.Setup.enable4k': '4K 요청 옵션 활성화',
+  'components.Setup.enable4kDescription':
+    'SeerrNG 전체에서 4K 요청을 사용할 수 있게 합니다. 영화 & TV에서 별도의 4K Radarr 또는 Sonarr 대상 위치를 추가하세요.',
+  'components.Setup.request4k': '새 사용자의 4K 요청 허용',
+  'components.Setup.request4kDescription':
+    '이것은 새 사용자의 기본 권한입니다. 요청 액세스 권한과 4K 옵션이 활성화되어 있어야 합니다.',
+  'components.Setup.partialRequests': '일부 TV 시즌 요청 허용',
+  'components.Setup.partialRequestsDescription':
+    '사용자가 전체 시즌 대신 선택된 에피소드를 요청할 수 있도록 합니다. 이는 모든 사용자에게 적용됩니다.',
+  'components.Setup.defaultsLoadError': '사용자 기본값을 불러올 수 없습니다.',
+  'components.Setup.defaultsSaveError':
+    '사용자 기본값을 저장할 수 없습니다. 다시 시도해 주세요.',
+  'components.Setup.skipDefaults': '지금은 건너뛰기',
+  'components.Setup.saveDefaults': '기본값 저장 및 계속',
+  'components.Setup.savingDefaults': '저장 중…',
+  'components.Setup.enabledRequestTypes': '활성화된 요청 유형',
+  'components.Setup.enabledMediaLibraries': '활성화된 미디어 라이브러리',
+  'components.Setup.noneEnabled': '활성화된 항목 없음',
+  'components.Setup.requiredSetupComplete':
+    '필수 설정이 완료되었습니다. 서비스 연결은 선택 사항이며, 아래 각 양식에서 테스트할 수 있습니다.',
+  'components.Setup.serviceTestNote':
+    '연결 테스트 결과는 각 서비스 양식에 표시되며, 설정 상태로 저장되지 않습니다.',
+  'components.Setup.categoryMovie': '영화',
+  'components.Setup.categoryTv': 'TV',
+  'components.Setup.categoryMusic': '음악',
+  'components.Setup.categoryEbook': '책',
+  'components.Setup.categoryAudiobook': '오디오북',
+  'components.Setup.categoryComic': '만화',
+  'components.Setup.categoryMagazine': '잡지',
+  'components.Setup.categoryAdult': '성인',
+  'components.Setup.categorySports': '스포츠',
+  'components.Setup.categoryRetro': '레트로 게임',
+  'components.Setup.categoryModern': '모던 게임',
+  'components.Setup.categoryGame': 'PC 게임',
 } as const;

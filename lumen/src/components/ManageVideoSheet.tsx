@@ -665,15 +665,15 @@ export function ManageVideoSheet({
                   </ul>
                 )}
                 <div className="toolbar">
-                  <a
+                  <Link
                     className="btn btn-tonal btn-sm"
-                    href={`/requests?mediaType=${kind}&search=${encodeURIComponent(title)}`}
+                    to={`/requests?mediaType=${kind}&search=${encodeURIComponent(title)}`}
                   >
                     {t(
                       'lumen.manageVideo.openRequests',
                       'Open matching requests'
                     )}
-                  </a>
+                  </Link>
                 </div>
               </section>
 
@@ -851,7 +851,7 @@ export function ManageVideoSheet({
                     <ul className="card-list">
                       {media.issues.map((issue) => (
                         <li key={issue.id}>
-                          <a href={`/issues/${issue.id}`}>
+                          <Link to={`/issues/${issue.id}`}>
                             {t(
                               'lumen.manageVideo.issueLink',
                               'Issue #{id} · {status}',
@@ -866,7 +866,7 @@ export function ManageVideoSheet({
                                     : t('lumen.manageVideo.openIssue', 'Open'),
                               }
                             )}
-                          </a>
+                          </Link>
                           {issue.comments?.[0]?.message && (
                             <details className="adv">
                               <summary>

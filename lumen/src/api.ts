@@ -981,6 +981,24 @@ export interface WatchProviderRegion {
   flatrate?: { id: number; name: string }[];
 }
 
+export type VideoMetadataSourceName = 'tmdb' | 'tvdb' | 'tvmaze' | 'wikidata';
+export interface VideoMetadataAttribution {
+  source: VideoMetadataSourceName;
+  url: string;
+  license?: string;
+  licenseUrl?: string;
+  fetchedAt: string;
+  stale: boolean;
+}
+export interface VideoMetadataSupplemental {
+  posterUrl?: string;
+  genres: string[];
+  studios: string[];
+  networks: string[];
+  directors: string[];
+  writers: string[];
+}
+
 export interface MovieDetails extends TitleResult {
   watchProviders?: WatchProviderRegion[];
   originalTitle?: string;
@@ -1008,6 +1026,8 @@ export interface MovieDetails extends TitleResult {
     }[];
   };
   collection?: { id: number; name: string };
+  metadataSources?: VideoMetadataAttribution[];
+  supplementalMetadata?: VideoMetadataSupplemental;
 }
 export interface Season {
   seasonNumber: number;
@@ -1025,12 +1045,14 @@ export interface TvDetails extends TitleResult {
   genres: { id: number; name: string }[];
   seasons: Season[];
   numberOfSeasons: number;
+  numberOfEpisodes: number;
   episodeRunTime?: number[];
   networks?: { id?: number; name: string }[];
   type?: string;
   status?: string;
   credits?: Credits;
   keywords?: SubjectTag[];
+  productionCompanies?: { id: number; name: string }[];
   productionCountries?: ProductionCountry[];
   createdBy?: { id?: number; name: string }[];
   contentRatings?: { results: { iso_3166_1: string; rating: string }[] };
@@ -1039,6 +1061,7 @@ export interface TvDetails extends TitleResult {
     seasonNumber: number;
     episodeNumber: number;
   };
+  lastAirDate?: string;
   nextEpisodeToAir?: {
     airDate: string;
     seasonNumber: number;
@@ -1047,6 +1070,8 @@ export interface TvDetails extends TitleResult {
   mediaInfo?: MediaInfo & {
     seasons?: { seasonNumber: number; status: number; status4k?: number }[];
   };
+  metadataSources?: VideoMetadataAttribution[];
+  supplementalMetadata?: VideoMetadataSupplemental;
 }
 
 export interface LibraryRemovalTarget {

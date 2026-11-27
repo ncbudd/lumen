@@ -140,6 +140,8 @@ export function ExtraCard({
   quick,
   metaHref,
   statusBadges,
+  details,
+  detailsDescriptions,
 }: {
   href: string;
   // the meta line (an album's artist) opens its own page
@@ -157,6 +159,8 @@ export function ExtraCard({
   // a one-tap request on the cover (Get album), shown while nothing is owned or asked for
   quick?: { label: string; action: string; run: () => Promise<unknown> };
   statusBadges?: QualityStatus[];
+  details?: string[];
+  detailsDescriptions?: Record<string, string>;
 }) {
   const titleMode = useCardTitleMode(titleKind);
   const safeImage = artUrl(img);
@@ -304,6 +308,20 @@ export function ExtraCard({
           <div className="m">{meta}</div>
         ))}
       {note && <div className="m2">{note}</div>}
+      {details?.map((detail, index) => (
+        <div className="m2 extra-card-detail" key={`${detail}-${index}`}>
+          <span
+            title={detailsDescriptions?.[detail]}
+            aria-label={
+              detailsDescriptions?.[detail]
+                ? `${detail}: ${detailsDescriptions[detail]}`
+                : undefined
+            }
+          >
+            {detail}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -530,5 +548,22 @@ export function ServiceNote({
         </button>
       )}
     </div>
+  );
+}
+
+export function CategorySettingsNote({
+  error,
+  retry,
+}: {
+  error: string | null;
+  retry: () => void;
+}) {
+  const { t } = useLumenLocale();
+  return (
+    <ServiceNote
+      error={error}
+      what={t('lumen.adminCategories.categoriesWhat', 'media categories')}
+      retry={retry}
+    />
   );
 }

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   ApiError,
@@ -56,6 +63,7 @@ import { useOffers4k, useVideoRequestQuota } from '../components/requestSheet';
 import { useToast } from '../components/toast';
 import TvCollectionLinks from '../components/TvCollectionLinks';
 import TvEpisodeRequestSheet from '../components/TvEpisodeRequestSheet';
+import { videoMetadataRows } from '../components/VideoMetadataFacts';
 import VideoPlaybackButton from '../components/VideoPlaybackButton';
 import VideoRatings from '../components/VideoRatings';
 import WatchlistButton from '../components/WatchlistButton';
@@ -298,6 +306,10 @@ export default function TvDetail() {
       />
     );
   if (!t) return <div className="detail-loading" aria-busy="true" />;
+
+  const detailSeasonCount = t.seasons.filter(
+    (season) => season.seasonNumber !== 0 && season.episodeCount !== 0
+  ).length;
 
   const n = sel.size;
   const requireApproval =
@@ -640,21 +652,30 @@ export default function TvDetail() {
         line={[
           years.join('–'),
           rating && <span className="cert">{rating}</span>,
-          seasons.length === 1
+          detailSeasonCount === 1
             ? translate('lumen.tv.oneSeason', '{count} season', { count: 1 })
-            : translate('lumen.tv.seasonCount', '{count} seasons', {
-                count: seasons.length,
-              }),
+            : detailSeasonCount > 1
+              ? translate('lumen.tv.seasonCount', '{count} seasons', {
+                  count: detailSeasonCount,
+                })
+              : '',
           t.episodeRunTime?.[0]
             ? translate('lumen.tv.episodesDuration', '{duration} episodes', {
                 duration: fmtRun(t.episodeRunTime[0]),
               })
             : '',
           t.genres
-            .filter((g) => g.id)
+            .filter(
+              (g) =>
+                Number.isSafeInteger(g.id) && g.id > 0 && g.id <= 1_000_000_000
+            )
             .slice(0, 3)
-            .map((g) => g.name)
-            .join(', '),
+            .map((g, index) => (
+              <Fragment key={g.id}>
+                {index > 0 ? ', ' : null}
+                <Link to={`/series?genre=${g.id}`}>{g.name}</Link>
+              </Fragment>
+            )),
         ]}
       />
       <div className="dbody">
@@ -1221,6 +1242,26 @@ export default function TvDetail() {
                     ),
                   ],
                   [
+                    translate(
+                      'lumen.movie.fact.productionStudios',
+                      'Production Studios'
+                    ),
+                    t.productionCompanies?.length
+                      ? t.productionCompanies.map(({ id, name }, index) => (
+                          <span key={`${id}:${index}`}>
+                            {index > 0 && ', '}
+                            {Number.isSafeInteger(id) &&
+                            id > 0 &&
+                            id <= 1_000_000_000 ? (
+                              <Link to={`/series?studio=${id}`}>{name}</Link>
+                            ) : (
+                              name
+                            )}
+                          </span>
+                        ))
+                      : null,
+                  ],
+                  [
                     translate('lumen.tv.fact.firstAirDate', 'First Air Date'),
                     shortDate(t.firstAirDate, true, locale),
                   ],
@@ -1297,6 +1338,10 @@ export default function TvDetail() {
                     fmtRun(t.episodeRunTime?.[0]),
                   ],
                   [
+                    translate('lumen.tv.fact.episodes', 'Episodes'),
+                    t.numberOfEpisodes > 0 ? t.numberOfEpisodes : null,
+                  ],
+                  [
                     translate('lumen.tv.fact.createdBy', 'Created by'),
                     t.createdBy?.map(({ id, name }, index) => (
                       <span key={`${id ?? name}:${index}`}>
@@ -1316,7 +1361,9 @@ export default function TvDetail() {
                     translate('lumen.tv.fact.lastAired', 'Last aired'),
                     t.lastEpisodeToAir
                       ? `S${t.lastEpisodeToAir.seasonNumber} E${t.lastEpisodeToAir.episodeNumber} · ${shortDate(t.lastEpisodeToAir.airDate, true, locale)}`
-                      : '',
+                      : t.lastAirDate !== t.firstAirDate
+                        ? shortDate(t.lastAirDate, true, locale)
+                        : '',
                   ],
                   [
                     translate('lumen.tv.fact.nextEpisode', 'Next episode'),
@@ -1324,6 +1371,16 @@ export default function TvDetail() {
                       ? `S${t.nextEpisodeToAir.seasonNumber} E${t.nextEpisodeToAir.episodeNumber} · ${shortDate(t.nextEpisodeToAir.airDate, true, locale)}`
                       : '',
                   ],
+                  ...videoMetadataRows(
+                    t.metadataSources,
+                    t.supplementalMetadata,
+                    [
+                      ...(t.createdBy ?? []).map(({ name }) => name),
+                      ...(t.credits?.crew ?? []).map(({ name }) => name),
+                    ],
+                    locale,
+                    translate
+                  ),
                 ]}
               />
             </VideoDisclosure>
@@ -1379,9 +1436,13 @@ export default function TvDetail() {
         title={t.name || ''}
         meta={
           statusLine ||
-          translate('lumen.tv.seasonCount', '{count} seasons', {
-            count: seasons.length,
-          })
+          (detailSeasonCount === 1
+            ? translate('lumen.tv.oneSeason', '{count} season', { count: 1 })
+            : detailSeasonCount > 1
+              ? translate('lumen.tv.seasonCount', '{count} seasons', {
+                  count: detailSeasonCount,
+                })
+              : '')
         }
       >
         {t.mediaInfo?.id && canManageRequests(user?.permissions) && (
