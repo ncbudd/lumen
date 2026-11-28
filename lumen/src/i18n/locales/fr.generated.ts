@@ -1888,6 +1888,48 @@ export const messages = {
   'components.Setup.categoryRetro': 'Jeux rétro',
   'components.Setup.categoryModern': 'Jeux modernes',
   'components.Setup.categoryGame': 'Jeux PC',
+  'components.BookDetails.Layout.firstPublished': 'Première publication',
+  'components.Common.PaginationFooter.pagination': 'Pagination',
+  'components.Discover.DiscoverComics.applyFilters': 'Appliquer des filtres',
+  'components.Discover.DiscoverComics.comics': 'BD',
+  'components.Discover.DiscoverComics.indexing':
+    'Créer l’index des bandes dessinées',
+  'components.Discover.DiscoverComics.indexingRetry':
+    'L’indexation reprend après la réponse du fournisseur. Les volumes déjà indexés sont conservés.',
+  'components.Discover.DiscoverComics.maxIssues': 'Nombre max. de numéros',
+  'components.Discover.DiscoverComics.minIssues': 'Nombre min. de numéros',
+  'components.Discover.DiscoverComics.noComicVineKey':
+    'L’exploration des bandes dessinées nécessite une clé API ComicVine configurée dans les paramètres.',
+  'components.Discover.DiscoverComics.publisher': 'Éditeur',
+  'components.Discover.DiscoverComics.search': 'Recherche de mots clés',
+  'components.Discover.DiscoverComics.searchComics': 'Rechercher des BD',
+  'components.Discover.DiscoverComics.startYear': 'Année de début',
+  'components.Discover.DiscoverMusic.album': 'Album',
+  'components.Discover.DiscoverMusic.music': 'Musique',
+  'components.Discover.upcomingtv': 'Séries à venir',
+  'components.Layout.Sidebar.browsesoftware': 'Logiciels',
+  'components.Layout.Sidebar.patches': 'Traductions & Hacks',
+  'components.LiveTv.RecordingList.actionFailed':
+    "L'enregistrement n'a pu être mis à jour.",
+  'components.RequestModal.Music.albumType': "Type d'album",
+  'components.RequestModal.Music.artist': 'Artiste',
+  'components.RequestModal.Music.entireAlbum':
+    "Cette requête inclut l'album entier.",
+  'components.RequestModal.Music.mediaAndFormat': 'Médias et format',
+  'components.RequestModal.Music.notAvailable': 'Non disponible',
+  'components.RequestModal.Music.readyToRequest': 'Prêt à demander',
+  'components.RequestModal.Music.releaseDate': 'Date de sortie',
+  'components.RequestModal.Music.requested': 'Demandé',
+  'components.RequestModal.Music.service': 'Service',
+  'components.RequestModal.Music.status': 'Statut',
+  'components.RequestModal.Music.trackCount': 'Nombre de pistes',
+  'components.TrackingControls.loadingSeasons': 'Saisons de chargement...',
+  'components.UserProfile.UserSettings.menuMaturityControls':
+    'Contrôles de maturité',
+  'i18n.loading': 'Chargement…',
+  'i18n.saving': 'Enregistrement…',
+  'library.episodes': '{count} épisodes regardés',
+  'library.library': 'Bibliothèque de serveurs multimédias',
   'components.IssueDetails.allepisodes': 'Tous les épisodes',
   'components.Layout.Sidebar.comingSoon': 'À venir',
   'components.Layout.Sidebar.watchSessions': 'Séances de visionnage',
@@ -2346,6 +2388,8 @@ export const messages = {
   'lumen.adminDownloadClients.saveChanges': 'Enregistrer les modifications',
   'lumen.adminDownloadClients.saveFailure':
     'Impossible de mettre à jour les paramètres du client de téléchargement.',
+  'lumen.adminDownloadClients.confirmFailure':
+    'Impossible de confirmer l’enregistrement des paramètres du client de téléchargement.',
   'lumen.adminDownloadClients.savedCredential': 'Identifiant enregistré',
   'lumen.adminDownloadClients.sectionTitle':
     'Progression des téléchargements en direct',
@@ -2720,6 +2764,8 @@ export const messages = {
   'lumen.adminNotifications.retry': 'Réessayer',
   'lumen.adminNotifications.saveChannel': 'Enregistrer {channel}',
   'lumen.adminNotifications.savedValue': 'Valeur enregistrée',
+  'lumen.adminNotifications.confirmFailure':
+    'Impossible de confirmer l’enregistrement des paramètres de notification. Réessayez.',
   'lumen.adminNotifications.sendTest': 'Envoyer un test {channel}',
   'lumen.adminNotifications.testDeliveryWebPush':
     'Pour tester la livraison, votre compte doit être abonné aux notifications Web Push sur un navigateur.',
@@ -2860,6 +2906,8 @@ export const messages = {
   'lumen.adminRecognition.saveChanges': 'Enregistrer les modifications',
   'lumen.adminRecognition.saveFailure':
     'Impossible de mettre à jour les paramètres de reconnaissance.',
+  'lumen.adminRecognition.confirmFailure':
+    'Impossible de confirmer l’enregistrement des paramètres de reconnaissance.',
   'lumen.adminRecognition.savedCredential': 'Enregistrée',
   'lumen.adminRecognition.sectionTitle': 'Partager pour demander',
   'lumen.adminRecognition.settingsSaved':
@@ -3090,6 +3138,8 @@ export const messages = {
   'lumen.adminUsers.profileSaved': 'Profil enregistré.',
   'lumen.adminUsers.refresh': 'Actualiser',
   'lumen.adminUsers.requestCount': '{count} demandes',
+  'lumen.adminUsers.requestCount.one': '{count} demande',
+  'lumen.adminUsers.requestCount.other': '{count} demandes',
   'lumen.adminUsers.requestQuotas': 'Quotas de demandes',
   'lumen.adminUsers.requests': 'Demandes',
   'lumen.adminUsers.role.administrator': 'Administrateur',
@@ -4067,6 +4117,10 @@ export const messages = {
   'lumen.followButton.followStoryExpansions':
     'Suivre les extensions scénaristiques',
   'lumen.followButton.following': 'Abonné',
+  'lumen.followButton.confirmFailure':
+    'Impossible de confirmer la modification du suivi. Rechargez et réessayez.',
+  'lumen.followButton.statusRefreshed':
+    'État du suivi actualisé. Vérifiez l’action proposée.',
   'lumen.followButton.retryStatus': 'Réessayer le suivi',
   'lumen.followButton.updateFailed': 'Impossible de modifier le suivi',
   'lumen.following.accessRequired':
@@ -4085,6 +4139,8 @@ export const messages = {
   'lumen.following.nextPage': 'Page suivante',
   'lumen.following.noSubscriptions': 'Vous ne suivez encore aucun élément.',
   'lumen.following.noUpdates': 'Aucune mise à jour sur cette page.',
+  'lumen.following.empty':
+    'Aucune actualité des éléments que vous suivez pour le moment.',
   'lumen.following.notifyMe': 'M’avertir',
   'lumen.following.previousPage': 'Page précédente',
   'lumen.following.reason.collectorsAreSharing':
@@ -5209,6 +5265,8 @@ export const messages = {
   'lumen.music.title': 'Musique',
   'lumen.music.oneSong': '1 chanson',
   'lumen.music.playCount': '{count} écoutes',
+  'lumen.music.playCount.one': '{count} écoute',
+  'lumen.music.playCount.other': '{count} écoutes',
   'lumen.music.trackCountMany': '{count} pistes',
   'lumen.music.trackCountOne': '{count} piste',
   'lumen.music.trackRequests': 'Demandes de titres',
@@ -5362,6 +5420,8 @@ export const messages = {
   'lumen.manageVideo.past30Days': '30 derniers jours',
   'lumen.manageVideo.allTime': 'Depuis toujours',
   'lumen.manageVideo.playCount': '{count} lectures',
+  'lumen.manageVideo.playCount.one': '{count} lecture',
+  'lumen.manageVideo.playCount.other': '{count} lectures',
   'lumen.manageVideo.playedBy': 'Vu par',
   'lumen.manageVideo.playbackHours': '{hours} heures de lecture',
   'lumen.manageVideo.jellystatActivity': 'Activité de visionnage Jellystat',
@@ -6664,6 +6724,7 @@ export const messages = {
   'lumen.watchlist.music': 'Musique',
   'lumen.watchlist.next': 'Page suivante',
   'lumen.watchlist.noTitles': 'Aucun titre sur cette page.',
+  'lumen.watchlist.empty': 'Votre liste de suivi est vide.',
   'lumen.watchlist.page': 'Page {page}',
   'lumen.watchlist.pages': 'Pages de la liste de suivi',
   'lumen.watchlist.personalTitle': 'Liste de suivi personnelle',
@@ -8768,4 +8829,7 @@ export const messages = {
   'lumen.readerDelivery.magazinePdfs': 'PDF de magazines',
   'lumen.category.disabledForServer':
     'La catégorie {category} est désactivée sur ce serveur.',
+  'lumen.settings.confirmFailed':
+    'Le serveur a accepté la modification, mais Lumen n’a pas pu confirmer l’enregistrement. Gardez ce formulaire ouvert et réessayez.',
+  'components.Common.available': 'Disponible',
 } as const;

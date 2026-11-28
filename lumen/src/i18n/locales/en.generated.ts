@@ -1820,6 +1820,47 @@ export const messages = {
   'components.Setup.categoryRetro': 'Retro games',
   'components.Setup.categoryModern': 'Modern games',
   'components.Setup.categoryGame': 'PC games',
+  'components.BookDetails.Layout.firstPublished': 'First Published',
+  'components.Common.PaginationFooter.pagination': 'Pagination',
+  'components.Discover.DiscoverComics.applyFilters': 'Apply filters',
+  'components.Discover.DiscoverComics.comics': 'Comics',
+  'components.Discover.DiscoverComics.indexing': 'Building comic index',
+  'components.Discover.DiscoverComics.indexingRetry':
+    'The index is retrying after a provider response. Already indexed volumes are saved.',
+  'components.Discover.DiscoverComics.maxIssues': 'Max issues',
+  'components.Discover.DiscoverComics.minIssues': 'Min issues',
+  'components.Discover.DiscoverComics.noComicVineKey':
+    'Comic discovery requires a ComicVine API key configured in settings.',
+  'components.Discover.DiscoverComics.publisher': 'Publisher',
+  'components.Discover.DiscoverComics.search': 'Keyword Search',
+  'components.Discover.DiscoverComics.searchComics': 'Search Comics',
+  'components.Discover.DiscoverComics.startYear': 'Start year',
+  'components.Discover.DiscoverMusic.album': 'Album',
+  'components.Discover.DiscoverMusic.music': 'Music',
+  'components.Discover.upcomingtv': 'Upcoming Series',
+  'components.Layout.Sidebar.browsesoftware': 'Software',
+  'components.Layout.Sidebar.patches': 'Translations & Hacks',
+  'components.LiveTv.RecordingList.actionFailed':
+    'The recording could not be updated.',
+  'components.RequestModal.Music.albumType': 'Album Type',
+  'components.RequestModal.Music.artist': 'Artist',
+  'components.RequestModal.Music.entireAlbum':
+    'This request includes the entire album.',
+  'components.RequestModal.Music.mediaAndFormat': 'Media & Format',
+  'components.RequestModal.Music.notAvailable': 'Not Available',
+  'components.RequestModal.Music.readyToRequest': 'Ready to Request',
+  'components.RequestModal.Music.releaseDate': 'Release Date',
+  'components.RequestModal.Music.requested': 'Requested',
+  'components.RequestModal.Music.service': 'Service',
+  'components.RequestModal.Music.status': 'Status',
+  'components.RequestModal.Music.trackCount': 'Track Count',
+  'components.TrackingControls.loadingSeasons': 'Loading seasons…',
+  'components.UserProfile.UserSettings.menuMaturityControls':
+    'Maturity Controls',
+  'i18n.loading': 'Loading…',
+  'i18n.saving': 'Saving…',
+  'library.episodes': '{count} episodes watched',
+  'library.library': 'Media server library',
   'lumen.account.administratorAccess': 'This account has administrator access.',
   'lumen.account.backToSettings': 'Back to Account Settings',
   'lumen.account.backToYou': 'Back to You',
@@ -2200,6 +2241,8 @@ export const messages = {
   'lumen.adminDownloadClients.saveChanges': 'Save Changes',
   'lumen.adminDownloadClients.saveFailure':
     'Could not update download client settings.',
+  'lumen.adminDownloadClients.confirmFailure':
+    'Could not confirm the saved download client settings.',
   'lumen.adminDownloadClients.savedCredential': 'Saved credential',
   'lumen.adminDownloadClients.sectionTitle': 'Live Download Progress',
   'lumen.adminDownloadClients.settingsSaved': 'Download client settings saved.',
@@ -2539,6 +2582,8 @@ export const messages = {
   'lumen.adminNotifications.retry': 'Retry',
   'lumen.adminNotifications.saveChannel': 'Save {channel}',
   'lumen.adminNotifications.savedValue': 'Saved value',
+  'lumen.adminNotifications.confirmFailure':
+    'Could not confirm the saved notification settings. Try again.',
   'lumen.adminNotifications.sendTest': 'Send {channel} Test',
   'lumen.adminNotifications.testDeliveryWebPush':
     'Test delivery requires a browser subscribed to Web Push on your account.',
@@ -2668,6 +2713,8 @@ export const messages = {
   'lumen.adminRecognition.removeSavedKey': 'Remove Saved API Key',
   'lumen.adminRecognition.saveChanges': 'Save Changes',
   'lumen.adminRecognition.saveFailure': 'Could not save recognition settings.',
+  'lumen.adminRecognition.confirmFailure':
+    'Could not confirm the saved recognition settings.',
   'lumen.adminRecognition.savedCredential': 'Saved',
   'lumen.adminRecognition.sectionTitle': 'Share to Request',
   'lumen.adminRecognition.settingsSaved': 'Recognition settings saved.',
@@ -2880,6 +2927,8 @@ export const messages = {
   'lumen.adminUsers.profileSaved': 'Profile saved.',
   'lumen.adminUsers.refresh': 'Refresh',
   'lumen.adminUsers.requestCount': '{count} requests',
+  'lumen.adminUsers.requestCount.one': '{count} request',
+  'lumen.adminUsers.requestCount.other': '{count} requests',
   'lumen.adminUsers.requestQuotas': 'Request Quotas',
   'lumen.adminUsers.requests': 'Requests',
   'lumen.adminUsers.role.administrator': 'Administrator',
@@ -3795,6 +3844,10 @@ export const messages = {
   'lumen.followButton.followNarrator': 'Follow {name}',
   'lumen.followButton.followStoryExpansions': 'Follow Story Expansions',
   'lumen.followButton.following': 'Following',
+  'lumen.followButton.confirmFailure':
+    'Could not confirm the Following change. Reload and retry.',
+  'lumen.followButton.statusRefreshed':
+    'Following status refreshed. Review the current action.',
   'lumen.followButton.retryStatus': 'Retry Follow Status',
   'lumen.followButton.updateFailed': 'Couldn’t update Following',
   'lumen.following.accessRequired':
@@ -3813,6 +3866,7 @@ export const messages = {
   'lumen.following.nextPage': 'Next Page',
   'lumen.following.noSubscriptions': 'You haven’t followed anything yet.',
   'lumen.following.noUpdates': 'No updates on this page.',
+  'lumen.following.empty': 'No updates from what you follow yet.',
   'lumen.following.notifyMe': 'Notify Me',
   'lumen.following.previousPage': 'Previous Page',
   'lumen.following.reason.collectorsAreSharing':
@@ -4792,6 +4846,8 @@ export const messages = {
   'lumen.music.title': 'Music',
   'lumen.music.oneSong': '1 song',
   'lumen.music.playCount': '{count} plays',
+  'lumen.music.playCount.one': '{count} listen',
+  'lumen.music.playCount.other': '{count} listens',
   'lumen.music.trackCountMany': '{count} tracks',
   'lumen.music.trackCountOne': '{count} track',
   'lumen.music.trackRequests': 'Track Requests',
@@ -4933,6 +4989,8 @@ export const messages = {
   'lumen.manageVideo.past30Days': 'Past 30 days',
   'lumen.manageVideo.allTime': 'All time',
   'lumen.manageVideo.playCount': '{count} plays',
+  'lumen.manageVideo.playCount.one': '{count} play',
+  'lumen.manageVideo.playCount.other': '{count} plays',
   'lumen.manageVideo.playedBy': 'Played by',
   'lumen.manageVideo.playbackHours': '{hours} hours of playback',
   'lumen.manageVideo.jellystatActivity': 'Jellystat watch activity',
@@ -6147,6 +6205,7 @@ export const messages = {
   'lumen.watchlist.music': 'Music',
   'lumen.watchlist.next': 'Next Page',
   'lumen.watchlist.noTitles': 'No titles on this page.',
+  'lumen.watchlist.empty': 'Your Watchlist is empty.',
   'lumen.watchlist.page': 'Page {page}',
   'lumen.watchlist.pages': 'Watchlist pages',
   'lumen.watchlist.personalTitle': 'Personal Watchlist',
@@ -7977,4 +8036,6 @@ export const messages = {
   'lumen.readerDelivery.magazinePdfs': 'Magazine PDFs',
   'lumen.category.disabledForServer':
     '{category} is turned off on this server.',
+  'lumen.settings.confirmFailed':
+    'The server accepted the change, but Lumen could not confirm the saved state. Keep this form open and retry.',
 } as const;

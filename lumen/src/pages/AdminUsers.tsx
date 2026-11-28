@@ -25,7 +25,7 @@ import ManagedQuotas from '../components/ManagedQuotas';
 import ManagedTvAccess from '../components/ManagedTvAccess';
 import { friendlyError } from '../errors';
 import { useApi, usePublicSettings } from '../hooks';
-import { useLumenLocale } from '../i18n';
+import { pluralMessage, useLumenLocale } from '../i18n';
 import { canViewUserWatchlist } from './Watchlist';
 
 const UserNotifications = lazy(() =>
@@ -294,11 +294,13 @@ function EditProfile({
     setBusy(true);
     setError('');
     setNotice('');
+    let writeAcknowledged = false;
     try {
       const saved = await api<{ username?: string; email?: string }>(path, {
         method: 'POST',
         body: JSON.stringify(update),
       });
+      writeAcknowledged = true;
       const readback = await api<{ username?: string; email?: string }>(path);
       if (
         (update.username !== undefined &&
@@ -319,14 +321,19 @@ function EditProfile({
       onSaved();
     } catch (failure) {
       setError(
-        friendlyError(
-          failure,
-          t(
-            'lumen.adminUsers.profileSaveFailure',
-            'Could not save the profile.'
-          ),
-          t
-        )
+        writeAcknowledged
+          ? t(
+              'lumen.settings.confirmFailed',
+              'The server accepted the change, but Lumen could not confirm the saved state. Keep this form open and retry.'
+            )
+          : friendlyError(
+              failure,
+              t(
+                'lumen.adminUsers.profileSaveFailure',
+                'Could not save the profile.'
+              ),
+              t
+            )
       );
     } finally {
       working.current = false;
@@ -765,9 +772,14 @@ export default function AdminUsers() {
                   </small>
                   {user.requestCount !== undefined && (
                     <small>
-                      {t('lumen.adminUsers.requestCount', '{count} requests', {
-                        count: user.requestCount.toLocaleString(locale),
-                      })}
+                      {pluralMessage(
+                        t,
+                        locale,
+                        'lumen.adminUsers.requestCount',
+                        user.requestCount,
+                        '{count} request',
+                        '{count} requests'
+                      )}
                     </small>
                   )}
                 </div>
